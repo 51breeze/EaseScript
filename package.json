@@ -1,0 +1,44 @@
+{
+  "name": "easescript",
+  "version": "1.0.3",
+  "description": "EaseScript",
+  "main": "./bin/es.js",
+  "bin": {
+    "easescript": "./bin/es.js",
+    "es": "./bin/es.js"
+  },
+  "scripts": {
+    "test": "./bin/es.js -V"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/51breeze/breezejs.git"
+  },
+  "keywords": [
+    "es",
+    "ease",
+    "script",
+    "EaseScript",
+    "web"
+  ],
+  "author": "Jun Ye",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/51breeze/breezejs/issues"
+  },
+  "homepage": "https://github.com/51breeze/breezejs#readme",
+  "dependencies": {
+    "libxmljs": "^0.18.6",
+    "uglify-js": "~3.1.1",
+    "commander": "~2.11.0",
+    "less": "~2.7.2",
+    "colors": "~1.1.2"
+  },
+  "devDependencies":{
+    "libxmljs": "^0.18.6",
+    "uglify-js": "~3.1.1",
+    "commander": "~2.11.0",
+    "less": "~2.7.2",
+    "colors": "~1.1.2"
+  }
+}
