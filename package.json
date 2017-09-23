@@ -1,6 +1,6 @@
 {
   "name": "easescript",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "EaseScript",
   "main": "./bin/es.js",
   "bin": {
@@ -28,14 +28,14 @@
   },
   "homepage": "https://github.com/51breeze/EaseScript#readme",
   "dependencies": {
-    "libxmljs": "^0.18.6",
+    "libxmljs": "~0.18.6",
     "uglify-js": "~3.1.1",
     "commander": "~2.11.0",
     "less": "~2.7.2",
     "colors": "~1.1.2"
   },
   "devDependencies":{
-    "libxmljs": "^0.18.6",
+    "libxmljs": "~0.18.6",
     "uglify-js": "~3.1.1",
     "commander": "~2.11.0",
     "less": "~2.7.2",
