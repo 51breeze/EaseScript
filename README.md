@@ -1,7 +1,7 @@
-# breezejs
-BreezeJS 1.0.0 Beta
+# EaseScript
+EaseScript 1.0.0 Beta
 
-BreezeJS 是一个需要编译后才能正常运行的JS语法<br/>
+EaseScript 是一个需要编译后才能正常运行的JS语法<br/>
 
 那为什么要编译？<br/>
 
@@ -13,7 +13,7 @@ BreezeJS 是一个需要编译后才能正常运行的JS语法<br/>
 6、按需导入合并文件（未使用的模块即使用了import导入但在代码中未使用也不会合并）减少了代码体积。<br/>
 ...
 
-*BreezeJS 希望能做到一次编程，实现多个端口通用* <br/>
+*希望能做到一次编程，实现多个端口通用* <br/>
 ------
 
 ```
