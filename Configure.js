@@ -1,9 +1,5 @@
-const config={
-    //皮肤文件的后缀
-    //'skin_file_suffix':'.xml',
-    //工程文件的后缀
-    // 'project_file_suffix':'.as',
-    //构建输出的目录结构
+//构建输出的目录结构
+module.exports={
     "build": {
         "path": "./",
         "name": "build",
@@ -70,10 +66,6 @@ const config={
                 "name": "client",
                 "config":{
                     "syntax": "javascript",
-                    "suffix": ".as",
-                    "bootstrap":"Index",
-                    'compat_version':'*',
-                    'browser':'enable',
                 },
                 "child": {
                     'skin': {
@@ -82,13 +74,11 @@ const config={
                     },
                 },
             },
-            /*'server': {
+            'server': {
                 "path": "./",
                 "name": "server",
                 "config":{
                     "syntax": "php",
-                    "suffix": ".as",
-                    "bootstrap":"Index",
                     'compat_version':{'php':5.3},
                 },
                 "child": {
@@ -109,8 +99,7 @@ const config={
                         "name": "view",
                     },
                 },
-            },*/
+            },
         },
     },
 };
-module.exports = config;

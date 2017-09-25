@@ -108,8 +108,8 @@ function include(contents, name , filepath, fix, libs )
 
     if( !filepath )
     {
-        filepath = rootPath + '/modules/' + name + '.js';
-        if( !utils.isFileExists(filepath) )filepath = rootPath + '/components/' + name + '.js';
+        filepath = rootPath + '/system/' + name + '.js';
+        //if( !utils.isFileExists(filepath) )filepath = rootPath + '/components/' + name + '.js';
     }
 
     //加载的模块有依赖的第三方库
@@ -255,7 +255,7 @@ function Context( name )
 function builder(config , code, requirements , skins )
 {
     var fix = polyfill( config );
-
+    
     /**
      * 需要支持的第三方库文件
      */
@@ -312,12 +312,12 @@ function builder(config , code, requirements , skins )
          contents,
         '}(System,' + g.join(',') + '));',
         //自定义模块域
-        '(function('+requires.join(',')+'){',
+        '(function(define,'+requires.join(',')+'){',
         skins,
         code,
         'var main=System.getDefinitionByName("'+config.main+'");',
         'System.Reflect.construct(main);',
-        '})('+requires.map(function (a){
+        '})(Internal.define,'+requires.map(function (a){
             a = mapname[a] || a;
             if(a==='System')return a;
             return 'System.'+a;

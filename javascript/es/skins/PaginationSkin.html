@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<s:Skin xmlns:s="es.core" class="pagination">
+
+    <![CDATA[
+        private var __radius__=3;
+        public function set radius( val:Number ):void{
+            if( this.__radius__ !== val )
+            {
+            this.__radius__=val;
+            }
+        }
+        public function get radius():Number
+        {
+         return this.__radius__;
+        }
+        override protected function updateDisplayList()
+        {
+            super.updateDisplayList();
+            Element('.link' , this ).style('borderRadius', this.radius+'px' );
+        }
+    ]]>
+
+    <style>
+        @radius:3px;
+        @border:darken(@secondary, 8.5%);
+        .pagination{
+            width: 100%;
+            height: auto;
+        }
+        .pagination li{
+            list-style: none;
+            display: inline-block;
+            margin: 0px 3px;
+            width: auto;
+            float: left;
+        }
+        .pagination li.link{
+            background-color: #ffffff;
+            border: solid 1px @border;
+           .border-radius( @radius, @radius,  @radius,  @radius);
+        }
+        .pagination li.link a{
+            width: 22px;
+            height: 22px;
+            text-align:center;
+        }
+        .pagination li.current{
+            background-color: @secondary;
+        }
+        .pagination li.current a{
+            color: #46484c;
+        }
+        .pagination li a{
+            text-decoration: none;
+            cursor: pointer;
+            text-align:center;
+            display: inline-block;
+            line-height: 22px;
+            color: #46484c;
+        }
+
+    </style>
+  <s:template>
+      <li class="first">
+          <a href="{url(first,profile)}">第一页</a>
+      </li>
+      <li class="prev">
+          <a href="{url(prev,profile)}" class='{current===1?"disabled":""}'>上一页</a>
+      </li>
+      <:foreach name="link" value="val">
+          <li class="link {val===current?'current':''}">
+              <a href="{url(val,profile)}">{val}</a>
+          </li>
+      </:foreach>
+      <li class="next">
+          <a href="{url(next,profile)}">下一页</a>
+      </li>
+      <li class="last">
+          <a href="{url(last,profile)}">最后页</a>
+      </li>
+  </s:template>
+
+</s:Skin>

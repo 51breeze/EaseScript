@@ -459,6 +459,7 @@ var descriptor = {
         },
     },
     'RenderEvent':{
+
         'id':'class', 'type':'RenderEvent','inherit':'Event',
         'static':{
             "START":{'id':'const','type':'String'},
@@ -470,102 +471,7 @@ var descriptor = {
             "viewport":{'id':'const','type':'Element'},
             "html":{'id':'const','type':'String'},
         }
-    }, 'ComponentEvent':{
-        'id':'class', 'type':'ComponentEvent','inherit':'Event',
-        'static':{
-            "INITIALIZED":{'id':'const','type':'String'},
-        },
-    }, 'SkinEvent':{
-        'id':'class', 'type':'SkinEvent','inherit':'Event',
-        'static':{
-            "INSTALLING":{'id':'const','type':'String'},
-            "INSTALLED":{'id':'const','type':'String'},
-            "CREATE_CHILDREN_COMPLETED":{'id':'const','type':'String'},
-            "CONTENT_CHNAGED":{'id':'const','type':'String'},
-        },
-        'proto':{
-            "viewport":{'id':'var','type':'Object'},
-            "hostComponent":{'id':'var','type':'Component'},
-            "skinContent":{'id':'var','type':'Object'},
-        }
-    },
-    'Component': {
-        'type': 'Component',
-        'id': 'class',
-        'inherit':'EventDispatcher',
-        'proto': {
-            'hostComponent': {type: 'Component', 'id': 'function',param:[]},
-            //'display': {type: 'Boolean', 'id': 'function',param:[]},
-        }
-    },
-    'Skin': {
-        'type': 'Skin',
-        'id': 'class',
-        'inherit':'Element',
-        'ignorePropertyNotExists':true,
-        'proto': {
-            'getChildById': {type: 'Object', 'id': 'function',param:['String']},
-            'initializing': {type: 'Object', 'id': 'function',param:[]},
-            'initialized': {type: 'Object', 'id': 'function',param:[]},
-            'createChildren': {type: 'void', 'id': 'function',param:[]},
-            'render': {type: 'Render', 'id': 'function',param:[]},
-            'hostComponent': {type: '*', 'id': 'function',param:['Object']},
-            'updateDisplayList': {type: 'void', 'id': 'function',param:[]},
-            'variable': {type: 'Object', 'id': 'function',param:['Object']},
-            'template': {type: 'String', 'id': 'function',param:['String']},
-            'layout': {type: 'void', 'id': 'function',param:['Object']},
-            'states': {type: 'Skin', 'id': 'function',param:['Array']},
-            'currentState': {type: 'Skin', 'id': 'function',param:['String']},
-        },
-        "xml":{
-            'foreach':{name:'String',value:"String"},
-            'for':{name:'String',step:"String", condition:"String"},
-            'if': {condition:'String'},
-            'elseif': {condition:'String'},
-            'else': {},
-            'switch': {condition:'String'},
-            'case': {condition:'String'},
-            'default': {},
-            'break':{},
-            'do': {},
-            'while':{condition:'String'},
-            'code':{},
-            'script':{},
-            'attr':{},
-        },
-    },
-    'Layout': {
-        'type': 'Layout',
-        'id': 'class',
-        'inherit':'EventDispatcher',
-        'proto': {
-            "gap": {type: 'Number', 'id': 'function',param:[]},
-            "horizontalAlign": {type: 'String', 'id': 'function',param:[]},
-            "verticalAlign": {type: 'String', 'id': 'function',param:[]},
-        }
-    },
-
-    'DataGrid': {
-        'type': 'DataGrid',
-        'id': 'class',
-        'inherit':'SkinComponent',
-        'proto': {
-            'dataSource': {type: 'DataSource', 'id': 'function',param:[]},
-            'source': {type: 'DataRender', 'id': 'function',param:['Object']},
-            'dataProfile': {type: 'Object', 'id': 'function',param:[]},
-            'display': {type: 'Boolean', 'id': 'function',param:[]},
-        }
-    },
-    'Pagination': {
-        'type': 'Pagination',
-        'id': 'class',
-        'inherit':'SkinComponent',
-        'proto': {
-            'dataSource': {type: 'DataSource', 'id': 'function',param:[]},
-            'source': {type: 'DataRender', 'id': 'function',param:['Object']},
-            'dataProfile': {type: 'Object', 'id': 'function',param:[]},
-            'display': {type: 'Boolean', 'id': 'function',param:[]},
-        }
+        
     },'State': {
         'type': 'State',
         'id': 'class',
