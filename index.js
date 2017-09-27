@@ -703,7 +703,9 @@ const builder={
 
          if( script && config.minify ==='on' )
          {
-             script = uglify.minify(script, {mangle: true, fromString: true}).code;
+             script = uglify.minify(script, {mangle: true, sourceMap:true});
+             if( script.error )throw script.error;
+             script = script.code;
          }
          filename = PATH.resolve(Utils.getBuildPath(config, 'build.webroot.static.js'), config.bootstrap + '.js');
          fs.writeFileSync(filename, script );
