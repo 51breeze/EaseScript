@@ -1,16 +1,16 @@
 /**
  * RangeError
  * @param message
- * @param line
  * @param filename
+ * @param line
  * @constructor
  * @require Error,Object;
  */
-function RangeError( message , line, filename)
+function RangeError( message , filename, line)
 {
-    this.name='RangeError';
-    Error.call(this, message , line, filename);
+    Error.call(this,  message , filename, line);
 };
 System.RangeError=RangeError;
 RangeError.prototype = Object.create( Error.prototype) ;
 RangeError.prototype.constructor=RangeError;
+RangeError.prototype.name='RangeError';

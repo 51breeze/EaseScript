@@ -1,26 +1,20 @@
 /**
  * 错误消息构造函数
  * @param message
- * @param line
  * @param filename
+ * @param line
  * @constructor
  * @require Object
  */
 function Error( message , filename, line )
 {
     message = message ||"";
-    var msg = [];
-    if( filename )msg.push( filename );
-    if( line )msg.push( line );
-    if( msg.length > 0 )
-    {
-        message+='('+ msg.join(':') +')';
-    }
-    $Error.call(this, message , filename, line);
+    var obj = $Error.call(this, message);
+    obj.name = this.name;
+    this.stack = Internal.environment == 1 ? Internal.getStack().reverse().join("\n at ") : (obj.stack || '').toString();
     this.message = message;
     this.line=line || 0;
     this.filename =filename || '';
-    this.name="Error";
 }
 System.Error=Error;
 Error.prototype =Object.create( $Error.prototype );
@@ -29,7 +23,15 @@ Error.prototype.line=null;
 Error.prototype.name='Error';
 Error.prototype.message=null;
 Error.prototype.filename=null;
+Error.prototype.stack='';
 Error.prototype.toString=function ()
 {
-    return this.message;
+    var msg = [];
+    if( this.filename )msg.push( this.filename );
+    if( this.line )msg.push( this.line );
+    if( msg.length > 0 )
+    {
+        return this.name+': '+this.message+'\n at '+ msg.join(':');
+    }
+    return this.name+': '+this.message;
 };

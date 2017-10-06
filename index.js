@@ -100,7 +100,7 @@ function getType( type )
  * @param stack
  * @returns {string}
  */
-function createDescription( stack , owner , moduleClass )
+function createDescription( syntax, stack , owner , moduleClass )
 {
     var desc = {};
     desc.__stack__ = stack;
@@ -109,20 +109,8 @@ function createDescription( stack , owner , moduleClass )
 
     if( stack.returnType && desc['id']==='function' )
     {
-        desc['type'] = getType( stack.returnType );
-    }
-
-    if( moduleClass && desc['type'] !=='*' && desc['type'] !=='void' )
-    {
-       if( moduleClass.import.hasOwnProperty(desc['type']) )
-       {
-           desc['type'] = moduleClass.import[ desc['type'] ];
-       }
-    }
-
-    if( stack.returnType && desc['id']==='function' )
-    {
-        stack.returnType = desc['type'];
+        stack.returnType = getImportType(syntax, moduleClass, stack.returnType );
+        desc['type'] = stack.returnType;
     }
 
     desc['origintype'] = desc['type'];
@@ -142,19 +130,34 @@ function createDescription( stack , owner , moduleClass )
         desc['param'] = stack.param();
         desc['paramType'] = [];
         desc['type']=stack.returnType;
+
         for(var i in desc['param'] )
         {
             if( desc['param'][i] ==='...')
             {
                 desc['paramType'].push('*');
             }else{
-                var obj = stack.define(desc['param'][i]);
-                obj.type = getType(obj.type);
-                desc['paramType'].push(obj.type);
+                var obj = stack.define( desc['param'][i] );
+                obj.type = getImportType(syntax, moduleClass, getType(obj.type) );
+                desc['paramType'].push( obj.type );
             }
         }
     }
     return desc;
+}
+
+function getImportType(syntax, moduleClass,  type )
+{
+    if( !type )return '*';
+    if( type && type !=='*' && type !=='void' )
+    {
+        if( moduleClass.import.hasOwnProperty(type) )
+        {
+            return moduleClass.import[ type ];
+        }
+        return type;
+    }
+    return type || '*';
 }
 
 /**
@@ -314,7 +317,7 @@ function getDeclareClassDescription( stack , isInternal, config, project , synta
             //跳过构造函数
             if (item.keyword() === 'function' && item.name() === stack.name() && !isstatic)
             {
-                list.constructor = createDescription(item, null, list );
+                list.constructor = createDescription(syntax, item, null, list );
                 continue;
 
             } else if ( item.keyword() === "use" )
@@ -328,10 +331,10 @@ function getDeclareClassDescription( stack , isInternal, config, project , synta
             {
                 var refObj = ref[item.name()];
                 if (!refObj) {
-                    ref[item.name()] = refObj = createDescription(item, type, list );
+                    ref[item.name()] = refObj = createDescription(syntax,item, type, list );
                     refObj.value = {};
                 }
-                refObj.value[item.accessor()] = createDescription(item, type, list);
+                refObj.value[item.accessor()] = createDescription(syntax,item, type, list);
                 refObj.isAccessor = true;
                 if (item.accessor() === 'get') {
                     refObj.type = refObj.value[item.accessor()].type;
@@ -343,7 +346,7 @@ function getDeclareClassDescription( stack , isInternal, config, project , synta
 
             }else if (item.keyword() !== 'metatype')
             {
-                ref[item.name()] = createDescription(item, type, list);
+                ref[item.name()] = createDescription(syntax,item, type, list);
             }
 
             //为当前的成员绑定一个数据元
@@ -460,7 +463,7 @@ function getPropertyDescription( stack , config , project , syntax )
                             Utils.error('"'+value.name()+'" is already been declared');
                         }
                         mergeImportClass( moduleClass.import, item.scope().define() );
-                        moduleClass.namespaces[ value.name() ] = createDescription( value, null,  moduleClass);
+                        moduleClass.namespaces[ value.name() ] = createDescription(syntax, value, null,  moduleClass);
                         moduleClass.package = item.name();
                         moduleClass.fullclassname =  moduleClass.package ? moduleClass.package+"."+value.name() : value.name();
                         moduleClass.namespaces[ value.name() ].value = getNamespaceValue( value, moduleClass);
@@ -494,7 +497,7 @@ function getPropertyDescription( stack , config , project , syntax )
                     {
                         Utils.error('"' + item.name() + '" is already been declared');
                     }
-                    moduleClass.namespaces[item.name()] = createDescription(item,null,  moduleClass);
+                    moduleClass.namespaces[item.name()] = createDescription(syntax,item,null,  moduleClass);
                     moduleClass.namespaces[item.name()].value = getNamespaceValue(item, moduleClass);
 
                 } else if (id === "class" || id === "interface")
@@ -503,7 +506,7 @@ function getPropertyDescription( stack , config , project , syntax )
 
                 } else if (item.name())
                 {
-                    moduleClass.declared[item.name()] = createDescription(item,null,  moduleClass);
+                    moduleClass.declared[item.name()] = createDescription(syntax,item,null,  moduleClass);
                 }
             }
 
@@ -677,7 +680,7 @@ const builder={
              var options =  {
                  paths: [ lessPath ],
                  globalVars:themes.default,
-                 compress: config.minify ==='on' ,
+                 compress: config.minify ==='enable' ,
              };
              var style = styleContents.map(function (e, i) {
                  e.replace(/\B@(\w+)\s*:/gi,function (a, b , c) {
@@ -701,9 +704,9 @@ const builder={
              });
          }
 
-         if( script && config.minify ==='on' )
+         if( script && config.minify ==='enable' )
          {
-             script = uglify.minify(script, {mangle: true, sourceMap:true});
+             script = uglify.minify(script);
              if( script.error )throw script.error;
              script = script.code;
          }
@@ -787,10 +790,12 @@ function getConfigure(config)
 {
     root_path = config.root_path || process.cwd();
     //生产环境模式启用压缩文件
-    if( config.mode===2 )
+    if( config.mode===2 && config.minify == null )
     {
-        config.minify = 'on';
+        config.minify = 'enable';
     }
+
+    config.debug = config.debug==='enable' ? 'on' : 'off';
 
     //工作的目录
     var project_path = PATH.resolve( config.project_path );

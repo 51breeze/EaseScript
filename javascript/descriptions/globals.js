@@ -30,8 +30,28 @@ var descriptor = {
     },
     'String':{
         'id':'class', 'type':'String', 'inherit':'Object',
+        'static': {
+            'length': {'type': 'Number', 'id': 'const'},
+            'fromCharCode': {'type': 'Number', 'id': 'function','param':['...']},
+        },
         'proto': {
-          'replace':{ 'id':'function','type':'String'}
+            'replace':{ 'id':'function','type':'String','param':['Object','Object']},
+            'match': {'type': 'Array', 'id': 'function','param':['RegExp']},
+            'search': {'type': 'Array', 'id': 'function','param':['RegExp']},
+            'charAt': {'type': 'String', 'id': 'function','param':['Number']},
+            'charCodeAt': {'type': 'Number', 'id': 'function','param':['Number']},
+            'concat': {'type': 'String', 'id': 'function','param':['...']},
+            'indexOf': {'type': 'Number', 'id': 'function','param':['String']},
+            'localeCompare': {'type': 'Number', 'id': 'function','param':['String','String']},
+            'repeat': {'type': 'String', 'id': 'function','param':['Number']},
+            'slice': {'type': 'String', 'id': 'function','param':['Number']},
+            'substr': {'type': 'String', 'id': 'function','param':['Number']},
+            'substring': {'type': 'String', 'id': 'function','param':['Number']},
+            'toLocaleLowerCase': {'type': 'String', 'id': 'function','param':[]},
+            'toLowerCase': {'type': 'String', 'id': 'function','param':[]},
+            'toLocaleUpperCase': {'type': 'String', 'id': 'function','param':[]},
+            'toUpperCase': {'type': 'String', 'id': 'function','param':[]},
+            'split': {'type': 'Array', 'id': 'function','param':['String']},
         }
     },
     'JSON':{
@@ -45,22 +65,22 @@ var descriptor = {
         'id':'class',
         'type':'Object',
         'static': {
-            'assign': {'type': 'Object', 'id': 'function', param: []},
+            //'assign': {'type': 'Object', 'id': 'function', param: []},
             'create': {'type': 'Object', 'id': 'function', param: []},
             'defineProperty': {'type': 'Object', 'id': 'function', param: []},
             'defineProperties': {'type': 'Object', 'id': 'function', param: []},
-            'entries': {'type': 'Object', 'id': 'function', param: []},
-            'freeze': {'type': 'Object', 'id': 'function', param: []},
-            'getOwnPropertyDescriptor': {'type': 'Object', 'id': 'function', param: []},
-            'getOwnPropertyNames': {'type': 'Object', 'id': 'function', param: []},
-            'getOwnPropertySymbols': {'type': 'Object', 'id': 'function', param: []},
+            //'entries': {'type': 'Object', 'id': 'function', param: []},
+            //'freeze': {'type': 'Object', 'id': 'function', param: []},
+            //'getOwnPropertyDescriptor': {'type': 'Object', 'id': 'function', param: []},
+            //'getOwnPropertyNames': {'type': 'Object', 'id': 'function', param: []},
+            //'getOwnPropertySymbols': {'type': 'Object', 'id': 'function', param: []},
             'getPrototypeOf': {'type': 'Object', 'id': 'function', param: []},
-            'is': {'type': 'Object', 'id': 'function', param: []},
-            'isExtensible': {'type': 'Object', 'id': 'function', param: []},
-            'isFrozen': {'type': 'Object', 'id': 'function', param: []},
-            'isSealed': {'type': 'Object', 'id': 'function', param: []},
-            'preventExtensions': {'type': 'Object', 'id': 'function', param: []},
-            'seal': {'type': 'Object', 'id': 'function', param: []},
+            //'is': {'type': 'Object', 'id': 'function', param: []},
+            //'isExtensible': {'type': 'Object', 'id': 'function', param: []},
+            //'isFrozen': {'type': 'Object', 'id': 'function', param: []},
+            //'isSealed': {'type': 'Object', 'id': 'function', param: []},
+            //'preventExtensions': {'type': 'Object', 'id': 'function', param: []},
+            //'seal': {'type': 'Object', 'id': 'function', param: []},
             'setPrototypeOf': {'type': 'Object', 'id': 'function', param: []},
             'merge': {'type': 'Object', 'id': 'function', param: []},
         },
@@ -78,8 +98,34 @@ var descriptor = {
             'values': {'type': 'Object', 'id': 'function', param: []}
        }
     },
-    'RegExp':{'id':'class', 'type':'RegExp'},
-    'Error':{'id':'class', 'type':'Error','inherit':'Object'},
+    'RegExp':{
+        'id':'class', 'type':'RegExp','inherit':'Object',
+        'static':{
+            'lastIndex': {'type': 'Number', 'id': 'const'},
+            '$1': {'type': 'String', 'id': 'const'},
+            '$2': {'type': 'String', 'id': 'const'},
+            '$3': {'type': 'String', 'id': 'const'},
+            '$4': {'type': 'String', 'id': 'const'},
+            '$5': {'type': 'String', 'id': 'const'},
+            '$6': {'type': 'String', 'id': 'const'},
+            '$7': {'type': 'String', 'id': 'const'},
+            '$8': {'type': 'String', 'id': 'const'},
+            '$9': {'type': 'String', 'id': 'const'},
+        },
+        'proto':{
+            'test': {'type': 'Boolean', 'id': 'function', 'param': ['String']},
+            'exec': {'type': 'Array', 'id': 'function', 'param': ['String']},
+        }
+    },
+    'Error':{
+        'id':'class', 'type':'Error','inherit':'Object',
+        'proto':{
+            'message': {'type': 'String', 'id': 'const'},
+            'name': {'type': 'String', 'id': 'const'},
+            'filename': {'type': 'String', 'id': 'const'},
+            'line': {'type': 'String', 'id': 'const'},
+        }
+    },
     'EvalError':{'id':'class', 'type':'EvalError','inherit':'Error'},
     'RangeError':{'id':'class', 'type':'RangeError','inherit':'Error'},
     'ReferenceError':{'id':'class', 'type':'ReferenceError','inherit':'Error'},
@@ -157,11 +203,9 @@ var descriptor = {
     'Boolean':{
         'id':'class',
         'type':'Boolean',
-        'proto':{
-            'valueOf':{'type':'Boolean','id':'function','param':[]}
-        }
+        'inherit':'Object'
     },
-    'Symbol':{'id':'class', 'type':'Symbol'},
+    'Symbol':{'id':'class', 'type':'Symbol','inherit':'Object'},
     'Iterator':{
         'id':'class', 'type':'Iterator','inherit':'Object',
         'proto':{
@@ -176,7 +220,7 @@ var descriptor = {
         }
     },
     'Reflect':{
-        'id':'object', 'type':'Reflect',
+        'id':'object', 'type':'Reflect','inherit':'Object',
         'static':{
             'apply':{'id':'function','type':'*','param':['Function','...']},
             'construct':{'id':'function','type':'*','param':['Class','...']},
@@ -188,7 +232,7 @@ var descriptor = {
         }
     }, 
     'Event':{
-        'id':'class', 'type':'Event',
+        'id':'class', 'type':'Event','inherit':'Object',
         'static':{
             "SUBMIT":{'id':'const','type':'String'},
             "RESIZE":{'id':'const','type':'String'},
@@ -216,6 +260,7 @@ var descriptor = {
             "bubbles":{'id':'const','type':'Boolean'},
             "cancelable":{'id':'const','type':'Boolean'},
             "currentTarget":{'id':'const','type':'Object'},
+            "target":{'id':'const','type':'Object'},
             "defaultPrevented":{'id':'const','type':'Boolean'},
             "originalEvent":{'id':'const','type':'Object'},
             "type":{'id':'const','type':'String'},
@@ -229,7 +274,7 @@ var descriptor = {
         }
     },
     'EventDispatcher':{
-        'id':'class', 'type':'EventDispatcher',
+        'id':'class', 'type':'EventDispatcher','inherit':'Object',
         'proto':{
             'dispatchEvent':{'id':'function','type':'Boolean','param':['Event']},
             'removeEventListener':{'id':'function','type':'Boolean','param':['String']},

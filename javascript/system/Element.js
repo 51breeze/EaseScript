@@ -1055,7 +1055,7 @@ Element.prototype.scrollHeight=function scrollHeight()
  * 获取元素相对文档页面边界的矩形坐标。
  * 如果元素的 position = fixed 或者 force=== true 则相对浏览器窗口的位置
  * @param NodeElement elem
- * @param boolean force
+ * @param boolean force 是否为全局坐标
  * @returns {left,top,right,bottom,width,height}
  */
 Element.prototype.getBoundingRect=function getBoundingRect( force )

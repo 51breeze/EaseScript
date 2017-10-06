@@ -1,15 +1,15 @@
 /**
  * EvalError
  * @param message
- * @param line
  * @param filename
+ * @param line
  * @constructor
  * @require System,Error,Object;
  */
-function EvalError( message , line, filename) {
-    this.name='EvalError';
-    Error.call(this, message , line, filename);
+function EvalError( message , filename, line) {
+    Error.call(this, message , filename, line);
 };
 System.EvalError = EvalError;
 EvalError.prototype = Object.create( Error.prototype );
 EvalError.prototype.constructor=EvalError;
+EvalError.prototype.name='EvalError';

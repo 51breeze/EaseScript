@@ -368,21 +368,19 @@ package es.components
                  {
                      dataSource.pageSize(pageSize);
                  }
-
-                 this.skin.addEventListener( MouseEvent.CLICK, function (e)
-                 {
-                     if( Element.getNodeName( e.target ) ==='a' )
-                     {
-                         e.preventDefault();
-                         var url = Element( e.target ).property( 'href' ) || '';
-                         var page = url.match( profile );
-                         page = page ? page[1]>>0 : 0;
-                         if (page > 0)
-                         {
-                             this.current = page;
-                         }
-                     }
-                 },false,0, this);
+                  this.skin.addEventListener(MouseEvent.CLICK, function (e:MouseEvent)
+                  {
+                      if (Element.getNodeName(e.target) === 'a')
+                      {
+                          e.preventDefault();
+                          var url:String = Element(e.target).property('href');
+                          var _profile:Array = url.match(profile);
+                          var page:Number = parseInt(_profile ? _profile[1] : 0);
+                          if (page > 0) {
+                              this.current = page;
+                          }
+                      }
+                  }, false, 0, this);
                  return true;
              }
              return false;

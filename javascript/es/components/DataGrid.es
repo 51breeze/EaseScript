@@ -54,7 +54,7 @@ package es.components
             {
                 var self = this;
                 dataSource = new DataSource();
-                dataSource.addEventListener(DataSourceEvent.SELECT, function (event)
+                dataSource.addEventListener(DataSourceEvent.SELECT, function (event:DataSourceEvent)
                 {
                     if ( !event.waiting )
                     {

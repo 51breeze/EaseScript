@@ -309,14 +309,22 @@ function builder(config , code, requirements , skins )
         '"use strict";',
         //系统全局模块域
         '(function(System,$'+globals.join(',$')+'){',
+        //internal
+        '(function(System,Internal,environment){',
+        utils.getContents( rootPath+'/internal.js' ),
+        '}(System,Internal,'+config.mode+'));',
          contents,
+        //running
+        '(function(System,Internal,Class){',
+         config.mode === 3 ? utils.getContents( rootPath+'/run-pro.js' ) : utils.getContents( rootPath+'/run-dev.js' ),
+        '}(System,Internal,System.Class));',
         '}(System,' + g.join(',') + '));',
         //自定义模块域
         '(function(define,'+requires.join(',')+'){',
         skins,
         code,
         'var main=System.getDefinitionByName("'+config.main+'");',
-        'System.Reflect.construct(main);',
+        'try{System.Reflect.construct(main);}catch(e){throw e.toString();}',
         '})(Internal.define,'+requires.map(function (a){
             a = mapname[a] || a;
             if(a==='System')return a;

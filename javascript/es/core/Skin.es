@@ -228,6 +228,14 @@ package es.core
         };
 
         /**
+         * 安装皮肤
+         */
+        es_internal function skinInstaller()
+        {
+            this.createChildren();
+        }
+
+        /**
          * 创建一组子级元素
          * 当前皮肤被添加到视图中后会自动调用，无需要手动调用
          */
@@ -268,8 +276,8 @@ package es.core
                         this.addChildAt( new Display( new Element( Element.createElement( child ) ) ) , -1);
                     }else if( child instanceof Skin )
                     {
-                        child.createChildren();
-                        this.addChild( child );
+                        (child as Skin).createChildren();
+                        this.addChild( child as Display );
                     }
                 }
             }

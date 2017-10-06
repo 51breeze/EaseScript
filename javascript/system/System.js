@@ -135,17 +135,20 @@ System.typeOf = function typeOf(instanceObj)
  */
 System.instanceOf = function instanceOf(instanceObj, theClass)
 {
-    if( instanceObj == null && theClass === System.Object )return true;
-    if (theClass === System.Class)return instanceObj instanceof System.Class;
-
-    //如果不是一个函数直接返回false
+    if( instanceObj == null )
+    {
+        return theClass === System.Object || theClass===$Object  ? true : false;
+    }
+    if (theClass === System.Class)
+    {
+        return instanceObj instanceof System.Class;
+    }
     try {
         if( theClass instanceof System.Class )theClass = theClass.constructor;
         if ( Object(instanceObj) instanceof theClass)return true;
-        if (theClass === System.Array)return instanceObj instanceof $Array;
-        if (theClass === System.Object)return instanceObj instanceof $Object;
-    } catch (e) {
-    }
+        if ( theClass === System.Array )return instanceObj instanceof $Array;
+        if ( theClass === System.Object )return instanceObj instanceof $Object;
+    } catch (e) {}
     return false;
 };
 
@@ -157,9 +160,16 @@ System.instanceOf = function instanceOf(instanceObj, theClass)
  */
 System.is=function is(instanceObj, theClass)
 {
-    if( instanceObj == null && theClass === System.Object )return true;
-    if( theClass === System.Class )return instanceObj instanceof System.Class;
-    if( instanceObj && instanceObj.constructor instanceof System.Class  )
+    if( instanceObj == null )
+    {
+        return theClass === System.Object || theClass===$Object  ? true : false;
+    }
+    if (theClass === System.Class)
+    {
+        return instanceObj instanceof System.Class;
+    }
+
+    if( instanceObj && instanceObj.constructor instanceof System.Class && theClass instanceof System.Interface)
     {
         var objClass =instanceObj.constructor;
         if (objClass === theClass)return true;
@@ -194,7 +204,8 @@ System.is=function is(instanceObj, theClass)
  * @param flag 默认为 false。如为true表示一个纯对象,否则数组对象也会返回true
  * @returns {boolean}
  */
-System.isObject =function isObject(val, flag) {
+System.isObject =function isObject(val, flag)
+{
     if (!val || typeof val !== "object")return false;
     var proto = System.Object.getPrototypeOf(val);
     var result = proto === System.Object.prototype || proto === $Object.prototype;
@@ -207,7 +218,8 @@ System.isObject =function isObject(val, flag) {
  * @param val,...
  * @returns {boolean}
  */
-System.isDefined = function isDefined() {
+System.isDefined = function isDefined()
+{
     var i = arguments.length;
     while (i > 0) if (typeof arguments[--i] === 'undefined')return false;
     return true;

@@ -33,7 +33,7 @@ package es.components
         protected function skinInstaller()
         {
             var skin = this.skin;
-            skin.createChildren();
+            skin.es_internal::skinInstaller();
             this.viewport.addChild( skin );
         }
 

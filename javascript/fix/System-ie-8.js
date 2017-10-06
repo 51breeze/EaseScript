@@ -10,7 +10,7 @@ if (System.env.platform(System.env.BROWSER_IE) && System.env.version(8, '<='))
         {
             return "function";
 
-        } else if( val === 'function' && instanceObj.constructor === System.RegExp)
+        } else if( val === 'function' && (instanceObj.constructor === System.RegExp || instanceObj.constructor===$RegExp ) )
         {
             return "object";
         }
