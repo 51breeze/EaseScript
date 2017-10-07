@@ -33,7 +33,7 @@ package
               });
         }
 
-        private var _label:String = "Hello world!";
+        private var _label:String = "<h1>Hello world!</h1>";
 
         public function get label():String
         {
