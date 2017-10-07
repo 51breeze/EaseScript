@@ -13,7 +13,6 @@ es -p ./project  //创建一个工程项目
 
 ```
 语法
-
 ```
 package
 {
