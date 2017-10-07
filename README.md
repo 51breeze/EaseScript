@@ -20,9 +20,10 @@ es -p ./project
 package client
 {
     import EventDispatcher;
+
 	public class Index extends EventDispatcher
 	{
-		function Index()
+        function Index()
         {
               super(document);
               this.addEventListener(Event.READY,function(e:Event)
