@@ -1,20 +1,20 @@
 # EaseScript 1.0.9 Beta
 
-# EaseScript 致力于改变web的开发方式，减少重复的开发成本。
+## EaseScript 致力于改变web的开发方式，减少重复的开发成本。
 
-# 安装
+### 安装
 ```
 npm install easescript
 ```
 
-# 使用
+### 使用
 ```
 打开命令窗口，在以下输入
 <br/>
 es -p ./project  //创建一个工程项目
 ```
 
-# 语法
+### 语法
 ```
 package
 {
