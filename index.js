@@ -706,7 +706,7 @@ const builder={
 
          if( script && config.minify ==='enable' )
          {
-             script = uglify.minify(script);
+             script = uglify.minify(script,{ie8:true});
              if( script.error )throw script.error;
              script = script.code;
          }
@@ -790,7 +790,7 @@ function getConfigure(config)
 {
     root_path = config.root_path || process.cwd();
     //生产环境模式启用压缩文件
-    if( config.mode===2 && config.minify == null )
+    if( config.mode===3 && config.minify == null )
     {
         config.minify = 'enable';
     }

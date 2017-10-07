@@ -1,17 +1,20 @@
-/**
-* 数组构造器
-* @returns {Array}
-* @constructor
-* @require System;
-* @require Object,Math;
-*/
+/*
+ * Copyright © 2017 EaseScript All rights reserved.
+ * Released under the MIT license
+ * https://github.com/51breeze/EaseScript
+ * @author Jun Ye <664371281@qq.com>
+ * @require System,Object,ReferenceError,TypeError
+ */
 function Array(length)
 {
     if ( !System.instanceOf(this, Array) )
     {
-        return $Array.apply( new Array(), Array.prototype.slice.call(arguments, 0));
+        var obj = new Array();
+        $Array.apply(obj , Array.prototype.slice.call(arguments, 0) );
+        return obj;
     }
     this.length=0;
+    $Array.call(this);
     if( arguments.length > 0 )
     {
         if( typeof length === 'number' && arguments.length===1 )
@@ -20,9 +23,8 @@ function Array(length)
             $Array.call(this, this.length );
             return this;
         }
-        return Array.prototype.splice.apply(this, [0,0].concat( Array.prototype.slice.call(arguments,0)));
+        Array.prototype.splice.apply(this, [0,0].concat( Array.prototype.slice.call(arguments,0)));
     }
-    $Array.call(this);
     return this;
 };
 System.Array = Array;
@@ -39,8 +41,6 @@ Array.prototype.shift = $Array.prototype.shift;
 Array.prototype.unshift = $Array.prototype.unshift;
 Array.prototype.sort = $Array.prototype.sort;
 Array.prototype.reverse = $Array.prototype.reverse;
-Array.prototype.toString = $Array.prototype.toString;
-Array.prototype.valueOf = $Array.prototype.valueOf;
 Array.prototype.indexOf = $Array.prototype.indexOf;
 Array.prototype.map = $Array.prototype.map;
 

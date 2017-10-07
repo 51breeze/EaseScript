@@ -1,9 +1,9 @@
 /*
-* BreezeJS TouchEvent class.
-* version: 1.0 Beta
-* Copyright © 2015 BreezeJS All rights reserved.
-* Released under the MIT license
-* https://github.com/51breeze/breezejs
+ * EaseScript
+ * Copyright © 2017 EaseScript All rights reserved.
+ * Released under the MIT license
+ * https://github.com/51breeze/EaseScript
+ * @author Jun Ye <664371281@qq.com>
 * @require Event,TouchEvent,Math,EventDispatcher,Object;
 */
 function TouchSwipeEvent(type, bubbles, cancelable)

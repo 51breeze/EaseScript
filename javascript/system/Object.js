@@ -8,7 +8,7 @@
 function Object( value )
 {
     if ( value != null )return $Object(value);
-    if( !(this instanceof Object) ) return {};
+    if( !(this instanceof Object) ) return new Object();
     return this;
 }
 System.Object = Object;

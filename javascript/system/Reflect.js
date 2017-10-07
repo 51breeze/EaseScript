@@ -1,10 +1,11 @@
-/**
- * Reflect是一个内置的对象，提供可拦截的JavaScript操作的方法。
- * 方法与代理处理程序相同。反射不是一个函数对象，因此它不可构造。
- * @constructor
+/*
+ * EaseScript
+ * Copyright © 2017 EaseScript All rights reserved.
+ * Released under the MIT license
+ * https://github.com/51breeze/EaseScript
+ * @author Jun Ye <664371281@qq.com>
  * @require Class,Object,Internal.$get,Internal.$set,Error,TypeError,ReferenceError,SyntaxError
  */
-
 var $has = $Object.prototype.hasOwnProperty;
 var _construct = $Reflect ? $Reflect.construct : function (theClass,args)
 {
@@ -47,21 +48,14 @@ var _apply = $Reflect ? $Reflect.apply : function(target, thisArgument, argument
     {
         throw new TypeError('is not function');
     }
-
-    try {
-        thisArgument = thisArgument === target ? undefined : thisArgument;
-        if (argumentsList != null) {
-            return target.apply(thisArgument === target ? undefined : thisArgument, argumentsList);
-        }
-        if (thisArgument != null) {
-            return target.call(thisArgument);
-        }
-        return target();
-    }catch (e)
-    {
-        alert( e.message );
-        throw new TypeError(e.message);
+    thisArgument = thisArgument === target ? undefined : thisArgument;
+    if (argumentsList != null) {
+        return target.apply(thisArgument === target ? undefined : thisArgument, argumentsList);
     }
+    if (thisArgument != null) {
+        return target.call(thisArgument);
+    }
+    return target();
 };
 
 var getProtoDescByNs = function(name, proto, ns)

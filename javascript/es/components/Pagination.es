@@ -1,30 +1,36 @@
 /*
-* BreezeJS HttpRequest class.
-* version: 1.0 Beta
-* Copyright © 2015 BreezeJS All rights reserved.
-* Released under the MIT license
-* https://github.com/51breeze/breezejs
-* @require Object,PaginationEvent,SkinComponent,TypeError,Element,MouseEvent
-*/
-
-/**
- * 分页组件.
- * 此组件包含如下特性：
- * 皮肤元素：{info}{firstPage}{prevPage}{hiddenLeft}{links}{hiddenRight}{nextPage}{lastPage}{goto}
- * 动态变量：{totalPage}{totalRows}{rows}{current} （仅限用于info皮肤下）
+ * Copyright © 2017 EaseScript All rights reserved.
+ * Released under the MIT license
+ * https://github.com/51breeze/EaseScript
+ * @author Jun Ye <664371281@qq.com>
  *
- * 这些皮肤元素可以自由组合位置和删减以满足各种需求。
- * 此组件支持鼠标单击和鼠标滚动事件，默认为鼠标单击事件
- * 如果同时需要支持两种事件 只需要在 options.eventType 中设置 [MouseEvent.CLICK,MouseEvent.MOUSE_WHEEL] 即可。
- * @param viewport
- * @param context
- * @returns {*}
- * @constructor
+ * 数据分页组件.
+ * 此组件包含如下特性：
+ * 1、 可以通过鼠标滚轮控制翻页
+ * 2、 自动从数据源取数据
+ * 3、 可自定义每页要显示的数据行数
+ * 4、 可自定义按扭的数目
+ *
+ * 使用实例
+ *  var viewport  = new Container( new Element('body') );
+ *  var dataSource = new DataSource();
+ *  //dataSource.source='http://working.com/json.php';
+ *  dataSource.source = [
+ *  {id:"1",phone:'15302662590'},
+ *  {id:"2",phone:'15302662590'},
+ *  {id:"3",phone:'15302662590'},
+ *  {id:"4",phone:'15302662590'},
+ *  {id:"5",phone:'15302662590'},
+ *  ];
+ *  var pagination = new Pagination( viewport );
+ *  pagination.dataSource = dataSource;
+ *  pagination.wheelTarget = viewport;
+ *  pagination.display();
  */
+
 
 package es.components
 {
-
     import es.components.SkinComponent;
     import es.core.Skin;
     import es.events.PaginationEvent;
@@ -138,10 +144,7 @@ package es.components
                        return value.indexOf('?') >= 0 ? value + '&'+profile+'=' + page : value + '?'+profile+'=' + page;
                    };
                }
-               if( this.initializeCompleted )
-               {
-                   this.skinInstaller();
-               }
+               this.commitPropertyAndUpdateSkin();
            }
         };
 
@@ -353,6 +356,21 @@ package es.components
             }
         }
 
+        private var _radius=0;
+        public function set radius( val:Number ):void
+        {
+            if( _radius !== val )
+            {
+                _radius=val;
+                this.commitPropertyAndUpdateSkin();
+            }
+        }
+
+        public function get radius():Number
+        {
+            return _radius;
+        }
+
         /**
          * @inherit
          */
@@ -388,9 +406,10 @@ package es.components
 
         override public function display()
         {
-            var flag = this.initializeCompleted;
-            super.display();
-            if( !flag )this.dataSource.select( this.current );
+            if( !super.display() )
+            {
+                this.dataSource.select( this.current );
+            }
         }
 
     }

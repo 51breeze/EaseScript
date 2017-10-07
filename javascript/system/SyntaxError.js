@@ -1,9 +1,9 @@
-/**
- * 语法错误构造器
- * @param message
- * @param filename
- * @param line
- * @constructor
+/*
+ * EaseScript
+ * Copyright © 2017 EaseScript All rights reserved.
+ * Released under the MIT license
+ * https://github.com/51breeze/EaseScript
+ * @author Jun Ye <664371281@qq.com>
  * @require Error,Object;
  */
 function SyntaxError(  message , filename, line)

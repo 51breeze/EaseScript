@@ -1,11 +1,12 @@
 /*
-* BreezeJS DataSource class.
-* version: 1.0 Beta
-* Copyright © 2015 BreezeJS All rights reserved.
-* Released under the MIT license
-* https://github.com/51breeze/breezejs
-* @require System,Object,Array,DataArray,EventDispatcher,Http,HttpEvent,DataSourceEvent,Math,DataGrep,PropertyEvent,Symbol;
-*/
+ * EaseScript
+ * Copyright © 2017 EaseScript All rights reserved.
+ * Released under the MIT license
+ * https://github.com/51breeze/EaseScript
+ * @author Jun Ye <664371281@qq.com>
+ * @require System,Symbol,Array,DataArray,Object,EventDispatcher,Http,HttpEvent,PropertyEvent,DataSourceEvent,DataGrep
+ */
+
 var storage=Internal.createSymbolStorage( Symbol('DataSource') );
 var has = $Object.prototype.hasOwnProperty;
 function DataSource()
@@ -33,11 +34,11 @@ function DataSource()
                 'rows'  :'rows' //每次获取取多少行数据
             }
         }
-        ,"items":[]
+        ,"items":new Array()
         ,"cached":{
-            'queues':[]
+            'queues':new Array()
             ,'lastSegments':null
-            ,"loadSegments":[]
+            ,"loadSegments":new Array()
         }
         ,"isRemote":false
         ,"source":null
@@ -126,8 +127,8 @@ DataSource.prototype.source=function source( resource )
         var cached = storage(this,"cached");
         items.splice(0, items.length);
         cached.lastSegments=null;
-        cached.loadSegments=[];
-        cached.queues      =[];
+        cached.loadSegments=new Array();
+        cached.queues      =new Array();
         storage(this,"nowNotify",false);
         storage(this,"loadCompleted",false);
         return this;
@@ -165,8 +166,8 @@ DataSource.prototype.pageSize=function pageSize( size )
             var cached = storage(this,"cached");
             items.splice(0, items.length);
             cached.lastSegments=null;
-            cached.loadSegments=[];
-            cached.queues      =[];
+            cached.loadSegments=new Array();
+            cached.queues      =new Array();
             storage(this,"nowNotify",false);
             storage(this,"loadCompleted",false);
             this.select();

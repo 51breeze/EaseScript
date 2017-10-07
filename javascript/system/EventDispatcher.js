@@ -1,8 +1,9 @@
-/**
- * 事件调度器，所有需要实现事件调度的类都必须继承此类。
- * @param HTMLElement|EventDispatcher target 需要代理事件的目标对象
- * @returns {EventDispatcher}
- * @constructor
+/*
+ * EaseScript
+ * Copyright © 2017 EaseScript All rights reserved.
+ * Released under the MIT license
+ * https://github.com/51breeze/EaseScript
+ * @author Jun Ye <664371281@qq.com>
  * @require System,Object,Event,Internal,Reflect,Symbol
  */
 

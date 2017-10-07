@@ -1,32 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<s:Skin xmlns:c="es.components" xmlns:s="es.core" class="grid-skin">
+<s:Skin name="table" class="table data-grid-skin"  xmlns:c="es.components" xmlns:s="es.core">
+    <s:attr>
+        <border>0</border>
+    </s:attr>
 
     <![CDATA[
        import es.events.PaginationEvent;
        import es.components.DataGrid;
-       private var __radius__=5;
-       public function set radius( val:Number ):void{
-          if( this.__radius__ !== val )
-          {
-             this.__radius__=val;
-          }
-       }
+       import es.core.Display;
 
-       public function get radius():Number
+       override protected function createChildren()
        {
-          return this.__radius__;
+            var hostComponent:DataGrid = this.hostComponent as DataGrid;
+            var body:Skin = this.body as Skin;
+            var head:Skin = this.head as Skin;
+            body.variable('rowHeight', hostComponent.rowHeight );
+            head.variable('headHeight', hostComponent.headHeight );
+            super.createChildren();
        }
 
        override protected function updateDisplayList()
        {
             super.updateDisplayList();
-            var radius= this.radius+'px';
-            var table = new Element('table',  this );
+            var hostComponent:DataGrid = this.hostComponent as DataGrid;
+            var radius= hostComponent.radius+'px';
+            var table =  this.element;
             table.style('borderRadius', radius );
             Element('thead > tr:first-child >th:first-child' , table).style('borderTopLeftRadius',radius );
             Element('thead > tr:first-child >th:last-child' , table).style('borderTopRightRadius',radius );
             Element('tfoot > tr:last-child >td:first-child' , table).style('borderBottomLeftRadius',radius );
             Element('tfoot > tr:last-child >td:last-child' , table).style('borderBottomRightRadius',radius );
+            Element('td',  (this.foot as Display).element ).height( hostComponent.footHeight );
         }
 
     ]]>
@@ -36,15 +40,7 @@
         @radius:5px;
         @border_color:darken(@secondary, 8.5%);
 
-        .grid-skin{
-            width: 80%;
-            height:auto;
-           /* margin: auto;*/
-            /*margin-top: 20px;*/
-        }
-
         .data-grid-skin {
-
             border-collapse: separate;
             *border-collapse: collapse; /* IE7 and lower */
             border-spacing: 0;
@@ -55,6 +51,30 @@
             .box-shadow( 0px 1px 3px rgba(0,0,0,.3) );
         }
 
+        /*ie6*/
+        .data-grid-skin td,
+        .data-grid-skin th{
+            border-left: 1px solid @border_color;
+            border-top: 1px solid @border_color;
+            text-align: left;
+            margin: 0px;
+            padding: 4px;
+        }
+        .data-grid-skin thead th{
+            background-color: @secondary;
+        }
+
+        .data-grid-skin > thead > tr > td,
+        .data-grid-skin > thead > tr > th,
+        .data-grid-skin > tbody > tr > td,
+        .data-grid-skin > tfoot > tr > td {
+            border-left: 1px solid @border_color;
+            border-top: 1px solid @border_color;
+            text-align: left;
+            margin: 0px;
+            padding: 4px;
+        }
+
         .data-grid-skin > tbody > tr:hover {
             background: #fbf8e9;
             .transition(all 0.1s ease-in-out);
@@ -62,6 +82,7 @@
 
         .data-grid-skin > thead > tr:first-child > th {
             border-top: none;
+            line-height: 25px;
             background-color: @secondary;
             background-clip: padding-box;
             position:relative;
@@ -69,13 +90,6 @@
            .box-shadow( 0px 1px 0px rgba(255,255,255,.8) inset );
         }
 
-        .data-grid-skin > tbody > tr > td,
-        .data-grid-skin > thead > tr > th {
-            border-left: 1px solid @border_color;
-            border-top: 1px solid @border_color;
-            text-align: left;
-            padding: 9px;
-        }
         .data-grid-skin > thead > tr:last-child > th {
             border-bottom: none;
         }
@@ -109,45 +123,44 @@
 
     </style>
 
+    <s:Skin name="thead" id="@head">
+        <s:template>
+              <tr>
+                  <:foreach name="columns" value="name" >
+                      <th style="height:{headHeight}px">{name}</th>
+                  </:foreach>
+              </tr>
+         </s:template>
+    </s:Skin>
 
-    <table class="table data-grid-skin" border="0">
-        <head id="@head">
-            <s:template>
-                  <tr>
-                      <:foreach name="columns" value="name" >
-                          <th>{name}</th>
-                      </:foreach>
-                  </tr>
-             </s:template>
-        </head>
-        <tbody id="@body">
-            <s:template>
-                <:foreach name="datalist" value="item">
-                    <tr>
-                        <:foreach name="item" value="val" key="ukey">
-                            <:switch condition="ukey">
-                                <:case condition="name" break="true">
-                                    <td data-column="{key}">
-                                        <input value="{val}" />
-                                    </td>
-                                </:case>
-                                <:default>
-                                    <td data-column="{key}">{val}</td>
-                                </:default>
-                            </:switch>
-                        </:foreach>
-                    </tr>
-                </:foreach>
-            </s:template>
-        </tbody>
-        <tfoot id="@foot">
-             <tr>
-                 <td colspan="3" id="@footColapan">
-                     <c:Pagination id="@pagination" wheelTarget="@foot">
-                     </c:Pagination>
-                 </td>
-             </tr>
-        </tfoot>
-    </table>
+    <s:Skin name="tbody" id="@body">
+        <s:template>
+            <:foreach name="datalist" value="item">
+                <tr>
+                    <:foreach name="item" value="val" key="ukey">
+                        <:switch condition="ukey">
+                            <:case condition="name" break="true">
+                                <td data-column="{key}" style="height:{rowHeight}px">
+                                    <input value="{val}" />
+                                </td>
+                            </:case>
+                            <:default>
+                                <td data-column="{key}" style="height:{rowHeight}px">{val}</td>
+                            </:default>
+                        </:switch>
+                    </:foreach>
+                </tr>
+            </:foreach>
+        </s:template>
+    </s:Skin>
+
+    <tfoot id="@foot">
+         <tr>
+             <td colspan="3">
+                 <c:Pagination id="@pagination" wheelTarget="@foot" radius="3">
+                 </c:Pagination>
+             </td>
+         </tr>
+    </tfoot>
 
 </s:Skin>

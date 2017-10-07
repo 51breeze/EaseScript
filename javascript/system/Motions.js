@@ -1,7 +1,9 @@
-/**
- * 目标运动属性对象
- * @param nodeElement|function target 需要运动的目标元素
- * @constructor
+/*
+ * EaseScript
+ * Copyright © 2017 EaseScript All rights reserved.
+ * Released under the MIT license
+ * https://github.com/51breeze/EaseScript
+ * @author Jun Ye <664371281@qq.com>
  * @require Object,Element,Error
  */
 function Motions( target )

@@ -1,5 +1,12 @@
+/*
+ * Copyright © 2017 EaseScript All rights reserved.
+ * Released under the MIT license
+ * https://github.com/51breeze/EaseScript
+ * @author Jun Ye <664371281@qq.com>
+ */
 package es.core
 {
+    import Element;
     public class Display extends EventDispatcher
     {
         /**
@@ -36,17 +43,48 @@ package es.core
         }
 
         /**
+         * 设置显示对象的宽度
+         * @returns {Number}
+         */
+        public function get width():Number
+        {
+            return _element.width();
+        }
+
+        /**
+         * 获取显示对象的宽度
+         * @param value
+         */
+        public function set width(value:Number):void
+        {
+            _element.width(value);
+        }
+
+        /**
+         * 设置显示对象的高度
+         * @returns {Number}
+         */
+        public function get height():Number
+        {
+            return _element.height();
+        }
+
+        /**
+         * 获取显示对象的高度
+         * @param value
+         */
+        public function set height(value:Number):void
+        {
+            _element.height(value);
+        }
+
+        /**
          * 设置对象的属性
          * @param name
          * @param value
          */
-        public function property(name,value)
+        public function property(name,value):Object
         {
-            if( value !== undefined )
-            {
-                _element.property( name, value );
-                return this;
-            }
             return _element.property( name );
         }
 
@@ -55,7 +93,7 @@ package es.core
          * @param name
          * @param value
          */
-        public function style(name, value)
+        public function style(name, value):Object
         {
              var obj = _element.style( name, value );
              return _element===obj ? this : obj;
@@ -119,7 +157,7 @@ package es.core
          * 获取滚动条的宽度
          * @returns {Number}
          */
-        public function get scrollWidth()
+        public function get scrollWidth():Number
         {
             return _element.scrollWidth();
         };
@@ -128,7 +166,7 @@ package es.core
          * 获取滚动条的高度
          * @returns {Number}
          */
-        public function get scrollHeight()
+        public function get scrollHeight():Number
         {
             return  _element.scrollHeight();
         };
@@ -139,7 +177,7 @@ package es.core
          * @param boolean global 是否为全局坐标
          * @returns {left,top,right,bottom,width,height}
          */
-        public function getBoundingRect( global )
+        public function getBoundingRect( global ):Object
         {
             return _element.getBoundingRect( global );
         };
@@ -219,7 +257,7 @@ package es.core
          *  @param top
          *  @returns {object} left top
          */
-        public function localToGlobal(left:Number, top:Number)
+        public function localToGlobal(left:Number, top:Number):Object
         {
             return _element.localToGlobal(left, top);
         };
@@ -230,7 +268,7 @@ package es.core
          *  @param top
          *  @returns {object}  left top
          */
-        public function globalToLocal(left:Number, top:Number )
+        public function globalToLocal(left:Number, top:Number ):Object
         {
             return _element.globalToLocal(left, top);
         };
@@ -254,7 +292,7 @@ package es.core
          * 设置该对象的父级对象
          * @param parent
          */
-        protected function setParentOf( parent:Display )
+        final protected function setParentOf( parent:Display )
         {
             _parent = parent;
         }

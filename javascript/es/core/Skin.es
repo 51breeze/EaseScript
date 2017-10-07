@@ -1,5 +1,8 @@
-/**
- * 皮肤类
+/*
+ * Copyright © 2017 EaseScript All rights reserved.
+ * Released under the MIT license
+ * https://github.com/51breeze/EaseScript
+ * @author Jun Ye <664371281@qq.com>
  */
 package es.core
 {
@@ -14,12 +17,13 @@ package es.core
         private var hash:Object;
         private var _children;
         private var _name:String;
+        private var _attr:Object;
 
         /**
          * 皮肤类
          * @constructor
          */
-        function Skin( skinObject )
+        function Skin( skinObject:Object )
         {
             skinObject = skinObject || {};
             var attr=skinObject.attr || {};
@@ -41,6 +45,7 @@ package es.core
             this.hash = skinObject.hash || {};
             this.stateGroup = {};
             this._name = name;
+            this._attr = attr;
             var str = System.serialize(attr,'attr');
             super( new Element('<'+name+" "+str+'/>') );
         }
@@ -52,6 +57,17 @@ package es.core
         public function get name():String
         {
             return _name;
+        }
+
+        public function set attr(value:Object):void
+        {
+            Object.merge( _attr, value );
+            this.property( value );
+        }
+
+        public function get attr():Object
+        {
+             return _attr;
         }
 
         /**
@@ -224,7 +240,7 @@ package es.core
          */
         public function variable(name,value)
         {
-            this.render.variable( name,value );
+            return this.render.variable( name,value );
         };
 
         /**

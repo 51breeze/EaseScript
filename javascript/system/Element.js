@@ -1,9 +1,9 @@
 /*
- * BreezeJS : JavaScript framework
- * version: 1.0 Beta
- * Copyright © 2015 BreezeJS All rights reserved.
+ * EaseScript
+ * Copyright © 2017 EaseScript All rights reserved.
  * Released under the MIT license
- * https://github.com/51breeze/breezejs
+ * https://github.com/51breeze/EaseScript
+ * @author Jun Ye <664371281@qq.com>
  * @require System,Object,Array,EventDispatcher,Document,Window,StyleEvent,PropertyEvent,ScrollEvent,ElementEvent,Math,TypeError,Error,SyntaxError,ReferenceError,Symbol
  */
 var fix={

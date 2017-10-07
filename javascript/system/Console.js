@@ -1,7 +1,9 @@
-
-/**
- * 控制台
- * @require System,Object
+/*
+ * Copyright © 2017 EaseScript All rights reserved.
+ * Released under the MIT license
+ * https://github.com/51breeze/EaseScript
+ * @author Jun Ye <664371281@qq.com>
+ * @require System,Object,SyntaxError
  */
 function Console() {
     if (this instanceof Console)throw new SyntaxError('is not constructor')

@@ -30,7 +30,7 @@ if(!window.console)
         {
             var container = panel();
             if (container) {
-               var p = Element.createElement('<p style="line-height: 12px; font-size:12px;color:#333333; font-family: Arial; padding: 5px 0px;margin: 0px;">' + System.Array.prototype.slice.call(arguments, 0).join(' ') + '</p>')
+               var p = System.Element.createElement('<p style="line-height: 12px; font-size:12px;color:#333333; font-family: Arial; padding: 5px 0px;margin: 0px;">' + System.Array.prototype.slice.call(arguments, 0).join(' ') + '</p>')
                 container.addChild( p );
             }
         }

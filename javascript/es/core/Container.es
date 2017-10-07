@@ -1,3 +1,9 @@
+/*
+ * Copyright © 2017 EaseScript All rights reserved.
+ * Released under the MIT license
+ * https://github.com/51breeze/EaseScript
+ * @author Jun Ye <664371281@qq.com>
+ */
 package es.core
 {
     import es.core.Display;
@@ -120,7 +126,6 @@ package es.core
         /**
          * 为当前的皮肤添加一组子级元素, 并清空当前已存在的子级元素
          * @param child
-         * @returns {Display}
          */
         public function html( child:Display )
         {

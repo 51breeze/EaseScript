@@ -1,23 +1,14 @@
 /*
-* BreezeJS Component class.
-* version: 1.0 Beta
-* Copyright © 2015 BreezeJS All rights reserved.
-* Released under the MIT license
-* https://github.com/51breeze/breezejs
-*/
-
-/**
- * 所有皮肤组件的基类。
- * 只有需要显示皮肤的组件才需要继承此类。此组件是 Component 的子类，具备 Component 的特性。
- * 有关SkinGroup的用法请查看SkinGroup的说明。
- * @param SkinGroup skinGroup
- * @returns {Component}
- * @constructor
+ * Copyright © 2017 EaseScript All rights reserved.
+ * Released under the MIT license
+ * https://github.com/51breeze/EaseScript
+ * @author Jun Ye <664371281@qq.com>
  */
 
 package es.components
 {
     import es.components.Component;
+    import es.core.Display;
     import es.events.ComponentEvent;
     import es.core.Skin;
     import es.core.Container;
@@ -46,6 +37,14 @@ package es.components
             if( super.initializing() )
             {
                 this.skin.es_internal::hostComponent = this;
+                var _height = this.height;
+                if( _height !== NaN ){
+                    (this.skin as Display).height = _height;
+                }
+                var _width  = this.width;
+                if( _width !== NaN ){
+                    (this.skin as Display).width = _width;
+                }
                 return true;
             }
             return false;
@@ -180,6 +179,76 @@ package es.components
         }
 
         /**
+         * @private
+         */
+        private var _height:Number=NaN;
+
+        /**
+         * 获取此对象的高度
+         */
+        public function get height():Number
+        {
+            if( initializeCompleted )
+            {
+                return (this.skin as Display).height;
+            }
+            return _height;
+        }
+
+        /**
+         * 设置此对象的高度
+         */
+        public function set height(value:Number):void
+        {
+            _height = value;
+            if( initializeCompleted )
+            {
+                (this.skin as Display).height = value;
+            }
+        }
+
+        /**
+         * @private
+         */
+        private var _width:Number=NaN;
+
+        /**
+         * 获取此对象的高度
+         */
+        public function get width():Number
+        {
+            if( initializeCompleted )
+            {
+                return (this.skin as Display).width;
+            }
+            return _width;
+        }
+
+        /**
+         * 设置此对象的高度
+         */
+        public function set width(value:Number):void
+        {
+            _width = value;
+            if( initializeCompleted )
+            {
+                (this.skin as Display).width = value;
+            }
+        }
+
+        /**
+         * 提交属性并更新到皮肤
+         */
+        protected function commitPropertyAndUpdateSkin()
+        {
+            if( initializeCompleted )
+            {
+                updateSkin();
+                display();
+            }
+        }
+
+        /**
          * 标记组件是否初始化完成
          */
         protected var initializeCompleted = false;
@@ -203,10 +272,10 @@ package es.components
             var flag = this.initializeCompleted;
             if( !flag )
             {
-                this.initializeCompleted = true;
                 this.initializing();
                 this.skinInstaller();
                 this.initialized();
+                this.initializeCompleted = true;
 
             }else if( this._updateSkin===true )
             {

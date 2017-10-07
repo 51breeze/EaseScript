@@ -1,11 +1,10 @@
 /*
-* BreezeJS Grep class.
-* version: 1.0 Beta
-* Copyright © 2015 BreezeJS All rights reserved.
-* Released under the MIT license
-* https://github.com/51breeze/breezejs
-* @require Function,RegExp,DataSource,Object
-*/
+ * EaseScript
+ * Copyright © 2017 EaseScript All rights reserved.
+ * Released under the MIT license
+ * https://github.com/51breeze/EaseScript
+ * @author Jun Ye <664371281@qq.com>
+ */
 
 /**
  * 筛选条件组合
@@ -92,12 +91,12 @@ function createFilter()
 /**
  * @returns {DataGrep}
  * @constructor
- * @require Object,Math,DataArray,Array,Function
+ * @require Object,Math,DataArray,Array,Function,Error
  */
 function DataGrep( dataItems )
 {
     if( !(System.instanceOf(this,DataGrep)) )return new DataGrep( dataItems );
-    if( !System.instanceOf( dataItems, Array ) )Internal.throwError('error','Invalid data list');
+    if( !System.instanceOf( dataItems, Array ) )throw new Error('error','Invalid data list');
     this.dataItems=dataItems;
 }
 

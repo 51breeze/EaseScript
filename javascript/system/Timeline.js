@@ -1,17 +1,17 @@
-
-/********************************************************
-@class : 时间轴模拟类。
-      这个时间轴实现了添加关键侦和跳转到指定的侦进行播放或者停止动作。
-      实现了重复播放多少次或者倒放的功能，时间轴的播放时长是由每个添加的关键侦所决定的。
-@param: fps 播放速率,按每秒来计算,默认为24侦每秒
-@example
-var tl= new Timeline(60).addFrame(function(){
-    console.log( this.current() +'>>'+this.__name__ )
-},3,'one').reverse( true ).addFrame(function(){
-    console.log( this.current() +'>>'+this.__name__ )
-},21,'two')
-tl.play();
-**********************************************************/
+/*
+ * EaseScript
+ * Copyright © 2017 EaseScript All rights reserved.
+ * Released under the MIT license
+ * https://github.com/51breeze/EaseScript
+ * @author Jun Ye <664371281@qq.com>
+ * @example
+ * var tl= new Timeline(60).addFrame(function(){
+ *  console.log( this.current() +'>>'+this.__name__ )
+ *  },3,'one').reverse( true ).addFrame(function(){
+ *  console.log( this.current() +'>>'+this.__name__ )
+ *  },21,'two')
+ *  tl.play();
+ */
 
 //@require Object, EventDispatcher,Element,window,document,Event,TimeLineEvent,KeyFrame,Math,Error
 

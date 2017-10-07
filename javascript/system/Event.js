@@ -1,10 +1,8 @@
-/**
- *  事件对象,处理指定类型的事件分发。
- * @param type
- * @param bubbles
- * @param cancelable
- * @returns {Event}
- * @constructor
+/*
+ * Copyright © 2017 EaseScript All rights reserved.
+ * Released under the MIT license
+ * https://github.com/51breeze/EaseScript
+ * @author Jun Ye <664371281@qq.com>
  * @require System,Object
  */
 function Event( type, bubbles, cancelable )

@@ -1,18 +1,9 @@
 /*
-* es.components
-* version: 1.0 Beta
-* Copyright © 2015 BreezeJS All rights reserved.
+* Copyright © 2017 EaseScript All rights reserved.
 * Released under the MIT license
-* https://github.com/51breeze/breezejs
+* https://github.com/51breeze/EaseScript
+* @author Jun Ye <664371281@qq.com>
 */
-
-/**
- * 数据渲染器
- * @returns {DataGrid}
- * @inherit Template
- * @constructor
- */
-
 package es.components
 {
     import es.components.SkinComponent;
@@ -147,6 +138,106 @@ package es.components
             return this.__dataProfile__;
         };
 
+        /**
+         * @private
+         */
+        private var _radius:Number = 5;
+
+        /**
+         * 设置表格的圆角值
+         * @param value
+         */
+        public function set radius(value:Number):void
+        {
+            _radius = value;
+            commitPropertyAndUpdateSkin();
+        }
+
+        /**
+         * 获取表格的圆角值
+         * @param value
+         */
+        public function get radius():Number
+        {
+            return _radius;
+        }
+
+        /**
+         * @private
+         */
+        private var _rowHeight:Number = 25;
+
+        /**
+         * 设置表格的圆角值
+         * @param value
+         */
+        public function set rowHeight(value:Number):void
+        {
+            _rowHeight = value;
+            commitPropertyAndUpdateSkin();
+        }
+
+        /**
+         * 获取表格的圆角值
+         * @param value
+         */
+        public function get rowHeight():Number
+        {
+            return _rowHeight;
+        }
+
+        /**
+         * @private
+         */
+        private var _headHeight:Number = 30;
+
+        /**
+         * 设置表格的圆角值
+         * @param value
+         */
+        public function set headHeight(value:Number):void
+        {
+            _headHeight = value;
+            commitPropertyAndUpdateSkin();
+        }
+
+        /**
+         * 获取表格的圆角值
+         * @param value
+         */
+        public function get headHeight():Number
+        {
+            return _headHeight;
+        }
+
+        /**
+         * @private
+         */
+        private var _footHeight:Number = 30;
+
+        /**
+         * 设置表格的圆角值
+         * @param value
+         */
+        public function set footHeight(value:Number):void
+        {
+            _footHeight = value;
+            commitPropertyAndUpdateSkin();
+        }
+
+        /**
+         * 获取表格的圆角值
+         * @param value
+         */
+        public function get footHeight():Number
+        {
+            return _footHeight;
+        }
+
+        /**
+         * @override
+         * @return
+         */
         override protected function initializing():Boolean
         {
             if( super.initializing() )

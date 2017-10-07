@@ -7,51 +7,161 @@
 */
 package es.interfaces
 {
+    import es.core.es_internal;
     public interface IDisplay
     {
         /**
-         * 添加一个子级元素
-         * @param child
+         * 获取元素对象
+         * @returns {Element}
          */
-        function addChild( child:IDisplay ):IDisplay;
+        es_internal function get element():Element;
 
         /**
-         * 在指定索引位置添加元素
-         * @param child
-         * @param index
+         * 设置该对象的父级对象
+         * @param parent
          */
-        function addChildAt(child:IDisplay, index:Number ):IDisplay;
+        es_internal function setDisplayParent( parent:IDisplay );
 
         /**
-         * 添加一个子级元素
-         * @param child
+         * 设置对象的属性
+         * @param name
+         * @param value
          */
-        function getChildIndex( child:IDisplay ):Number;
+        public function property(name,value):Object;
 
         /**
-         * 在指定索引位置添加元素
-         * @param child
-         * @param index
+         * 设置显示对象的样式
+         * @param name
+         * @param value
          */
-        function getChildAt( index:Number ):IDisplay;
+        public function style(name, value):Object;
 
         /**
-         * 移除指定的子级元素
-         * @param child
+         * 添加指定的类名
+         * @param className
          */
-        public function removeChild(child:IDisplay):IDisplay;
+        public function addClass(name:String):void;
 
         /**
-         * 移除指定索引的子级元素
-         * @param index
+         * 移除指定的类名或者清除所有的类名。
+         * @param className
          */
-        public function removeChildAt(index):IDisplay;
+        public function removeClass( name:String ):void;
 
         /**
-         * 添加子级元素并移除已存在的子级
-         * @param child
+         * 获取滚动条在上边的位置
+         * @returns {Number}
          */
-        public function html( child:IDisplay );
+        public function get scrollTop():Number;
+        /**
+         * 设置滚动条在上边的位置
+         * @param value
+         */
+        public function set scrollTop(value:Number):void;
+
+        /**
+         * 获取滚动条在左边的位置
+         * @returns {Number}
+         */
+        public function get scrollLeft():Number;
+
+        /**
+         * 设置滚动条在左边的位置
+         * @param value
+         */
+        public function set scrollLeft(value:Number):void;
+
+        /**
+         * 获取滚动条的宽度
+         * @returns {Number}
+         */
+        public function get scrollWidth():Number;
+
+        /**
+         * 获取滚动条的高度
+         * @returns {Number}
+         */
+        public function get scrollHeight():Number;
+
+        /**
+         * 获取元素相对文档页面边界的矩形坐标。
+         * 如果元素的 position = fixed 或者 force=== true 则相对浏览器窗口的位置
+         * @param boolean global 是否为全局坐标
+         * @returns {left,top,right,bottom,width,height}
+         */
+        public function getBoundingRect( global ):Object;
+
+        /**
+         * 获取元素相对父元素的左边距
+         * @returns {Number}
+         */
+        public function get left():Number;
+
+        /**
+         * 设置元素相对父元素的左边距
+         * @returns {Number}
+         */
+        public function set left( value:Number ):void;
+
+        /**
+         * 获取元素相对父元素的上边距
+         * @returns {Number}
+         */
+        public function get top():Number;
+
+        /**
+         * 设置元素相对父元素的上边距
+         * @returns {Number}
+         */
+        public function set top( value:Number ):void;
+
+        /**
+         * 获取元素相对父元素的右边距
+         * @returns {Number}
+         */
+        public function get right():Number;
+
+        /**
+         * 设置元素相对父元素的右边距
+         * @returns {Number}
+         */
+        public function set right( value:Number ):void;
+
+        /**
+         * 获取元素相对父元素的下边距
+         * @returns {Number}
+         */
+        public function get bottom():Number;
+
+        /**
+         * 设置元素相对父元素的下边距
+         * @returns {Number}
+         */
+        public function set bottom( value:Number ):void;
+
+        /**
+         *  将本地坐标点转成相对视图的全局点
+         *  @param left
+         *  @param top
+         *  @returns {object} left top
+         */
+        public function localToGlobal(left:Number, top:Number):Object;
+
+        /**
+         *  将视图的全局点转成相对本地坐标点
+         *  @param left
+         *  @param top
+         *  @returns {object}  left top
+         */
+        public function globalToLocal(left:Number, top:Number ):Object;
+
+        /**
+         * 获取父级皮肤元素
+         * 只有已经添加到父级元素中才会返回父级皮肤元素，否则返回 null
+         * @returns {Display}
+         */
+        public function get parent():Display;
+
     }
 }
 

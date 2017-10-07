@@ -1,10 +1,10 @@
-/**
- * 错误消息构造函数
- * @param message
- * @param filename
- * @param line
- * @constructor
- * @require Object
+/*
+ * EaseScript
+ * Copyright © 2017 EaseScript All rights reserved.
+ * Released under the MIT license
+ * https://github.com/51breeze/EaseScript
+ * @author Jun Ye <664371281@qq.com>
+ * @require System,Object
  */
 function Error( message , filename, line )
 {

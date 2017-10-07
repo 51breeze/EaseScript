@@ -1,11 +1,10 @@
 /*
-* BreezeJS : JavaScript framework
-* version: 1.0 Beta
-* Copyright © 2015 BreezeJS All rights reserved.
-* Released under the MIT license
-* https://github.com/51breeze/breezejs
-* @require System,Array,Object
-*/
+ * Copyright © 2017 EaseScript All rights reserved.
+ * Released under the MIT license
+ * https://github.com/51breeze/EaseScript
+ * @author Jun Ye <664371281@qq.com>
+ * @require System,Object,Array
+ */
 function DataArray()
 {
     if( !System.instanceOf(this,DataArray) ){

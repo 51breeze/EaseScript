@@ -1,8 +1,9 @@
-/**
- * 类对象构造器
- * @returns {Class}
- * @constructor
- * @require System,Object,ReferenceError;
+/*
+ * Copyright © 2017 EaseScript All rights reserved.
+ * Released under the MIT license
+ * https://github.com/51breeze/EaseScript
+ * @author Jun Ye <664371281@qq.com>
+ * @require System,Object,SyntaxError,ReferenceError
  */
 function Class() {
 }

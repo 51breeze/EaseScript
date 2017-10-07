@@ -1,6 +1,9 @@
-/**
-* 全局函数
-* @type {Object}
+/*
+ * EaseScript
+ * Copyright © 2017 EaseScript All rights reserved.
+ * Released under the MIT license
+ * https://github.com/51breeze/EaseScript
+ * @author Jun Ye <664371281@qq.com>
 * @require System,Internal;
 */
 System.isFinite = isFinite;
@@ -121,6 +124,7 @@ System.env = {
  */
 System.typeOf = function typeOf(instanceObj)
 {
+    if (instanceObj == null )return 'object';
     if (instanceObj instanceof System.Class )return 'class';
     if (instanceObj instanceof System.Interface)return 'interface';
     if (instanceObj instanceof System.Namespace)return 'namespace';

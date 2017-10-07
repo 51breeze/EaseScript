@@ -1,11 +1,12 @@
-/**
- * DataSourceEvent
- * @param type
- * @param bubbles
- * @param cancelable
- * @constructor
- * @require Event,Object
+/*
+ * EaseScript
+ * Copyright © 2017 EaseScript All rights reserved.
+ * Released under the MIT license
+ * https://github.com/51breeze/EaseScript
+ * @author Jun Ye <664371281@qq.com>
+ * @require System,Event,Object
  */
+
 function DataSourceEvent(type, bubbles,cancelable)
 {
     if( !System.instanceOf(this,DataSourceEvent) )return new DataSourceEvent(type, bubbles,cancelable);

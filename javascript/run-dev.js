@@ -77,12 +77,8 @@ Class.prototype.__throw__=function( object )
 
 Class.prototype.__construct__=function(info,target,argumentsList)
 {
-    try {
         Internal.addStack(this.__T__.filename, info);
         return System.Reflect.construct(target, argumentsList);
-    }catch(e){
-        throw e.toString();
-    }
 };
 
 Class.prototype.__get__=function(info,target, propertyKey, receiver, ns)

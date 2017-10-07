@@ -1,3 +1,11 @@
+/*
+ * EaseScript
+ * Copyright © 2017 EaseScript All rights reserved.
+ * Released under the MIT license
+ * https://github.com/51breeze/EaseScript
+ * @author Jun Ye <664371281@qq.com>
+ */
+
 var syntax_regexp = /^\s*(if|foreach|for|else|do|switch|case|default|break|var|function|while|code|{|})(.*)?/,
 call_regexp = /^([\w\.]+)\s*\(/,
 foreach_regexp  = /(\w+)\s+as\s+(\w+)(\s+(\w+))?/i;
