@@ -13,7 +13,6 @@ npm install easescript
 
 //创建一个工程项目
 es -p ./project
-
 ```
 
 ### 语法
