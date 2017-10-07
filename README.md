@@ -23,28 +23,28 @@ package client
 
 	public class Index extends EventDispatcher
 	{
-        function Index()
-        {
-              super(document);
-              this.addEventListener(Event.READY,function(e:Event)
-              {
-                  var container:Element = new Element('#container');
-                  var text = Element.createElement( label );
-                  container.addChildAt( text, 0 );
-              });
-        }
+            function Index()
+            {
+                  super(document);
+                  this.addEventListener(Event.READY,function(e:Event)
+                  {
+                      var container:Element = new Element('#container');
+                      var text = Element.createElement( label );
+                      container.addChildAt( text, 0 );
+                  });
+            }
 
-        private var _label:String = "<h1>Hello world!</h1>";
+            private var _label:String = "<h1>Hello world!</h1>";
 
-        public function get label():String
-        {
-            return _label;
-        }
+            public function get label():String
+            {
+                return _label;
+            }
 
-        public function set label(val:String):void
-        {
-            this._label = val;
-        }
+            public function set label(val:String):void
+            {
+                this._label = val;
+            }
 	}
 }
 ```
