@@ -10,8 +10,10 @@ npm install easescript
 ### 使用
 ```
 打开命令窗口，在以下输入
-<br/>
-es -p ./project  //创建一个工程项目
+
+//创建一个工程项目
+es -p ./project
+
 ```
 
 ### 语法
