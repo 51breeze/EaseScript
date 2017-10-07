@@ -17,19 +17,19 @@ es -p ./project
 
 ### 语法
 ```
-package
+package client
 {
     import EventDispatcher;
-    public class Main extends EventDispatcher
-    {
-        function Main()
+	public class Index extends EventDispatcher
+	{
+		function Index()
         {
               super(document);
               this.addEventListener(Event.READY,function(e:Event)
               {
                   var container:Element = new Element('#container');
                   var text = Element.createElement( label );
-                  container.addChildAt( text );
+                  container.addChildAt( text, 0 );
               });
         }
 
@@ -44,7 +44,7 @@ package
         {
             this._label = val;
         }
-    }
+	}
 }
 ```
 
