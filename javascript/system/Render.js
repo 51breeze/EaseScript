@@ -193,7 +193,7 @@ Render.prototype.__template__='';
  */
 Render.prototype.template=function template( val )
 {
-    if( val )
+    if( val != null )
     {
         if( typeof val !== "string" )
         {

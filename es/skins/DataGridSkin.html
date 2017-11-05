@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <s:Skin name="table" class="table data-grid-skin"  xmlns:c="es.components" xmlns:s="es.core">
-    <s:attr>
-        <border>0</border>
-    </s:attr>
-
     <![CDATA[
        import es.events.PaginationEvent;
        import es.components.DataGrid;
@@ -38,7 +34,8 @@
     <style>
 
         @radius:5px;
-        @border_color:darken(@secondary, 8.5%);
+        @border_color:darken(@secondary, 3.5%);
+        @background_color:@secondary;
 
         .data-grid-skin {
             border-collapse: separate;
@@ -52,8 +49,8 @@
         }
 
         /*ie6*/
-        .data-grid-skin td,
-        .data-grid-skin th{
+        .data-grid-skin tbody td,
+        .data-grid-skin thead th{
             border-left: 1px solid @border_color;
             border-top: 1px solid @border_color;
             text-align: left;
@@ -61,13 +58,13 @@
             padding: 4px;
         }
         .data-grid-skin thead th{
-            background-color: @secondary;
+            background-color: @background_color;
         }
 
         .data-grid-skin > thead > tr > td,
         .data-grid-skin > thead > tr > th,
-        .data-grid-skin > tbody > tr > td,
-        .data-grid-skin > tfoot > tr > td {
+        .data-grid-skin > tbody > tr > td
+        {
             border-left: 1px solid @border_color;
             border-top: 1px solid @border_color;
             text-align: left;
@@ -83,10 +80,10 @@
         .data-grid-skin > thead > tr:first-child > th {
             border-top: none;
             line-height: 25px;
-            background-color: @secondary;
+            background-color: @background_color;
             background-clip: padding-box;
             position:relative;
-           .gradient-vertical( lighten(@secondary, 6.5%),  @secondary );
+           .gradient-vertical( lighten(@background_color, 6.5%),  @background_color );
            .box-shadow( 0px 1px 0px rgba(255,255,255,.8) inset );
         }
 
@@ -127,7 +124,7 @@
         <s:template>
               <tr>
                   <:foreach name="columns" value="name" >
-                      <th style="height:{headHeight}px">{name}</th>
+                      <th style="height:{headHeight}px;line-height:{headHeight}px;">{name}</th>
                   </:foreach>
               </tr>
          </s:template>
@@ -140,12 +137,12 @@
                     <:foreach name="item" value="val" key="ukey">
                         <:switch condition="ukey">
                             <:case condition="name" break="true">
-                                <td data-column="{key}" style="height:{rowHeight}px">
-                                    <input value="{val}" />
+                                <td data-column="{key}" style="height:{rowHeight}px;line-height:{rowHeight}px;">
+                                    <input value="{val}" style="height: 25px;" />
                                 </td>
                             </:case>
                             <:default>
-                                <td data-column="{key}" style="height:{rowHeight}px">{val}</td>
+                                <td data-column="{key}" style="height:{rowHeight}px;line-height:{rowHeight}px;">{val}</td>
                             </:default>
                         </:switch>
                     </:foreach>

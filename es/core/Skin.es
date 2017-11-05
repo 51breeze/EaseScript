@@ -230,7 +230,7 @@ package es.core
          */
         public function get template():String
         {
-            return this.render.template();
+            return this.render.template(null);
         };
 
         /**
@@ -251,6 +251,11 @@ package es.core
             this.createChildren();
         }
 
+        protected function parseSkinObject( skinObject:Object , hash )
+        {
+            return __toString(skinObject, hash );
+        }
+
         /**
          * 创建一组子级元素
          * 当前皮肤被添加到视图中后会自动调用，无需要手动调用
@@ -263,7 +268,7 @@ package es.core
             var c = 0;
             var child;
             var render = this._render;
-            var parent = this.parent;
+            var parent = this.parentDisplay;
             this.html( null );
             if( render )
             {
@@ -276,7 +281,7 @@ package es.core
             for (;c<len;c++)
             {
                 child = children[c];
-                if( child+"" === '[object Object]' )
+                if( System.isObject(child, true) )
                 {
                     child = __toString(child, hash );
 
@@ -287,7 +292,7 @@ package es.core
                 }
                 if( child )
                 {
-                    if (child+"" === child )
+                    if ( System.isString( child ) )
                     {
                         this.addChildAt( new Display( new Element( Element.createElement( child ) ) ) , -1);
                     }else if( child instanceof Skin )
@@ -306,6 +311,12 @@ package es.core
             }
             this.updateDisplayList();
         };
+
+        override public function toString()
+        {
+            createChildren();
+            return super.toString();
+        }
 
         /**
          * @private
@@ -371,7 +382,7 @@ package es.core
 function __toString(skin, hash)
 {
     var tag = skin.name || 'div';
-    var children:Array = skin+"" === "[object Object]" ?  skin.children : skin._children;
+    var children:Array = System.isObject(skin,true) ?  skin.children : skin._children;
     var attr = skin.attr || {};
     var content='';
     var len = children.length;
@@ -379,7 +390,7 @@ function __toString(skin, hash)
     for (;i<len;i++)
     {
         var child = children[i];
-        if ( child+"" === "[object Object]" )
+        if ( System.isObject(child,true) )
         {
             content += __toString(child, hash );
         } else

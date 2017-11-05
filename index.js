@@ -81,7 +81,7 @@ function getDescriptionAndGlobals(syntax, classname)
  */
 function filepath(file, base )
 {
-    return PATH.resolve( base, file.replace(/\./g,'/') );
+    return PATH.resolve( base, file.replace(/\./g,'/') ).replace(/\\/g,'/');
 }
 
 /**
@@ -116,6 +116,7 @@ function createDescription( syntax, stack , owner , moduleClass )
     desc['origintype'] = desc['type'];
     desc['privilege'] =stack.qualifier() || "internal";
     desc['static'] = !!stack.static();
+    desc['isStatic'] = !!stack.static();
     desc['owner'] = owner;
     if( stack.final() )
     {
@@ -281,7 +282,7 @@ function mergeImportClass(target, scope)
 function getDeclareClassDescription( stack , isInternal, config, project , syntax )
 {
     var list = {'static':{},'proto':{},'import':{},'constructor':{},'attachContent':{} ,'use':{},'namespaces':{},
-        'isInternal': isInternal,"privilege":"internal" };
+        'isInternal': isInternal,"privilege":"internal",'requirements':{}};
     var isstatic = stack.static();
     var type = stack.fullclassname();
     var prev = null;
@@ -419,7 +420,7 @@ var root_block_declared=['class','interface','const','var','let','use','function
 function getPropertyDescription( stack , config , project , syntax )
 {
     var moduleClass = {'static':{},'proto':{},'import':{},'constructor':{},'attachContent':{},"rootContent":[],
-        "namespaces":{}, "use":{},"declared":{},"nonglobal":true,"type":'' ,"privilege":"internal"};
+        "namespaces":{}, "use":{},"declared":{},"nonglobal":true,"type":'' ,"privilege":"internal",'requirements':{}};
     moduleClass.fullclassname = stack.fullclassname;
     var fullclassname = stack.fullclassname.split('.');
     moduleClass.classname = fullclassname.pop();
@@ -562,7 +563,7 @@ function loadModuleDescription( syntax , file , config , project , resource , su
     //是否加载系统库中的文件
     if( fullclassname.indexOf( config.system_lib_path_name+'.' )===0 )
     {
-        sourcefile = filepath( syntax+'.'+fullclassname, config.root_path ).replace(/\\/g,'/');
+        sourcefile = filepath( fullclassname, config.system_lib_path ).replace(/\\/g,'/');
     }
 
     //如果已存在就返回
@@ -656,7 +657,7 @@ function loadModuleDescription( syntax , file , config , project , resource , su
 
 //目前支持的语法
 const syntax_supported={
-    'php':false,
+    'php':true,
     'javascript':true
 };
 
@@ -679,7 +680,7 @@ const builder={
              var lessPath = PATH.resolve( config.root_path, './style/');
              var options =  {
                  paths: [ lessPath ],
-                 globalVars:themes.default,
+                 globalVars:themes[ config.themes ] || themes.default,
                  compress: config.minify ==='enable' ,
              };
              var style = styleContents.map(function (e, i) {
@@ -714,8 +715,55 @@ const builder={
          fs.writeFileSync(filename, script );
      },
 
-     'php':function(config,project){
+     'php':function(config,project)
+     {
+         var bootstrap = PATH.resolve(project.path, config.bootstrap );
+         var fullclassname = PATH.relative( config.project.path, bootstrap ).replace(/\\/g,'/').replace(/\//g,'.');
+         config.main = fullclassname;
+         var phpSyntax = require('./lib/php.js');
+         var script = phpSyntax(config, makeModules['php'], descriptions['php'], project );
+         var filename;
 
+         if( styleContents.length > 0  )
+         {
+             var less = require('less');
+             var themes = require('./style/themes.js');
+             var lessPath = PATH.resolve( config.root_path, './style/');
+             var options =  {
+                 paths: [ lessPath ],
+                 globalVars:themes[ config.themes ] || themes.default,
+                 compress: config.minify ==='enable' ,
+             };
+             var style = styleContents.map(function (e, i) {
+                 e.replace(/\B@(\w+)\s*:/gi,function (a, b , c) {
+                     e=e.replace( new RegExp('@'+b,"gi"),function (a){
+                         return '@'+b+i;
+                     });
+                 });
+                 return e;
+             });
+
+             style.unshift( "\n@import 'mixins.less';\n" );
+             style.unshift( "\n@import 'main.less';\n" );
+             less.render( style.join("\n") , options, function (err, output) {
+                 if (err) {
+                     Utils.error(err.message);
+                     Utils.error(err.extract.join('\n'));
+                 } else {
+                     filename = PATH.resolve(Utils.getBuildPath(config, 'build.webroot.static.css'), config.bootstrap + '.css');
+                     fs.writeFileSync(filename, output.css );
+                 }
+             });
+         }
+
+         if( script && config.minify ==='enable' )
+         {
+             script = uglify.minify(script,{ie8:true});
+             if( script.error )throw script.error;
+             script = script.code;
+         }
+         filename = PATH.resolve(Utils.getBuildPath(config, 'build.webroot'), config.bootstrap + '.php');
+         fs.writeFileSync(filename, script );
      }
 };
 
@@ -879,18 +927,32 @@ function getConfigure(config)
     //系统类库路径名
     //在加载类文件时发现是此路径名打头的都转到系统库路径中查找文件。
     config.system_lib_path_name = 'es';
+    config.system_lib_path = config.root_path;
+
     return config;
 }
+
+var syntaxMap={
+    'js':'javascript',
+    'php':'php'
+}
+
+var globalConfig = defaultConfig;
 
 /**
  * 开始生成代码片段
  */
-function make( config )
+function make( config, isGlobalConfig )
 {
-    config = getConfigure( Utils.merge(defaultConfig,config || {}) );
+    config = getConfigure( Utils.merge(globalConfig,config || {}) );
+    if( isGlobalConfig===true )
+    {
+        globalConfig  = config;
+    }
     makeModules = {};
     descriptions = {};
     requirements = config.requirements || (config.requirements = {});
+    config.syntax = syntaxMap[ config.syntax ] || 'javascript';
 
     //浏览器中的全局模块
     if( config.browser === 'enable' )
@@ -907,7 +969,8 @@ function make( config )
     var p;
     try
     {
-        for (p in build_project)
+
+       /* for (p in build_project)
         {
             var project = build_project[p];
             project.config = project_config = Utils.merge({},config, project.config || {});
@@ -920,16 +983,33 @@ function make( config )
                     loadModuleDescription(project_config.syntax, classname, project_config, project);
                 }
             }
+        }*/
+
+        var project = build_project.client;
+        project.config = project_config = Utils.merge({},config, project.config || {});
+        
+        if (typeof project_config.bootstrap === "string" && typeof project_config.syntax === "string")
+        {
+            if (syntax_supported[project_config.syntax] === true)
+            {
+                //throw new Error('Syntax ' + project_config.syntax + ' is not be supported.');
+                var classname = PATH.relative( config.project_path, filepath(project_config.bootstrap, project.path ) );
+                loadModuleDescription(project_config.syntax, classname, project_config, project);
+            }
         }
+
         Utils.info('Making starting...');
-        for (p in build_project)
+        /*for (p in build_project)
         {
             var project = build_project[p];
             if (typeof project.config.bootstrap === "string" && typeof project.config.syntax === "string")
             {
                 builder[ project.config.syntax ](project.config, project);
             }
-        }
+        }*/
+
+        builder[ project_config.syntax ](project.config, project);
+
         Utils.info('Making done...');
 
     }catch (e)

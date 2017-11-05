@@ -277,7 +277,7 @@ var descriptor = {
         'id':'class', 'type':'EventDispatcher','inherit':'Object',
         'proto':{
             'dispatchEvent':{'id':'function','type':'Boolean','param':['Event']},
-            'removeEventListener':{'id':'function','type':'Boolean','param':['String']},
+            'removeEventListener':{'id':'function','type':'Boolean','param':['String','Function'], 'required':[true,false] },
             'addEventListener':{'id':'function','type':'EventDispatcher','param':['String','Function']},
             'hasEventListener':{'id':'function','type':'Boolean','param':['String']},
         }

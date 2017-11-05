@@ -14,10 +14,12 @@ program
 .option('-c, --config [file]', '指定配置文件', PATH.resolve(root_path, 'configure.js') )
 .option('-m, --minify [enable|disabled]', '是否需要压缩代码', null )
 .option('-o, --output [dir]', '输出路径')
-.option('-s, --suffix [value]', '源文件的后缀名','es')
+.option('-s, --syntax [js|php]', '要构建的语法','js')
+.option('-S, --suffix [value]', '源文件的后缀名','es')
 .option('-B, --browser [enable|disabled]', '是否需要支持浏览器','enable')
 .option('-b, --bootstrap [value]', '默认的引导文件','Index')
 .option('-d, --debug [enable|disabled]', '是否需要开启调试','enable')
+.option('-t, --themes [default|blue]', '指定使用的主题颜色','default')
 .option('-r, --reserved [items]', '指定需要保护的关键字', function (val) {
     return val.split(',');
 })
@@ -61,6 +63,7 @@ var config = {
     'baseSkinClass':program.baseSkinClass,
     'config_file':program.config,
     'bootstrap':program.bootstrap,
+    'themes':program.themes,
     'context':{
         "public":"_public",
         "protected":"_protected",
@@ -73,6 +76,7 @@ var config = {
 
 config.clean = program.clean
 config.root_path = root_path;
+config.syntax = program.syntax;
 
 //开始
-require('../index.js')(config);
+require('../index.js')(config, true);

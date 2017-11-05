@@ -14,7 +14,7 @@ package es.events
         static public const INSTALLING   ='componentInstalling';
         static public const UPDATE_DISPLAY_LIST ='componentUpdateDisplayList';
         public var hostComponent:Component=null;
-        public function ComponentEvent(type, bubbles, cancelable)
+        public function ComponentEvent(type, bubbles=true, cancelable=true)
         {
             super(type, bubbles, cancelable);
         };

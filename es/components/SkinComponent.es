@@ -16,6 +16,11 @@ package es.components
 
     public class SkinComponent extends Component
     {
+        public function SkinComponent()
+        {
+            super();
+        }
+        
         /**
          * 安装皮肤。
          * 此阶段为编译阶段将皮肤转化成html

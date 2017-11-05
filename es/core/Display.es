@@ -274,9 +274,9 @@ package es.core
         };
 
         /**
-         * @private
+         * @protected
          */
-        private var _parent:Display;
+        protected var parentDisplay:Display;
 
         /**
          * 获取父级皮肤元素
@@ -285,16 +285,16 @@ package es.core
          */
         public function get parent():Display
         {
-            return _parent;
+            return parentDisplay;
         };
 
         /**
-         * 设置该对象的父级对象
-         * @param parent
+         * 输出html字符串格式
+         * @return
          */
-        final protected function setParentOf( parent:Display )
+        override public function toString():String
         {
-            _parent = parent;
+            return _element.html( true );
         }
     }
 }

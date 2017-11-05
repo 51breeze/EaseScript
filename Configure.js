@@ -64,9 +64,6 @@ module.exports={
             'client': {
                 "path": "./",
                 "name": "client",
-                "config":{
-                    "syntax": "javascript",
-                },
                 "child": {
                     'skin': {
                         "path": "./",
@@ -78,7 +75,6 @@ module.exports={
                 "path": "./",
                 "name": "server",
                 "config":{
-                    "syntax": "php",
                     'compat_version':{'php':5.3},
                 },
                 "child": {

@@ -147,7 +147,7 @@ var descriptor = {
         'proto': {
             'forEach': {type: '*', 'id': 'function',param:['Function']},
             'property': {type: 'String', 'id': 'function',param:['String','Object']},
-            'html': {type: 'String', 'id': 'function',param:['String']},
+            'html': {type: 'String', 'id': 'function',param:['Object']},
             'text': {type: 'String', 'id': 'function',param:['String']},
             'length': {type: 'Number', 'id': 'const'},
             'slice': {type: 'Number', 'id': 'function', param:['Number'] },

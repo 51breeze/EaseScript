@@ -12,7 +12,7 @@ package es.events
         static public const CREATE_CHILDREN_COMPLETED ='createChildrenCompleted';
         public var parent:Display;
         public var child:Display;
-        public function SkinEvent(type, bubbles, cancelable)
+        public function SkinEvent(type, bubbles=true, cancelable=true)
         {
             super(type, bubbles, cancelable);
         };

@@ -4,22 +4,42 @@
 module.exports = {
 
     'default':{
+        'base':'#000',
         //场景颜色
-        'scene':'#ffffff',
-        //强调颜色
-        'highlight':'#353535',
-        //主要的颜色
-        'primary':'#353535',
+        'scene':'#fff',
         //辅助的颜色
-        'secondary':'#DFDFDF', //#DFDFDF //#337ab7
-        //标题文本颜色
-        'normal':'#333333',
+        'secondary':'#DFDFDF',
+        //主要的颜色
+        'primary': '#428bca',
+        //文本颜色
+        'normal':'#333',
         //成功颜色
         'success':'#5cb85c',
+        //提示颜色
+        'info':'#5bc0de',
         //警告颜色
-        'warn':'#f0ad4e',
+        'warning':'#f0ad4e',
         //错误颜色
-        'error':'#d9534f',
+        'danger':'#d9534f',
+    },
+    'blue':{
+        'base':'#000',
+        //场景颜色
+        'scene':'#ffffff',
+        //辅助的颜色
+        'secondary':'#d1f0fd',
+        //主要的颜色
+        'primary': '#00aeff',
+        //标题文本颜色
+        'normal':'#333',
+        //成功颜色
+        'success':'#5cb85c',
+        //提示颜色
+        'info':'#5bc0de',
+        //警告颜色
+        'warning':'#f0ad4e',
+        //错误颜色
+        'danger':'#d9534f',
     }
 
 };

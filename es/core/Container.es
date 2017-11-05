@@ -86,11 +86,11 @@ package es.core
             {
                 (child.parent as Container).removeChild( child );
             }
-            var children = this._children;
+            var children:Array = this._children;
             var indexAt = index < 0 ? index+children.length : index;
             this.element.addChildAt( child.element, index);
             children.splice(indexAt, 0, child);
-            child.setParentOf(this);
+            child.parentDisplay = this;
             return child;
         };
 
@@ -105,7 +105,7 @@ package es.core
             {
                 var children:Array = this._children;
                 var index = children.indexOf( child );
-                child.setParentOf(null);
+                child.parentDisplay = null;
                 this.element.removeChild( child.element );
                 this._children.splice(index, 1);
                 return child;
@@ -127,7 +127,7 @@ package es.core
          * 为当前的皮肤添加一组子级元素, 并清空当前已存在的子级元素
          * @param child
          */
-        public function html( child:Display )
+        public function html( child:Display=null )
         {
             if( child !== null )
             {
@@ -136,7 +136,7 @@ package es.core
                     (child.parent as Container).removeChild( child );
                 }
                 this.element.html( child.element );
-                child.setParentOf(this);
+                child.parentDisplay = this;
                 this._children = [ child ];
 
             }else{
