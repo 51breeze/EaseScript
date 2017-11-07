@@ -162,7 +162,14 @@ class Element extends EventDispatcher implements \ArrayAccess,\Countable
     public function property($name, $value ){}
     public function hasProperty($prop){}
     public function data($name, $value ){}
-    public function style($name, $value ){}
+    public function style($name, $value ){
+        $item = $this->items[0];
+        if( $value!=null ){
+            $item->style->$name=$value;
+            return $this;
+        }
+        return $item->style->$name;
+    }
     public function show(){}
     public function hide(){}
     public function text( $value ){}

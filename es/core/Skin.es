@@ -25,29 +25,36 @@ package es.core
          */
         function Skin( skinObject:Object )
         {
-            skinObject = skinObject || {};
-            var attr=skinObject.attr || {};
-            var name = skinObject.name || 'div';
-            var hash = skinObject.hash;
-            if( hash )
+            if( !(skinObject is Element) )
             {
-                for(var h in hash )
+                skinObject = skinObject || {};
+                var attr = skinObject.attr || {};
+                var name = skinObject.name || 'div';
+                var hash = skinObject.hash;
+                if (hash)
                 {
-                    if( hash[h]==='@id' )
+                    for (var h in hash)
                     {
-                        hash[h] = System.uid();
-                        if( attr.id===h ) attr.id = hash[h];
+                        if (hash[h] === '@id')
+                        {
+                            hash[h] = System.uid();
+                            if (attr.id === h) attr.id = hash[h];
+                        }
                     }
                 }
+                this._children = skinObject.children || [];
+                this.hash = skinObject.hash || {};
+                this._name = name;
+                this._attr = attr;
+                var str = System.serialize(attr, 'attr');
+                skinObject = new Element('<' + name + " " + str + '/>');
             }
+            super( skinObject );
+        }
 
-            this._children = skinObject.children || [];
-            this.hash = skinObject.hash || {};
-            this.stateGroup = {};
-            this._name = name;
-            this._attr = attr;
-            var str = System.serialize(attr,'attr');
-            super( new Element('<'+name+" "+str+'/>') );
+        protected function get skinChildren():Array
+        {
+            return _children;
         }
 
         /**
@@ -57,6 +64,11 @@ package es.core
         public function get name():String
         {
             return _name;
+        }
+
+        public function set name(value:String)
+        {
+            _name = value;
         }
 
         public function set attr(value:Object):void
@@ -251,18 +263,13 @@ package es.core
             this.createChildren();
         }
 
-        protected function parseSkinObject( skinObject:Object , hash )
-        {
-            return __toString(skinObject, hash );
-        }
-
         /**
          * 创建一组子级元素
          * 当前皮肤被添加到视图中后会自动调用，无需要手动调用
          */
         protected function createChildren()
         {
-            var children = this._children;
+            var children:Array = this.skinChildren;
             var hash = this.hash;
             var len = children.length;
             var c = 0;
@@ -283,13 +290,14 @@ package es.core
                 child = children[c];
                 if( System.isObject(child, true) )
                 {
-                    child = __toString(child, hash );
+                    child = Skin.parseSkinObject(child, hash );
 
-                }else if( child instanceof Render )
+                } if( child instanceof Render )
                 {
                     var rd:Render = child as Render;
                     child = rd.fetch();
                 }
+
                 if( child )
                 {
                     if ( System.isString( child ) )
@@ -370,42 +378,42 @@ package es.core
                     }
                 });
             }
-        };
-    }
-}
+        }
 
-/**
- * 将皮肤对象转成html的字符串形式
- * @param skin
- * @param hash
- */
-function __toString(skin, hash)
-{
-    var tag = skin.name || 'div';
-    var children:Array = System.isObject(skin,true) ?  skin.children : skin._children;
-    var attr = skin.attr || {};
-    var content='';
-    var len = children.length;
-    var i = 0;
-    for (;i<len;i++)
-    {
-        var child = children[i];
-        if ( System.isObject(child,true) )
+        /**
+         * 将皮肤对象转成html的字符串形式
+         * @param skin
+         * @param hash
+         */
+        static protected function parseSkinObject( skin:Object , hash=null ):String
         {
-            content += __toString(child, hash );
-        } else
-        {
-            content += typeof child ==="string" ? child : __toString(child, child.hash);
+            var tag = skin.name || 'div';
+            var children:Array = skin is Skin ? skin.skinChildren : skin.children;
+            var attr = skin.attr || {};
+            var content='';
+            var len = children.length;
+            var i = 0;
+            for (;i<len;i++)
+            {
+                var child = children[i];
+                if ( System.isObject(child,true) )
+                {
+                    content += Skin.parseSkinObject(child, hash );
+                } else
+                {
+                    content += typeof child ==="string" ? child : Skin.parseSkinObject(child, child.hash);
+                }
+            }
+            if( tag==='text' )return content;
+            var str = '<' + tag;
+            for (var p in attr)
+            {
+                var v = attr[p];
+                v = p==='id' && hash.hasOwnProperty(v) ? hash[v] : v;
+                str += " " + p + '="' + v + '"';
+            }
+            str += '>' + content + '</' + tag + '>';
+            return str;
         }
     }
-    if( tag==='text' )return content;
-    var str = '<' + tag;
-    for (var p in attr)
-    {
-        var v = attr[p];
-        v = p==='id' && hash.hasOwnProperty(v) ? hash[v] : v;
-        str += " " + p + '="' + v + '"';
-    }
-    str += '>' + content + '</' + tag + '>';
-    return str;
 }

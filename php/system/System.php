@@ -8,32 +8,38 @@ final class System
         array_unshift( $param, implode(' ',array_fill(0,func_num_args(),'%s') ) );
         echo call_user_func_array('sprintf',  $param );
     }
+
     public static function isOf( $obj, $class )
     {
-        if( interface_exists($class,false) )
-        {
-            return false;
-        }
+        try {
+            if(interface_exists($class))return false;
+        }catch (\Exception $e){}
         return self::is($obj, $class);
     }
 
     public static function is( $obj, $class )
     {
-        switch ( $class ){
-            case 'Class' :
-                return is_string($obj) ? class_exists( $obj ) : false;
-            case 'Array' :
-                return is_array($obj);
-            case 'String' :
-                return is_string($obj);
-            case 'Boolean' :
-                return is_bool($obj);
-            case 'Number' :
-                return is_numeric($obj);
-            case 'Object' :
-                return is_object($obj);
+        try{
+            switch ( $class )
+            {
+                case 'Class' :
+                    return is_string($obj) ? class_exists($obj, true) : false;
+                case 'Array' :
+                    return is_array($obj);
+                case 'String' :
+                    return is_string($obj);
+                case 'Boolean' :
+                    return is_bool($obj);
+                case 'Number' :
+                    return is_numeric($obj);
+                case 'Object' :
+                    return is_object($obj);
+            }
+            return is_string($obj) ? false : is_a($obj, $class, true );
+        }catch (\Exception $e)
+        {
+            return false;
         }
-        return is_a($obj, $class, true );
     }
 
     public static function type($obj, $typeClass)
@@ -58,7 +64,7 @@ final class System
             return 'number';
         }else if( is_string($obj) ){
             return 'string';
-        }else if( is_a($obj,'RegExp',false) ){
+        }else if( self::is($obj,'RegExp') ){
             return 'regexp';
         }
         return 'object';

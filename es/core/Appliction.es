@@ -36,7 +36,7 @@ package es.core
        public function render()
        {
            this.display();
-           return this.skin.toString();
+           return document.documentElement.outerHTML;
        }
 
        private var _viewport=null;

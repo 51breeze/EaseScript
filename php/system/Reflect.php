@@ -116,14 +116,27 @@ final class Reflect
         {
             $target = $callback[0];
             $name =  $callback[1];
-            if( is_array($target) && is_string($name) )
+            if( is_string($name) )
             {
-                switch ($name)
+                if( is_array($target) )
                 {
-                    case 'pop' :
-                        return array_pop($target);
-                    case 'push' :
-                        return array_push($target, $args[0] );
+                    switch ($name) {
+                        case 'pop' :
+                            return array_pop($target);
+                        case 'push' :
+                            return array_push($target, $args[0]);
+                    }
+
+                } else if( is_string($target) )
+                {
+                    switch ($name) {
+                        case 'toLowerCase' :
+                            return strtolower( $target );
+                        case 'toUpperCase' :
+                            return strtoupper( $target );
+                        case 'substr' :
+                            return substr( $target, $args[0], isset($args[1]) ? $args[1] : null );
+                    }
                 }
             }
 
@@ -145,6 +158,10 @@ final class Reflect
             }
             if( $desc==false )
             {
+                if( !is_object($target) )
+                {
+                    throw new ReferenceError( 'target is non-object', __FILE__, __LINE__);
+                }
                 return $target->__call($name, $args==null ? [] : $args );
             }else
             {

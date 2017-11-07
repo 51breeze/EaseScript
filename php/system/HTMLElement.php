@@ -32,12 +32,12 @@ class HTMLElement extends Node
         {
             throw new \es\core\ReferenceError('parent and child elements can not be the same');
         }
-        if( $this->parentNode )
+        if( $child->parentNode )
         {
-            $this->parentNode->removeChild( $child );
+            $child->parentNode->removeChild( $child );
         }
         $this->content = '';
-        $index = $index<0 ? count($this->children)+$index : $index;
+        $index = $index<0 ? count($this->children)+$index+1 : $index;
         array_splice( $this->children,$index,0, array($child) );
         $child->parentNode = $this;
         $this->parseHtml = true;
@@ -94,7 +94,7 @@ class HTMLElement extends Node
             $attrStr  = System::serialize($this->attr, 'attr');
             $styleStr = System::serialize($this->style, 'style');
             if ($attrStr) $attr .= ' ' . $attrStr;
-            if ($styleStr) $attr .= ' ' . $styleStr;
+            if ($styleStr) $attr .= ' style="' . $styleStr.'"';
             if( $this->nodeName==='link' || $this->nodeName==='meta' )
             {
                 $this->outerHTML ='<' . $this->nodeName . $attr . ' />';
@@ -121,6 +121,12 @@ class HTMLElement extends Node
             case 'outerHTML' :
                 $this->__toString();
                 return $this->outerHTML;
+            case 'html' :
+            case 'documentElement' :
+                return System::document()->__get('documentElement');
+            case 'body' :
+            case 'head' :
+                return System::document()->__get( $name );
         }
         return parent::__get($name);
     }
@@ -133,6 +139,11 @@ class HTMLElement extends Node
                 return $this->setInnerHTML( $value );
             case 'outerHTML' :
                 return $this->setInnerHTML( $value ,  true );
+            case 'documentElement' :
+            case 'html' :
+            case 'body' :
+            case 'head' :
+                return;
         }
         return parent::__set($name, $value);
     }
