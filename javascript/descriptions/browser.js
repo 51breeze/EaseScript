@@ -125,6 +125,25 @@ var descriptor = {
             'replace': {type: 'void', 'id': 'function', param: []},
         }
     },
+    'Node': {
+        'type': 'Node',
+        'id': 'class',
+        'inherit': 'EventDispatcher',
+        'proto': {
+            'text':{type: 'String', 'id': 'var'},
+        }
+    },
+    'HTMLElement': {
+        'type': 'HTMLElement',
+        'id': 'class',
+        'inherit': 'Node',
+        'proto': {
+            'getElementByName': {type: 'Array', 'id': 'function', param: ['String']},
+            'getElementById': {type: 'Node', 'id': 'function', param: ['String']},
+            'addChild': {type: 'Node', 'id': 'function', param: ['Node']},
+            'addChildAt': {type: 'Node', 'id': 'function', param: ['Node','Number']},
+        }
+    },
     'Element': {
         'type': 'Element',
         'id': 'class',

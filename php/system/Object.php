@@ -3,9 +3,8 @@
 use es\core\ReferenceError;
 use es\core\System;
 
-class Object extends \stdClass implements \Iterator
+class Object extends \stdClass implements \Iterator, \ArrayAccess
 {
-    
     static function merge()
     {
         $length = func_num_args();
@@ -32,6 +31,7 @@ class Object extends \stdClass implements \Iterator
             $target = new \stdClass();
         }
 
+        $type = System::isArray($target) ? 'array' : 'object';
         for ( ;$i < $length; $i++ )
         {
             $options=null;
@@ -53,11 +53,23 @@ class Object extends \stdClass implements \Iterator
                         {
                             $cloneObj = $src && System::isObject($src) ? $src : new \stdClass();
                         }
-                        $target[ $key ]=Object::merge( $deep, $cloneObj, $copy );
+                        if( $type==='array' )
+                        {
+                            $target[ $key ]=Object::merge( $deep, $cloneObj, $copy );
+                        }else
+                        {
+                            $target->$key=Object::merge( $deep, $cloneObj, $copy );
+                        }
 
                     } else if ( !empty($copy) )
                     {
-                        $target[$key]=$copy;
+                        if( $type==='array' )
+                        {
+                            $target[ $key ]=$copy;
+                        }else
+                        {
+                            $target->$key=$copy;
+                        }
                     }
                 }
             }
@@ -69,7 +81,6 @@ class Object extends \stdClass implements \Iterator
     private $_originType= null;
 
     public $length = 0;
-
     public function __construct( $object=null )
     {
          if( $object != null && !is_subclass_of($this,"Object") )
@@ -110,7 +121,16 @@ class Object extends \stdClass implements \Iterator
 
     public function __toString()
     {
-        return "[object Object]";
+        switch ( $this->_originType )
+        {
+            case 'string'  :
+            case 'number'  :
+            case 'boolean' :
+            case 'regexp' :
+                return $this->_originValue;
+            break;
+        }
+        return json_encode( $this->_originValue, JSON_UNESCAPED_UNICODE);
     }
 
     public function defineProperty($obj, $prop, $desc)
@@ -178,7 +198,6 @@ class Object extends \stdClass implements \Iterator
         unset( $this->_originValue[$offset] );
     }
 
-
     public function current()
     {
         return current($this->_originValue);
@@ -196,7 +215,7 @@ class Object extends \stdClass implements \Iterator
 
     public function valid()
     {
-        return key($this->_originValue) !== null;
+        return key($this->_originValue) != null;
     }
 
     public function rewind()
@@ -211,6 +230,16 @@ class Object extends \stdClass implements \Iterator
             throw new ReferenceError($name.' is not exists.',__FILE__, __LINE__);
         }
         return isset($this->_originValue[$name]) ? $this->_originValue[$name] : null;
+    }
+
+    public function __isset($name)
+    {
+        return isset($this->_originValue[$name]);
+    }
+
+    public function __unset($name)
+    {
+       unset( $this->_originValue[$name] );
     }
 
     public function __set($name,$value)

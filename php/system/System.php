@@ -25,7 +25,7 @@ final class System
                 case 'Class' :
                     return is_string($obj) ? class_exists($obj, true) : false;
                 case 'Array' :
-                    return is_array($obj);
+                    return self::isArray( $obj );
                 case 'String' :
                     return is_string($obj);
                 case 'Boolean' :
@@ -35,7 +35,7 @@ final class System
                 case 'Object' :
                     return is_object($obj);
             }
-            return is_string($obj) ? false : is_a($obj, $class, true );
+            return is_string($obj) ? false : is_a($obj, $class);
         }catch (\Exception $e)
         {
             return false;
@@ -53,7 +53,7 @@ final class System
 
     public static function typeOf( $obj )
     {
-        if( is_array($obj) )
+        if( self::isArray( $obj ) )
         {
             return is_callable($obj) ? 'function' : 'array';
         }else if( function_exists( $obj ) ){
@@ -77,13 +77,19 @@ final class System
         {
             $type = get_class($obj);
             $result = $type === 'es\core\Object' || $type === "stdClass";
-            if ( $result || ( $flag !== true && is_array($obj) ) )
+            if ( $result || ( $flag !== true && self::isArray( $obj ) ) )
             {
                 return true;
             }
         }
         return false;
     }
+
+    public static function isArray( $obj )
+    {
+        return is_array($obj) || is_a($obj,'ArrayList', false);
+    }
+
     public static function isString( $obj )
     {
         return is_string($obj);
@@ -145,9 +151,9 @@ final class System
 
     static function serialize($object, $type='url', $group=true)
     {
-        if ( is_string($object)  || $object==null)
+        if ( is_string($object)  || $object==null )
         {
-            return $object;
+            return $object==null ? '' : $object;
         }
         $str = [];
         $joint = '&';
@@ -166,11 +172,17 @@ final class System
             $joint = ' ';
             $group = false;
         }
+        
         foreach ($object as $key=>$val)
         {
-            $val = $type === 'attr' ? '"' . $val . '"' : $val;
-            $key = $prefix ? $prefix . '[' . $key . ']' : $key;
-            array_splice( $str, 0, 0, is_object($val) ? System::serialize($val, $type, $group ? $key : false) : [$key . $separate . $val] );
+            if( is_object($val)  )
+            {
+                $key = $prefix ? $prefix . '[' . $key . ']' : $key;
+                $val = System::serialize($val, $type, $group ? $key : false);
+            }else{
+                $val = $type === 'attr' ? '"' . $val . '"' : $val;
+            }
+            array_splice( $str, 0, 0, array( $key . $separate . $val ) );
         }
         return implode($joint, $str);
     }

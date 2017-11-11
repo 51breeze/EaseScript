@@ -112,7 +112,7 @@ final class Reflect
 
     final static public function call( $callback, array $args=null, $thisArg=null, $scope=null, $ns=null )
     {
-        if( is_array($callback) )
+        if( System::isArray($callback) )
         {
             $target = $callback[0];
             $name =  $callback[1];
@@ -185,7 +185,7 @@ final class Reflect
 
     final static public function get($target, $name, $thisArg=null, $scope=null, $ns=null )
     {
-        if( is_array($target) || is_a($target, "ArrayAccess") )
+        if( System::isArray($target) )
         {
             if ( is_string($name) )
             {
@@ -222,7 +222,7 @@ final class Reflect
 
     final static public function set($target, $name, $value, $thisArg=null, $scope=null, $ns=null )
     {
-        if( is_array($target) || is_a($target, "ArrayAccess") )
+        if( System::isArray($target) )
         {
             if ( is_string($name) )
             {

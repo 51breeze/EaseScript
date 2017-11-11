@@ -83,9 +83,19 @@ package es.core
          * @param name
          * @param value
          */
-        public function property(name,value):Object
+        public function property(name,value=null):Object
         {
-            return _element.property( name );
+            if( value==null )
+            {
+                if( System.isObject(name,true) )
+                {
+                    _element.property( name );
+                    return this;
+                }
+                return _element.property( name );
+            }
+            _element.property( name , value );
+            return this;
         }
 
         /**

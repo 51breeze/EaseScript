@@ -10,11 +10,9 @@ package es.core
 
     public class SkinGroup extends Skin
     {
-
         public static const CHARSET_GB2312 = 'GB2312';
         public static const CHARSET_GBK    = 'GBK';
         public static const CHARSET_UTF8   = 'UTF-8';
-
         private var _skinChildren:Array = [];
         private var _skinObject = null;
 
@@ -32,15 +30,17 @@ package es.core
         {
             var children:Array = skinObject.children;
             var len = children.length;
+            var index = 0;
             var head:Object = document.documentElement.head;
-            for(;len>0;)
+            for(;index<len;index++)
             {
-                var child = children[--len];
+                var child = children[ index ];
                 var name =  child.name.toLowerCase();
                 switch ( name )
                 {
                     case 'body'   :
                         this._skinChildren = child is Skin ?  child.skinChildren : child.children;
+                        this.attr=child.attr;
                         break;
                     case 'head'   :
                         this.create( child , head );
@@ -60,6 +60,18 @@ package es.core
         override protected function createChildren()
         {
             this.create(_skinObject, document.body );
+            var title = this._title;
+            if( title )
+            {
+                var head:HTMLElement = document.documentElement.head as HTMLElement;
+                var elem:Array = head.getElementByName('title');
+                if( elem.length < 1 )
+                {
+                    var titleElem:HTMLElement = Element.createElement('title') as HTMLElement;
+                    titleElem.text= title;
+                    head.addChild( titleElem );
+                }
+            }
             super.createChildren();
         }
 

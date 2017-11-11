@@ -12,7 +12,40 @@ class HTMLElement extends Node
         $this->nodeType = $type;
         parent::__construct($name, $type, $attr);
     }
+
+    public function getElementByName( $name )
+    {
+         if( !is_string($name) )return false;
+         $len = count( $this->children );
+         $i = 0;
+         $items = array();
+         for(;$i<$len;$i++)
+         {
+             $child = $this->children[$i];
+             if( strcasecmp($child->nodeName ,$name)===0 )
+             {
+                 array_push($items, $child);
+             }
+         }
+         return $items;
+    }
     
+    public function getElementById( $name )
+    {
+         if( !is_string($name) )return false;
+         $len = count( $this->children );
+         $i = 0;
+         for(;$i<$len;$i++)
+         {
+             $child = $this->children[$i];
+             if( strcasecmp($child->id ,$name)===0 )
+             {
+                return $child;
+             }
+         }
+         return null;
+    }
+
     private $children=array();
 
     public function addChild( Node $child )
@@ -121,6 +154,8 @@ class HTMLElement extends Node
             case 'outerHTML' :
                 $this->__toString();
                 return $this->outerHTML;
+            case 'attr' :
+                 return $this->attr;
             case 'html' :
             case 'documentElement' :
                 return System::document()->__get('documentElement');
@@ -139,6 +174,17 @@ class HTMLElement extends Node
                 return $this->setInnerHTML( $value );
             case 'outerHTML' :
                 return $this->setInnerHTML( $value ,  true );
+            case 'attr' :
+                if( is_object($value) )
+                {
+                    if( isset($value->style) )
+                    {
+                        $this->style = Object::merge( $this->style, System::unserialize($value->style) );
+                        unset( $value->style );
+                    }
+                    $this->attr = Object::merge( $this->attr, $value);
+                    return $this->attr;
+                }
             case 'documentElement' :
             case 'html' :
             case 'body' :

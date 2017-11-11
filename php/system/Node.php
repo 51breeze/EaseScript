@@ -39,9 +39,12 @@ class Node extends EventDispatcher
         switch ($name)
         {
             case 'style' :
-                return $this->style = (object)$value;
+                $this->style = Object::merge( $this->style, (object)$value);
+                return $this->style;
             case 'parentNode' :
                 throw new \es\core\ReferenceError('parentNode is not writable.');
+            case 'text' :
+                return $this->content = $value;
         }
         $this->attr->$name = $value;
     }

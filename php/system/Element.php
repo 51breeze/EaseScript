@@ -39,7 +39,7 @@ class Element extends EventDispatcher implements \ArrayAccess,\Countable
                 break;
         }
 
-        if( preg_match('/^\w+$/') )
+        if( preg_match('/^\w+$/', $name ) )
         {
             $elem = new HTMLElement( $name, 1, $attr);
 
@@ -142,29 +142,41 @@ class Element extends EventDispatcher implements \ArrayAccess,\Countable
         return array_search($child,$this->items, true );
     }
 
-    public function width($width=null)
+    public function width($value=null)
     {
-         $item = $this->items[0];
-         if( $width==null )
-         {
-             return $item->style->width;
-         }
-        $item->style->width=$width;
-        return $this;
+        return $this->style('width', $value);
     }
 
-    public function height(){}
+    public function height($value=null)
+    {
+        return $this->style('height', $value);
+    }
 
     public function current( $elem=null )
     {
 
     }
-    public function property($name, $value ){}
+    public function property($name, $value=null)
+    {
+        $item = $this->items[0];
+        if( $value==null )
+        {
+            if( System::isObject($name) )
+            {
+                $item->attr = $name;
+            }
+            return $item->$name;
+        }
+        $item->$name = $value;
+        return $this;
+    }
     public function hasProperty($prop){}
     public function data($name, $value ){}
-    public function style($name, $value ){
+    public function style($name, $value=null)
+    {
         $item = $this->items[0];
-        if( $value!=null ){
+        if( $value != null )
+        {
             $item->style->$name=$value;
             return $this;
         }

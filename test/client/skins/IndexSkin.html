@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<s:SkinGroup name="html" xmlns:s="es.core" >
+<s:SkinGroup name="html" xmlns:s="es.core" xmlns:c="es.components" title="" >
     <![CDATA[
 
+     private var data:Array = [];
      override protected function updateDisplayList()
      {
         super.updateDisplayList();
-        Element('body').width(300);
-        Element('body').style('background-color','#ff0000');
-
+        Element('body').style('background-color','#cc0000');
      }
 
     ]]>
@@ -15,13 +14,17 @@
     <meta charset="UTF-8" http-equiv="X-UA-Compatible" content="IE=edge" />
     <script src="/webroot/static/js/Index.js"></script>
     <link rel="stylesheet" href="/webroot/static/css/Index.css" />
-    <title>Test</title>
 </head>
 
-<h1>Hello world!</h1>
+    <body style="background-color: #2b542c">
 
-    <div style="background-color: #00b3ee">
-        sdfsdfsdfsdf
-    </div>
+        <h1>Hello world!</h1>
+        <div style="background-color: #00b3ee">
+            sdfsdfsdfsdf
+        </div>
 
+        <c:DataGrid source="@this.data">
+        </c:DataGrid>
+
+    </body>
 </s:SkinGroup>
