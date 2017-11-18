@@ -13,9 +13,9 @@ package es.components
 
     public class DataGrid extends SkinComponent
     {
-        public function DataGrid(viewport)
+        public function DataGrid()
         {
-            super(viewport);
+            super();
         }
 
         /**
@@ -123,7 +123,7 @@ package es.components
          * @type {string}
          * @private
          */
-        private var __dataProfile__ = 'data';
+        private var __dataProfile__ = 'datalist';
 
         /**
          * @param profile

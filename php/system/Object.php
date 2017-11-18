@@ -5,7 +5,7 @@ use es\core\System;
 
 class Object extends \stdClass implements \Iterator, \ArrayAccess
 {
-    static function merge()
+    static public function merge()
     {
         $length = func_num_args();
         $target = func_get_arg(0);
@@ -79,8 +79,8 @@ class Object extends \stdClass implements \Iterator, \ArrayAccess
 
     private $_originValue= null;
     private $_originType= null;
-
     public $length = 0;
+
     public function __construct( $object=null )
     {
          if( $object != null && !is_subclass_of($this,"Object") )
@@ -139,39 +139,28 @@ class Object extends \stdClass implements \Iterator, \ArrayAccess
 
     function hasOwnProperty( $name )
     {
-       static $reflect = null;
-       if( $reflect ==null )
-       {
-           $reflect = new \ReflectionObject($this);
-       }
-       $property = $reflect->getProperty( $name );
-       if( $property->isPublic() && $property->isDefault() )
-       {
-           return true;
-       }
-       return false;
+        return isset( $this->_originValue[$name] );
     }
 
     function propertyIsEnumerable( $name )
     {
-
+        return isset( $this->_originValue[$name] );
     }
 
     function keys()
     {
-        return [];
+        return array_keys($this->_originValue);
     }
 
-    function values()
+    public function values()
     {
-        return [];
+        return array_values( $this->_originValue );
     }
 
-    function getEnumerableProperties( $state )
+    function getEnumerableProperties( $state=null )
     {
-        return [];
+        return array_slice($this->_originValue,0);
     }
-
 
     public function offsetExists($offset)
     {
@@ -248,7 +237,7 @@ class Object extends \stdClass implements \Iterator, \ArrayAccess
         {
             throw new ReferenceError($name . ' is not exists.', __FILE__, __LINE__);
         }
-        if( $this->_originType !== "object" )
+        if( $this->_originType !== "object" && is_subclass_of($this,"Object") )
         {
             throw new ReferenceError($name . ' is not writable. The value type is an '.$this->_originType,__FILE__, __LINE__);
         }

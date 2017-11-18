@@ -39,9 +39,9 @@ package es.components
 
     public class Pagination extends SkinComponent
     {
-        function Pagination(viewport)
+        function Pagination()
         {
-            super(viewport);
+            super();
         }
 
         /**

@@ -5,15 +5,9 @@ const Utils = require('./lib/utils.js');
 const makeSkin = require('./lib/skin.js');
 const globals=require('./javascript/descriptions/globals.js');
 const uglify = require('uglify-js');
-const loadModuleDescriptionQueues=[];
-var  descriptions={};
-var  makeModules={};
-var  skinContents=[];
-var  styleContents=[];
-var requirements={};
 
 //全局配置
-var defaultConfig = {
+const defaultConfig = {
     'suffix': '.es',  //需要编译文件的后缀
     'debug':'on', //是否需要开启调式
     'blockScope':'enable',     //是否启用块级域
@@ -39,6 +33,11 @@ var defaultConfig = {
     'mode': 1, //1 标准模式（开发时使用） 2 性能模式（生产环境使用）
 };
 
+var  descriptions={};
+var  makeModules={};
+var  styleContents=[];
+var  requirements={};
+var  clientScriptContents = [];
 
 /**
  * 全局模块
@@ -581,11 +580,19 @@ function loadModuleDescription( syntax , file , config , project , resource , su
 
         //加载皮肤
         var modules = makeSkin( fullclassname , config , project, syntax, loadModuleDescription );
-        styleContents = styleContents.concat( modules.styleContents);
+
+        //构建客户端运行的脚本
+        if( modules.clientScriptContents )
+        {
+            loadFragmentModuleDescription('javascript',  modules.clientScriptContents , modules.clientScriptContents.config || config , project);
+        }
+
+        styleContents = styleContents.concat( modules.styleContents );
         modules = modules.moduleContents;
         for( var index in modules )
         {
-            loadFragmentModuleDescription(syntax, modules[ index ], config, project);
+            var _module = modules[ index ];
+            loadFragmentModuleDescription(syntax, _module, config, project);
         }
         return define(syntax, fullclassname);
     }
@@ -969,48 +976,23 @@ function make( config, isGlobalConfig )
     var p;
     try
     {
-
-       /* for (p in build_project)
-        {
-            var project = build_project[p];
-            project.config = project_config = Utils.merge({},config, project.config || {});
-            if (typeof project_config.bootstrap === "string" && typeof project_config.syntax === "string")
-            {
-                if (syntax_supported[project_config.syntax] === true)
-                {
-                    //throw new Error('Syntax ' + project_config.syntax + ' is not be supported.');
-                    var classname = PATH.relative( config.project_path, filepath(project_config.bootstrap, project.path ) );
-                    loadModuleDescription(project_config.syntax, classname, project_config, project);
-                }
-            }
-        }*/
-
         var project = build_project.client;
         project.config = project_config = Utils.merge({},config, project.config || {});
-        
         if (typeof project_config.bootstrap === "string" && typeof project_config.syntax === "string")
         {
             if (syntax_supported[project_config.syntax] === true)
             {
-                //throw new Error('Syntax ' + project_config.syntax + ' is not be supported.');
                 var classname = PATH.relative( config.project_path, filepath(project_config.bootstrap, project.path ) );
                 loadModuleDescription(project_config.syntax, classname, project_config, project);
             }
         }
 
-        Utils.info('Making starting...');
-        /*for (p in build_project)
+        for (var s in makeModules )
         {
-            var project = build_project[p];
-            if (typeof project.config.bootstrap === "string" && typeof project.config.syntax === "string")
-            {
-                builder[ project.config.syntax ](project.config, project);
-            }
-        }*/
-
-        builder[ project_config.syntax ](project.config, project);
-
-        Utils.info('Making done...');
+            Utils.info('Making '+s+' starting ...');
+            builder[s](project.config, project);
+            Utils.info('Making '+s+' done ...');
+        }
 
     }catch (e)
     {

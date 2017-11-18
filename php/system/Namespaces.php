@@ -19,7 +19,7 @@ class Namespaces extends Object
         $this->uri =$uri;
     }
 
-    public function valudOf()
+    public function valueOf()
     {
         return $this->prefix . $this->uri;
     }

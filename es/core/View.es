@@ -8,7 +8,7 @@ package es.core
 {
     import es.core.Skin;
 
-    public class SkinGroup extends Skin
+    public class View extends Skin
     {
         public static const CHARSET_GB2312 = 'GB2312';
         public static const CHARSET_GBK    = 'GBK';
@@ -17,10 +17,10 @@ package es.core
         private var _skinObject = null;
 
         /**
-         * 皮肤类
+         * 视图类
          * @constructor
          */
-        function SkinGroup(skinObject:Object)
+        function View(skinObject:Object={})
         {
             _skinObject = skinObject;
             super( new Element( document.body ) );
@@ -31,7 +31,7 @@ package es.core
             var children:Array = skinObject.children;
             var len = children.length;
             var index = 0;
-            var head:Object = document.documentElement.head;
+            var head:Object = document.head;
             for(;index<len;index++)
             {
                 var child = children[ index ];
@@ -75,7 +75,7 @@ package es.core
             super.createChildren();
         }
 
-        private var _charset:String = SkinGroup.CHARSET_UTF8;
+        private var _charset:String = View.CHARSET_UTF8;
         public function get charset():String
         {
             return _charset;
@@ -83,7 +83,7 @@ package es.core
 
         public function set charset(value:String)
         {
-            if( value===SkinGroup.CHARSET_UTF8 || value === SkinGroup.CHARSET_GB2312 || value === SkinGroup.CHARSET_GBK )
+            if( value===View.CHARSET_UTF8 || value === View.CHARSET_GB2312 || value === View.CHARSET_GBK )
             {
                 _charset = value;
             }
@@ -104,8 +104,10 @@ package es.core
         {
             return 'html';
         }
-        override public function set name(value:String){}
 
+        override public function set name(value:String){
+
+        }
 
         override protected function get skinChildren():Array
         {

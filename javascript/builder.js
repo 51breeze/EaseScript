@@ -5,7 +5,7 @@ const rootPath =  utils.getResolvePath( __dirname );
 /**
  *  已加载的模块
  */
-const loaded = {};
+const loaded = {'HTMLElement':true,'Node':true};
 
 /**
  * 根据指定的版本加载对应的策略文件
@@ -279,10 +279,14 @@ function builder(config , code, requirements , skins )
     {
         for ( var p in requirements )
         {
-            if( requirements[p]===true && requires.indexOf( p ) < 0 )requires.push( p );
+            if( requirements[p]===true && requires.indexOf( p ) < 0 && ( globals.hasOwnProperty( p ) || config.globals.hasOwnProperty(p) ) )
+            {
+                requires.push( p );
+            }
         }
     }
-    for(var prop in requires)include(contents, requires[prop] , null, fix , libs);
+
+    for(var prop in requires)include(contents, requires[prop], null, fix, libs);
 
     //模块定义器
     include(contents, 'define' , rootPath+'/define.js', fix , libs);
