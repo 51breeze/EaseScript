@@ -10,9 +10,9 @@ class Element extends EventDispatcher implements \ArrayAccess,\Countable
         $html = trim( $html );
         $name = $html;
         $attr = array();
-        if( preg_match('/^<(\w+)([^>]*?)\/>/', $html, $match ) )
+        if( preg_match('/^<(\w+)([^>]*?)\/>$/', $html, $match ) )
         {
-            if( !empty($match[2]) && preg_match_all( '/(\w+)\s*\=\s*([\'\"])([^\\2]*?)\\2/', $match[2][0], $attr ) )
+            if( !empty($match[2]) && preg_match_all( '/(\w+)\s*\=\s*([\'\"])([^\\2]*?)\\2/', $match[2], $attr ) )
             {
                 $attr = array_combine( $attr[1], $attr[3] );
             }
@@ -21,8 +21,15 @@ class Element extends EventDispatcher implements \ArrayAccess,\Countable
 
         if( substr($name,0,1) === '<' )
         {
-            $elem = new HTMLElement( $name, 1,  $attr );
-            $elem->outerHTML = $html;
+            $elem = new HTMLElement('#documentFragment');
+            $elem->innerHTML = $html;
+            $childNodes = $elem->childNodes;
+            if( count($childNodes)===1 )
+            {
+                $elem = $childNodes[0];
+                unset($childNodes);
+                return $elem;
+            }
             return $elem;
         }
 
@@ -84,7 +91,7 @@ class Element extends EventDispatcher implements \ArrayAccess,\Countable
                 $selector = [ self::createElement( $selector ) ];
             }else
             {
-
+                $selector = \es\core\Document::querySelectorAll( $selector, $context );
             }
 
         }else if( $selector instanceof Node )
@@ -154,8 +161,9 @@ class Element extends EventDispatcher implements \ArrayAccess,\Countable
 
     public function current( $elem=null )
     {
-
+        return current($this->items);
     }
+
     public function property($name, $value=null)
     {
         $item = $this->items[0];
@@ -174,13 +182,13 @@ class Element extends EventDispatcher implements \ArrayAccess,\Countable
     public function data($name, $value ){}
     public function style($name, $value=null)
     {
-        $item = $this->items[0];
+        $item = @$this->items[0];
         if( $value != null )
         {
-            $item->style->$name=$value;
+            if( $item ) $item->style->$name=$value;
             return $this;
         }
-        return $item->style->$name;
+        return $item ? $item->style->$name : null;
     }
     public function show(){}
     public function hide(){}

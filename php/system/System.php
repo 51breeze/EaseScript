@@ -1,5 +1,8 @@
 <?php
 use \es\core\TypeError;
+
+if( !defined('NaN') )define('NaN','NaN');
+
 final class System
 {
     public static function log()
@@ -72,15 +75,14 @@ final class System
 
     public static function isObject( $obj, $flag=false )
     {
-        $result = is_object($obj);
-        if( $result )
+        if(  is_object($obj) )
         {
             $type = get_class($obj);
-            $result = $type === 'es\core\Object' || $type === "stdClass";
-            if ( $result || ( $flag !== true && self::isArray( $obj ) ) )
-            {
-                return true;
-            }
+            return $type === 'es\core\Object' || $type === "stdClass";
+
+        }else if(  $flag !== true && is_array( $obj ) )
+        {
+            return true;
         }
         return false;
     }
@@ -93,6 +95,16 @@ final class System
     public static function isString( $obj )
     {
         return is_string($obj);
+    }
+
+    public static function isNaN($value)
+    {
+        return $value === NaN || !is_numeric($value);
+    }
+
+    public static function range($low, $high, $step=1)
+    {
+        return range($low, $high, $step);
     }
 
     public static function bind($thisArg, $callback )
@@ -175,7 +187,8 @@ final class System
         
         foreach ($object as $key=>$val)
         {
-            if( is_object($val)  )
+            if( $type === 'attr' && $val==null )continue;
+            if( System::isObject($val) )
             {
                 $key = $prefix ? $prefix . '[' . $key . ']' : $key;
                 $val = System::serialize($val, $type, $group ? $key : false);

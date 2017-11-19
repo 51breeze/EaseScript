@@ -6,7 +6,7 @@
  * https://github.com/51breeze/EaseScript
  * @author Jun Ye <664371281@qq.com>
  */
-
+use \es\core\ArrayList;
 class DataGrep extends ArrayList
 {
     const LIKE_LEFT = 'left';

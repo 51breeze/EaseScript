@@ -104,7 +104,7 @@ class Object extends \stdClass implements \Iterator, \ArrayAccess
 
          }else
          {
-             $this->_originValue = new \stdClass();
+             $this->_originValue = array();
              $this->_originType = 'object';
          }
     }

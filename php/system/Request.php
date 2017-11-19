@@ -36,11 +36,19 @@ if (!defined('HTTP_URL_STRIP_QUERY')) {
 if (!defined('HTTP_URL_STRIP_FRAGMENT')) {
     define('HTTP_URL_STRIP_FRAGMENT', 512);
 }
-if (!defined('HTTP_URL_STRIP_ALL')) {
-    define('HTTP_URL_STRIP_ALL', 1024);
+
+if (!defined('HTTP_URL_STRIP_HOST'))
+{
+    define('HTTP_URL_STRIP_HOST', 1024);
 }
 
-if (!function_exists('http_build_url')) {
+if (!defined('HTTP_URL_STRIP_ALL'))
+{
+    define('HTTP_URL_STRIP_ALL', 2048);
+}
+
+if (!function_exists('http_build_url'))
+{
     /**
      * Build a URL.
      *
@@ -62,7 +70,7 @@ if (!function_exists('http_build_url')) {
         is_array($parts) || $parts = parse_url($parts);
         isset($url['query']) && is_string($url['query']) || $url['query'] = null;
         isset($parts['query']) && is_string($parts['query']) || $parts['query'] = null;
-        $keys = array('user', 'pass', 'port', 'path', 'query', 'fragment');
+        $keys = array('host','user', 'pass', 'port', 'path', 'query', 'fragment');
         // HTTP_URL_STRIP_ALL and HTTP_URL_STRIP_AUTH cover several other flags.
         if ($flags & HTTP_URL_STRIP_ALL) {
             $flags |= HTTP_URL_STRIP_USER | HTTP_URL_STRIP_PASS
@@ -72,11 +80,13 @@ if (!function_exists('http_build_url')) {
             $flags |= HTTP_URL_STRIP_USER | HTTP_URL_STRIP_PASS;
         }
         // Schema and host are alwasy replaced
-        foreach (array('scheme', 'host') as $part) {
+        foreach (array('scheme', 'host') as $part)
+        {
             if (isset($parts[$part])) {
                 $url[$part] = $parts[$part];
             }
         }
+
         if ($flags & HTTP_URL_REPLACE) {
             foreach ($keys as $key) {
                 if (isset($parts[$key])) {
@@ -114,29 +124,37 @@ if (!function_exists('http_build_url')) {
         if (isset($url['path']) && $url['path'] !== '' && substr($url['path'], 0, 1) !== '/') {
             $url['path'] = '/' . $url['path'];
         }
+
         foreach ($keys as $key) {
             $strip = 'HTTP_URL_STRIP_' . strtoupper($key);
             if ($flags & constant($strip)) {
                 unset($url[$key]);
             }
         }
+
         $parsed_string = '';
-        if (!empty($url['scheme'])) {
-            $parsed_string .= $url['scheme'] . '://';
-        }
-        if (!empty($url['user'])) {
-            $parsed_string .= $url['user'];
-            if (isset($url['pass'])) {
-                $parsed_string .= ':' . $url['pass'];
+        if( !($flags & HTTP_URL_STRIP_HOST) )
+        {
+            if (!empty($url['scheme'])) {
+                $parsed_string .= $url['scheme'] . '://';
             }
-            $parsed_string .= '@';
+            if (!empty($url['user'])) {
+                $parsed_string .= $url['user'];
+                if (isset($url['pass'])) {
+                    $parsed_string .= ':' . $url['pass'];
+                }
+                $parsed_string .= '@';
+            }
+
+            if (!empty($url['host'])) {
+                $parsed_string .= $url['host'];
+            }
+
+            if (!empty($url['port'])) {
+                $parsed_string .= ':' . $url['port'];
+            }
         }
-        if (!empty($url['host'])) {
-            $parsed_string .= $url['host'];
-        }
-        if (!empty($url['port'])) {
-            $parsed_string .= ':' . $url['port'];
-        }
+
         if (!empty($url['path'])) {
             $parsed_string .= $url['path'];
         }
@@ -178,44 +196,22 @@ final class Request extends Object
     }
 
     /**
-     * 获取当前请求的URL地址
-     * @return null|string
-     */
-    static public function url()
-    {
-        static $url=null;
-        if( $url == null )
-        {
-            $url =  isset($_SERVER['HTTPS']) ? 'https://' : 'http://';
-            $url .= $_SERVER['SERVER_NAME'];
-            if( isset($_SERVER['SERVER_PORT']) )$url.= $_SERVER['SERVER_PORT'];
-            $url.= $_SERVER['REQUEST_URI'];
-        }
-        return $url;
-    }
-
-    /**
      * 返回一个URL组装的所有属性
      * @return mixed|null
      */
-    static public function urlProperties()
+    static public function parse( $url )
     {
-        static $body=null;
-        if( $body == null )$body = parse_url( self::url() );
-        return $body;
+        return parse_url( $url );
     }
 
     private $body=null;
 
     public function __construct( $url = null )
     {
-        $properties = self::urlProperties();
+        $properties = self::parse( $this->url() );
         if( $url != null )
         {
-            if( !is_string($url) )
-            {
-                throw new TypeError('url is not String');
-            }
+            if( !is_string($url) )throw new TypeError('url is not String');
             $properties = array_merge($properties, parse_url($url) );
         }
         $this->body = (object)$properties;
@@ -226,28 +222,53 @@ final class Request extends Object
         return $this->buildUrl();
     }
 
-    public function buildUrl( $mode= HTTP_URL_STRIP_AUTH | HTTP_URL_JOIN_PATH | HTTP_URL_JOIN_QUERY | HTTP_URL_STRIP_FRAGMENT )
+    public function buildUrl( $mode= HTTP_URL_STRIP_ALL )
     {
-        return http_build_url( self::url() , (array)$this->body, $mode );
+        return http_build_url( $this->url() , (array)$this->body, $mode );
     }
 
     public function uri()
     {
-        return http_build_url( self::url() , (array)$this->body, HTTP_URL_JOIN_PATH | HTTP_URL_JOIN_QUERY | HTTP_URL_STRIP_FRAGMENT );
+        return http_build_url( $this->url() , (array)$this->body, HTTP_URL_REPLACE | HTTP_URL_JOIN_PATH | HTTP_URL_JOIN_QUERY | HTTP_URL_STRIP_HOST );
     }
 
-    public function host( $value )
+    private $_url = null;
+
+    /**
+     * 获取当前请求的URL地址
+     * @return null|string
+     */
+    public function url( $value = null )
     {
-        if( isset($value) )
+        if( $value != null )
+        {
+            $this->_url = $value;
+            return $this;
+        }
+        if( $this->_url===null )
+        {
+            $url = isset($_SERVER['HTTPS']) ? 'https://' : 'http://';
+            $url .= $_SERVER['SERVER_NAME'];
+            if (isset($_SERVER['SERVER_PORT'])) $url .= ':'.$_SERVER['SERVER_PORT'];
+            $url .= $_SERVER['REQUEST_URI'];
+            $this->_url = $url;
+        }
+        return $this->_url;
+    }
+
+    public function host( $value=null )
+    {
+        if( $value!=null )
         {
             $this->body->host = $value;
+            return $this;
         }
         return $this->body->host;
     }
 
-    public function scheme( $value )
+    public function scheme( $value=null )
     {
-        if( isset($value) && is_string($value) )
+        if( $value!=null )
         {
             $value = trim($value);
             if( !($value =='http' || $value=='https') )
@@ -255,68 +276,75 @@ final class Request extends Object
                 throw new SyntaxError('Invalid scheme. be was http or https');
             }
             $this->body->scheme = $value;
+            return $this;
         }
         return $this->body->scheme;
     }
 
-    public function path($value)
+    public function path($value=null)
     {
-        if( isset($value) )
+        if( $value!=null )
         {
             if( !is_string($value) )
             {
                 $value = implode('/', (array)$value);
             }
             $this->body->path = $value;
+            return $this;
         }
         return $this->body->path;
     }
-    public function query($value)
+    public function query($value=null)
     {
-        if( isset($value) )
+        if( $value!==null )
         {
             if( !is_string($value) )
             {
                 $value = http_build_query( (array)$value );
             }
             $this->body->query = $value;
+            return $this;
         }
         return $this->body->query;
     }
 
-    public function port($value)
+    public function port($value=null)
     {
-        if( isset($value) )
+        if( $value!=null )
         {
             if( !is_numeric($value) )throw new TypeError("port must is Number");
             $this->body->port = $value;
+            return $this;
         }
         return $this->body->port;
     }
 
-    public function pass($value)
+    public function pass($value=null)
     {
-        if( isset($value) )
+        if( $value!=null )
         {
             $this->body->pass = $value;
+            return $this;
         }
         return $this->body->pass;
     }
 
-    public function user( $value )
+    public function user( $value=null )
     {
-        if( isset($value) )
+        if( $value != null )
         {
             $this->body->user = $value;
+            return $this;
         }
         return $this->body->user;
     }
 
-    public function fragment($value)
+    public function fragment($value=null)
     {
-        if( isset($value) )
+        if( $value!=null )
         {
             $this->body->fragment = $value;
+            return $this;
         }
         return $this->body->fragment;
     }

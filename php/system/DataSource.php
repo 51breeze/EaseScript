@@ -7,9 +7,11 @@
  * @author Jun Ye <664371281@qq.com>
  * @require System,Symbol,Array,DataArray,Object,EventDispatcher,Http,HttpEvent,PropertyEvent,DataSourceEvent,DataGrep
  */
+use \es\core\Http;
+use \es\core\DataGrep;
+
 class DataSource extends EventDispatcher
 {
-
     private $_options = array(
         'method' => Http::METHOD_GET,
         'dataType' => Http::TYPE_JSON,
@@ -35,7 +37,7 @@ class DataSource extends EventDispatcher
     private $_totalSize = NaN;
     private $_buffer = 3;
     private $_current = 1;
-    private $_pageSize = 1;
+    private $_pageSize = 10;
     private $_loadCompleted = false;
     private $_loading = false;
     private $_nowNotify = false;
@@ -88,32 +90,41 @@ class DataSource extends EventDispatcher
     {
         $old_source = $this->_source;
         if ($old_source === $resource) return $this;
-        $options = (object)$this->_options;
-        if ($resource == null) {
+        $options = &$this->_options;
+        $options = (object)$options;
+        if ($resource == null)
+        {
             return $this->_isRemote ? $options->url : $old_source;
         }
 
         //本地数据源数组
-        if (is_array($resource)) {
+        if (is_array($resource))
+        {
             $this->_items = array_slice($resource, 0);
             $this->_source = $resource;
             $this->_isRemote = false;
-        } //远程数据源
-        else if ($resource) {
-            if (is_string($resource)) {
+        }
+        //远程数据源
+        else if ($resource)
+        {
+            if (is_string($resource))
+            {
                 $options->url = $resource;
                 $resource = new Http($options);
             }
-            if ($resource instanceof Http) {
+
+            if ($resource instanceof Http)
+            {
                 $this->_source = $resource;
                 $this->_isRemote = true;
                 //请求远程数据源侦听器
-                $resource->addEventListener(HttpEvent::SUCCESS, success, false, 0, $this);
+                $resource->addEventListener(HttpEvent::SUCCESS, array($this,'success'), false, 0, $this);
             }
         }
 
         //清空数据源
-        if ($resource === null) {
+        if ($resource === null)
+        {
             $cached = (object)$this->_cached;
             array_splice($this->_items, 0, count($this->_items));
             $cached->lastSegments = null;
@@ -127,8 +138,9 @@ class DataSource extends EventDispatcher
         $source = $this->_source;
 
         //移除加载远程数据侦听事件
-        if (!$this->_isRemote && System::is($source, "Http")) {
-            $source->removeEventListener(HttpEvent::SUCCESS, success);
+        if (!$this->_isRemote && $source instanceof Http )
+        {
+            $source->removeEventListener(HttpEvent::SUCCESS, array($this,'success') );
         }
         return $this;
     }
@@ -138,17 +150,18 @@ class DataSource extends EventDispatcher
      * @param number rows
      * @returns {DataSource}
      */
-    public function pageSize($size)
+    public function pageSize($size=null)
     {
         $old = $this->_pageSize;
-        if ($size >= 0 && $old !== $size) {
+        if ($size > 0 && $old !== $size) {
             $this->_pageSize = $size;
             $event = new PropertyEvent(PropertyEvent::CHANGE);
             $event->property = 'pageSize';
             $event->newValue = $size;
             $event->oldValue = $old;
             $this->dispatchEvent($event);
-            if ($this->selected) {
+            if ($this->_selected)
+            {
                 $cached = $this->_cached;
                 array_splice($this->_items, 0, count($this->_items));
                 $cached->lastSegments = null;
@@ -180,7 +193,7 @@ class DataSource extends EventDispatcher
      */
     public function totalPage()
     {
-        return $this->totalSize() > 0 ? max(ceil($this->totalSize() / $this->pageSize()), 1) : NaN;
+        return $this->totalSize() > 0 ? max( ceil($this->totalSize() / $this->pageSize() ), 1 ) : NaN;
     }
 
     /**
@@ -188,7 +201,7 @@ class DataSource extends EventDispatcher
      * @param Number num
      * @returns {DataSource}
      */
-    public function maxBuffer($num)
+    public function maxBuffer($num=null)
     {
         if ($num > 0) {
             $this->_buffer = min(10, $num);
@@ -287,7 +300,7 @@ class DataSource extends EventDispatcher
     public function offsetAt($index)
     {
         $index = $index >> 0;
-        if (isNaN($index)) return $index;
+        if (System::isNaN($index)) return $index;
         return ($this->current() - 1) * $this->pageSize() + $index;
     }
 
@@ -425,6 +438,8 @@ class DataSource extends EventDispatcher
         return array_slice($this->_items, $start, $end);
     }
 
+    private $_selected = false;
+
     /**
      * 选择数据集
      * @param Number segments 选择数据的段数, 默认是1
@@ -434,10 +449,10 @@ class DataSource extends EventDispatcher
     {
         $total = $this->totalPage();
         $page = $page > 0 ? $page : $this->current();
-        $page = min($page, isNaN($total) ? $page : $total);
+        $page = min($page, System::isNaN($total) ? $page : $total);
         $this->_current = $page;
         $rows = $this->pageSize();
-        $start = ($page - 1) * rows;
+        $start = ($page - 1) * $rows;
         $cached = (object)$this->_cached;
         $loadCompleted = $this->_loadCompleted;
         $isRemote = $this->_isRemote;
@@ -447,10 +462,11 @@ class DataSource extends EventDispatcher
 
         //数据准备好后需要立即通知
         $this->_nowNotify = true;
-        $this->selected = true;
+        $this->_selected = true;
 
         //需要等待加载数据
-        if ($isRemote && $waiting && !$loadCompleted) {
+        if ($isRemote && $waiting && !$loadCompleted)
+        {
             $event = new DataSourceEvent(DataSourceEvent::SELECT);
             $event->current = $page;
             $event->offset = $start;
@@ -458,11 +474,13 @@ class DataSource extends EventDispatcher
             $event->waiting = true;
             $this->dispatchEvent($event);
 
-        } else {
+        } else
+        {
             $this->nowNotify($page, $index * $rows, $rows);
         }
         //加载数据
-        if ($isRemote) {
+        if ($isRemote)
+        {
             $this->doload();
         }
         return $this;
@@ -477,16 +495,18 @@ class DataSource extends EventDispatcher
     private function success($event)
     {
         $options = (object)$this->_options;
-        $totalProfile = $options->responseProfile->total;
-        $dataProfile = $options->responseProfile->data;
-        $stateProfile = $options->responseProfile->code;
-        if ($event->data[$stateProfile] != $options->responseProfile->successCode) {
-            throw new Error('Loading data failed '.$event->data[$options->responseProfile->error]);
+        $responseProfile =  (object)$options->responseProfile;
+        $totalProfile = $responseProfile->total;
+        $dataProfile = $responseProfile->data;
+        $stateProfile =$responseProfile->code;
+        if ($event->data[$stateProfile] != $responseProfile->successCode) {
+            throw new Error('Loading data failed '.$event->data[$responseProfile->error]);
         }
         $data = $event->data;
         $total = 0;
-        if (!is_array($data)) {
-            if (($dataProfile && !isset($data[$dataProfile])) || ($totalProfile && !isset($data[totalProfile]))) {
+        if ( is_array($data) )
+        {
+            if (($dataProfile && !isset($data[$dataProfile])) || ($totalProfile && !isset($data[$totalProfile]))) {
                 throw new Error('Response data profile fields is not correct.');
             }
             $total = $totalProfile ? $data[$totalProfile] >> 0 : 0;
@@ -520,10 +540,10 @@ class DataSource extends EventDispatcher
         $offset = intval(array_search($cached->lastSegments, $cached->loadSegments)) * $rows;
 
         //合并数据项
-        call_user_func_array('array_splice', array(&$this->_items, $offset, 0) + (array)$data);
+        array_splice( $this->_items, $offset, 0 , (array)$data );
 
         //发送数据
-        if ($this->_nowNotify && array_search($cached->loadSegments, $current) >= 0) {
+        if ($this->_nowNotify && array_search($current, $cached->loadSegments) >= 0) {
             $this->nowNotify($current, $offset, $rows);
         }
         //还有数据需要加载
@@ -539,7 +559,7 @@ class DataSource extends EventDispatcher
     private function isload($cached, $page)
     {
         $cached = (object)$cached;
-        return $cached->lastSegments != $page && array_search($page, $cached->loadSegments) < 0 && array_search($page, $cached->queues) < 0;
+        return $cached->lastSegments != $page && array_search($page, $cached->loadSegments)===false && array_search($page, $cached->queues) === false;
     }
 
     /**
@@ -556,19 +576,24 @@ class DataSource extends EventDispatcher
         $queue = &$cached->queues;
         $rows = $this->pageSize();
         $buffer = $this->maxBuffer();
-        if ($this->isload($cached, $page)) {
+        if ($this->isload($cached, $page))
+        {
             array_unshift($queue, $page);
-
-        } else if (count($queue) === 0) {
+        } else if (count($queue) === 0)
+        {
             $p = 1;
             $t = $this->totalPage();
-            while ($buffer > $p) {
+            $t = System::isNaN($t) ? 10 : $t;
+            while ($buffer > $p)
+            {
                 $next = $page + $p;
                 $prev = $page - $p;
-                if ($next <= $t && $this->isload($cached, $next)) {
+                if ($next <= $t && $this->isload($cached, $next))
+                {
                     array_push($queue, $next);
                 }
-                if ($prev > 0 && $this->isload($cached, $prev)) {
+                if ($prev > 0 && $this->isload($cached, $prev))
+                {
                     array_push($queue, $prev);
                 }
                 $p++;
@@ -576,6 +601,7 @@ class DataSource extends EventDispatcher
         }
 
         if (!$loading && count($queue) > 0) {
+
             $this->_loading = true;
             $page = array_shift($queue);
             $cached->lastSegments = $page;
@@ -589,8 +615,9 @@ class DataSource extends EventDispatcher
             $source = $this->_source;
             $options = (object)$this->_options;
             $param = array_merge(array(), $options->param);
-            $param[$options->requestProfile->offset] = $start;
-            $param[$options->requestProfile->rows] = $rows;
+            $requestProfile = (object)$options->requestProfile;
+            $param[$requestProfile->offset] = $start;
+            $param[$requestProfile->rows] = $rows;
             $source->load($options->url, $param, $options->method);
         }
     }

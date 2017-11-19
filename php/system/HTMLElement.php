@@ -65,12 +65,22 @@ class HTMLElement extends Node
         {
             throw new \es\core\ReferenceError('parent and child elements can not be the same');
         }
+
+        $this->content = '';
+        $index = $index<0 ? count($this->children)+$index+1 : $index;
+
+        if( $child->nodeName === '#documentFragment' )
+        {
+            $childNodes = $child->childNodes;
+            $len = count($childNodes);
+            for($i=0;$i<$len;$i++)$this->addChildAt( $childNodes[$i] , $index++ );
+            return $child;
+        }
+
         if( $child->parentNode )
         {
             $child->parentNode->removeChild( $child );
         }
-        $this->content = '';
-        $index = $index<0 ? count($this->children)+$index+1 : $index;
         array_splice( $this->children,$index,0, array($child) );
         $child->parentNode = $this;
         $this->parseHtml = true;
@@ -162,6 +172,8 @@ class HTMLElement extends Node
             case 'body' :
             case 'head' :
                 return System::document()->__get( $name );
+            case 'childNodes':
+                return array_slice($this->children,0);
         }
         return parent::__get($name);
     }
@@ -189,6 +201,8 @@ class HTMLElement extends Node
             case 'html' :
             case 'body' :
             case 'head' :
+            case 'childNodes':
+            case 'children':
                 return;
         }
         return parent::__set($name, $value);

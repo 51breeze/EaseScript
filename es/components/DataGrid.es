@@ -110,7 +110,7 @@ package es.components
          * @param profile
          * @returns {*}
          */
-        public function columnProfile(profile)
+        public function columnProfile(profile=null)
         {
             if (typeof profile === "string") {
                 this.__columnProfile__ = profile;
@@ -129,7 +129,7 @@ package es.components
          * @param profile
          * @returns {*}
          */
-        public function dataProfile(profile)
+        public function dataProfile(profile=null)
         {
             if (typeof profile === "string") {
                 this.__dataProfile__ = profile;

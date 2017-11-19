@@ -27,7 +27,7 @@ class DataSourceEvent extends Event
     public $totalSize = NaN;
     public $pageSize = NaN;
 
-    public function __construct($type, $bubbles, $cancelable)
+    public function __construct($type, $bubbles=true, $cancelable=true )
     {
         parent::__construct($type, $bubbles, $cancelable);
     }

@@ -1,4 +1,7 @@
 <?php
+use \es\core\HttpEvent;
+use \es\core\Request;
+
 class Http extends EventDispatcher
 {
     /**
@@ -40,10 +43,10 @@ class Http extends EventDispatcher
         'accept'=>self::ACCEPT_HTML,
     );
 
-    public function __construct( array $option =array() )
+    public function __construct( $option =array() )
     {
         parent::__construct();
-        $this->option = array_merge( $this->option,$option);
+        $this->option = array_merge( $this->option,(array)$option );
     }
 
     public function abort()
@@ -53,20 +56,50 @@ class Http extends EventDispatcher
     public function load($url, $data=null, $method=self::METHOD_GET )
     {
         $request = new Request( $url );
-        $fp = fsockopen( $request->host() , 80, $errno, $errstr, 30);
-        stream_set_blocking($fp, 1);
+        $fp = fsockopen( $request->host() , $request->port() , $errno, $errstr,10);
         if( !$fp )
         {
             throw new Error( $errstr );
         }
-        $out = $method.' / HTTP/1.1\r\n';
-        $out .= 'Host: '.$request->host().'\r\n';
-        $out .= 'Connection: Close\r\n\r\n';
+
+        $out = $method." ".$request->uri()." HTTP/1.1\r\n";
+        $out .= "Host: ".$request->host()."\r\n";
+        $out .= "Connection: Close\r\n\r\n";
+
+        stream_set_blocking($fp, 1 );
+        stream_set_timeout($fp, 10);
         fwrite($fp, $out);
+
         $content = '';
-        while( !feof($fp) )$content.=fgets($fp, 1024);
+        $len = 0;
+        while( !feof($fp) ){
+            $ret = fgets($fp, 1024);
+            if( $ret===false )break;
+            if( $len ===0 && substr($ret,0,15) === 'Content-Length:' )
+            {
+                $len = intval( trim(substr($ret,16)) );
+            }
+            $content.=$ret;
+        }
         fclose($fp);
 
+        $event = null;
+        if( !empty($content) && $len > 0 )
+        {
+            $content = substr($content, -$len);
+            $content = json_decode($content, true);
+            $event = new HttpEvent(HttpEvent::SUCCESS);
+            $event->data = $content;
+            $event->total = $len;
+            $event->loaded = $len;
+
+        }else
+        {
+            $event = new HttpEvent(HttpEvent::ERROR );
+            $event->data = array();
+        }
+        $event->url = $url;
+        $this->dispatchEvent( $event );
     }
 
     /**
