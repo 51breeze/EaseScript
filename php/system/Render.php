@@ -64,7 +64,7 @@ class Render extends Object
             $offsetPos = $match[0][1];
             if( $begin_code===true )
             {
-                $code .= mb_substr($template,$cursor, $offsetPos - $cursor );
+                $code .= substr($template,$cursor, $offsetPos - $cursor );
                 $code .=PHP_EOL;
                 $begin_code=false;
 
@@ -73,7 +73,7 @@ class Render extends Object
                 //模板元素
                 if( $cursor != $offsetPos )
                 {
-                    $code .='$___code___.="'.self::escape(  mb_substr($template,$cursor, $offsetPos - $cursor ) ).'";'.PHP_EOL;
+                    $code .='$___code___.="'.self::escape(  substr($template,$cursor, $offsetPos - $cursor ) ).'";'.PHP_EOL;
                 }
                 //短语法
                 if( isset($match[2]) )
@@ -111,6 +111,10 @@ class Render extends Object
                             case 'do' :
                             case 'while' :
                             case 'for' :
+                                if( isset($matchSyntax[2]) && !empty( $matchSyntax[2] ) )
+                                {
+                                    $matchSyntax[2] = preg_replace('/([\(\,])\s*([a-zA-Z_]+\w+)/i','\\1\$\\2', $matchSyntax[2] );
+                                }
                                 $code .= $matchSyntax[1].( $matchSyntax[2] ? $matchSyntax[2] : '');
                                 $code.=PHP_EOL;
                                 break;

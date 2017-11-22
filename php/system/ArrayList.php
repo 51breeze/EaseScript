@@ -106,6 +106,8 @@ class ArrayList extends Object implements \Countable
 
     public function filter($callback = null, $flag = 0 )
     {
+        var_dump( $callback );
+        exit;
         return new ArrayList( array_filter($this->_dataItems,  $callback, $flag ) );
     }
 

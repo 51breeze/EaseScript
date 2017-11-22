@@ -105,7 +105,7 @@ class Element extends EventDispatcher implements \ArrayAccess,\Countable
         parent::__construct( isset($selector[0]) ? $selector[0] : null );
     }
 
-    public function html( $value )
+    public function html( $value=null )
     {
         if( $value != null && is_string($value) )
         {

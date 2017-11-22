@@ -56,7 +56,7 @@ class Http extends EventDispatcher
     public function load($url, $data=null, $method=self::METHOD_GET )
     {
         $request = new Request( $url );
-        $fp = fsockopen( $request->host() , $request->port() , $errno, $errstr,10);
+        $fp = fsockopen( $request->host() , $request->port() , $errno, $errstr,5);
         if( !$fp )
         {
             throw new Error( $errstr );
@@ -67,26 +67,30 @@ class Http extends EventDispatcher
         $out .= "Connection: Close\r\n\r\n";
 
         stream_set_blocking($fp, 1 );
-        stream_set_timeout($fp, 10);
+        stream_set_timeout($fp, 5);
         fwrite($fp, $out);
-
+        
         $content = '';
         $len = 0;
         while( !feof($fp) ){
             $ret = fgets($fp, 1024);
             if( $ret===false )break;
-            if( $len ===0 && substr($ret,0,15) === 'Content-Length:' )
+            if( $len===0 && substr($ret,0,15) === 'Content-Length:' )
             {
                 $len = intval( trim(substr($ret,16)) );
             }
             $content.=$ret;
         }
-        fclose($fp);
 
-        $event = null;
-        if( !empty($content) && $len > 0 )
+        if( !empty($content) && $len>0 )
         {
-            $content = substr($content, -$len);
+           $content = substr($content, -$len);
+        }
+       fclose($fp);
+        $event = null;
+        if( !empty($content)  )
+        {
+            $len = strlen( $content );
             $content = json_decode($content, true);
             $event = new HttpEvent(HttpEvent::SUCCESS);
             $event->data = $content;

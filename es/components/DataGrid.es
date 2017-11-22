@@ -10,6 +10,7 @@ package es.components
     import es.events.PaginationEvent;
     import es.components.Pagination;
     import es.skins.DataGridSkin;
+    import es.core.es_internal;
 
     public class DataGrid extends SkinComponent
     {
@@ -51,7 +52,7 @@ package es.components
                     {
                         var body = self.skin.getChildById('body');
                         body.variable( self.dataProfile(), event.data );
-                        body.createChildren();
+                        body.es_internal::skinInstaller();
                     }
                 });
                 this.__dataSource__ = dataSource;

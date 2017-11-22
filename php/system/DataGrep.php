@@ -7,7 +7,7 @@
  * @author Jun Ye <664371281@qq.com>
  */
 use \es\core\ArrayList;
-class DataGrep extends ArrayList
+class DataGrep extends Object
 {
     const LIKE_LEFT = 'left';
     const LIKE_RIGHT = 'right';
@@ -28,7 +28,6 @@ class DataGrep extends ArrayList
     public function __construct($dataItems)
     {
         parent::__construct();
-        if (!(System::isOf($this, "DataGrep"))) return new DataGrep($dataItems);
         if (!System::isOf($dataItems, "Array")) throw new Error('error', 'Invalid data list');
         $this->_dataItems = $dataItems;
     }
@@ -107,7 +106,8 @@ class DataGrep extends ArrayList
                 }
             }
         }
-        if ($command->length === 0) {
+        if ( count($command)=== 0)
+        {
             return null;
         }
 
@@ -121,7 +121,7 @@ class DataGrep extends ArrayList
      * @param condition
      * @returns {*}
      */
-    public function filter($condition)
+    public function filter($condition=null)
     {
         if ($condition == null) {
             $this->_filter = $this->createFilter();
@@ -198,7 +198,7 @@ class DataGrep extends ArrayList
      * @param filter
      * @returns {*}
      */
-    public function execute($filter)
+    public function execute($filter=null)
     {
         $data = $this->_dataItems;
         $filter = $this->filter($filter);

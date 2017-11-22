@@ -123,11 +123,26 @@ package es.core
             return this.removeChild( this.getChildAt(index) );
         };
 
+
+        /**
+         * 移除所有的子级元素
+         */
+        public function removeAllChild()
+        {
+            var children:Array = this._children;
+            var len = children.length;
+            while( len>0 )
+            {
+                this.removeChild( children[ --len ] );
+            }
+            this._children = [];
+        }
+
         /**
          * 为当前的皮肤添加一组子级元素, 并清空当前已存在的子级元素
          * @param child
          */
-        public function html( child:Display=null )
+        public function html( child:Display=null ):Object
         {
             if( child !== null )
             {
@@ -138,12 +153,9 @@ package es.core
                 this.element.html( child.element );
                 child.parentDisplay = this;
                 this._children = [ child ];
-
-            }else{
-
-                this.element.html('');
-                this._children = [];
+                return child;
             }
+            return this.element.html();
         };
     }
 }

@@ -317,7 +317,7 @@ package es.components
             render.variable('prev', Math.max(current - 1, 1));
             render.variable('next', Math.min(current + 1, totalPage));
             render.variable('last', totalPage);
-            render.variable('link', System.range( Math.max(1 + offset, 1 ), link + offset + 1, 1) );
+            render.variable('link', System.range( Math.max(1 + offset, 1 ), link + offset, 1) );
             super.skinInstaller();
         }
 

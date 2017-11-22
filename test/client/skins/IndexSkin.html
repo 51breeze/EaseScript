@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<s:View  xmlns:s="es.core" xmlns:c="es.components" title="" >
+<s:View  xmlns:s="es.core" xmlns:c="es.components" xmlns:ss="@" title="" >
     <script>
     <![CDATA[
      private var data:Array = [];
@@ -20,7 +20,21 @@
 
     <body >
         <h1>Hello world!</h1>
-        <c:DataGrid id="@dataGrid" source="http://working.com/json.php" width="500">
+        <c:DataGrid id="@dataGrid" width="500">
+            <c:source>
+                <ss:Array>
+                    <item>
+                        <id>1</id>
+                        <name>yejun</name>
+                        <phone>15302662136</phone>
+                    </item>
+                    <item>
+                        <id>2</id>
+                        <name>张三</name>
+                        <phone>4569333</phone>
+                    </item>
+                </ss:Array>
+            </c:source>
             <c:columns>
                 <id>ID</id>
                 <name>名称</name>

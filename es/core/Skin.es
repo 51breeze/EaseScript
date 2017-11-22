@@ -276,7 +276,7 @@ package es.core
             var child;
             var render = this._render;
             var parent = this.parentDisplay;
-            this.html( null );
+            this.removeAllChild();
             if( render )
             {
                 child = render.fetch();

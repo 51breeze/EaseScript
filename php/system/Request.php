@@ -150,7 +150,7 @@ if (!function_exists('http_build_url'))
                 $parsed_string .= $url['host'];
             }
 
-            if (!empty($url['port'])) {
+            if (!empty($url['port']) && $url['port'] != '80') {
                 $parsed_string .= ':' . $url['port'];
             }
         }
@@ -205,55 +205,42 @@ final class Request extends Object
     }
 
     private $body=null;
+    private $baseurl = null;
 
-    public function __construct( $url = null )
+    public function __construct($baseurl = null )
     {
-        $properties = self::parse( $this->url() );
-        if( $url != null )
+        $url = isset($_SERVER['HTTPS']) ? 'https://' : 'http://';
+        $url .= $_SERVER['SERVER_NAME'];
+        if (isset($_SERVER['SERVER_PORT'])) $url .= ':'.$_SERVER['SERVER_PORT'];
+        $url .= $_SERVER['REQUEST_URI'];
+        $this->baseurl = $url;
+        $properties = self::parse( $url );
+        if( $baseurl != null )
         {
-            if( !is_string($url) )throw new TypeError('url is not String');
-            $properties = array_merge($properties, parse_url($url) );
+            if( !is_string($baseurl) )throw new TypeError('url is not String');
+            $properties = array_merge($properties, parse_url($baseurl) );
+            $this->baseurl = $baseurl;
         }
         $this->body = (object)$properties;
     }
 
     public function __toString()
     {
-        return $this->buildUrl();
+        return $this->url();
     }
-
-    public function buildUrl( $mode= HTTP_URL_STRIP_ALL )
-    {
-        return http_build_url( $this->url() , (array)$this->body, $mode );
-    }
-
-    public function uri()
-    {
-        return http_build_url( $this->url() , (array)$this->body, HTTP_URL_REPLACE | HTTP_URL_JOIN_PATH | HTTP_URL_JOIN_QUERY | HTTP_URL_STRIP_HOST );
-    }
-
-    private $_url = null;
 
     /**
      * 获取当前请求的URL地址
      * @return null|string
      */
-    public function url( $value = null )
+    public function url( $mode=HTTP_URL_REPLACE )
     {
-        if( $value != null )
-        {
-            $this->_url = $value;
-            return $this;
-        }
-        if( $this->_url===null )
-        {
-            $url = isset($_SERVER['HTTPS']) ? 'https://' : 'http://';
-            $url .= $_SERVER['SERVER_NAME'];
-            if (isset($_SERVER['SERVER_PORT'])) $url .= ':'.$_SERVER['SERVER_PORT'];
-            $url .= $_SERVER['REQUEST_URI'];
-            $this->_url = $url;
-        }
-        return $this->_url;
+        return http_build_url( $this->baseurl , (array)$this->body, $mode );
+    }
+
+    public function uri()
+    {
+        return http_build_url( $this->baseurl , (array)$this->body, HTTP_URL_REPLACE | HTTP_URL_JOIN_PATH | HTTP_URL_JOIN_QUERY | HTTP_URL_STRIP_HOST );
     }
 
     public function host( $value=null )

@@ -244,4 +244,12 @@ class Object extends \stdClass implements \Iterator, \ArrayAccess
         $this->_originValue[ $name ] = $value;
     }
 
+    public function __call($name, $arguments)
+    {
+        if( !method_exists($this, $name) )
+        {
+            throw new ReferenceError($name . ' is not exists.',__FILE__, __LINE__);
+        }
+        return call_user_func_array( array($this, $name),  $arguments );
+    }
 }
