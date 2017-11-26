@@ -209,7 +209,7 @@ Http.JSONP_CALLBACK_NAME = 'JSONP_CALLBACK';
  * @type {Object|Function}
  */
 Http.prototype = Object.create( EventDispatcher.prototype );
-Http.prototype.constructor = Http;
+Object.defineProperty(Http.prototype,"constructor", {value:Http});
 Http.prototype.__options__={};
 Http.prototype.__xhr__=null;
 Http.prototype.__loading__=false;
@@ -406,7 +406,7 @@ function ScriptRequest( async )
 }
 
 ScriptRequest.prototype = Object.create(EventDispatcher.prototype);
-ScriptRequest.prototype.constructor = ScriptRequest;
+Object.defineProperty(ScriptRequest.prototype,"constructor", {value:ScriptRequest});
 ScriptRequest.prototype.__key__ = null;
 ScriptRequest.prototype.__target__ = null;
 ScriptRequest.prototype.__async__ = null;

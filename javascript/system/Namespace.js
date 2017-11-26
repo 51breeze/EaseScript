@@ -15,10 +15,11 @@ Namespace.valueOf=Namespace.toString=function () {return '[object Namespace]'};
 Namespace.prototype = Object.create( Object.prototype );
 Namespace.prototype.__prefix__='';
 Namespace.prototype.__uri__='';
-Namespace.prototype.constructor = Namespace;
-Namespace.prototype.toString=function (){return '[object Namespace]'};
-Namespace.prototype.valueOf =function valueOf()
-{
+Object.defineProperty(Namespace.prototype,"constructor", {value:Namespace});
+Object.defineProperty( Namespace.prototype, "toString", {value:function toString(){
+    return '[object Namespace]'
+}});
+Object.defineProperty( Namespace.prototype, "valueOf", {value:function valueOf(){
     return this.__prefix__+this.__uri__;
-};
+}});
 System.Namespace = Namespace;

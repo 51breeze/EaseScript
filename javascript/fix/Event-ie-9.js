@@ -33,9 +33,9 @@ var getReadyState=function( target )
 
 Event.fix.hooks[ Event.LOAD ]=function (listener, dispatcher)
 {
-    if( this.addEventListener )
+    if( this.$addEventListener )
     {
-        this.addEventListener( Event.type(Event.LOAD) ,dispatcher);
+        this.$addEventListener( Event.type(Event.LOAD) ,dispatcher);
 
     }else if( this.attachEvent )
     {

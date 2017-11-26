@@ -26,14 +26,14 @@ function EventDispatcher( target )
 }
 System.EventDispatcher=EventDispatcher;
 EventDispatcher.prototype=Object.create( Object.prototype );
-EventDispatcher.prototype.constructor=EventDispatcher;
+Object.defineProperty(EventDispatcher.prototype,"constructor", {value:EventDispatcher});
 
 /**
  * 判断是否有指定类型的侦听器
  * @param type
  * @returns {boolean}
  */
-EventDispatcher.prototype.hasEventListener=function hasEventListener( type )
+Object.defineProperty(EventDispatcher.prototype,"hasEventListener", {value:function hasEventListener( type )
 {
     var target =  storage(this,'target');
     var events;
@@ -57,7 +57,7 @@ EventDispatcher.prototype.hasEventListener=function hasEventListener( type )
         return events[type].length > 0;
     }
     return false;
-};
+}});
 
 /**
  * 添加侦听器
@@ -66,7 +66,7 @@ EventDispatcher.prototype.hasEventListener=function hasEventListener( type )
  * @param priority
  * @returns {EventDispatcher}
  */
-EventDispatcher.prototype.addEventListener=function(type,callback,useCapture,priority,reference)
+Object.defineProperty(EventDispatcher.prototype,"addEventListener", {value:function addEventListener(type,callback,useCapture,priority,reference)
 {
     if( typeof type !== 'string' )throw new TypeError('Invalid event type');
     if( typeof callback !== 'function' )throw new TypeError('Invalid callback function');
@@ -77,13 +77,13 @@ EventDispatcher.prototype.addEventListener=function(type,callback,useCapture,pri
     {
         while(len>0 && target[--len] )
         {
-            addEventListener( target[len], listener );
+            $addEventListener( target[len], listener );
         }
         return this;
     }
-    addEventListener(target, listener);
+    $addEventListener(target, listener);
     return this;
-};
+}});
 
 /**
  * 移除指定类型的侦听器
@@ -91,23 +91,23 @@ EventDispatcher.prototype.addEventListener=function(type,callback,useCapture,pri
  * @param listener
  * @returns {boolean}
  */
-EventDispatcher.prototype.removeEventListener=function(type,listener)
+Object.defineProperty(EventDispatcher.prototype,"removeEventListener", {value:function(type,listener)
 {
     var target = storage(this,'target');
     var len = target.length >> 0;
     if( len > 0 ){
-        while(len>0 && target[--len] )removeEventListener( target[len], type, listener, this);
+        while(len>0 && target[--len] )$removeEventListener( target[len], type, listener, this);
         return true;
     }
-    return removeEventListener(target,type,listener,this);
-};
+    return $removeEventListener(target,type,listener,this);
+}});
 
 /**
  * 调度指定事件
  * @param event
  * @returns {boolean}
  */
-EventDispatcher.prototype.dispatchEvent=function( event )
+Object.defineProperty(EventDispatcher.prototype,"dispatchEvent", {value:function( event )
 {
     if( !System.is(event,Event) )throw new TypeError('Invalid event');
     var target = storage(this,'target');
@@ -116,13 +116,13 @@ EventDispatcher.prototype.dispatchEvent=function( event )
         while(len>0 && target[--len] )
         {
             event.target = event.currentTarget = target[len];
-            dispatchEvent(event);
+            $dispatchEvent(event);
         }
         return !event.immediatePropagationStopped;
     }
     event.target = event.currentTarget=target;
-    return dispatchEvent( event );
-};
+    return $dispatchEvent( event );
+}});
 
 /**
  * 添加侦听器到元素中
@@ -130,7 +130,7 @@ EventDispatcher.prototype.dispatchEvent=function( event )
  * @param handle
  * @returns {boolean}
  */
-function addEventListener(target, listener )
+function $addEventListener(target, listener )
 {
     if( target==null )throw new ReferenceError('this is null or not define');
 
@@ -148,13 +148,13 @@ function addEventListener(target, listener )
         //自定义事件处理
         if( Object.prototype.hasOwnProperty.call(Event.fix.hooks,type) )
         {
-            Event.fix.hooks[ type ].call(target, listener, dispatchEvent);
+            Event.fix.hooks[ type ].call(target, listener, $dispatchEvent);
 
         }else {
             type = Event.type(type);
             try {
-                target.addEventListener ? target.addEventListener(type, dispatchEvent, listener.useCapture) : target.attachEvent(type, function (e) {
-                    dispatchEvent(e, target)
+                target.addEventListener ? target.addEventListener(type, $dispatchEvent, listener.useCapture) : target.attachEvent(type, function (e) {
+                    $dispatchEvent(e, target)
                 });
             }catch (e) {}
         }
@@ -177,7 +177,7 @@ function addEventListener(target, listener )
  * @param EventDispatcher eventDispatcher 可选，如果指定则只删除本对象中的元素事件
  * @returns {boolean}
  */
-function removeEventListener(target, type, listener , dispatcher )
+function $removeEventListener(target, type, listener , dispatcher )
 {
     if( target==null )throw new ReferenceError('this is null or not define');
 
@@ -207,12 +207,12 @@ function removeEventListener(target, type, listener , dispatcher )
         var eventType= Event.type( type );
         if( target.removeEventListener )
         {
-            target.removeEventListener(eventType,dispatchEvent,false);
-            target.removeEventListener(eventType,dispatchEvent,true);
+            target.removeEventListener(eventType,$dispatchEvent,false);
+            target.removeEventListener(eventType,$dispatchEvent,true);
 
         }else if( target.detachEvent )
         {
-            target.detachEvent(eventType,dispatchEvent);
+            target.detachEvent(eventType,$dispatchEvent);
         }
     }
     return events.length !== ret;
@@ -223,7 +223,7 @@ function removeEventListener(target, type, listener , dispatcher )
  * @param listeners
  * @returns {boolean}
  */
-function dispatchEvent( e, currentTarget )
+function $dispatchEvent(e, currentTarget )
 {
     if( !System.is(e,Event) )
     {
@@ -266,7 +266,7 @@ function Listener(type,callback,useCapture,priority,reference,dispatcher)
     this.reference=reference || null;
     this.dispatcher=dispatcher;
 }
-Listener.prototype.constructor= Listener;
+Object.defineProperty(Listener.prototype,"constructor",{value:Listener});
 Listener.prototype.useCapture=false;
 Listener.prototype.dispatcher=null;
 Listener.prototype.reference=null;

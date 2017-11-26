@@ -20,7 +20,7 @@ function Iterator( target )
 }
 System.Iterator=Iterator;
 Iterator.prototype = Object.create( Object.prototype );
-Iterator.prototype.constructor = Iterator;
+Object.defineProperty(Iterator.prototype,"constructor", {value:Iterator});
 
 /**
  * 返回当前的元素键名

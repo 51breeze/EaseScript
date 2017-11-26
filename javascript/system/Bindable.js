@@ -111,7 +111,7 @@ function Bindable(source,properties)
     this.addEventListener(PropertyEvent.CHANGE,commitProperties);
 }
 Bindable.prototype=  Object.create( EventDispatcher.prototype );
-Bindable.prototype.constructor=Bindable;
+Object.defineProperty(Bindable.prototype,"constructor", {value:Bindable});
 
 
 /**

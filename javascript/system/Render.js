@@ -155,7 +155,7 @@ function Render( options )
 }
 
 Render.prototype = Object.create(EventDispatcher.prototype);
-Render.prototype.constructor = Render;
+Object.defineProperty(Render.prototype,"constructor", {value:Render});
 Render.prototype.__variable__=null;
 Render.prototype.__split__=  new RegExp(_options.left+'(.*?)'+_options.right+'|'+_options.shortLeft+'(.*?)'+_options.shortRight,'gi');
 
@@ -218,10 +218,10 @@ Render.prototype.fetch=function fetch( view )
     return make.call(this, this.__template__ , this.variable() );
 };
 
-Render.prototype.toString=function toString()
+Object.defineProperty( Render.prototype, "toString", {value:function toString()
 {
     return '[object Render]';
-};
+}});
 
 /**
  * 模板变量构造器

@@ -44,7 +44,7 @@ Event.INITIALIZED='systemInitialized';
  * @type {Object}
  */
 Event.prototype = Object.create( Object.prototype );
-Event.prototype.constructor = Event;
+Object.defineProperty(Event.prototype,"constructor", {value:Event});
 //true 只触发冒泡阶段的事件 , false 只触发捕获阶段的事件
 Event.prototype.bubbles = true;
 //是否可以取消浏览器默认关联的事件
@@ -60,12 +60,12 @@ Event.prototype.button = false;
 Event.prototype.ctrlKey = false;
 Event.prototype.shiftKey = false;
 Event.prototype.metaKey = false;
-Event.prototype.toString=function toString(){
+Object.defineProperty( Event.prototype, "toString", {value:function toString(){
     return '[object Event]';
-};
-Event.prototype.valueOf=function valueOf(){
+}});
+Object.defineProperty( Event.prototype, "valueOf", {value:function valueOf(){
     return '[object Event]';
-};
+}});
 
 /**
  * 阻止事件的默认行为

@@ -12,5 +12,5 @@ function SyntaxError(  message , filename, line)
 };
 System.SyntaxError = SyntaxError;
 SyntaxError.prototype = Object.create( Error.prototype );
-SyntaxError.prototype.constructor=SyntaxError;
+Object.defineProperty(SyntaxError.prototype,"constructor", {value:SyntaxError});
 SyntaxError.prototype.name='SyntaxError';

@@ -54,8 +54,7 @@ function description(scope, refObject, name , thisArgument , ns, setter)
     }
     return null;
 }
-
-Class.prototype.__call__=function(target, name, argumentsList, receiver, ns)
+Object.defineProperty(Class.prototype,"__call__",{value:function(target, name, argumentsList, receiver, ns)
 {
     if( target && name != null )
     {
@@ -63,19 +62,19 @@ Class.prototype.__call__=function(target, name, argumentsList, receiver, ns)
         target = this.__get__(target,name,receiver,ns);
     }
     return System.Reflect.apply(target, receiver, argumentsList);
-};
+}});
 
-Class.prototype.__throw__=function( object )
+Object.defineProperty(Class.prototype,"__throw__",{value:function( object )
 {
     throw object.toString();
-};
+}});
 
-Class.prototype.__construct__=function(target,argumentsList)
+Object.defineProperty(Class.prototype,"__construct__",{value:function(target,argumentsList)
 {
     return System.Reflect.construct(target, argumentsList);
-};
+}});
 
-Class.prototype.__get__=function(target, propertyKey, receiver, ns)
+Object.defineProperty(Class.prototype,"__get__",{value:function(target, propertyKey, receiver, ns)
 {
     if( propertyKey==null )return target;
     if( target == null ){
@@ -130,9 +129,9 @@ Class.prototype.__get__=function(target, propertyKey, receiver, ns)
     }
     //实例函数 或者 静态属性 或者 静态方法
     return desc.value || desc;
-};
+}});
 
-Class.prototype.__set__=function (target, propertyKey, value, receiver, ns)
+Object.defineProperty(Class.prototype,"__set__",{value:function (target, propertyKey, value, receiver, ns)
 {
     if( propertyKey==null )return target;
     if( target == null )
@@ -201,17 +200,17 @@ Class.prototype.__set__=function (target, propertyKey, value, receiver, ns)
         return receiver[_private][propertyKey] = value;
     }
     throw new System.ReferenceError( '"'+propertyKey+'" is not exist',  this.__T__.filename );
-};
+}});
 
-Class.prototype.__has__=function (target,name,ns)
+Object.defineProperty(Class.prototype,"__has__",{value:function (target,name,ns)
 {
     var desc = description(this,target,name,undefined,ns);
     if( desc === false )return false;
     if( desc )return !!desc;
     return !!target[name];
-};
+}});
 
-Class.prototype.__unset__=function (refObject,name,thisArgument,ns)
+Object.defineProperty(Class.prototype,"__unset__",{value:function (refObject,name,thisArgument,ns)
 {
     thisArgument = thisArgument || refObject;
     var objClass = thisArgument.constructor;
@@ -239,27 +238,27 @@ Class.prototype.__unset__=function (refObject,name,thisArgument,ns)
         }
     }
     delete thisArgument[name];
-};
+}});
 
-Class.prototype.__incre__=function ( refObject, name, flag , ns )
+Object.defineProperty(Class.prototype,"__incre__",{value:function ( refObject, name, flag , ns )
 {
     flag = flag !== false;
     var val = this.__get__(refObject, name, undefined, ns );
     var ret = val+1;
     this.__set__(refObject, name, ret , undefined, ns );
     return flag ? val : ret;
-};
+}});
 
-Class.prototype.__decre__=function ( refObject, name, flag , ns )
+Object.defineProperty(Class.prototype,"__decre__",{value:function ( refObject, name, flag , ns )
 {
     flag = flag !== false;
     var val = this.__get__(refObject, name, undefined, ns );
     var ret = val-1;
     this.__set__(refObject, name, ret , undefined, ns );
     return flag ? val : ret;
-};
+}});
 
-Class.prototype.__check__=function(type, value)
+Object.defineProperty(Class.prototype,"__check__",{value:function(type, value)
 {
     if( value == null || type === System.Object )return value;
     if ( type && !System.is(value, type) )
@@ -267,4 +266,4 @@ Class.prototype.__check__=function(type, value)
         throw new System.TypeError( 'Specify the type of value do not match. must is "' + System.getQualifiedClassName(type)+'"' ,  this.__T__.filename )
     }
     return value;
-};
+}});

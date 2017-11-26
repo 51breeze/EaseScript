@@ -128,7 +128,11 @@ Reflect.apply=function apply( theClass, thisArgument, argumentsList )
     {
         theClass = theClass.constructor;
     }
-    return _apply(theClass, thisArgument, argumentsList || [] );
+    if( !System.isArray(argumentsList) )
+    {
+        argumentsList = typeof argumentsList !== "undefined" ? [argumentsList] : [];
+    }
+    return _apply(theClass, thisArgument, argumentsList);
 };
 
 /**

@@ -3,7 +3,7 @@ const PATH = require('path');
 const Ruler = require('./lib/ruler.js');
 const Utils = require('./lib/utils.js');
 const makeSkin = require('./lib/skin.js');
-const globals=require('./javascript/descriptions/globals.js');
+const globals=require('./lib/globals.js');
 const uglify = require('uglify-js');
 
 //全局配置
@@ -964,7 +964,7 @@ function make( config, isGlobalConfig )
     //浏览器中的全局模块
     if( config.browser === 'enable' )
     {
-        var browser = require('./javascript/descriptions/browser.js');
+        var browser = require('./lib/browser.js');
         for(var b in browser){
             globals[b]=browser[b];
         }

@@ -23,12 +23,12 @@ HttpEvent.PROGRESS = 'httpProgress';
 HttpEvent.ERROR   = 'httpError';
 HttpEvent.CANCELED  = 'httpCanceled';
 HttpEvent.TIMEOUT = 'httpTimeout';
-HttpEvent.prototype.toString=function toString(){
+Object.defineProperty( HttpEvent.prototype, "toString", {value:function toString(){
     return '[object HttpEvent]';
-}
-HttpEvent.prototype.valueOf=function valueOf(){
+}});
+Object.defineProperty( HttpEvent.prototype, "valueOf", {value:function valueOf(){
     return '[object HttpEvent]';
-}
+}});
 
 //属性事件
 Event.registerEvent(function ( type , target, originalEvent )

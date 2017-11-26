@@ -18,7 +18,7 @@ System.DataArray=DataArray;
 DataArray.DESC='desc';
 DataArray.ASC='asc';
 DataArray.prototype= Object.create( Array.prototype );
-DataArray.prototype.constructor = DataArray;
+Object.defineProperty(DataArray.prototype,"constructor", {value:DataArray});
 
 /**
  * 根据指定的列进行排序

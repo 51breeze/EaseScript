@@ -12,5 +12,5 @@ function RangeError( message , filename, line)
 };
 System.RangeError=RangeError;
 RangeError.prototype = Object.create( Error.prototype) ;
-RangeError.prototype.constructor=RangeError;
+Object.defineProperty(RangeError.prototype,"constructor", {value:RangeError});
 RangeError.prototype.name='RangeError';

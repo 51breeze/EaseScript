@@ -13,7 +13,7 @@ function ScrollEvent( type, bubbles,cancelable ){
 };
 System.ScrollEvent =ScrollEvent;
 ScrollEvent.prototype=Object.create( PropertyEvent.prototype );
-ScrollEvent.prototype.constructor=ScrollEvent;
+Object.defineProperty(ScrollEvent.prototype,"constructor", {value:ScrollEvent});
 ScrollEvent.CHANGE='scrollChange';
 
 //属性事件

@@ -552,7 +552,7 @@ function Element(selector, context)
 
 Element.querySelector=querySelector;
 Element.prototype= Object.create( EventDispatcher.prototype );
-Element.prototype.constructor = Element;
+Object.defineProperty(Element.prototype,"constructor", {value:Element});
 Element.prototype.length = 0;
 Element.prototype.slice  = Array.prototype.slice;
 Element.prototype.splice = Array.prototype.splice;

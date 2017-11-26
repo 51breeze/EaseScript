@@ -9,8 +9,8 @@ function Class() {
 }
 Class.valueOf=Class.toString=function () {return '[object Class]'};
 Class.prototype = Object.create( Object.prototype );
-Class.prototype.constructor = Class;
-Class.prototype.valueOf=function valueOf()
+Object.defineProperty(Class.prototype,"constructor", {value:Class});
+Object.defineProperty( Class.prototype, "valueOf", {value:function valueOf()
 {
     if(this==null)return this===null ? 'null' : 'undefined';
     if( this instanceof Class )
@@ -18,13 +18,13 @@ Class.prototype.valueOf=function valueOf()
         return '[class '+this.__T__.classname+']';
     }
     return Object.prototype.valueOf.call( this );
-};
+}});
 
 /**
  * 返回指定对象的字符串表示形式。
  * @returns {String}
  */
-Class.prototype.toString=function toString()
+Object.defineProperty( Class.prototype, "toString", {value:function toString()
 {
     if(this==null)return this===null ? 'null' : 'undefined';
     if( this instanceof Class )
@@ -32,7 +32,7 @@ Class.prototype.toString=function toString()
         return '[object Class]';
     }
     return Object.prototype.toString.call( this );
-};
+}});
 
 System.Class = Class;
 

@@ -15,7 +15,7 @@ function DataSourceEvent(type, bubbles,cancelable)
 }
 System.DataSourceEvent=DataSourceEvent;
 DataSourceEvent.prototype= Object.create(Event.prototype);
-DataSourceEvent.prototype.constructor=DataSourceEvent;
+Object.defineProperty(DataSourceEvent.prototype,"constructor", {value:DataSourceEvent});
 DataSourceEvent.prototype.condition=null;
 DataSourceEvent.prototype.index=NaN;
 DataSourceEvent.prototype.data=null;

@@ -112,7 +112,7 @@ DataGrep.prototype.dataItems=null;
  * constructor.
  * @type {DataGrep}
  */
-DataGrep.prototype.constructor=DataGrep;
+Object.defineProperty(DataGrep.prototype,"constructor", {value:DataGrep});
 
 /**
  * @type {number}

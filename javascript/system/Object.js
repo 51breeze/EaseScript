@@ -14,29 +14,11 @@ function Object( value )
 
 System.Object = Object;
 Object.prototype = new $Object();
-Object.prototype.constructor=Object;
 
-Object.prototype.valueOf = function valueOf()
-{
-    if( this.constructor instanceof System.Class )
-    {
-        var objClass = this.constructor;
-        var p = objClass.__T__['package'];
-        return '[object '+(p ? p+'.' : '')+objClass.__T__.classname+"]";
-    }
-    return $Object.prototype.valueOf.call(this);
-};
-
-Object.prototype.toString = function toString()
-{
-    if( this.constructor instanceof System.Class )
-    {
-        var objClass = this.constructor;
-        var p = objClass.__T__['package'];
-        return '[object '+(p ? p+'.' : '')+objClass.__T__.classname+"]";
-    }
-    return $Object.prototype.toString.call(this);
-};
+/**
+ * 生成一个对象
+ */
+Object.create = $Object.create;
 
 /**
  * 定义属性描述
@@ -53,6 +35,11 @@ if( !Object.defineProperty || ( System.env.platform('IE') && System.env.version(
 }
 
 /**
+ * 对象的构造函数
+ */
+Object.defineProperty(Object.prototype,"constructor", {configurable:true,value:Object});
+
+/**
  * 合并其它参数到指定的 target 对象中
  * 如果只有一个参数则只对本身进行扩展。
  * @param deep true 深度合并
@@ -60,7 +47,7 @@ if( !Object.defineProperty || ( System.env.platform('IE') && System.env.version(
  * @param ...valueObj object 待合并到目标源上的对象
  * @returns Object
  */
-Object.merge =function merge()
+Object.defineProperty(Object,"merge", {value:function merge()
 {
     var options, name, src, copy, copyIsArray, clone,
         target = arguments[0] || {},
@@ -125,7 +112,45 @@ Object.merge =function merge()
         }
     }
     return target;
-};
+}});
+
+/**
+ * 获取对象的原型
+ */
+Object.defineProperty( Object, "getPrototypeOf", {value:$Object.getPrototypeOf || function getPrototypeOf(obj)
+{
+    if( obj == null )throw new TypeError("non-object");
+    if( obj instanceof System.Class || obj.constructor instanceof System.Class )
+    {
+        return null;
+    }
+    return obj.__proto__ ? obj.__proto__ : (obj.constructor ? obj.constructor.prototype : null);
+}});
+
+/**
+ * 返回对象的原始值
+ */
+Object.defineProperty( Object.prototype, "valueOf", {configurable:true,value:function valueOf()
+{
+    if( this.constructor instanceof System.Class )
+    {
+        var objClass = this.constructor;
+        var p = objClass.__T__['package'];
+        return '[object '+(p ? p+'.' : '')+objClass.__T__.classname+"]";
+    }
+    return $Object.prototype.valueOf.call(this);
+}});
+
+Object.defineProperty( Object.prototype, "toString", {configurable:true,value:function toString()
+{
+    if( this.constructor instanceof System.Class )
+    {
+        var objClass = this.constructor;
+        var p = objClass.__T__['package'];
+        return '[object '+(p ? p+'.' : '')+objClass.__T__.classname+"]";
+    }
+    return $Object.prototype.toString.call(this);
+}});
 
 /**
  * 设置对象的原型链
@@ -143,29 +168,11 @@ Object.setPrototypeOf = $Object.setPrototypeOf || function setPrototypeOf(obj, p
 };
 
 /**
- * 获取对象的原型
- */
-Object.getPrototypeOf = $Object.getPrototypeOf || function getPrototypeOf(obj)
-{
-    if( obj == null )throw new TypeError("non-object");
-    if( obj instanceof System.Class || obj.constructor instanceof System.Class )
-    {
-        return null;
-    }
-    return obj.__proto__ ? obj.__proto__ : (obj.constructor ? obj.constructor.prototype : null);
-};
-
-/**
- * 生成一个对象
- */
-Object.create = $Object.create;
-
-/**
  * 指示 Object 类的实例是否在指定为参数的对象的原型链中
  * @param theClass
  * @returns {Boolean}
  */
-Object.prototype.isPrototypeOf = $Object.prototype.isPrototypeOf;
+Object.defineProperty(Object.prototype, "isPrototypeOf", {value:$Object.prototype.isPrototypeOf});
 
 /**
  * 表示对象本身是否已经定义了指定的属性。
@@ -174,7 +181,7 @@ Object.prototype.isPrototypeOf = $Object.prototype.isPrototypeOf;
  * @returns {Boolean}
  */
 var $hasOwnProperty = $Object.prototype.hasOwnProperty;
-Object.prototype.hasOwnProperty = function hasOwnProperty( name )
+Object.defineProperty(Object.prototype, "hasOwnProperty", {configurable:true,value:function hasOwnProperty( name )
 {
     if( this == null )throw new TypeError("non-object");
     if( this instanceof  System.Class ) return false;
@@ -184,7 +191,7 @@ Object.prototype.hasOwnProperty = function hasOwnProperty( name )
         if( this.constructor.__T__.uri[0] === name )return false;
     }
     return $hasOwnProperty.call(this,name);
-};
+}});
 
 /**
  * 表示指定的属性是否存在、是否可枚举。
@@ -194,7 +201,7 @@ Object.prototype.hasOwnProperty = function hasOwnProperty( name )
  * @returns {Boolean}
  */
 var $propertyIsEnumerable=$Object.prototype.propertyIsEnumerable;
-Object.prototype.propertyIsEnumerable = function propertyIsEnumerable( name )
+Object.defineProperty(Object.prototype, "propertyIsEnumerable", {configurable:true,value:function propertyIsEnumerable( name )
 {
     if( this == null )throw new TypeError("non-object");
     if( this instanceof System.Class ) return false;
@@ -205,32 +212,32 @@ Object.prototype.propertyIsEnumerable = function propertyIsEnumerable( name )
     }
     if( System.Symbol.isSymbolPropertyName && System.Symbol.isSymbolPropertyName(name) )return false;
     return $propertyIsEnumerable.call(this,name);
-};
+}});
 
 /**
  * 返回对象可枚举的属性的键名
  * @returns {Array}
  */
-Object.prototype.keys=function keys()
+Object.defineProperty(Object.prototype, "keys", {configurable:true,value:function keys()
 {
     return Object.prototype.getEnumerableProperties.call(this,-1);
-};
+}});
 
 /**
  * 返回对象可枚举的属性值
  * @returns {Array}
  */
-Object.prototype.values=function values()
+Object.defineProperty(Object.prototype, "values", {configurable:true,value:function values()
 {
     return Object.prototype.getEnumerableProperties.call(this,1);
-};
+}});
 
 /**
  * 获取可枚举的属性
  * @param state
  * @returns {Array}
  */
-Object.prototype.getEnumerableProperties=function getEnumerableProperties( state )
+Object.defineProperty(Object.prototype, "getEnumerableProperties", {configurable:true,value:function getEnumerableProperties( state )
 {
     if( this == null )throw new TypeError("non-object");
     if( this instanceof System.Class )return [];
@@ -258,4 +265,4 @@ Object.prototype.getEnumerableProperties=function getEnumerableProperties( state
         }
     }
     return items;
-};
+}});

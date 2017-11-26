@@ -10,7 +10,7 @@ function Interface() {
 }
 System.Interface=Interface;
 Interface.prototype = Object.create( null );
-Interface.prototype.constructor = Interface;
+Object.defineProperty(Interface.prototype,"constructor", {value:Interface});
 Interface.prototype.valueOf=function valueOf()
 {
     if(this==null)return this===null ? 'null' : 'undefined';

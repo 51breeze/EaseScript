@@ -16,7 +16,7 @@ System.ElementEvent = ElementEvent;
 ElementEvent.prototype=Object.create( Event.prototype );
 ElementEvent.prototype.parent=null;
 ElementEvent.prototype.child=null;
-ElementEvent.prototype.constructor=ElementEvent;
+Object.defineProperty(ElementEvent.prototype,"constructor", {value:ElementEvent});
 ElementEvent.ADD='elementAdd';
 ElementEvent.REMOVE='elementRemove';
 ElementEvent.CHNAGED='elementContentChanged';
