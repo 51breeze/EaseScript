@@ -212,9 +212,11 @@ System.isObject =function isObject(val, flag)
 {
     if (!val || typeof val !== "object")return false;
     var proto = System.Object.getPrototypeOf(val);
-    var result = proto === System.Object.prototype || proto === $Object.prototype;
-    if (!result && flag !== true && System.isArray(val))return true;
-    return result;
+    if( proto === System.Object.prototype || proto === $Object.prototype )
+    {
+        return true;
+    }
+    return flag !== true && System.isArray(val);
 };
 /**
  * 检查所有传入的值定义
@@ -314,11 +316,16 @@ System.trim =function trim(str) {
  * @param step 每次的步增数，默认为1
  */
 System.range =function range(low, high, step) {
-    var obj = [];
-    if (!System.isNumber(step))step = 1;
-    step = System.Math.max(step, 1);
-    for (; low < high; low += step)obj.push(low);
-    return obj;
+
+    if( high > low )
+    {
+        var obj = [];
+        if (!System.isNumber(step))step = 1;
+        step = Math.max(step, 1);
+        for (; low < high; low += step)obj.push(low);
+        return obj;
+    }
+    return [low];
 };
 
 /**

@@ -706,7 +706,7 @@ const builder={
                      Utils.error(err.message);
                      Utils.error(err.extract.join('\n'));
                  } else {
-                     filename = PATH.resolve(Utils.getBuildPath(config, 'build.webroot.static.css'), config.bootstrap + '.css');
+                     filename = PATH.resolve(Utils.getBuildPath(config, 'build.css'), config.bootstrap + '.css');
                      fs.writeFileSync(filename, output.css );
                  }
              });
@@ -718,7 +718,7 @@ const builder={
              if( script.error )throw script.error;
              script = script.code;
          }
-         filename = PATH.resolve(Utils.getBuildPath(config, 'build.webroot.static.js'), config.bootstrap + '.js');
+         filename = PATH.resolve(Utils.getBuildPath(config, 'build.js'), config.bootstrap + '.js');
          fs.writeFileSync(filename, script );
      },
 
@@ -898,11 +898,11 @@ function getConfigure(config)
         config = JSON.parse( Utils.getContents(makefile) );
     }
 
-    var bootstrap_file = PATH.resolve( config.project.child.client.path , config.bootstrap+config.suffix );
+    var bootstrap_file = PATH.resolve( config.project.path , config.bootstrap+config.suffix );
     if( !Utils.isFileExists(bootstrap_file) )
     {
         var defaultFile = [
-            'package client\n{\n',
+            'package\n{\n',
             '\tpublic class '+config.bootstrap,
             ' extends EventDispatcher\n\t{\n',
             '\t\tpublic function '+config.bootstrap,
@@ -951,7 +951,7 @@ var globalConfig = defaultConfig;
  */
 function make( config, isGlobalConfig )
 {
-    config = getConfigure( Utils.merge(globalConfig,config || {}) );
+    config = getConfigure( Utils.merge(globalConfig, config || {}) );
     if( isGlobalConfig===true )
     {
         globalConfig  = config;
@@ -971,19 +971,17 @@ function make( config, isGlobalConfig )
     }
     config.globals=globals;
     config.$getDescriptionAndGlobals = getDescriptionAndGlobals;
-    var build_project = config.project.child;
-    var project_config;
-    var p;
+
     try
     {
-        var project = build_project.client;
-        project.config = project_config = Utils.merge({},config, project.config || {});
-        if (typeof project_config.bootstrap === "string" && typeof project_config.syntax === "string")
+        var project = config.project;
+        project.config = Utils.merge({},config, project.config || {});
+        if (typeof project.config.bootstrap === "string" && typeof project.config.syntax === "string")
         {
-            if (syntax_supported[project_config.syntax] === true)
+            if( syntax_supported[ project.config.syntax ] === true )
             {
-                var classname = PATH.relative( config.project_path, filepath(project_config.bootstrap, project.path ) );
-                loadModuleDescription(project_config.syntax, classname, project_config, project);
+                var classname = PATH.relative( project.path, filepath( project.config.bootstrap, project.path ) );
+                loadModuleDescription( project.config.syntax, classname,  project.config, project);
             }
         }
 

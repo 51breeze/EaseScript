@@ -4,55 +4,17 @@ module.exports={
         "path": "./",
         "name": "build",
         "child": {
-            "framework": {
+            "js": {
                 "path": "./",
-                "name": "breezephp",
+                "name": "js",
             },
-            "application": {
+            "img": {
                 "path": "./",
-                "name": "application",
-                "child": {
-                    "library": {
-                        "path": "./",
-                        "name": "library",
-                    },
-                    "controller": {
-                        "path": "./",
-                        "name": "controller",
-                    },
-                    "model": {
-                        "path": "./",
-                        "name": "model",
-                    },
-                    "view": {
-                        "path": "./",
-                        "name": "view",
-                    },
-                },
+                "name": "img",
             },
-            "webroot": {
+            "css": {
                 "path": "./",
-                "name": "webroot",
-                "child": {
-                    "static": {
-                        "path": "./",
-                        "name": "static",
-                        "child": {
-                            "js": {
-                                "path": "./",
-                                "name": "js",
-                            },
-                            "img": {
-                                "path": "./",
-                                "name": "img",
-                            },
-                            "css": {
-                                "path": "./",
-                                "name": "css",
-                            },
-                        },
-                    },
-                },
+                "name": "css",
             },
         },
     },
@@ -60,42 +22,5 @@ module.exports={
     "project":{
         "path": "./",
         "name": "project",
-        "child":{
-            'client': {
-                "path": "./",
-                "name": "client",
-                "child": {
-                    'skin': {
-                        "path": "./",
-                        "name": "skins",
-                    },
-                },
-            },
-            'server': {
-                "path": "./",
-                "name": "server",
-                "config":{
-                    'compat_version':{'php':5.3},
-                },
-                "child": {
-                    'controller': {
-                        "path": "./",
-                        "name": "controller",
-                    },
-                    'model': {
-                        "path": "./",
-                        "name": "model",
-                    },
-                    'library': {
-                        "path": "./",
-                        "name": "library",
-                    },
-                    'view': {
-                        "path": "./",
-                        "name": "view",
-                    },
-                },
-            },
-        },
     },
 };

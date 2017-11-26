@@ -11,6 +11,7 @@ function Object( value )
     if( !(this instanceof Object) ) return new Object();
     return this;
 }
+
 System.Object = Object;
 Object.prototype = new $Object();
 Object.prototype.constructor=Object;
@@ -173,14 +174,14 @@ Object.prototype.isPrototypeOf = $Object.prototype.isPrototypeOf;
  * @returns {Boolean}
  */
 var $hasOwnProperty = $Object.prototype.hasOwnProperty;
-Object.prototype.hasOwnProperty = function( name )
+Object.prototype.hasOwnProperty = function hasOwnProperty( name )
 {
     if( this == null )throw new TypeError("non-object");
     if( this instanceof  System.Class ) return false;
     if( this.constructor instanceof System.Class )
     {
         if( this.constructor.__T__.dynamic !==true )return false;
-        if(  this.constructor.__T__.uri[0] === name )return false;
+        if( this.constructor.__T__.uri[0] === name )return false;
     }
     return $hasOwnProperty.call(this,name);
 };
@@ -196,13 +197,12 @@ var $propertyIsEnumerable=$Object.prototype.propertyIsEnumerable;
 Object.prototype.propertyIsEnumerable = function propertyIsEnumerable( name )
 {
     if( this == null )throw new TypeError("non-object");
-    if( this instanceof  System.Class ) return false;
+    if( this instanceof System.Class ) return false;
     if( this.constructor instanceof System.Class )
     {
         if( this.constructor.__T__.dynamic !==true )return false;
-        if(  this.constructor.__T__.uri[0] === name )return false;
+        if( this.constructor.__T__.uri[0] === name )return false;
     }
-    //symbol property
     if( System.Symbol.isSymbolPropertyName && System.Symbol.isSymbolPropertyName(name) )return false;
     return $propertyIsEnumerable.call(this,name);
 };
@@ -211,7 +211,7 @@ Object.prototype.propertyIsEnumerable = function propertyIsEnumerable( name )
  * 返回对象可枚举的属性的键名
  * @returns {Array}
  */
-Object.prototype.keys=function()
+Object.prototype.keys=function keys()
 {
     return Object.prototype.getEnumerableProperties.call(this,-1);
 };
@@ -220,7 +220,7 @@ Object.prototype.keys=function()
  * 返回对象可枚举的属性值
  * @returns {Array}
  */
-Object.prototype.values=function()
+Object.prototype.values=function values()
 {
     return Object.prototype.getEnumerableProperties.call(this,1);
 };

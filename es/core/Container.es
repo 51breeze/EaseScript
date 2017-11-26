@@ -123,7 +123,6 @@ package es.core
             return this.removeChild( this.getChildAt(index) );
         };
 
-
         /**
          * 移除所有的子级元素
          */

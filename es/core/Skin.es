@@ -15,7 +15,7 @@ package es.core
     public class Skin extends Container
     {
         private var hash:Object;
-        private var _children;
+        private var _skinChildren;
         private var _name:String;
         private var _attr:Object;
 
@@ -42,7 +42,7 @@ package es.core
                         }
                     }
                 }
-                this._children = skinObject.children || [];
+                this._skinChildren = skinObject.children || [];
                 this.hash = skinObject.hash || {};
                 this._name = name;
                 this._attr = attr;
@@ -54,7 +54,7 @@ package es.core
 
         protected function get skinChildren():Array
         {
-            return _children;
+            return _skinChildren;
         }
 
         /**

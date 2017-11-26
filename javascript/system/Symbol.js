@@ -6,6 +6,7 @@
  * @author Jun Ye <664371281@qq.com>
  * @require System,Internal
  */
+var hasSymbol = !!$Symbol;
 System.Symbol = $Symbol || (function()
 {
 var tables={};
@@ -16,7 +17,7 @@ var SYMBOL_KEY_NAME = prefix+'(SYMBOL_KEY_NAME)';
 var SYMBOL_KEY_VALUE= prefix+'(SYMBOL_KEY_VALUE)';
 function isSymbolPropertyName( propName )
 {
-    if( propName==null )return false;
+    if( propName==null || hasSymbol===true )return false;
     propName=propName.toString();
     return propName.substr(0,prefixLen) === prefix+'(' && propName.substr(-1)===')';
 }

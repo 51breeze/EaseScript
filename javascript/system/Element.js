@@ -1506,9 +1506,14 @@ Element.prototype.addChildAt=function addChildAt( childElemnet, index )
      {
         throw new Error('parent is null of child elemnet in addChildAt');
      }
+
     var refChild=index===-1 ? null : Element.prototype.getChildAt.call(this,index);
     if( childElemnet.parentNode )Element.prototype.removeChild.call(this, childElemnet );
     var result = parent.insertBefore( childElemnet , refChild || null );
+    if( Element.getNodeName(childElemnet)==="#document-fragment" )
+    {
+        childElemnet['parent-element'] = parent;
+    }
     $dispatchEvent( EventDispatcher( childElemnet ) ,ElementEvent.ADD, parent, childElemnet , result );
     $dispatchEvent( EventDispatcher( parent ) , ElementEvent.CHNAGED, parent, childElemnet , result );
     return childElemnet;
@@ -1575,9 +1580,22 @@ Element.prototype.removeChild=function removeChild( childElemnet )
     {
         throw new TypeError('is not HTMLElement in removeChild');
     }
+
     var parent = childElemnet.parentNode;
     if( !parent )
     {
+        if( Element.getNodeName(childElemnet)==="#document-fragment" )
+        {
+            parent = childElemnet['parent-element'];
+            if( parent )
+            {
+                while ( parent.childNodes.length > 0 )
+                {
+                    this.removeChild( parent.childNodes[0] );
+                }
+                return childElemnet;
+            }
+        }
         throw new TypeError('parentNode is null of child elemnet');
     }
     var result = parent.removeChild( childElemnet );

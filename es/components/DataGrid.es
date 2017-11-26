@@ -101,6 +101,16 @@ package es.components
             this.__columns__ = isString(columns) ? columns.split(',') : columns;
         };
 
+        public function set rows( value:Number ):void
+        {
+            this.dataSource.pageSize( value );
+        }
+
+        public function get rows():Number
+        {
+            return this.dataSource.pageSize();
+        }
+
         /**
          * @type {string}
          * @private

@@ -27,12 +27,12 @@ function foreach( expression)
         key=result[2];
         item=result[3];
     }
-    var code =  'var forIndex=0;\n';
+    var code ='var forIndex=0;\n';
     code += 'var forKey;\n';
     code += 'var forItem;\n';
     code += 'var '+item+';\n';
-    code += 'if( this.isObject('+data+') )for(var '+key+' in '+data+'){\n';
-    code += item+'=this.forEach('+data+','+key+', forIndex++);\n';
+    code += 'if( this.isObject('+data+') )for(var '+key+' in '+data+')if(Object.prototype.hasOwnProperty.call('+data+','+key+')){\n';
+    code += item+'='+data+'['+key+'];\n';
     code += 'forKey='+key+';\n';
     code += 'forItem='+item+';\n';
     return code;
