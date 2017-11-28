@@ -34,7 +34,6 @@ function description(scope, refObject, name , thisArgument , ns, setter)
         //是否为调用超类中的方法
         isstatic =  isstatic && thisArgument===refObject;
         var proto = isstatic ? objClass.__T__.method : objClass.__T__.proto;
-
         //默认命名空间
         if( has.call(proto,name) && System.Array.prototype.indexOf.call(scope.__T__.uri, proto[ name ].ns ) >=0 )
         {

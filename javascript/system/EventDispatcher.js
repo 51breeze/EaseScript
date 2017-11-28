@@ -35,7 +35,7 @@ Object.defineProperty(EventDispatcher.prototype,"constructor", {value:EventDispa
  */
 Object.defineProperty(EventDispatcher.prototype,"hasEventListener", {value:function hasEventListener( type )
 {
-    var target =  storage(this,'target');
+    var target =  storage(this,'target') || this;
     var events;
     var len = target.length >> 0;
     if( len > 0 )
@@ -71,7 +71,7 @@ Object.defineProperty(EventDispatcher.prototype,"addEventListener", {value:funct
     if( typeof type !== 'string' )throw new TypeError('Invalid event type');
     if( typeof callback !== 'function' )throw new TypeError('Invalid callback function');
     var listener=new Listener(type,callback,useCapture,priority,reference,this);
-    var target = storage(this,'target');
+    var target = storage(this,'target') || this;
     var len = target.length >> 0;
     if( len > 0 )
     {
@@ -93,7 +93,7 @@ Object.defineProperty(EventDispatcher.prototype,"addEventListener", {value:funct
  */
 Object.defineProperty(EventDispatcher.prototype,"removeEventListener", {value:function(type,listener)
 {
-    var target = storage(this,'target');
+    var target = storage(this,'target') || this;
     var len = target.length >> 0;
     if( len > 0 ){
         while(len>0 && target[--len] )$removeEventListener( target[len], type, listener, this);
@@ -110,7 +110,7 @@ Object.defineProperty(EventDispatcher.prototype,"removeEventListener", {value:fu
 Object.defineProperty(EventDispatcher.prototype,"dispatchEvent", {value:function( event )
 {
     if( !System.is(event,Event) )throw new TypeError('Invalid event');
-    var target = storage(this,'target');
+    var target = storage(this,'target') || this;
     var len = target.length >> 0;
     if( len > 0 ){
         while(len>0 && target[--len] )
