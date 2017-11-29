@@ -11,6 +11,7 @@ package es.core
     import es.core.es_internal;
     import es.components.Component;
     import es.events.SkinEvent;
+    import es.core.State;
 
     public class Skin extends Container
     {

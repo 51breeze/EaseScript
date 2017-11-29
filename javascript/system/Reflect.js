@@ -132,6 +132,10 @@ Reflect.apply=function apply( theClass, thisArgument, argumentsList )
     {
         argumentsList = typeof argumentsList !== "undefined" ? [argumentsList] : [];
     }
+    if( !System.isFunction( theClass ) )
+    {
+        throw new TypeError('target is not function');
+    }
     return _apply(theClass, thisArgument, argumentsList);
 };
 

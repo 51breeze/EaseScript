@@ -210,21 +210,6 @@ function $doRecursion(propName, strainer, deep )
 }
 
 /**
- * @private
- * @type {RegExp}
- */
-var selectorExpr = /^(?:#([\w-]+)|\:?(\w+.*?)|\.([\w-]+)|(\[[\w-]+.*?\]))$/;
-
-/**
- * 判断是否为一个有效的选择器
- * @param selector
- * @returns {boolean}
- */
-function isSelector( selector )
-{
-    return typeof selector === "string" ? selectorExpr.test( selector ) : false;
-}
-/**
  * 统一规范的样式名
  * @param name
  * @returns {string}
@@ -299,8 +284,7 @@ var querySelector = typeof Sizzle === "function" ?  function(selector, context, 
 /**
  * @type {RegExp}
  */
-var singleTagRegex=/^<(\w+)(.*?)\/\s*>$/
-    ,tableChildRegex=/^\<(tr|td|th|thead|tbody|tfoot)/i;
+var singleTagRegex=/^<(\w+)(.*?)\/\s*>$/;
 
 /**
  * 创建HTML元素
@@ -317,13 +301,15 @@ function $createElement(html , flag )
             if( flag !==true  )
             {
                 var match;
-                if (html.charAt(0) !== "<" && html.charAt(html.length - 1) !== ">" && html.length >= 1) {
+                if (html.charAt(0) !== "<" && html.charAt(html.length - 1) !== ">" && html.length >= 1)
+                {
                     try {
                         return document.createElement(html);
                     } catch (e) {
                     }
 
-                } else if (html.charAt(0) === "<" && ( match = singleTagRegex.exec(html) )) {
+                } else if (html.charAt(0) === "<" && ( match = singleTagRegex.exec(html) ))
+                {
                     var elem = document.createElement(match[1]);
                     var attr = $matchAttr(html);
                     var isset = typeof elem.setAttribute === "function";
@@ -545,13 +531,13 @@ function Element(selector, context)
             result = selector;
         }
     }
-    this.length = 0;
+    Object.defineProperty(this,"length", {value:0,writable:true});
     Array.prototype.splice.apply(this,[0,0].concat(result) );
     EventDispatcher.call(this);
 }
 
-Element.querySelector=querySelector;
 Element.prototype= Object.create( EventDispatcher.prototype );
+Object.defineProperty(Element,"querySelector", {value:querySelector});
 Object.defineProperty(Element.prototype,"constructor", {value:Element});
 Element.prototype.length = 0;
 Element.prototype.slice  = Array.prototype.slice;
