@@ -113,7 +113,6 @@ function Bindable(source,properties)
 Bindable.prototype=  Object.create( EventDispatcher.prototype );
 Object.defineProperty(Bindable.prototype,"constructor", {value:Bindable});
 
-
 /**
  * 指定对象到当前绑定器。
  * @param object target 绑定的目标对象。

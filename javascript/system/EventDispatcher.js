@@ -36,6 +36,11 @@ Object.defineProperty(EventDispatcher.prototype,"constructor", {value:EventDispa
 Object.defineProperty(EventDispatcher.prototype,"hasEventListener", {value:function hasEventListener( type )
 {
     var target =  storage(this,'target') || this;
+    if( System.is(target,EventDispatcher) && target !== this )
+    {
+        return target.hasEventListener(type);
+    }
+
     var events;
     var len = target.length >> 0;
     if( len > 0 )
@@ -70,8 +75,14 @@ Object.defineProperty(EventDispatcher.prototype,"addEventListener", {value:funct
 {
     if( typeof type !== 'string' )throw new TypeError('Invalid event type');
     if( typeof callback !== 'function' )throw new TypeError('Invalid callback function');
-    var listener=new Listener(type,callback,useCapture,priority,reference,this);
     var target = storage(this,'target') || this;
+    if( System.is(target,EventDispatcher) && target !== this )
+    {
+        target.addEventListener(type,callback,useCapture,priority,reference||this);
+        return this;
+    }
+
+    var listener=new Listener(type,callback,useCapture,priority,reference,this);
     var len = target.length >> 0;
     if( len > 0 )
     {
@@ -94,6 +105,10 @@ Object.defineProperty(EventDispatcher.prototype,"addEventListener", {value:funct
 Object.defineProperty(EventDispatcher.prototype,"removeEventListener", {value:function(type,listener)
 {
     var target = storage(this,'target') || this;
+    if( System.is(target,EventDispatcher) && target !== this )
+    {
+        return target.removeEventListener(type,listener);
+    }
     var len = target.length >> 0;
     if( len > 0 ){
         while(len>0 && target[--len] )$removeEventListener( target[len], type, listener, this);
@@ -111,6 +126,11 @@ Object.defineProperty(EventDispatcher.prototype,"dispatchEvent", {value:function
 {
     if( !System.is(event,Event) )throw new TypeError('Invalid event');
     var target = storage(this,'target') || this;
+    if( System.is(target,EventDispatcher) && target !== this )
+    {
+        return target.dispatchEvent(event);
+    }
+
     var len = target.length >> 0;
     if( len > 0 ){
         while(len>0 && target[--len] )
@@ -143,7 +163,7 @@ function $addEventListener(target, listener )
     events = events[ type ] || ( events[ type ]=[] );
 
     //如果不是 EventDispatcher 则在第一个事件中添加事件代理。
-    if( events.length===0 && !System.is(target,EventDispatcher) )
+    if( events.length===0 )
     {
         //自定义事件处理
         if( Object.prototype.hasOwnProperty.call(Event.fix.hooks,type) )
