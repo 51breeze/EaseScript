@@ -62,7 +62,7 @@ function done(event)
     if (xhr.status >= 200 && xhr.status < 300)
     {
         result = xhr.responseXML;
-        if (options.dataType.toLowerCase() === Http.TYPE.JSON)
+        if (options.dataType.toLowerCase() === Http.TYPE_JSON)
         {
             try {
                 result = JSON.parse( xhr.responseText );
@@ -105,7 +105,8 @@ function progress(event)
     this.dispatchEvent(e);
 }
 
-function error() {
+function error()
+{
     var e = new HttpEvent(HttpEvent.ERROR);
     var xhr = event.currentTarget;
     e.url = xhr.__url__;
@@ -145,48 +146,38 @@ function Http( options )
 }
 System.Http=Http;
 
-
 /**
  * Difine constan Http accept type
  */
-Http.ACCEPT = {
-    XML: "application/xml,text/xml",
-    HTML: "text/html",
-    TEXT: "text/plain",
-    JSON: "application/json, text/javascript",
-    ALL: "*/*"
-};
+Http.ACCEPT_XML= "application/xml,text/xml";
+Http.ACCEPT_HTML= "text/html";
+Http.ACCEPT_TEXT="text/plain";
+Http.ACCEPT_JSON= "application/json, text/javascript";
+Http.ACCEPT_ALL= "*/*";
 
 /**
  * Difine constan Http contentType data
  */
-Http.FORMAT = {
-    X_WWW_FORM_URLENCODED: "application/x-www-form-urlencoded",
-    FORM_DATA: "multipart/form-data",
-    PLAIN: "text/plain",
-    JSON: "application/json"
-};
+Http.HEADER_TYPE_URLENCODED= "application/x-www-form-urlencoded";
+Http.HEADER_TYPE_FORM_DATA="multipart/form-data";
+Http.HEADER_TYPE_PLAIN="text/plain";
+Http.HEADER_TYPE_JSON="application/json";
 
 /**
  * Difine constan Http dataType format
  */
-Http.TYPE = {
-    HTML: 'html',
-    XML: 'xml',
-    JSON: 'json',
-    JSONP: 'jsonp'
-};
+Http.TYPE_HTML= 'html';
+Http.TYPE_XML= 'xml';
+Http.TYPE_JSON= 'json';
+Http.TYPE_JSONP= 'jsonp';
 
 /**
  * Difine Http method
  */
-Http.METHOD = {
-    GET: 'GET',
-    POST: 'POST',
-    PUT: 'PUT'
-};
-
-Http.JSONP_CALLBACK_NAME = 'JSONP_CALLBACK';
+Http.METHOD_GET='GET';
+Http.METHOD_POST='POST';
+Http.METHOD_PUT='PUT';
+Http.METHOD_DELETE='DELETE';
 
 /**
  * 继承事件类
@@ -241,12 +232,12 @@ Object.defineProperty(Http.prototype,"load",{value:function load(url, data, meth
     if (typeof method === 'string')
     {
         method = method.toUpperCase();
-        if (!(method in Http.METHOD))throw new Error('Invalid method for ' + method);
+        if ( Http["METHOD_"+method] !==method )throw new Error('Invalid method for ' + method);
     }
 
     try
     {
-        if (options.dataType.toLowerCase() === 'jsonp')
+        if( options.dataType.toLowerCase() === Http.TYPE_JSONP )
         {
             xhr = new ScriptRequest( async );
             xhr.addEventListener(HttpEvent.SUCCESS, function (event)
@@ -267,7 +258,7 @@ Object.defineProperty(Http.prototype,"load",{value:function load(url, data, meth
         {
             xhr = options.xhr = getXHR( this );
             data = data != null ? System.serialize(data, 'url') : null;
-            if (method === Http.METHOD.GET && data)
+            if (method === Http.METHOD_GET && data)
             {
                 if (data != '')url += /\?/.test(url) ? '&' + data : '?' + data;
                 data = null;
@@ -277,9 +268,9 @@ Object.defineProperty(Http.prototype,"load",{value:function load(url, data, meth
             if( options.setHeader===false )
             {
                 //设置请求头 如果请求方法为post
-                if (method === Http.METHOD.POST)
+                if( method === Http.METHOD_POST)
                 {
-                    options.header.contentType = "application/x-www-form-urlencoded";
+                    options.header.contentType = Http.HEADER_TYPE_URLENCODED;
                 }
 
                 //设置编码
@@ -377,7 +368,7 @@ function ScriptRequest( async )
     target.setAttribute('type', 'text/javascript');
     EventDispatcher.call(this, target);
     queues.push(this);
-    this.__key__ = 's'+queues.length+System.time();
+    this.__key__ = 's'+queues.length+System.uid();
     this.__target__ = target;
     this.__async__ = !!async;
 }
@@ -403,6 +394,7 @@ ScriptRequest.prototype.send = function send(url, data)
     var param = [];
     if(data!=null)param.push( System.serialize(data, 'url') );
     param.push('k=' + this.__key__ );
+    param.push('JSONP_CALLBACK=JSONP_CALLBACK');
     param = param.join('&');
     url += !/\?/.test(url) ? '?' + param : '&' + param;
     var target = this.__target__;

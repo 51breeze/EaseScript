@@ -15,8 +15,8 @@ function DataSource()
     EventDispatcher.call(this);
     storage(this,true,{
         "options":{
-            'method': Http.METHOD.GET,
-            'dataType':Http.TYPE.JSON,
+            'method': Http.METHOD_GET,
+            'dataType':Http.TYPE_JSON,
             'timeout':30,
             'param':{},
             'url':null,

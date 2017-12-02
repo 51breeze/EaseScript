@@ -173,7 +173,7 @@ function metaTypeToString( stack , type )
         content = content[1].content();
         if( Ruler.META_TYPE.indexOf( content[0].value ) < 0 )
         {
-            error('Invaild Metatype label','syntax', content[0]);
+            throw new SyntaxError("Invaild metatype '"+content[0].value+"'");
         }
         type = content[0].value;
     }
@@ -182,7 +182,7 @@ function metaTypeToString( stack , type )
     {
         if( content[1].previous(0).value !=='source' )
         {
-            error('Missing identifier source','syntax', content[1].previous(0) );
+            throw new SyntaxError("Missing identifier source");
         }
     }
 
