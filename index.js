@@ -182,7 +182,8 @@ function metaTypeToString( stack , type )
     {
         if( content[1].previous(0).value !=='source' )
         {
-            throw new SyntaxError("Missing identifier source");
+            //console.log( content[1].previous(0).value )
+            //throw new SyntaxError("Missing identifier source");
         }
     }
 
@@ -205,7 +206,28 @@ function metaTypeToString( stack , type )
     return str.join('');
 }
 
+function parseMetaEmbed(metatype, config )
+{
+    var source = metatype.param.source;
+    var filepath = PATH.resolve(config.project_path, source);
+    if( fs.existsSync(filepath) )
+    {
+        var rootImg  = Utils.getBuildPath(config, 'build.img');
+        var directory= PATH.relative(filepath, source );
+        var filename = PATH.basename( directory );
+        directory = PATH.dirname(directory).replace(/\\/g,'/').split('/');
+        directory = directory.filter(function (a) {
+            return a !== '..';
+        });
+        var dest =  PATH.resolve( rootImg, directory.join('/'), filename ).replace(/\\/g,'/');
+        fs.writeFileSync(dest, fs.readFileSync(filepath) );
+        return dest;
 
+    }else
+    {
+        throw new ReferenceError("file is not exists '"+source+"'");
+    }
+}
 
 /**
  * 解析元类型模块
@@ -230,10 +252,25 @@ function parseMetaType( describe, currentStack, metaTypeStack , config, project,
             }
             describe[ currentStack.name() ].value = ' System.getDefinitionByName("'+source+'")';
         break;
+        case 'Embed' :
+            var dest = parseMetaEmbed(metatype, config );
+            dest= PATH.relative(config.build_path,dest ).replace(/\\/g,'/');
+            describe[ currentStack.name() ].value = '"./'+dest+'"';
+        break;
         case 'Bindable' :
             var name = currentStack.name();
             var item = describe[ name ];
             if( item.bindable===true )return;
+            var eventType = "PropertyEvent.CHANGE";
+            if( metatype.param.eventType )
+            {
+                if( metatype.param.eventType.lastIndexOf('.')>0 )
+                {
+                    eventType =  metatype.param.eventType;
+                }else{
+                    eventType = '"'+ metatype.param.eventType+'"';
+                }
+            }
             if( item.id==='var' )
             {
                 var private_var = name;
@@ -244,7 +281,7 @@ function parseMetaType( describe, currentStack, metaTypeStack , config, project,
                     'var old = this['+config.context.private+'].'+private_var,';\n',
                     'if(old!==val){\n',
                     'this['+config.context.private+'].'+private_var+'=val;\n',
-                    'var event = new PropertyEvent(PropertyEvent.CHANGE);\n',
+                    'var event = new PropertyEvent('+eventType+');\n',
                     'event.property = "'+name+'";\n',
                     'event.oldValue = old;\n',
                     'event.newValue = val;\n',
@@ -691,6 +728,13 @@ const builder={
                  compress: config.minify ==='enable' ,
              };
              var style = styleContents.map(function (e, i) {
+
+                 e=e.replace(/@Embed\(.*?\)/g, function (a,b) {
+                     var metatype = Utils.executeMetaType( a.substr(1) );
+                     var dest = parseMetaEmbed(metatype, config);
+                     return '"./'+ PATH.relative( Utils.getBuildPath(config,'build.css'), dest ).replace(/\\/g,'/')+'"';
+                 });
+
                  e.replace(/\B@(\w+)\s*:/gi,function (a, b , c) {
                      e=e.replace( new RegExp('@'+b,"gi"),function (a){
                          return '@'+b+i;

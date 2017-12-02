@@ -56,7 +56,7 @@ function setProperty(object, prop, newValue )
 
     }else if( object instanceof Element )
     {
-        if( Element.prototype.hasProperty.call(object,prop) )Element.prototype.property.call(object,prop,newValue);
+       Element.prototype.property.call(object,prop,newValue);
 
     }else if( Reflect.has( object, prop) )
     {

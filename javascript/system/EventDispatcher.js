@@ -163,7 +163,7 @@ function $addEventListener(target, listener )
     events = events[ type ] || ( events[ type ]=[] );
 
     //如果不是 EventDispatcher 则在第一个事件中添加事件代理。
-    if( events.length===0 )
+    if( events.length===0 && !System.is(target,EventDispatcher) )
     {
         //自定义事件处理
         if( Object.prototype.hasOwnProperty.call(Event.fix.hooks,type) )
@@ -182,7 +182,7 @@ function $addEventListener(target, listener )
 
     //添加到元素
     events.push( listener );
-
+    
     //按权重排序，值大的在前面
     if( events.length > 1 ) events.sort(function(a,b)
     {

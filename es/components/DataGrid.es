@@ -82,7 +82,7 @@ package es.components
         /**
          * @private
          */
-        private var __columns__:Object = null;
+        private var __columns__:Object = {};
 
         /**
          * @returns {Object}
