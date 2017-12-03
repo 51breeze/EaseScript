@@ -29,7 +29,10 @@ package es.components
             if( val===false )
             {
                 this.__initialized__=true;
-                this.dispatchEvent( new ComponentEvent( ComponentEvent.INITIALIZED ) );
+                if( this.hasEventListener( ComponentEvent.INITIALIZED) )
+                {
+                    this.dispatchEvent(new ComponentEvent(ComponentEvent.INITIALIZED));
+                }
             }
             return val;
         }
@@ -49,7 +52,10 @@ package es.components
             if( val===true )
             {
                 this.__initializing__=false;
-                this.dispatchEvent( new ComponentEvent( ComponentEvent.INITIALIZING ) );
+                if( this.hasEventListener( ComponentEvent.INITIALIZING) )
+                {
+                    this.dispatchEvent(new ComponentEvent(ComponentEvent.INITIALIZING));
+                }
             }
             return val;
         };

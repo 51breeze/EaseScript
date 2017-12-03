@@ -308,15 +308,23 @@ function builder(config , code, requirements , skins )
          return val;
     });
 
+    var index = requires.indexOf('console');
+    if( index > 0 )requires.splice(index,1);
+    index = requires.indexOf('Symbol');
+    if( index > 0 )requires.splice(index,1);
+
+    var internal = '';
+    if( config.mode < 3 ){
+        internal='(function(System,Internal,environment){\n'+ utils.getContents( rootPath+'/internal.js' )+ '\n}(System,Internal,'+config.mode+'));'
+    }
+
     return [
         '(function(System,Internal,undefined){',
         '"use strict";',
         //系统全局模块域
         '(function(System,$'+globals.join(',$')+'){',
         //internal
-        '(function(System,Internal,environment){',
-        utils.getContents( rootPath+'/internal.js' ),
-        '}(System,Internal,'+config.mode+'));',
+         internal,
          contents,
         //running
         '(function(System,Internal,Class){',

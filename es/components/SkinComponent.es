@@ -28,8 +28,7 @@ package es.components
          */
         protected function skinInstaller()
         {
-            var skin = this.skin;
-            skin.es_internal::skinInstaller();
+            skin.skinInstaller();
             this.viewport.addChild( skin );
         }
 

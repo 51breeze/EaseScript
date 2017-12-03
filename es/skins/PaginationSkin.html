@@ -13,6 +13,27 @@
                 Element('.link' , this.element ).style('borderRadius', _radius+'px' );
              }
         }
+
+        override protected function initializing()
+        {
+            var hostComponent:Pagination = this.hostComponent as Pagination;
+            var dataSource:DataSource = hostComponent.dataSource;
+            var profile = new RegExp( hostComponent.profile+'\\s*=\\s*(\\d+)');
+            this.addEventListener(MouseEvent.CLICK, function (e:MouseEvent)
+            {
+                if (Element.getNodeName(e.target) === 'a')
+                {
+                    e.preventDefault();
+                    var url:String = Element(e.target).property('href');
+                    var _profile:Array = url.match(profile);
+                    var page:Number = parseInt(_profile ? _profile[1] : 0);
+                    if (page > 0)
+                    {
+                         hostComponent.current = page;
+                    }
+                }
+            });
+        }
     ]]>
 
     <style>

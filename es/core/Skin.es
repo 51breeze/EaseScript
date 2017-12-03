@@ -182,6 +182,15 @@ package es.core
             return this._layout;
         }
 
+        /**
+         * 在第一次调用 createChildren 之前调用此函数，用来初始化皮肤需要的一些参数
+         * 在子类中覆盖
+         */
+        protected function initializing(){}
+
+        /**
+         * @private
+         */
         private var _hostComponent;
 
         /**
@@ -192,7 +201,8 @@ package es.core
         es_internal function set hostComponent(host:Component):void
         {
             if( host == null )throw new ReferenceError("hostComponent is null");
-            this._hostComponent = host;
+            _hostComponent = host;
+            initializing();
         };
 
         /**
@@ -202,7 +212,7 @@ package es.core
          */
         protected function get hostComponent():Component
         {
-            return this._hostComponent;
+            return _hostComponent;
         };
 
         private var _render;
@@ -259,7 +269,7 @@ package es.core
         /**
          * 安装皮肤
          */
-        es_internal function skinInstaller()
+        public function skinInstaller()
         {
             this.createChildren();
         }

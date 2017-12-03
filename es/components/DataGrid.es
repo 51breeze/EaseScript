@@ -7,10 +7,7 @@
 package es.components
 {
     import es.components.SkinComponent;
-    import es.events.PaginationEvent;
-    import es.components.Pagination;
     import es.skins.DataGridSkin;
-    import es.core.es_internal;
 
     public class DataGrid extends SkinComponent
     {
@@ -25,7 +22,7 @@ package es.components
          */
         override public function get skinClass():Class
         {
-            var value=super.skinClass;
+            var value:Class=super.skinClass;
             if( value===null )return DataGridSkin;
             return value;
         }
@@ -44,17 +41,7 @@ package es.components
             var dataSource = this.__dataSource__;
             if ( dataSource === null )
             {
-                var self = this;
                 dataSource = new DataSource();
-                dataSource.addEventListener(DataSourceEvent.SELECT, function (event:DataSourceEvent)
-                {
-                    if ( !event.waiting )
-                    {
-                        var body = self.skin.getChildById('body');
-                        body.variable( self.dataProfile(), event.data );
-                        body.es_internal::skinInstaller();
-                    }
-                });
                 this.__dataSource__ = dataSource;
             }
             return dataSource;
@@ -101,11 +88,19 @@ package es.components
             this.__columns__ = isString(columns) ? columns.split(',') : columns;
         };
 
+        /**
+         * 每页显示数据的行数
+         * @param value
+         */
         public function set rows( value:Number ):void
         {
             this.dataSource.pageSize( value );
         }
 
+        /**
+         * 每页显示数据的行数
+         * @param value
+         */
         public function get rows():Number
         {
             return this.dataSource.pageSize();
@@ -123,7 +118,8 @@ package es.components
          */
         public function columnProfile(profile=null)
         {
-            if (typeof profile === "string") {
+            if (typeof profile === "string")
+            {
                 this.__columnProfile__ = profile;
                 return this;
             }
@@ -244,41 +240,5 @@ package es.components
         {
             return _footHeight;
         }
-
-        /**
-         * @override
-         * @return
-         */
-        override protected function initializing():Boolean
-        {
-            if( super.initializing() )
-            {
-                var skin = this.skin;
-                var body = skin.getChildById('body');
-                var head = skin.getChildById('head');
-                var pagination = skin.getChildById('pagination');
-                body.variable( this.dataProfile(), [] );
-                head.variable( this.columnProfile(), this.columns );
-                if( pagination )
-                {
-                    pagination.dataSource = this.dataSource;
-                }
-                return true;
-            }
-            return false;
-        }
-
-        override public function display()
-        {
-            super.display();
-            var pagination = this.skin.getChildById("pagination");
-            if( pagination )
-            {
-                pagination.display();
-            }else
-            {
-                this.dataSource.select(1);
-            }
-        };
     }
 }

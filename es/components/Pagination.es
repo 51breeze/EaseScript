@@ -112,10 +112,7 @@ package es.components
             if( this.__profile__ !== value )
             {
                 this.__profile__ = value;
-                if( this.initializeCompleted )
-                {
-                    this.skinInstaller();
-                }
+                commitPropertyAndUpdateSkin();
             }
         }
 
@@ -284,10 +281,7 @@ package es.components
             if( this.__link__ !== num )
             {
                 this.__link__ = num;
-                if( this.initializeCompleted )
-                {
-                    this.skinInstaller();
-                }
+                commitPropertyAndUpdateSkin();
             }
         }
 
@@ -362,7 +356,7 @@ package es.components
             if( _radius !== val )
             {
                 _radius=val;
-                this.commitPropertyAndUpdateSkin();
+                commitPropertyAndUpdateSkin();
             }
         }
 
@@ -376,32 +370,18 @@ package es.components
          */
         override protected function initializing()
         {
-             if( super.initializing() )
-             {
-                 var dataSource = this.dataSource;
-                 if( !dataSource )throw new ReferenceError('dataSource is not defined');
-                 var profile = new RegExp( this.profile+'\\s*=\\s*(\\d+)');
-                 var pageSize = this.__pageSize__;
-                 if( !isNaN(pageSize) )
-                 {
-                     dataSource.pageSize(pageSize);
-                 }
-                  this.skin.addEventListener(MouseEvent.CLICK, function (e:MouseEvent)
-                  {
-                      if (Element.getNodeName(e.target) === 'a')
-                      {
-                          e.preventDefault();
-                          var url:String = Element(e.target).property('href');
-                          var _profile:Array = url.match(profile);
-                          var page:Number = parseInt(_profile ? _profile[1] : 0);
-                          if (page > 0) {
-                              this.current = page;
-                          }
-                      }
-                  }, false, 0, this);
-                 return true;
-             }
-             return false;
+            if( super.initializing() )
+            {
+                var dataSource:DataSource = __dataSource__;
+                if( !dataSource )throw new ReferenceError('dataSource is not defined');
+                var size = pageSize;
+                if( !isNaN(size) )
+                {
+                    dataSource.pageSize(size);
+                }
+                return true;
+            }
+            return false;
         }
 
         override public function display()
@@ -411,6 +391,5 @@ package es.components
                 this.dataSource.select( this.current );
             }
         }
-
     }
 }

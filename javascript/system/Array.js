@@ -44,9 +44,22 @@ Object.defineProperty(Array.prototype,"push", {value:$Array.prototype.push});
 Object.defineProperty(Array.prototype,"shift", {value:$Array.prototype.shift});
 Object.defineProperty(Array.prototype,"unshift", {value:$Array.prototype.unshift});
 Object.defineProperty(Array.prototype,"sort", {value:$Array.prototype.sort});
-Object.defineProperty(Array.prototype,"reverse", {value:$Array.prototype.reverse});
-Object.defineProperty(Array.prototype,"indexOf", {value:$Array.prototype.indexOf});
-Object.defineProperty(Array.prototype,"map", {value:$Array.prototype.map});
+Object.defineProperty(Array.prototype, "reverse", {value: $Array.prototype.reverse});
+Object.defineProperty(Array.prototype, "toLocaleString", {value: $Array.prototype.toLocaleString});
+
+if( $Array.prototype.indexOf ) {
+    Object.defineProperty(Array.prototype, "indexOf", {value: $Array.prototype.indexOf});
+}
+
+if( $Array.prototype.lastIndexOf )
+{
+    Object.defineProperty(Array.prototype, "lastIndexOf", {value: $Array.prototype.lastIndexOf});
+}
+
+if( $Array.prototype.map )
+{
+    Object.defineProperty(Array.prototype,"map", {value:$Array.prototype.map});
+}
 
 /**
  * 循环对象中的每一个属性，只有纯对象或者是一个数组才会执行。

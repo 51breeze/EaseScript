@@ -539,7 +539,7 @@ function Element(selector, context)
 Element.prototype= Object.create( EventDispatcher.prototype );
 Object.defineProperty(Element,"querySelector", {value:querySelector});
 Object.defineProperty(Element.prototype,"constructor", {value:Element});
-Element.prototype.length = 0;
+
 Element.prototype.slice  = Array.prototype.slice;
 Element.prototype.splice = Array.prototype.splice;
 Element.prototype.concat = Array.prototype.concat;
@@ -1229,7 +1229,7 @@ Element.prototype.revert=function revert(step)
  * @param selector
  * @returns {Element}
  */
-Element.prototype.find=function find(selector )
+Element.prototype.find=function find(selector)
 {
     var ret=[];
     Element.prototype.forEach.call(this,function(elem){
@@ -1336,52 +1336,6 @@ Element.prototype.children=function children( selector )
 };
 
 //========================操作元素===========================
-
-/**
- * 用指定的元素来包裹当前所有匹配到的元素
- * @param element
- * @returns {Element}
- */
-Element.prototype.wrap=function wrap(element )
-{
-    var is=System.isFunction( element );
-    return Element.prototype.forEach.call(this,function(elem)
-    {
-        var wrap=$createElement( is ? element.call(this,elem) : element );
-        Element.prototype.current.call(this, elem.parentNode ).addChildAt( wrap , elem );
-        Element.prototype.current.call(this, wrap ).addChildAt( elem ,-1);
-    });
-};
-
-/**
- * 取消当前所有匹配元素的父级元素。不指定选择器则默认为父级元素，否则为指定选择器的祖辈元素。
- * 父级或者祖辈元素只能是body的子元素。
- * @param selector
- * @returns {Element}
- */
-Element.prototype.unwrap=function unwrap(selector )
-{
-    var is= typeof selector === "undefined";
-    return Element.prototype.forEach.call(this,function(elem)
-    {
-        var parent= is ?  elem.parentNode : $doRecursion.call(this,'parentNode',selector )[0];
-        if( parent && parent.ownerDocument && Element.contains(parent, parent.ownerDocument.body) )
-        {
-            var children=parent.hasChildNodes() ? parent.childNodes : [];
-            if( parent.parentNode )
-            {
-                Element.prototype.current.call(this, parent.parentNode );
-                var len=children.length,i=0;
-                while( i<len ){
-                    if( children[i] )Element.prototype.addChildAt.call(this, children[ i ], parent );
-                    i++;
-                }
-                Element.prototype.removeChildAt.call(this, parent );
-            }
-        }
-    });
-};
-
 
 /**
  * 获取或者设置 html

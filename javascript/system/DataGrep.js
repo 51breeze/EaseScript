@@ -97,28 +97,19 @@ function DataGrep( dataItems )
 {
     if( !(System.instanceOf(this,DataGrep)) )return new DataGrep( dataItems );
     if( !System.instanceOf( dataItems, Array ) )throw new Error('error','Invalid data list');
-    this.dataItems=dataItems;
+    Object.defineProperty(this,"length", {value:0,writable:true});
+    Object.defineProperty(this,"dataItems", {value:dataItems});
+    Object.defineProperty(this,"__filter__", {value:dataItems,writable:true});
 }
 
 System.DataGrep=DataGrep;
 DataGrep.prototype = Object.create( Object.prototype );
 
 /**
- * @type {Array}
- */
-DataGrep.prototype.dataItems=null;
-
-/**
  * constructor.
  * @type {DataGrep}
  */
 Object.defineProperty(DataGrep.prototype,"constructor", {value:DataGrep});
-
-/**
- * @type {number}
- */
-DataGrep.prototype.length=0;
-DataGrep.prototype.__filter__=null;
 
 /**
  * 获取设置过滤器

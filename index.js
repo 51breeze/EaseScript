@@ -318,7 +318,7 @@ function mergeImportClass(target, scope)
 function getDeclareClassDescription( stack , isInternal, config, project , syntax )
 {
     var list = {'static':{},'proto':{},'import':{},'constructor':{},'attachContent':{} ,'use':{},'namespaces':{},
-        'isInternal': isInternal,"privilege":"internal",'requirements':{}};
+        'isInternal': isInternal,"privilege":"internal",'requirements':{},'hasUsed':false};
     var isstatic = stack.static();
     var type = stack.fullclassname();
     var prev = null;
@@ -456,7 +456,7 @@ var root_block_declared=['class','interface','const','var','let','use','function
 function getPropertyDescription( stack , config , project , syntax )
 {
     var moduleClass = {'static':{},'proto':{},'import':{},'constructor':{},'attachContent':{},"rootContent":[],
-        "namespaces":{}, "use":{},"declared":{},"nonglobal":true,"type":'' ,"privilege":"internal",'requirements':{}};
+        "namespaces":{}, "use":{},"declared":{},"nonglobal":true,"type":'' ,"privilege":"internal",'requirements':{},'hasUsed':false};
     moduleClass.fullclassname = stack.fullclassname;
     var fullclassname = stack.fullclassname.split('.');
     moduleClass.classname = fullclassname.pop();
@@ -729,6 +729,9 @@ const builder={
              };
              var style = styleContents.map(function (e, i) {
 
+                 var ownerModule = descriptions['javascript'][e.ownerModule];
+                 if( ownerModule.hasUsed !==true )return '';
+                 e = e.style;
                  e=e.replace(/@Embed\(.*?\)/g, function (a,b) {
                      var metatype = Utils.executeMetaType( a.substr(1) );
                      var dest = parseMetaEmbed(metatype, config);
@@ -1025,7 +1028,8 @@ function make( config, isGlobalConfig )
             if( syntax_supported[ project.config.syntax ] === true )
             {
                 var classname = PATH.relative( project.path, filepath( project.config.bootstrap, project.path ) );
-                loadModuleDescription( project.config.syntax, classname,  project.config, project);
+                var mainDescription = loadModuleDescription( project.config.syntax, classname,  project.config, project);
+                mainDescription.hasUsed = true;
             }
         }
 
