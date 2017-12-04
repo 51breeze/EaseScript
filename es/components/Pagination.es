@@ -31,7 +31,9 @@
 
 package es.components
 {
-    import es.components.SkinComponent;
+
+import es.components.Pagination;
+import es.components.SkinComponent;
     import es.core.Skin;
     import es.events.PaginationEvent;
     import es.skins.PaginationSkin;
@@ -120,9 +122,6 @@ package es.components
          * @private
          */
         private var __url__='';
-        private var __callback__=function (page,profile) {
-            return '?'+profile+'='+page;
-        };
 
         /**
          * 设置返回一个回调函数,用来返回一个url地址
@@ -134,13 +133,6 @@ package es.components
            if( this.__url__ !== value )
            {
                this.__url__ = value;
-               this.__callback__ = value;
-               if (typeof value !== "function")
-               {
-                   this.__callback__ = function (page, profile) {
-                       return value.indexOf('?') >= 0 ? value + '&'+profile+'=' + page : value + '?'+profile+'=' + page;
-                   };
-               }
                this.commitPropertyAndUpdateSkin();
            }
         };
@@ -300,12 +292,21 @@ package es.components
             var link = this.link;
             var url = this.url;
             var offset = Math.max(current - Math.ceil(link / 2), 0);
+            if( typeof url !== "function" )
+            {
+                var linkUrl = url;
+                url = linkUrl.length > 0 ? function(page, profile) {
+                    return linkUrl.indexOf('?') >= 0 ? linkUrl + '&'+profile+'=' + page : linkUrl + '?'+profile+'=' + page;
+                }:function(page, profile) {
+                    return '?'+profile+'=' + page;
+                };
+            }
             offset = (offset + link) > totalPage ? offset - ( offset + link - totalPage ) : offset;
             render.variable('totalPage', totalPage);
             render.variable('pageSize', pageSize );
             render.variable('offset',  (current - 1) * pageSize );
             render.variable('profile', this.profile );
-            render.variable('url', this.__callback__ );
+            render.variable('url', url );
             render.variable('current', current);
             render.variable('first', 1);
             render.variable('prev', Math.max(current - 1, 1));
@@ -379,6 +380,22 @@ package es.components
                 {
                     dataSource.pageSize(size);
                 }
+                var profile = new RegExp( this.profile+'\\s*=\\s*(\\d+)');
+                var self = this;
+                this.skin.addEventListener(MouseEvent.CLICK, function (e:MouseEvent)
+                {
+                    if (Element.getNodeName(e.target) === 'a')
+                    {
+                        e.preventDefault();
+                        var url:String = Element(e.target).property('href');
+                        var _profile:Array = url.match(profile);
+                        var page:Number = parseInt(_profile ? _profile[1] : 0);
+                        if (page > 0)
+                        {
+                            self.current = page;
+                        }
+                    }
+                });
                 return true;
             }
             return false;

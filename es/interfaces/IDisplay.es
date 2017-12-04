@@ -7,20 +7,37 @@
 */
 package es.interfaces
 {
-    import es.core.es_internal;
     public interface IDisplay
     {
         /**
          * 获取元素对象
          * @returns {Element}
          */
-        es_internal function get element():Element;
+        public function get element():Element
 
         /**
-         * 设置该对象的父级对象
-         * @param parent
+         * 设置显示对象的宽度
+         * @returns {Number}
          */
-        es_internal function setDisplayParent( parent:IDisplay );
+        public function get width():Number;
+
+        /**
+         * 获取显示对象的宽度
+         * @param value
+         */
+        public function set width(value:Number):void;
+
+        /**
+         * 设置显示对象的高度
+         * @returns {Number}
+         */
+        public function get height():Number;
+
+        /**
+         * 获取显示对象的高度
+         * @param value
+         */
+        public function set height(value:Number):void;
 
         /**
          * 设置对象的属性
@@ -35,18 +52,6 @@ package es.interfaces
          * @param value
          */
         public function style(name, value):Object;
-
-        /**
-         * 添加指定的类名
-         * @param className
-         */
-        public function addClass(name:String):void;
-
-        /**
-         * 移除指定的类名或者清除所有的类名。
-         * @param className
-         */
-        public function removeClass( name:String ):void;
 
         /**
          * 获取滚动条在上边的位置
@@ -160,7 +165,7 @@ package es.interfaces
          * 只有已经添加到父级元素中才会返回父级皮肤元素，否则返回 null
          * @returns {Display}
          */
-        public function get parent():Display;
+        public function get parent():IDisplay;
 
     }
 }

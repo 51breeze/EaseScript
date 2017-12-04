@@ -96,6 +96,7 @@ var fix={
  * @private
  */
 var accessor={};
+var storage=Internal.createSymbolStorage( Symbol('element') );
 
 /**
  * @private
@@ -177,7 +178,7 @@ function $dispatchEvent(thisArg, type, parent, child, result )
  */
 function $doMake( elems )
 {
-    var r = this.__reverts__ || (this.__reverts__ = []);
+    var r = storage(this,'reverts');
     r.push( Array.prototype.splice.apply(this, [0,this.length].concat(elems) ) );
     Element.prototype.current.call(this,null);
     return this;
@@ -416,14 +417,7 @@ function $matchAttr(strAttr)
     }
     return null;
 }
-/**
- * 以小写的形式返回元素的节点名
- * @returns {string}
- */
-function $getNodeName(elem )
-{
-    return elem && typeof elem.nodeName=== "string" && elem.nodeName!='' ? elem.nodeName.toLowerCase() : '';
-}
+
 /**
  * 合并元素属性。
  * 将 refTarget 对象的属性合并到 target 元素
@@ -483,7 +477,6 @@ function $cloneNode(nodeElement , deep )
     }
     return null;
 }
-var storage=Internal.createSymbolStorage( Symbol('element') );
 
 /**
  * Element class
@@ -507,7 +500,8 @@ function Element(selector, context)
     storage(this,true,{
         'context':context,
         'forEachCurrentItem':null,
-        'forEachCurrentIndex':NaN
+        'forEachCurrentIndex':NaN,
+        'reverts':[]
     });
 
     var result=[];
@@ -884,7 +878,6 @@ Element.prototype.hasClass=function hasClass(className )
     return value === '' || !value ? false : typeof className==='string' ? new RegExp('(\\s|^)' + className + '(\\s|$)').test( value ) : true ;
 };
 
-
 /**
  * 添加指定的类名
  * @param className
@@ -1212,7 +1205,7 @@ Element.prototype.globalToLocal=function globalToLocal(left, top )
  */
 Element.prototype.revert=function revert(step)
 {
-    var reverts= this.__reverts__;
+    var reverts = storage(this,'reverts');
     if( reverts && reverts.length > 0 )
     {
         var len=reverts.length;
@@ -1395,7 +1388,7 @@ Element.prototype.html=function html( htmlObject )
                 elem.innerHTML = htmlObject;
             } catch (e)
             {
-                var nodename = $getNodeName(elem);
+                var nodename = Element.getNodeName(elem);
                 if (!new RegExp("^<" + nodename).exec(htmlObject)) {
                     htmlObject = System.sprintf('<%s>%s</%s>', nodename, htmlObject, nodename);
                 }

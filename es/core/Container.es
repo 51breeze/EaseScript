@@ -7,6 +7,7 @@
 package es.core
 {
     import es.core.Display;
+    import es.interfaces.IDisplay;
     public class Container extends Display
     {
         /**
@@ -15,11 +16,11 @@ package es.core
          */
         function Container( element:Element )
         {
-            super( element );
             if( !Element.isHTMLContainer( element[0] ) )
             {
-                 throw new TypeError("Invalid container element");
+                throw new TypeError("Invalid container element");
             }
+            super( element );
         }
         
         /**
@@ -39,9 +40,9 @@ package es.core
         /**
          * 获取指定索引处的子级元素
          * @param index
-         * @returns {Display}
+         * @returns {IDisplay}
          */
-        public function getChildAt( index ):Display
+        public function getChildAt( index ):IDisplay
         {
             var children:Array = this._children;
             index = index < 0 ? index+children.length : index;
@@ -58,7 +59,7 @@ package es.core
          * @param child
          * @returns {Number}
          */
-        public function getChildIndex( child:Display ):Number
+        public function getChildIndex( child:IDisplay ):Number
         {
             var children:Array = this._children;
             return children.indexOf( child );
@@ -69,7 +70,7 @@ package es.core
          * @param child
          * @returns {Display}
          */
-        public function addChild( child:Display ):Display
+        public function addChild( child:IDisplay ):IDisplay
         {
             return this.addChildAt(child, -1);
         };
@@ -80,7 +81,7 @@ package es.core
          * @param index
          * @returns {Display}
          */
-        public function addChildAt( child:Display , index ):Display
+        public function addChildAt( child:IDisplay , index ):IDisplay
         {
             if( child.parent )
             {
@@ -90,7 +91,7 @@ package es.core
             var indexAt = index < 0 ? index+children.length : index;
             this.element.addChildAt( child.element, index);
             children.splice(indexAt, 0, child);
-            child.parentDisplay = this;
+            (child as Display).parentDisplay = this;
             return child;
         };
 
@@ -99,13 +100,13 @@ package es.core
          * @param child
          * @returns {Display}
          */
-        public function removeChild( child:Display ):Display
+        public function removeChild( child:IDisplay ):IDisplay
         {
             if( child )
             {
                 var children:Array = this._children;
                 var index = children.indexOf( child );
-                child.parentDisplay = null;
+                (child as Display).parentDisplay = null;
                 this.element.removeChild( child.element );
                 this._children.splice(index, 1);
                 return child;
@@ -118,7 +119,7 @@ package es.core
          * @param index
          * @returns {Display}
          */
-        public function removeChildAt( index:Number ):Display
+        public function removeChildAt( index:Number ):IDisplay
         {
             return this.removeChild( this.getChildAt(index) );
         };
@@ -136,25 +137,5 @@ package es.core
             }
             this._children = [];
         }
-
-        /**
-         * 为当前的皮肤添加一组子级元素, 并清空当前已存在的子级元素
-         * @param child
-         */
-        public function html( child:Display=null ):Object
-        {
-            if( child !== null )
-            {
-                if( child.parent )
-                {
-                    (child.parent as Container).removeChild( child );
-                }
-                this.element.html( child.element );
-                child.parentDisplay = this;
-                this._children = [ child ];
-                return child;
-            }
-            return this.element.html();
-        };
     }
 }

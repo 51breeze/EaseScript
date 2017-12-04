@@ -172,11 +172,11 @@ System.is=function is(instanceObj, theClass)
     {
         return instanceObj instanceof System.Class;
     }
-
     if( instanceObj && instanceObj.constructor instanceof System.Class && theClass instanceof System.Interface)
     {
         var objClass =instanceObj.constructor;
         if (objClass === theClass)return true;
+
         while ( objClass instanceof System.Class )
         {
             var impls = objClass.__T__.implements;
@@ -317,15 +317,15 @@ System.trim =function trim(str) {
  */
 System.range =function range(low, high, step) {
 
-    if( high > low )
+    if( high >= low )
     {
         var obj = [];
         if (!System.isNumber(step))step = 1;
         step = Math.max(step, 1);
-        for (; low < high; low += step)obj.push(low);
+        for (;low <= high; low += step)obj.push(low);
         return obj;
     }
-    return [low];
+    return [];
 };
 
 /**

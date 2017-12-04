@@ -105,6 +105,7 @@ function createDescription( syntax, stack , owner , moduleClass )
     desc.__stack__ = stack;
     desc['id'] =stack.keyword();
     desc['type'] = getType( stack.type() );
+    desc['type'] = getImportType(syntax, moduleClass, getType( stack.type() ) );
 
     if( stack.returnType && desc['id']==='function' )
     {
@@ -154,6 +155,9 @@ function getImportType(syntax, moduleClass,  type )
         if( moduleClass.import.hasOwnProperty(type) )
         {
             return moduleClass.import[ type ];
+        }else if( moduleClass.classname===type )
+        {
+            return moduleClass.fullclassname;
         }
         return type;
     }
@@ -327,12 +331,37 @@ function getDeclareClassDescription( stack , isInternal, config, project , synta
     var len = data.length;
     var item;
 
-    mergeImportClass( list.import, stack.scope().define() );
+    list['inherit'] = stack.extends() ? stack.extends() : null;
+    list['package'] = stack.parent().keyword()==="package" ? stack.parent().name() : "";
+    list['type'] = stack.fullclassname();
+    list['nonglobal'] = true;
+    list['fullclassname'] = stack.fullclassname();
+    list['classname'] = stack.name();
+
+    if (stack.keyword() === 'interface')
+    {
+        list['implements'] = [];
+        list['isDynamic'] = false;
+        list['isStatic'] = false;
+        list['isFinal'] = false;
+        list['id'] = 'interface';
+
+    } else
+    {
+        list['implements'] = stack.implements();
+        list['isDynamic'] = stack.dynamic();
+        list['isStatic'] = stack.static();
+        list['isFinal'] = stack.final();
+        list['isAbstract'] = stack.abstract();
+        list['id'] = 'class';
+    }
 
     if( stack.qualifier() )
     {
         list.privilege = stack.qualifier();
     }
+
+    mergeImportClass( list.import, stack.scope().define() );
 
     for (; i < len; i++)
     {
@@ -394,31 +423,6 @@ function getDeclareClassDescription( stack , isInternal, config, project , synta
             }
             prev = item;
         }
-    }
-
-    list['inherit'] = stack.extends() ? stack.extends() : null;
-    list['package'] = stack.parent().keyword()==="package" ? stack.parent().name() : "";
-    list['type'] = stack.fullclassname();
-    list['nonglobal'] = true;
-    list['fullclassname'] = stack.fullclassname();
-    list['classname'] = stack.name();
-
-    if (stack.keyword() === 'interface')
-    {
-        list['implements'] = [];
-        list['isDynamic'] = false;
-        list['isStatic'] = false;
-        list['isFinal'] = false;
-        list['id'] = 'interface';
-
-    } else
-    {
-        list['implements'] = stack.implements();
-        list['isDynamic'] = stack.dynamic();
-        list['isStatic'] = stack.static();
-        list['isFinal'] = stack.final();
-        list['isAbstract'] = stack.abstract();
-        list['id'] = 'class';
     }
     return list;
 }

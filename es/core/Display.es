@@ -6,8 +6,10 @@
  */
 package es.core
 {
-    import Element;
-    public class Display extends EventDispatcher
+     import Element;
+     import es.interfaces.IDisplay;
+
+    public class Display extends EventDispatcher implements IDisplay
     {
         /**
          * 代理元素对象
@@ -37,7 +39,7 @@ package es.core
          * 获取元素对象
          * @returns {Element}
          */
-        protected function get element():Element
+        public function get element():Element
         {
             return _element;
         }
@@ -107,24 +109,6 @@ package es.core
         {
              var obj = _element.style( name, value );
              return _element===obj ? this : obj;
-        }
-
-        /**
-         * 添加指定的类名
-         * @param className
-         */
-        public function addClass(name:String):void
-        {
-            _element.addClass( name );
-        }
-
-        /**
-         * 移除指定的类名或者清除所有的类名。
-         * @param className
-         */
-        public function removeClass( name:String ):void
-        {
-            _element.removeClass( name );
         }
 
         /**
@@ -286,14 +270,14 @@ package es.core
         /**
          * @protected
          */
-        protected var parentDisplay:Display;
+        protected var parentDisplay:IDisplay;
 
         /**
          * 获取父级皮肤元素
          * 只有已经添加到父级元素中才会返回父级皮肤元素，否则返回 null
          * @returns {Display}
          */
-        public function get parent():Display
+        public function get parent():IDisplay
         {
             return parentDisplay;
         };
