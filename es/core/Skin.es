@@ -15,7 +15,7 @@ package es.core
 
     public class Skin extends Container
     {
-        private var hash:Object;
+        private var _hash:Object;
         private var _skinChildren;
         private var _name:String;
         private var _attr:Object;
@@ -44,7 +44,7 @@ package es.core
                     }
                 }
                 this._skinChildren = skinObject.children || [];
-                this.hash = skinObject.hash || {};
+                this._hash = skinObject.hash || {};
                 this._name = name;
                 this._attr = attr;
                 var str = System.serialize(attr, 'attr');
@@ -90,9 +90,9 @@ package es.core
          */
         public function getChildById( id ):Object
         {
-            if( this.hash.hasOwnProperty(id) )
+            if( _hash.hasOwnProperty(id) )
             {
-                return this.hash[id];
+                return _hash[id];
             }
             return null;
         };
@@ -281,12 +281,12 @@ package es.core
         protected function createChildren()
         {
             var children:Array = this.skinChildren;
-            var hash = this.hash;
+            var hash = this._hash;
             var len = children.length;
             var c = 0;
             var child;
             var render = this._render;
-            var parent = this.parentDisplay;
+            var parent = this.displayParent;
             this.removeAllChild();
             if( render )
             {
@@ -313,7 +313,9 @@ package es.core
                 {
                     if ( System.isString( child ) )
                     {
-                        this.addChildAt( new Display( new Element( Element.createElement( child ) ) ) , -1);
+                        child = System.trim( child );
+                        var elem = new Element( Element.createElement( child , child.charAt(0)!=="<" ) );
+                        this.addChildAt( new Display( elem ) , -1);
                     }else if( child instanceof Skin )
                     {
                         (child as Skin).createChildren();

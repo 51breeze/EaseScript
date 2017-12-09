@@ -270,7 +270,7 @@ package es.core
         /**
          * @protected
          */
-        protected var parentDisplay:IDisplay;
+        protected var displayParent:IDisplay=null;
 
         /**
          * 获取父级皮肤元素
@@ -279,7 +279,7 @@ package es.core
          */
         public function get parent():IDisplay
         {
-            return parentDisplay;
+            return displayParent;
         };
 
         /**

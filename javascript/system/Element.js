@@ -299,32 +299,34 @@ function $createElement(html , flag )
         html=System.trim( html ).replace(/[\r\n]+/g,'');
         if( html )
         {
-            if( flag !==true  )
+            if( flag ===true  && html.charAt(0) !== "<" )
             {
-                var match;
-                if (html.charAt(0) !== "<" && html.charAt(html.length - 1) !== ">" && html.length >= 1)
-                {
-                    try {
-                        return document.createElement(html);
-                    } catch (e) {
-                    }
+                return document.createTextNode( html );
+            }
 
-                } else if (html.charAt(0) === "<" && ( match = singleTagRegex.exec(html) ))
-                {
-                    var elem = document.createElement(match[1]);
-                    var attr = $matchAttr(html);
-                    var isset = typeof elem.setAttribute === "function";
-                    for (var prop in attr) {
-                        if (isset) {
-                            elem.setAttribute(prop, attr[prop]);
-                        } else {
-                            var attrNode = document.createAttribute(prop);
-                            attrNode.nodeValue = attr[prop];
-                            elem.setAttributeNode(attrNode)
-                        }
-                    }
-                    return elem;
+            var match;
+            if ( html.charAt(0) !== "<" && html.charAt(html.length - 1) !== ">" && html.length >= 1)
+            {
+                try {
+                    return document.createElement(html);
+                } catch (e) {
                 }
+
+            } else if (html.charAt(0) === "<" && ( match = singleTagRegex.exec(html) ))
+            {
+                var elem = document.createElement(match[1]);
+                var attr = $matchAttr(html);
+                var isset = typeof elem.setAttribute === "function";
+                for (var prop in attr) {
+                    if (isset) {
+                        elem.setAttribute(prop, attr[prop]);
+                    } else {
+                        var attrNode = document.createAttribute(prop);
+                        attrNode.nodeValue = attr[prop];
+                        elem.setAttributeNode(attrNode)
+                    }
+                }
+                return elem;
             }
 
             var div = document.createElement("div");

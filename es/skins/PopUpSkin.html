@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<s:Skin class="pop-up-skin"  xmlns:c="es.components" xmlns:s="es.core">
+
+    <style>
+
+        @radius:5px;
+        @border_color:darken(@secondary, 3.5%);
+        @background_color:@secondary;
+
+        .pop-up-skin{
+            width: 100%;
+            height:100%;
+            z-index:999998;
+            left: 0px;
+            top:0px;
+            position:absolute;
+        }
+
+        .pop-up-main{
+            z-index:999999;
+            position:absolute;
+            background-color: #ffffff;
+            left:100px;
+            top:100px;
+            width: 280px;
+            height:auto;
+            border:1px solid @border_color;
+            margin:0px;
+            .border-radius( @radius, @radius,  @radius,  @radius);
+            .box-shadow( 0px 1px 3px rgba(0,0,0,.3) );
+        }
+
+        .pop-up-head{
+            height: 30px;
+            line-height: 30px;
+            border-bottom: solid 1px #ccc;
+            padding:0px 8px;
+        }
+        .pop-up-head .pop-up-close{
+            float: right;
+        }
+        .pop-up-head .pop-up-title{
+            line-height: 30px;
+        }
+
+        .pop-up-body{
+            height: auto;
+            padding: 8px;
+        }
+
+        .pop-up-footer{
+            border-top: solid 1px #ccc;
+            height: 40px;
+            line-height: 40px;
+            text-align: center;
+        }
+        .pop-up-footer button{
+            margin: 0px 6px;
+        }
+
+    </style>
+
+    <div class="pop-up-main" id="@main">
+        <div class="pop-up-head" id="@head">
+           <span class="pop-up-title" id="@title">title</span>
+           <span class="pop-up-close" id="@close">
+               <i class="glyphicon glyphicon-remove"></i>
+           </span>
+        </div>
+        <div class="pop-up-body" id="@body"></div>
+        <div class="pop-up-footer" id="@footer">
+            <button class="btn btn-sm btn-default">取 消</button>
+            <button class="btn btn-sm btn-primary">确 定</button>
+        </div>
+    </div>
+
+</s:Skin>

@@ -133,7 +133,12 @@ Object.defineProperty(Class.prototype,"__get__",{value:function(info,target, pro
         {
             return receiver[_private][propertyKey];
         }
+
+    }else
+    {
+        return desc.value;
     }
+
     //实例函数 或者 静态属性 或者 静态方法
     return desc.value || desc;
 }});

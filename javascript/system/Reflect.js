@@ -210,6 +210,7 @@ Reflect.get=function(target, propertyKey, receiver , ns)
     //是否静态原型
     var isstatic = receiver instanceof Class;
     var desc = description(this,target,propertyKey,receiver,ns);
+
     if( !desc )
     {
         //如果是一个静态属性的引用报错
@@ -247,7 +248,11 @@ Reflect.get=function(target, propertyKey, receiver , ns)
         {
             return receiver[_private][propertyKey];
         }
+    }else
+    {
+        return desc.value;
     }
+    
     //实例函数 或者 静态属性 或者 静态方法
     return desc.value || desc;
 };

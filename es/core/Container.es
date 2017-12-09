@@ -83,15 +83,16 @@ package es.core
          */
         public function addChildAt( child:IDisplay , index ):IDisplay
         {
-            if( child.parent )
+            var parent = child.parent;
+            if( parent )
             {
-                (child.parent as Container).removeChild( child );
+                (parent as Container).removeChild( child );
             }
             var children:Array = this._children;
             var indexAt = index < 0 ? index+children.length : index;
             this.element.addChildAt( child.element, index);
             children.splice(indexAt, 0, child);
-            (child as Display).parentDisplay = this;
+            (child as Display).displayParent = this;
             return child;
         };
 
@@ -106,7 +107,7 @@ package es.core
             {
                 var children:Array = this._children;
                 var index = children.indexOf( child );
-                (child as Display).parentDisplay = null;
+                (child as Display).displayParent = null;
                 this.element.removeChild( child.element );
                 this._children.splice(index, 1);
                 return child;
