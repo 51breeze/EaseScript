@@ -40,7 +40,7 @@ package es.components
         {
             if( super.initializing() )
             {
-                this.skin.es_internal::hostComponent = this;
+                this["skin"].es_internal::hostComponent = this;
                 var _height = this.height;
                 if( _height !== NaN ){
                     (this.skin as Display).height = _height;

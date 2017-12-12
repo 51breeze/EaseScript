@@ -1,6 +1,6 @@
 /**
  * 定义模块对象
- * @require System,Internal,Class,Interface,Namespace,Reflect,Object,JSON,Array,TypeError,Error
+ * @require System,Internal,Class,Interface,Namespace,Reflect,Object,JSON,Array,TypeError,Error,Symbol
  * @internal
  */
 var modules={};
@@ -59,13 +59,11 @@ function define(requires , callback )
         }
         return ref;
     });
-    requires.push( getValueOfNS("public") );
-    requires.push( getValueOfNS(pn+":internal") );
-    requires.push( getValueOfNS(name+":protected") );
-    requires.push( getValueOfNS(name+":private") );
-    if(fix){
+    if(fix)
+    {
         requires = requires.slice(0);
     }
+    context._private = Symbol(name);
     return callback.apply( context, requires);
 }
 Internal.define = define;

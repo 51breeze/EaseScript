@@ -282,20 +282,20 @@ function parseMetaType( describe, currentStack, metaTypeStack , config, project,
                 var type = item.type;
                 var setter = [
                     'function(val){\n',
-                    'var old = this['+config.context.private+'].'+private_var,';\n',
-                    'if(old!==val){\n',
-                    'this['+config.context.private+'].'+private_var+'=val;\n',
-                    'var event = new PropertyEvent('+eventType+');\n',
-                    'event.property = "'+name+'";\n',
-                    'event.oldValue = old;\n',
-                    'event.newValue = val;\n',
-                    'this.dispatchEvent(event);\n',
-                    '}',
-                    '}',
+                    '\tvar old = this['+config.context.private+'].'+private_var,';\n',
+                    '\tif(old!==val){\n',
+                    '\t\tthis['+config.context.private+'].'+private_var+'=val;\n',
+                    '\t\tvar event = new PropertyEvent('+eventType+');\n',
+                    '\t\tevent.property = "'+name+'";\n',
+                    '\t\tevent.oldValue = old;\n',
+                    '\t\tevent.newValue = val;\n',
+                    '\t\tthis.dispatchEvent(event);\n',
+                    '\t}',
+                    '\n}',
                 ];
                 var getter = [
                     'function(val){\n',
-                    'return this['+config.context.private+'].'+private_var,
+                    '\treturn this['+config.context.private+'].'+private_var,
                     ';\n}',
                 ];
                 describe[ name ]={
@@ -430,20 +430,24 @@ function getDeclareClassDescription( stack , isInternal, config, project , synta
 
 function getNamespaceValue( stack, classModule )
 {
-    var express = stack.content().slice();
+    var express = stack.content();
     express.shift();
-    express = express[0].content()[0].content().slice();
+    express = express[0].content()[0].content();
     express.splice(0, 2);
     var scope = stack.getScopeOf();
     var id = scope.keyword();
-    var ret = classModule.package+':'+stack.name();
-    if( id==="class" )
+    var ret;
+    if( id==="package" )
     {
-        ret = classModule.package+":"+classModule.classname+"/"+stack.qualifier()+":"+stack.name();
+        ret = classModule.package+"/"+stack.qualifier()+":"+stack.name();
+
+    }else if( id==="class" )
+    {
+        ret = classModule.package+"."+classModule.classname+"/"+stack.qualifier()+":"+stack.name();
 
     }else if( id==="function" )
     {
-        ret = classModule.package+":"+classModule.classname+'/'+stack.qualifier()+":"+scope.name()+"/"+classModule.package+":"+stack.name();
+        ret = classModule.package+"."+classModule.classname+"/"+stack.qualifier()+":"+scope.name()+"/"+classModule.package+":"+stack.name();
     }
     if (express.length === 1)
     {
@@ -465,6 +469,7 @@ function getPropertyDescription( stack , config , project , syntax )
     var fullclassname = stack.fullclassname.split('.');
     moduleClass.classname = fullclassname.pop();
     moduleClass.package = fullclassname.join(".");
+    moduleClass.rootStack=stack;
 
     var has = false;
     var data = stack.content();
@@ -507,11 +512,10 @@ function getPropertyDescription( stack , config , project , syntax )
                         moduleClass.namespaces[ value.name() ] = createDescription(syntax, value, null,  moduleClass);
                         moduleClass.package = item.name();
                         moduleClass.fullclassname =  moduleClass.package ? moduleClass.package+"."+value.name() : value.name();
-                        moduleClass.namespaces[ value.name() ].value = getNamespaceValue( value, moduleClass);
+                        //moduleClass.namespaces[ value.name() ].value = getNamespaceValue( value, moduleClass);
                         moduleClass.classname = value.name();
                         moduleClass.id="namespace";
                         count++;
-
                     }
                     else if ( value.keyword() === "use" )
                     {
@@ -599,6 +603,7 @@ function loadModuleDescription( syntax , file , config , project , resource , su
 
     //获取对应的包和类名
     var fullclassname = PATH.relative( config.project_path, sourcefile ).replace(/\\/g,'/').replace(/\//g,'.');
+    fullclassname=fullclassname.replace(/^[\.]+/g,'');
 
     //是否加载系统库中的文件
     if( fullclassname.indexOf( config.system_lib_path_name+'.' )===0 )
@@ -655,12 +660,11 @@ function loadModuleDescription( syntax , file , config , project , resource , su
     var scope = makeCodeDescription(fs.readFileSync( sourcefile , 'utf-8'), config );
 
     //需要编译的模块
-    var module = makeModules[syntax] || (makeModules[syntax]=[]);
-    module.push( scope );
-
-    scope.fullclassname = fullclassname;
+    var module = makeModules[syntax] || (makeModules[syntax]={});
+    module[fullclassname]=scope;
 
     //获取模块的描述
+    scope.fullclassname = fullclassname;
     description = getPropertyDescription( scope, config, project , syntax );
     description.uid= id;
     description.filename = sourcefile.replace(/\\/g,'/');
@@ -1060,11 +1064,6 @@ function loadFragmentModuleDescription( syntax, fragmentModule, config , project
     //解析代码语法
     var scope = makeCodeDescription( fragmentModule.script , config);
 
-    //需要编译的模块
-    var module = makeModules[syntax] || (makeModules[syntax]=[]);
-    module.push( scope );
-    scope.isFragmentModule = true;
-
     var file = fragmentModule.filepath.replace( new RegExp( config.skin_file_suffix+"$" ),"").replace(/\\/g,'/');
 
     //获取源文件的路径
@@ -1072,7 +1071,13 @@ function loadFragmentModuleDescription( syntax, fragmentModule, config , project
 
     //获取对应的包和类名
     var fullclassname = PATH.relative( config.project_path, sourcefile ).replace(/\\/g,'/').replace(/\//g,'.');
+    fullclassname=fullclassname.replace(/^[\.]+/g,'');
     scope.fullclassname = fullclassname;
+
+    //需要编译的模块
+    var module = makeModules[syntax] || (makeModules[syntax]={});
+    module[fullclassname] = scope;
+    scope.isFragmentModule = true;
 
     //获取模块的描述
     var description = getPropertyDescription( scope, config, project, syntax );

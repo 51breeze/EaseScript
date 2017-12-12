@@ -40,8 +40,8 @@
                     body.skinInstaller();
                 }
             });
+           pagination.display();
            PopUp.info("title2");
-
         }
 
     ]]>
@@ -169,7 +169,7 @@
     <tfoot id="@foot">
          <tr>
              <td colspan="3">
-                 <c:Pagination id="@pagination" wheelTarget="@foot" radius="3">
+                 <c:Pagination id="@pagination" wheelTarget="@foot" radius="3" auto="false">
                  </c:Pagination>
              </td>
          </tr>
