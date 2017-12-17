@@ -328,7 +328,7 @@ function builder(config , code, requirements , skins )
          contents,
         //running
         '(function(System,Internal,Class){',
-         config.mode === 3 ? utils.getContents( rootPath+'/run-pro.js' ) : utils.getContents( rootPath+'/run-dev.js' ),
+         config.mode === 1 ? utils.getContents( rootPath+'/run-dev.js' ) : '',
         '}(System,Internal,System.Class));',
         '}(System,' + g.join(',') + '));',
         //自定义模块域

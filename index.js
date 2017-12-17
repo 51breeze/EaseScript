@@ -424,6 +424,7 @@ function getDeclareClassDescription( stack , isInternal, config, project , synta
             prev = item;
         }
     }
+
     return list;
 }
 
@@ -543,7 +544,7 @@ function getPropertyDescription( stack , config , project , syntax )
                         Utils.error('"' + item.name() + '" is already been declared');
                     }
                     moduleClass.namespaces[item.name()] = createDescription(syntax,item,null,  moduleClass);
-                    moduleClass.namespaces[item.name()].value = getNamespaceValue(item, moduleClass);
+                    //moduleClass.namespaces[item.name()].value = getNamespaceValue(item, moduleClass);
 
                 } else if (id === "class" || id === "interface")
                 {
@@ -565,7 +566,6 @@ function getPropertyDescription( stack , config , project , syntax )
     {
         throw new Error('The content of the namespace is defined not greater than one');
     }
-
     //root block
     mergeImportClass( moduleClass.import, stack.scope().define() );
     return moduleClass;

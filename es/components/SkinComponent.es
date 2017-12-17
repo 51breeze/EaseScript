@@ -14,6 +14,8 @@ package es.components
     import es.core.Container;
     import es.core.es_internal;
 
+   use namespace es_internal;
+
     public class SkinComponent extends Component
     {
         public function SkinComponent()
@@ -40,7 +42,7 @@ package es.components
         {
             if( super.initializing() )
             {
-                this["skin"].es_internal::hostComponent = this;
+                this.skin.es_internal::hostComponent = this;
                 var _height = this.height;
                 if( _height !== NaN ){
                     (this.skin as Display).height = _height;

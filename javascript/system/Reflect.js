@@ -58,63 +58,56 @@ var _apply = $Reflect ? $Reflect.apply : function(target, thisArgument, argument
     return target();
 };
 
-var description = function(scope, target, name , receiver , ns, accessor )
+var description = function(scope, target, name , receiver , ns, accessor, flag )
 {
-    var objClass = target.constructor;
     //表示获取一个类中的属性或者方法（静态属性或者静态方法）
     var isstatic = target instanceof Class;
-    if( isstatic || objClass instanceof Class )
+    if( isstatic || target.constructor instanceof Class )
     {
+        var proto = isstatic && receiver && receiver !== target ? target.prototype : target;
+        var uri = ['_'];
         var prop;
         var obj;
-        var proto = isstatic && receiver && receiver !== target ? target.prototype : target;
 
         //自定义命名空间
         if( ns && ns.length > 0 )
         {
-            for( var i=0; i<ns.length; i++)
-            {
-                prop = ns[i]+name;
-                obj = proto[ prop ] || proto[ prop = accessor+prop ];
-                if( obj )
-                {
-                    var accessor = prop.substr(0,4);
-                    return accessor==="Set_" ? {"set":obj} : accessor==="Get_" ? {"get":obj}  : {"value":obj};
-                }
-            }
+            uri = ns;
         }
-
-        var uri = ['_'];
-        if( scope instanceof Class )
+        //指定作用域
+        else if( scope instanceof Class )
         {
             uri = scope.__T__.uri;
-            //私有的静态属性
-            if( isstatic )
+            if( flag !==true )
             {
-                if( $has.call(target,uri[0]+name) )
+                //私有的静态属性
+                if (isstatic)
                 {
-                    return {"target":target,"prop":uri[0]+name};
+                    if ($has.call(target, uri[0] + name)) {
+                        return {"target": target, "prop": uri[0] + name};
+                    }
                 }
-            }
-            //私有的实例属性
-            else
-            {
-                var _private = scope.__T__._private.valueOf();
-                obj = target[_private];
-                if ( obj && $has.call(obj, name))
+                //私有的实例属性
+                else
                 {
-                    return {"target":obj,"prop":name};
+                    var _private = scope.__T__._private.valueOf();
+                    obj = target[_private];
+                    if (obj && $has.call(obj, name)) {
+                        return {"target": obj, "prop": name};
+                    }
                 }
             }
         }
-        for( var i=0; i<uri.length;i++ )
+        var i=uri.length;
+        while( (i--)>0 )
         {
             prop = uri[i]+name;
-            obj = proto[ prop ] || proto[ prop = accessor+prop ];
-            if( obj && typeof obj === "function" )
+            obj = proto[ prop ];
+            if( obj )return {"value":obj};
+            if(accessor)
             {
-                var accessor = prop.substr(0,4);
-                return accessor==="Set_" ? {"set":obj} : accessor==="Get_" ? {"get":obj}  : {"value":obj};
+                obj = proto[ accessor+prop ];
+                if( obj )return accessor==="Set_" ? {"set":obj} : {"get":obj};
             }
         }
     }
@@ -146,6 +139,27 @@ Reflect.apply=function apply( target, thisArgument, argumentsList )
         throw new TypeError('target is not function');
     }
     return _apply(target, thisArgument, argumentsList);
+};
+
+/**
+ * 调用一个对象上的函数
+ * @param target
+ * @param propertyKey
+ * @param thisArgument
+ * @param argumentsList
+ * @returns {*}
+ */
+Reflect.call=function call(scope, target, propertyKey,argumentsList,thisArgument,ns)
+{
+    if( propertyKey==null )throw new ReferenceError('propertyKey is null or undefined');
+    if( target == null )throw new ReferenceError('target is null or undefined');
+    var desc = description(scope,target,propertyKey,thisArgument,ns,null, true);
+    var fn = desc ? desc.value : target[propertyKey];
+    if( typeof fn !== "function" )
+    {
+        throw new TypeError('target.'+propertyKey+' is not function');
+    }
+    return _apply(fn, thisArgument||target, argumentsList||[]);
 };
 
 /**
@@ -197,34 +211,37 @@ Reflect.has=function has(target, propertyKey)
     return propertyKey in target;
 };
 
+Reflect.type=function type(value, typeClass)
+{
+    if( value == null || typeClass === System.Object )return value;
+    if ( typeClass && !System.is(value, typeClass) )
+    {
+        throw new System.TypeError( 'Specify the type of value do not match. must is "' + System.getQualifiedClassName(typeClass)+'"')
+    }
+    return value;
+};
+
 /**
  * 获取目标公开的属性值
  * @param target
  * @param propertyKey
  * @returns {*}
  */
-Reflect.get=function(target, propertyKey, receiver , ns )
+Reflect.get=function(scope,target, propertyKey, receiver , ns )
 {
     if( propertyKey==null )return target;
     if( target == null )throw new ReferenceError('target is null or undefined');
-    //是否静态原型
-    var isstatic = receiver instanceof Class;
-    var desc = description(this,target,propertyKey,receiver,ns,"Get_");
+    var desc = description(scope,target,propertyKey,receiver,ns,"Get_");
     receiver = receiver || target;
     if( !desc )
     {
         //内置对象属性外部不可访问
-        if( propertyKey === '__proto__' )
-        {
-            return undefined;
-        }
+        if( propertyKey === '__proto__' )return undefined;
         return target[propertyKey];
     }
-
-    if( desc.get )return desc.get.call( isstatic ? null : receiver);
+    if( desc.get )return desc.get.call( receiver instanceof Class ? null : receiver);
     if( desc.value )return desc.value;
-    if( desc.target )return desc.target[ desc.prop ];
-    return target[ propertyKey ];
+    return desc.target[ desc.prop ];
 };
 
 /**
@@ -234,14 +251,13 @@ Reflect.get=function(target, propertyKey, receiver , ns )
  * @param value
  * @returns {*}
  */
-Reflect.set=function(target, propertyKey, value , receiver ,ns )
+Reflect.set=function(scope,target, propertyKey, value , receiver ,ns )
 {
     if( propertyKey==null )return target;
     if( target == null )throw new ReferenceError('target is null or undefined');
-    //是否静态原型
-    var isstatic = receiver instanceof Class;
-    var desc = description(this,target,propertyKey,receiver,ns,"Set_");
+    var desc = description(scope,target,propertyKey,receiver,ns,"Set_");
     receiver = receiver || target;
+    var isstatic = receiver instanceof Class;
     if( !desc )
     {
         //内置对象属性外部不可访问
@@ -251,21 +267,38 @@ Reflect.set=function(target, propertyKey, value , receiver ,ns )
         if( objClass instanceof Class )
         {
             if( objClass.__T__.dynamic !==true )throw new ReferenceError(propertyKey+' is not exists');
-            if( target[propertyKey] && typeof target[propertyKey] === "function" && target[propertyKey].configurable===false )
+            var obj = target[propertyKey];
+            //如果是一个动态对象并且是第一次赋值时存在此属性名则认为是原型对象上的类成员， 不能赋值。
+            if( obj && !$has.call(target,propertyKey) )
             {
                 throw new TypeError(propertyKey+' is not configurable');
             }
         }
         return target[propertyKey]=value;
     }
-
-    if( desc.target )
-    {
-        return desc.target[ desc.prop ] = value;
-
-    }else if( desc.set )
+    if( desc.set )
     {
         return desc.set.call( isstatic ? null : receiver, value);
+    }else if( desc.target ) {
+        return desc.target[ desc.prop ] = value;
     }
     throw new ReferenceError(propertyKey+' is not writable');
 };
+
+Reflect.incre=function incre(scope,target, propertyKey, flag , ns)
+{
+    flag = flag !== false;
+    var val = Reflect.get(scope,target, propertyKey, undefined, ns );
+    var ret = val+1;
+    Reflect.set(scope,target, propertyKey, ret , undefined, ns );
+    return flag ? val : ret;
+}
+
+Reflect.decre= function decre(scope,target, propertyKey, flag , ns )
+{
+    flag = flag !== false;
+    var val = Reflect.get(scope,target, propertyKey, undefined, ns );
+    var ret = val-1;
+    Reflect.set(scope,target, propertyKey, ret , undefined, ns );
+    return flag ? val : ret;
+}

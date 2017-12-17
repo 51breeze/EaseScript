@@ -7,17 +7,7 @@ Object.defineProperty(System.Error.prototype,"toString",{value:function toString
 Object.defineProperty(Class.prototype,"__call__",{value:function(info,target, name, argumentsList, receiver, ns)
 {
         Internal.addStack(this.__T__.filename, info);
-        var fn = target;
-        if (target && name != null)
-        {
-            fn =  System.Reflect.get.call(this,target, name, receiver, ns);
-        }
-        return System.Reflect.apply(fn, receiver||target, argumentsList);
-}});
-
-Object.defineProperty(Class.prototype,"__throw__",{value:function( object )
-{
-      throw object.toString();
+        return System.Reflect.call(this,target, name, argumentsList, receiver, ns);
 }});
 
 Object.defineProperty(Class.prototype,"__construct__",{value:function(info,target,argumentsList)
@@ -29,53 +19,48 @@ Object.defineProperty(Class.prototype,"__construct__",{value:function(info,targe
 Object.defineProperty(Class.prototype,"__get__",{value:function(info,target, propertyKey, receiver, ns)
 {
     Internal.addStack( this.__T__.filename, info );
-    return System.Reflect.get.call(this, target, propertyKey, receiver, ns );
+    return System.Reflect.get(this, target, propertyKey, receiver, ns );
 }});
 
 Object.defineProperty(Class.prototype,"__set__",{value:function (info,target, propertyKey, value, receiver, ns)
 {
     Internal.addStack( this.__T__.filename, info);
-    return System.Reflect.set.call(this, target, propertyKey, value, receiver, ns );
+    return System.Reflect.set(this, target, propertyKey, value, receiver, ns );
 }});
 
-Object.defineProperty(Class.prototype,"__has__",{value:function (info,target,name,ns)
+Object.defineProperty(Class.prototype,"__has__",{value:function (info,target,name)
 {
     Internal.addStack( this.__T__.filename, info);
-    return System.Reflect.has.call(this,target,name,ns);
+    return System.Reflect.has(target,name);
 }});
 
-Object.defineProperty(Class.prototype,"__unset__",{value:function (info,target,name,thisArgument,ns)
+Object.defineProperty(Class.prototype,"__unset__",{value:function (info,target,name)
 {
     Internal.addStack( this.__T__.filename, info);
-    return System.Reflect.deleteProperty.call(this,target,name,thisArgument,ns);
+    return System.Reflect.deleteProperty(target,name);
     
 }});
 
-Object.defineProperty(Class.prototype,"__incre__",{value:function (info, refObject, name, flag , ns )
+Object.defineProperty(Class.prototype,"__incre__",{value:function (info, target, name, flag , ns )
 {
     flag = flag !== false;
-    var val = this.__get__(info,refObject, name, undefined, ns );
+    var val = this.__get__(info,target, name, undefined, ns );
     var ret = val+1;
-    this.__set__(info,refObject, name, ret , undefined, ns );
+    this.__set__(info,target, name, ret , undefined, ns );
     return flag ? val : ret;
 }});
 
-Object.defineProperty(Class.prototype,"__decre__",{value:function (info, refObject, name, flag , ns )
+Object.defineProperty(Class.prototype,"__decre__",{value:function (info, target, name, flag , ns )
 {
     flag = flag !== false;
-    var val = this.__get__(info,refObject, name, undefined, ns );
+    var val = this.__get__(info,target, name, undefined, ns );
     var ret = val-1;
-    this.__set__(info,refObject, name, ret , undefined, ns );
+    this.__set__(info,target, name, ret , undefined, ns );
     return flag ? val : ret;
 }});
 
 Object.defineProperty(Class.prototype,"__check__",{value:function(info,type, value)
 {
-    Internal.addStack( this.__T__.filename, info);
-    if( value == null || type === System.Object )return value;
-    if ( type && !System.is(value, type) )
-    {
-        throw new System.TypeError( 'Specify the type of value do not match. must is "' + System.getQualifiedClassName(type)+'"' ,  this.__T__.filename )
-    }
-    return value;
+    Internal.addStack(this.__T__.filename, info);
+    return Reflect.type( value, type);
 }});
