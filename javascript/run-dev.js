@@ -7,37 +7,40 @@ Object.defineProperty(System.Error.prototype,"toString",{value:function toString
 Object.defineProperty(Class.prototype,"__call__",{value:function(info,target, name, argumentsList, receiver, ns)
 {
         Internal.addStack(this.__T__.filename, info);
-        return System.Reflect.call(this,target, name, argumentsList, receiver, ns);
+        if( name ){
+            return Reflect.call(this,target, name, argumentsList, receiver, ns);
+        }
+        return Reflect.apply(target,receiver,argumentsList);
 }});
 
 Object.defineProperty(Class.prototype,"__construct__",{value:function(info,target,argumentsList)
 {
         Internal.addStack(this.__T__.filename, info);
-        return System.Reflect.construct(target, argumentsList);
+        return Reflect.construct(target, argumentsList);
 }});
 
 Object.defineProperty(Class.prototype,"__get__",{value:function(info,target, propertyKey, receiver, ns)
 {
     Internal.addStack( this.__T__.filename, info );
-    return System.Reflect.get(this, target, propertyKey, receiver, ns );
+    return Reflect.get(this, target, propertyKey, receiver, ns );
 }});
 
 Object.defineProperty(Class.prototype,"__set__",{value:function (info,target, propertyKey, value, receiver, ns)
 {
     Internal.addStack( this.__T__.filename, info);
-    return System.Reflect.set(this, target, propertyKey, value, receiver, ns );
+    return Reflect.set(this, target, propertyKey, value, receiver, ns );
 }});
 
 Object.defineProperty(Class.prototype,"__has__",{value:function (info,target,name)
 {
     Internal.addStack( this.__T__.filename, info);
-    return System.Reflect.has(target,name);
+    return Reflect.has(target,name);
 }});
 
 Object.defineProperty(Class.prototype,"__unset__",{value:function (info,target,name)
 {
     Internal.addStack( this.__T__.filename, info);
-    return System.Reflect.deleteProperty(target,name);
+    return Reflect.deleteProperty(target,name);
     
 }});
 

@@ -327,9 +327,9 @@ function builder(config , code, requirements , skins )
          internal,
          contents,
         //running
-        '(function(System,Internal,Class){',
+        '(function(System,Internal,Object,Class,Reflect){',
          config.mode === 1 ? utils.getContents( rootPath+'/run-dev.js' ) : '',
-        '}(System,Internal,System.Class));',
+        '}(System,Internal,System.Object,System.Class,System.Reflect));',
         '}(System,' + g.join(',') + '));',
         //自定义模块域
         '(function(define,'+requires.join(',')+'){',

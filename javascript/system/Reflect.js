@@ -62,53 +62,71 @@ var description = function(scope, target, name , receiver , ns, accessor, flag )
 {
     //表示获取一个类中的属性或者方法（静态属性或者静态方法）
     var isstatic = target instanceof Class;
-    if( isstatic || target.constructor instanceof Class )
+    var objClass = target.constructor;
+    if( isstatic || objClass instanceof Class )
     {
-        var proto = isstatic && receiver && receiver !== target ? target.prototype : target;
+        var objClass = isstatic ? target : objClass;
+        isstatic = isstatic && ( !receiver || receiver === target );
         var uri = ['_'];
         var prop;
         var obj;
+        var proto;
 
         //自定义命名空间
-        if( ns && ns.length > 0 )
+        if (ns && ns.length > 0)
         {
             uri = ns;
         }
         //指定作用域
-        else if( scope instanceof Class )
+        else if (scope instanceof Class)
         {
             uri = scope.__T__.uri;
-            if( flag !==true )
-            {
-                //私有的静态属性
-                if (isstatic)
-                {
-                    if ($has.call(target, uri[0] + name)) {
-                        return {"target": target, "prop": uri[0] + name};
-                    }
-                }
-                //私有的实例属性
-                else
-                {
-                    var _private = scope.__T__._private.valueOf();
-                    obj = target[_private];
-                    if (obj && $has.call(obj, name)) {
-                        return {"target": obj, "prop": name};
-                    }
-                }
-            }
         }
-        var i=uri.length;
-        while( (i--)>0 )
-        {
-            prop = uri[i]+name;
-            obj = proto[ prop ];
-            if( obj )return {"value":obj};
-            if(accessor)
+
+        do{
+            proto = isstatic ? objClass.__T__.method : objClass.__T__.proto;
+            if (flag !== true && uri[0] )
             {
-                obj = proto[ accessor+prop ];
-                if( obj )return accessor==="Set_" ? {"set":obj} : {"get":obj};
+                prop = uri[0] + name;
+                if( $has.call(proto,prop ) )
+                {
+                    //私有的静态属性
+                    if( isstatic )
+                    {
+                        return {"target": target, "prop": prop,"value":target[prop], "desc": proto[ prop ] };
+                    }
+                    //私有的实例属性
+                    else{
+                        var _private = scope.__T__._private.valueOf();
+                        return {"target": target[_private], "prop": name,"value":target[_private][name],"desc": proto[ prop ] };
+                    }
+                }
             }
+
+            var i = uri.length;
+            while ( proto && (i--) > 0)
+            {
+                prop = uri[i] + name;
+                obj = proto[prop];
+                if( obj ){
+                    if( isstatic ){
+                        return {"target": target, "prop": prop,"value":target[prop],  "desc": obj };
+                    }else{
+                        return {"target": proto, "prop": prop,"value":obj.value,  "desc": obj };
+                    }
+                }
+                if ( accessor )
+                {
+                    obj = proto[ prop= accessor + prop ];
+                    if (obj)return accessor === "Set_" ? {"set": obj.value, "prop": prop, "desc": obj} : {"get":obj.value, "prop": prop, "desc": obj};
+                }
+            }
+
+        }while ( !isstatic && (objClass = objClass.__T__["extends"]) instanceof Class );
+        objClass = (objClass || Object).prototype;
+        obj = objClass[name];
+        if( obj ){
+            return {"target":objClass, "prop": name, "value":obj, "desc": {value:obj} };
         }
     }
     return null;
@@ -240,8 +258,7 @@ Reflect.get=function(scope,target, propertyKey, receiver , ns )
         return target[propertyKey];
     }
     if( desc.get )return desc.get.call( receiver instanceof Class ? null : receiver);
-    if( desc.value )return desc.value;
-    return desc.target[ desc.prop ];
+    return desc.value;
 };
 
 /**
@@ -279,10 +296,12 @@ Reflect.set=function(scope,target, propertyKey, value , receiver ,ns )
     if( desc.set )
     {
         return desc.set.call( isstatic ? null : receiver, value);
-    }else if( desc.target ) {
-        return desc.target[ desc.prop ] = value;
     }
-    throw new ReferenceError(propertyKey+' is not writable');
+    if( desc.desc &&  desc.desc.writable !==true  )
+    {
+        throw new ReferenceError(propertyKey+' is not writable');
+    }
+    return desc.target[ desc.prop ] = value;
 };
 
 Reflect.incre=function incre(scope,target, propertyKey, flag , ns)
