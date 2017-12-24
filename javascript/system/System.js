@@ -152,6 +152,7 @@ System.instanceOf = function instanceOf(instanceObj, theClass)
         if ( Object(instanceObj) instanceof theClass)return true;
         if ( theClass === System.Array )return instanceObj instanceof $Array;
         if ( theClass === System.Object )return instanceObj instanceof $Object;
+        if ( theClass === System.Function )return instanceObj instanceof $Function;
     } catch (e) {}
     return false;
 };

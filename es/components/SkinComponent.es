@@ -69,7 +69,7 @@ package es.components
         {
             if (this.__skin__ === null)
             {
-                var skinClass = this.skinClass;
+                var skinClass:Class = this.skinClass;
                 if( skinClass===null )skinClass = Skin;
                 this.__skin__ = new skinClass();
             }

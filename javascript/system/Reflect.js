@@ -4,7 +4,7 @@
  * Released under the MIT license
  * https://github.com/51breeze/EaseScript
  * @author Jun Ye <664371281@qq.com>
- * @require Class,Object,Internal.$get,Internal.$set,Error,TypeError,ReferenceError,SyntaxError
+ * @require Class,Object,Namespace,Error,TypeError,ReferenceError,SyntaxError
  */
 var $has = $Object.prototype.hasOwnProperty;
 var _construct = $Reflect ? $Reflect.construct : function (theClass,args)
@@ -71,47 +71,54 @@ var description = function(scope, target, name , receiver , ns, accessor, flag )
         var prop;
         var obj;
         var proto;
+        var i=0;
+        var context = scope instanceof Class ? scope : null;
 
         //自定义命名空间
         if (ns && ns.length > 0)
         {
-            uri = ns;
+            uri = [];
+            var nsitem;
+            var len = ns.length;
+            for(;i<len;i++)
+            {
+                nsitem = ns[i];
+                if(nsitem instanceof Namespace)uri.push( Namespace.getCodeByUri( nsitem.valueOf() ) );
+            }
         }
         //指定作用域
-        else if (scope instanceof Class)
+        else  if ( context )
         {
-            uri = scope.__T__.uri;
+            uri = context.__T__.uri;
         }
 
         do{
             proto = isstatic ? objClass.__T__.method : objClass.__T__.proto;
-            if (flag !== true && uri[0] )
-            {
-                prop = uri[0] + name;
-                if( $has.call(proto,prop ) )
-                {
-                    //私有的静态属性
-                    if( isstatic )
-                    {
-                        return {"target": target, "prop": prop,"value":target[prop], "desc": proto[ prop ] };
-                    }
-                    //私有的实例属性
-                    else{
-                        var _private = scope.__T__._private.valueOf();
-                        return {"target": target[_private], "prop": name,"value":target[_private][name],"desc": proto[ prop ] };
-                    }
-                }
-            }
-
-            var i = uri.length;
+            i = uri.length;
             while ( proto && (i--) > 0)
             {
                 prop = uri[i] + name;
                 obj = proto[prop];
                 if( obj ){
-                    if( isstatic ){
+                    //静态成员
+                    if( isstatic )
+                    {
                         return {"target": target, "prop": prop,"value":target[prop],  "desc": obj };
-                    }else{
+                    }
+                    //实例成员
+                    else
+                    {
+                        //实例属性
+                        if( context && context.__T__.uri[0]===uri[i] )
+                        {
+                            var _private = context.__T__._private.valueOf();
+                            return {
+                                "target": target[_private],
+                                "prop": name,
+                                "value": target[_private][name],
+                                "desc": proto[prop]
+                            };
+                        }
                         return {"target": proto, "prop": prop,"value":obj.value,  "desc": obj };
                     }
                 }
@@ -171,8 +178,7 @@ Reflect.call=function call(scope, target, propertyKey,argumentsList,thisArgument
 {
     if( propertyKey==null )throw new ReferenceError('propertyKey is null or undefined');
     if( target == null )throw new ReferenceError('target is null or undefined');
-    var desc = description(scope,target,propertyKey,thisArgument,ns,null, true);
-    var fn = desc ? desc.value : target[propertyKey];
+    var fn = Reflect.get(scope,target, propertyKey, thisArgument , ns );
     if( typeof fn !== "function" )
     {
         throw new TypeError('target.'+propertyKey+' is not function');

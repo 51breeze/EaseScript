@@ -116,7 +116,7 @@ function createDescription( syntax, stack , owner , moduleClass )
     desc['origintype'] = desc['type'];
     desc['privilege'] =stack.qualifier() || "internal";
     desc['static'] = !!stack.static();
-    desc['isStatic'] = !!stack.static();
+    desc['isStatic'] = desc['static'];
     desc['owner'] = owner;
     if( stack.final() )
     {
@@ -424,7 +424,6 @@ function getDeclareClassDescription( stack , isInternal, config, project , synta
             prev = item;
         }
     }
-
     return list;
 }
 
@@ -516,6 +515,7 @@ function getPropertyDescription( stack , config , project , syntax )
                         //moduleClass.namespaces[ value.name() ].value = getNamespaceValue( value, moduleClass);
                         moduleClass.classname = value.name();
                         moduleClass.id="namespace";
+                        moduleClass.type=value.name();
                         count++;
                     }
                     else if ( value.keyword() === "use" )
@@ -549,6 +549,7 @@ function getPropertyDescription( stack , config , project , syntax )
                 } else if (id === "class" || id === "interface")
                 {
                     moduleClass.declared[item.name()] = getDeclareClassDescription(item, true, config, project, syntax );
+                    moduleClass.declared[item.name()].rootStack=item;
 
                 } else if (item.name())
                 {

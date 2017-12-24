@@ -100,7 +100,7 @@ const vendorContents=[];
  * 获取指定的文件模块
  * @param filepath
  */
-function include(contents, name , filepath, fix, libs )
+function include(contents, name , filepath, fix, libs, callback )
 {
     name = mapname[name] || name;
     if( loaded[name] === true )return;
@@ -121,6 +121,10 @@ function include(contents, name , filepath, fix, libs )
     if( utils.isFileExists(filepath) )
     {
         var str = utils.getContents( filepath );
+        if( callback && typeof callback === "function" )
+        {
+            str = callback( str );
+        }
         var desc = describe( str, name);
         if( desc.requirements.indexOf('System') < 0 )desc.requirements.unshift('System');
         var map = desc.requirements.map(function (val) {
@@ -252,7 +256,7 @@ function Context( name )
  * @param config
  * @returns {string}
  */
-function builder(config , code, requirements , skins )
+function builder(config , code, requirements , replacements )
 {
     var fix = polyfill( config );
     
@@ -286,7 +290,10 @@ function builder(config , code, requirements , skins )
         }
     }
 
-    for(var prop in requires)include(contents, requires[prop], null, fix, libs);
+    for(var prop in requires)
+    {
+        include(contents, requires[prop], null, fix, libs, replacements[ requires[prop].toLowerCase()] );
+    }
 
     //模块定义器
     include(contents, 'define' , rootPath+'/define.js', fix , libs);
@@ -333,7 +340,6 @@ function builder(config , code, requirements , skins )
         '}(System,' + g.join(',') + '));',
         //自定义模块域
         '(function(define,'+requires.join(',')+'){',
-        skins,
         code,
         'var main=System.getDefinitionByName("'+config.main+'");',
         'try{System.Reflect.construct(main);}catch(e){throw e.toString();}',
