@@ -550,6 +550,7 @@ function getPropertyDescription( stack , config , project , syntax )
                 {
                     moduleClass.declared[item.name()] = getDeclareClassDescription(item, true, config, project, syntax );
                     moduleClass.declared[item.name()].rootStack=item;
+                    moduleClass.declared[item.name()].namespaces = Utils.merge( moduleClass.declared[item.name()] ,moduleClass.namespaces);
 
                 } else if (item.name())
                 {

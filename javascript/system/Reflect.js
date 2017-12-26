@@ -74,22 +74,24 @@ var description = function(scope, target, name , receiver , ns, accessor, flag )
         var i=0;
         var context = scope instanceof Class ? scope : null;
 
+        //指定作用域
+        if ( context )
+        {
+            uri = context.__T__.uri;
+        }
+
         //自定义命名空间
         if (ns && ns.length > 0)
         {
-            uri = [];
             var nsitem;
             var len = ns.length;
+            uri = uri.splice(1,-1);
+            uri.unshift("_");
             for(;i<len;i++)
             {
                 nsitem = ns[i];
                 if(nsitem instanceof Namespace)uri.push( Namespace.getCodeByUri( nsitem.valueOf() ) );
             }
-        }
-        //指定作用域
-        else  if ( context )
-        {
-            uri = context.__T__.uri;
         }
 
         do{
@@ -125,7 +127,9 @@ var description = function(scope, target, name , receiver , ns, accessor, flag )
                 if ( accessor )
                 {
                     obj = proto[ prop= accessor + prop ];
-                    if (obj)return accessor === "Set_" ? {"set": obj.value, "prop": prop, "desc": obj} : {"get":obj.value, "prop": prop, "desc": obj};
+                    if (obj){
+                        return accessor === "Set_" ? {"set": obj.value, "prop": prop, "desc": obj} : {"get":obj.value, "prop": prop, "desc": obj};
+                    }
                 }
             }
 
@@ -299,6 +303,8 @@ Reflect.set=function(scope,target, propertyKey, value , receiver ,ns )
         }
         return target[propertyKey]=value;
     }
+
+
     if( desc.set )
     {
         return desc.set.call( isstatic ? null : receiver, value);

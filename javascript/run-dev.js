@@ -15,7 +15,7 @@ Object.defineProperty(Class.prototype,"__call__",{value:function(info,target, na
 
 Object.defineProperty(Class.prototype,"__construct__",{value:function(info,target,argumentsList)
 {
-        Internal.addStack(this.__T__.filename, info);
+        Internal.addStack(this.__T__.filename, "new "+info);
         return Reflect.construct(target, argumentsList);
 }});
 
