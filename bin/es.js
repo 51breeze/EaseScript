@@ -12,7 +12,7 @@ program
 .version( 'EaseScript '+require('../package.json').version )
 .option('-p, --path [dir]', '项目路径', cmd===cwd || cwd===root_path ? './project' : cwd )
 .option('-c, --config [file]', '指定配置文件', PATH.resolve(root_path, 'configure.js') )
-.option('-m, --minify [enable|disabled]', '是否需要压缩代码', null )
+.option('-M, --minify [enable|disabled]', '是否需要压缩代码', null )
 .option('-o, --output [dir]', '输出路径')
 .option('-s, --syntax [js|php]', '要构建的语法','js')
 .option('-S, --suffix [value]', '源文件的后缀名','es')
@@ -23,7 +23,7 @@ program
 .option('-r, --reserved [items]', '指定需要保护的关键字', function (val) {
     return val.split(',');
 })
-.option('-M, --mode [dev|test|production]', '构建模式是用于生产环境还是测试环境','dev')
+.option('-m, --mode [dev|test|production]', '构建模式是用于生产环境还是测试环境','production')
 .option('-C, --clean', '清除编译配置文件,并重新生成')
 .option('--cv, --compat-version [ie:number,chrome:number,...]', '需要兼容的浏览器版本,默认为所有(*)',function (val) {
    val = val.split(',');
@@ -38,6 +38,7 @@ program
 .option('--bs, --block-scope [enable|disabled]', '是否需要启用块级域','disabled')
 .option('--bsc, --base-skin-class [value]', '指定皮肤文件的基础类','es.core.Skin')
 .option('--sfs, --skin-file-suffix [value]', '皮肤文件的后缀','html')
+.option('--src, --source-file [enable|disabled]', '是否需要生成源文件','enable');
 
 program.parse(process.argv);
 
@@ -53,7 +54,7 @@ var config = {
     'debug': program.debug, //是否需要开启调式
     'blockScope': program.blockScope,     //是否启用块级域
     'reserved': ['let', 'of','System',"Context"],
-    'minify': program.minify, //是否需要压缩
+    'minify': program.minify==null && program.mode=="production" ? "enable" : program.minify, //是否需要压缩 minify
     'compat_version':program.compatVersion || '*',      //要兼容的平台 {'ie':8,'chrome':32.5}
     'build_path': program.output,
     'project_path':program.path,
@@ -64,6 +65,7 @@ var config = {
     'config_file':program.config,
     'bootstrap':program.bootstrap,
     'themes':program.themes,
+    'source_file':program.sourceFile,
     'context':{
         "public":"_public",
         "protected":"_protected",
@@ -71,9 +73,8 @@ var config = {
         "internal":"_internal",
         "package":"Context",
     },
-    'mode': program.mode=='dev' ? 1 : program.mode=='test' ? 1 : 3, //1 标准模式（开发时使用） 2 测试  3 性能模式（生产环境使用）
+    'mode': program.mode=='dev' ? 1 : program.mode=='test' ? 2 : 3, //1 标准模式（开发时使用） 2 测试  3 性能模式（生产环境使用）
 };
-
 config.clean = program.clean
 config.root_path = root_path;
 config.syntax = program.syntax;

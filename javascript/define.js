@@ -34,7 +34,6 @@ var fix = !$Array.prototype.map;
 function define(requires , callback )
 {
     var name = requires[0];
-    var pn = getPackageName(name);
     var context = getContext(name);
     requires = Array.prototype.map.call( requires , function (item)
     {
@@ -59,12 +58,8 @@ function define(requires , callback )
         }
         return ref;
     });
-    if(fix)
-    {
-        requires = requires.slice(0);
-    }
-    context._private = Symbol(name);
-    return callback.apply( context, requires);
+    if(fix)requires = requires.slice(0);
+    return callback.apply({_private:Symbol(name)}, requires);
 }
 Internal.define = define;
 
