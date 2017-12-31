@@ -218,7 +218,11 @@ Reflect.construct=function construct( target , args )
 Reflect.deleteProperty=function deleteProperty(target, propertyKey)
 {
     if( !target || propertyKey==null )return false;
-    if( target instanceof Class )return false;
+    if( propertyKey==="__proto__")return false;
+    if( target instanceof Class ){
+        if( target.__T__.dynamic !==true )return false;
+        if( target.__T__._private === propertyKey)return false;
+    }
     if( $has.call(target,propertyKey) )
     {
         delete target[propertyKey];
@@ -233,10 +237,28 @@ Reflect.deleteProperty=function deleteProperty(target, propertyKey)
  * @param propertyKey
  * @returns {boolean}
  */
-Reflect.has=function has(target, propertyKey)
+Reflect.has=function has(scope, target, propertyKey)
 {
     if( propertyKey==null || target == null )return false;
-    return propertyKey in target;
+    if( propertyKey==="__proto__")return false;
+    if( propertyKey in target )return true;
+    if( target instanceof Class || target.constructor instanceof Class  )
+    {
+        var uri=['_'];
+        if( scope && scope instanceof Class )
+        {
+            uri = scope.__T__.uri;
+        }
+        var i=0;
+        var len = uri.length;
+        for(;i<len;i++)
+        {
+            if( (uri[i]+propertyKey) in target )return true;
+            if( ('Get_'+uri[i]+propertyKey) in target )return true;
+            if( ('Set_'+uri[i]+propertyKey) in target )return true;
+        }
+    }
+    return false;
 };
 
 Reflect.type=function type(value, typeClass)
@@ -293,18 +315,22 @@ Reflect.set=function(scope,target, propertyKey, value , receiver ,ns )
         var objClass = target.constructor;
         if( objClass instanceof Class )
         {
-            if( objClass.__T__.dynamic !==true )throw new ReferenceError(propertyKey+' is not exists');
+            if( objClass.__T__.dynamic !==true ){
+                throw new ReferenceError(propertyKey+' is not exists');
+            }
             var obj = target[propertyKey];
             //如果是一个动态对象并且是第一次赋值时存在此属性名则认为是原型对象上的类成员， 不能赋值。
             if( obj && !$has.call(target,propertyKey) )
             {
                 throw new TypeError(propertyKey+' is not configurable');
             }
+
+        }else if( typeof target ==="function" )
+        {
+            throw new TypeError(propertyKey+' is not configurable');
         }
         return target[propertyKey]=value;
     }
-
-
     if( desc.set )
     {
         return desc.set.call( isstatic ? null : receiver, value);

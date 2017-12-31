@@ -987,6 +987,7 @@ function getConfigure(config)
     }
     if( config.reserved.indexOf('System')<0 )config.reserved.push('System');
     if( config.reserved.indexOf('Context')<0 )config.reserved.push('Context');
+    if( config.reserved.indexOf('Reflect')<0 )config.reserved.push('Reflect');
 
     //系统类库路径名
     //在加载类文件时发现是此路径名打头的都转到系统库路径中查找文件。

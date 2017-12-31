@@ -71,7 +71,7 @@ var config = {
         "protected":"_protected",
         "private":"_private",
         "internal":"_internal",
-        "package":"Context",
+        "package":"Context"
     },
     'mode': program.mode=='dev' ? 1 : program.mode=='test' ? 2 : 3, //1 标准模式（开发时使用） 2 测试  3 性能模式（生产环境使用）
 };

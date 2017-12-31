@@ -321,8 +321,13 @@ function builder(config , code, requirements , replacements )
     if( index > 0 )requires.splice(index,1);
 
     var internal = '';
-    if( config.mode < 3 ){
+    if( config.mode==1  ){
         internal='(function(System,Internal,environment){\n'+ utils.getContents( rootPath+'/internal.js' )+ '\n}(System,Internal,'+config.mode+'));'
+    }
+
+    var run='';
+    if( config.mode==1 ){
+        run = '(function(System,Internal,Object,Class,Reflect){\n'+ utils.getContents( rootPath+'/run-dev.js' )+'\n}(System,Internal,System.Object,System.Class,System.Reflect));';
     }
 
     return [
@@ -330,13 +335,9 @@ function builder(config , code, requirements , replacements )
         '"use strict";',
         //系统全局模块域
         '(function(System,$'+globals.join(',$')+'){',
-        //internal
          internal,
          contents,
-        //running
-        '(function(System,Internal,Object,Class,Reflect){',
-         config.mode === 1 ? utils.getContents( rootPath+'/run-dev.js' ) : '',
-        '}(System,Internal,System.Object,System.Class,System.Reflect));',
+         run,
         '}(System,' + g.join(',') + '));',
         //自定义模块域
         '(function(define,'+requires.join(',')+'){',
