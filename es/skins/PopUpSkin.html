@@ -1,5 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <s:Skin class="pop-up-skin"  xmlns:c="es.components" xmlns:s="es.core">
+    <![CDATA[
+        private var _titleText:String="title";
+        public function set titleText( text:String ):void
+        {
+           if( _titleText != text){
+                _titleText = text;
+              title.element.html( text );
+           }
+        }
+
+        public function get titleText():String
+        {
+            return _titleText;
+        }
+
+        private var _cancelText:String="取 消";
+        public function set cancelText( text:String ):void
+        {
+           if( _cancelText != text){
+                _cancelText = text;
+                cancel.element.html( text );
+           }
+        }
+
+        public function get cancelText():String
+        {
+            return _cancelText;
+        }
+
+        private var _submitText:String="确 定";
+        public function set submitText( text:String ):void
+        {
+           if( _submitText != text){
+                 _submitText = text;
+                submit.element.html( text );
+           }
+        }
+
+        public function get submitText():String
+        {
+            return _submitText;
+        }
+
+    ]]>
 
     <style>
 
@@ -60,6 +104,11 @@
 
     </style>
 
+    <s:states>
+        <s:State name="info" />
+        <s:State name="comfirm" />
+    </s:states>
+
     <div class="pop-up-main" id="@main">
         <div class="pop-up-head" id="@head">
            <span class="pop-up-title" id="@title">title</span>
@@ -67,10 +116,12 @@
                <i class="glyphicon glyphicon-remove"></i>
            </span>
         </div>
-        <div class="pop-up-body" id="@body"></div>
-        <div class="pop-up-footer" id="@footer">
-            <button class="btn btn-sm btn-default">取 消</button>
-            <button class="btn btn-sm btn-primary">确 定</button>
+        <div class="pop-up-body" id="@body">
+            ssss
+        </div>
+        <div class="pop-up-footer" id="@footer" excludeFrom="info">
+            <button class="btn btn-sm btn-default" id="@cancel">取 消</button>
+            <button class="btn btn-sm btn-primary" id="@submit">确 定</button>
         </div>
     </div>
 

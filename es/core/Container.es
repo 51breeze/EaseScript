@@ -8,7 +8,8 @@ package es.core
 {
     import es.core.Display;
     import es.interfaces.IDisplay;
-    public class Container extends Display
+    import es.interfaces.IContainer;
+    public class Container extends Display implements IContainer
     {
         /**
          * 显示对象构造类
@@ -42,11 +43,11 @@ package es.core
          * @param index
          * @returns {IDisplay}
          */
-        public function getChildAt( index ):IDisplay
+        public function getChildAt( index:Number ):IDisplay
         {
             var children:Array = this._children;
             index = index < 0 ? index+children.length : index;
-            var result = children[index];
+            var result:IDisplay = children[index];
             if( result == null )
             {
                 throw new RangeError('The index out of range');
@@ -128,7 +129,7 @@ package es.core
         /**
          * 移除所有的子级元素
          */
-        public function removeAllChild()
+        public function removeAllChild():void
         {
             var children:Array = this._children;
             var len = children.length;
@@ -137,6 +138,17 @@ package es.core
                 this.removeChild( children[ --len ] );
             }
             this._children = [];
+        }
+
+        /**
+         * 添加一个html子级元素, 并清空当前容器中之前的所有子极
+         * @param strHtml 如果是一个有效的html标签则生成对应的html元素，否则生成一个文本元素添加到当前容器中。
+         * @return IDisplay
+         */
+        public function html( strHtml:String ):IDisplay
+        {
+            removeAllChild();
+            return addChild( new Display( new Element( Element.createElement( strHtml , true ) ) ) );
         }
     }
 }

@@ -8,13 +8,12 @@
 package es.components
 {
     import es.components.Component;
-    import es.core.Display;
     import es.events.ComponentEvent;
     import es.core.Skin;
-    import es.core.Container;
+    import es.interfaces.IContainer;
+    import es.interfaces.IDisplay;
     import es.core.es_internal;
-
-   use namespace es_internal;
+    use namespace es_internal;
 
     public class SkinComponent extends Component
     {
@@ -45,11 +44,11 @@ package es.components
                 this.skin.es_internal::hostComponent = this;
                 var _height = this.height;
                 if( _height !== NaN ){
-                    (this.skin as Display).height = _height;
+                    (this.skin as IDisplay).height = _height;
                 }
                 var _width  = this.width;
                 if( _width !== NaN ){
-                    (this.skin as Display).width = _width;
+                    (this.skin as IDisplay).width = _width;
                 }
                 return true;
             }
@@ -119,12 +118,12 @@ package es.components
         /**
          * @private
          */
-        private var __viewport__:Container = null;
+        private var __viewport__:IContainer = null;
 
         /**
          * @returns {Object}
          */
-        public function get viewport():Container
+        public function get viewport():IContainer
         {
             return this.__viewport__;
         };
@@ -134,22 +133,22 @@ package es.components
          * @param Object obj
          * @returns {void}
          */
-        public function set viewport(obj:Container):void
+        public function set viewport(container:IContainer):void
         {
-            var old = this.__viewport__;
-            if( obj !== old )
+            var old:IContainer = this.__viewport__;
+            if( container !== old )
             {
                 if( old )
                 {
-                    old.removeEventListener( ElementEvent.ADD, this.display);
+                    (old as EventDispatcher).removeEventListener( ElementEvent.ADD, this.display);
                 }
-                this.__viewport__ = obj;
+                this.__viewport__ = container;
                 
                 //自动显示组件
                 if( this.__auto__ )
                 {
                     //当视图被添加时渲染显示此组件
-                    obj.addEventListener( ElementEvent.ADD, this.display, false, 0, this);
+                    (container as EventDispatcher).addEventListener( ElementEvent.ADD, this.display, false, 0, this);
                 }
             }
         };
@@ -168,10 +167,10 @@ package es.components
              this.__auto__=value;
              if( value===false )
              {
-                 var viewport = this.viewport;
+                 var viewport:IContainer = this.viewport;
                  if( viewport )
                  {
-                     viewport.removeEventListener(ElementEvent.ADD,this.display);
+                     (viewport as EventDispatcher).removeEventListener(ElementEvent.ADD,this.display);
                  }
              }
         }
@@ -196,7 +195,7 @@ package es.components
         {
             if( initializeCompleted )
             {
-                return (this.skin as Display).height;
+                return (this.skin as IDisplay).height;
             }
             return _height;
         }
@@ -209,7 +208,7 @@ package es.components
             _height = value;
             if( initializeCompleted )
             {
-                (this.skin as Display).height = value;
+                (this.skin as IDisplay).height = value;
             }
         }
 
@@ -225,7 +224,7 @@ package es.components
         {
             if( initializeCompleted )
             {
-                return (this.skin as Display).width;
+                return (this.skin as IDisplay).width;
             }
             return _width;
         }
@@ -238,7 +237,7 @@ package es.components
             _width = value;
             if( initializeCompleted )
             {
-                (this.skin as Display).width = value;
+                (this.skin as IDisplay).width = value;
             }
         }
 

@@ -81,6 +81,34 @@ package es.core
         }
 
         /**
+         * @private
+         */
+        private var _visible:Boolean=null;
+
+        /**
+         * 标记此显示对象是否可见
+         * @param flag
+         */
+        public function set visible( flag:Boolean ):void
+        {
+            _visible= flag;
+           flag===false ? _element.hide() : _element.show();
+        }
+
+        /**
+         * 获取此显示对象的可见状态
+         * @returns {Boolean}
+         */
+        public function get visible():Boolean
+        {
+            if( _visible===null )
+            {
+                return !( _element.style("display") === "none" || _element.style("visibility") === "hidden");
+            }
+            return _visible;
+        }
+
+        /**
          * 设置对象的属性
          * @param name
          * @param value

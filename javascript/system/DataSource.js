@@ -323,7 +323,7 @@ DataSource.prototype.append=function(item,index)
         e.newValue=item[i];
         if( this.dispatchEvent( e ) )
         {
-            Array.prototype.splice.call(this.__items__, index+i, 0, item[i]);
+            Array.prototype.splice.call(this.__items__, e.index, 0, item[i]);
             ret.push( item[i] );
         }
     }
@@ -355,7 +355,7 @@ DataSource.prototype.remove=function( condition )
             e.oldValue=result[i];
             if( this.dispatchEvent( e ) )
             {
-                data.push( Array.prototype.splice.call(this.__items__, index, 1) );
+                data.push( Array.prototype.splice.call(this.__items__, e.index, 1) );
             }
         }
     }
@@ -381,6 +381,7 @@ DataSource.prototype.update=function update( value, condition)
     var data=[];
     var flag=false;
     var e;
+
     for (var i = 0; i < result.length; i++)
     {
         flag=false;

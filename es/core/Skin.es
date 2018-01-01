@@ -115,11 +115,8 @@ package es.core
             var stateGroup=this.stateGroup;
             for(;i<len;i++)
             {
-                if( !(value[i] instanceof State) )
-                {
-                    throw new TypeError('array element is not State. in Skin.prototype.states');
-                }
-                var name = value[i].name();
+                var stateObj:State = value[i] as State;
+                var name = stateObj.name;
                 if( !name )throw new TypeError('name is not define in Skin.prototype.states');
                 if( stateGroup.hasOwnProperty(name) )
                 {
@@ -314,7 +311,7 @@ package es.core
                     if ( System.isString( child ) )
                     {
                         child = System.trim( child );
-                        var elem = new Element( Element.createElement( child , child.charAt(0)!=="<" ) );
+                        var elem = new Element( Element.createElement( child , true ) );
                         this.addChildAt( new Display( elem ) , -1);
                     }else if( child instanceof Skin )
                     {

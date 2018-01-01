@@ -40,6 +40,18 @@ package es.interfaces
         public function set height(value:Number):void;
 
         /**
+         * 标记此显示对象是否可见
+         * @param flag
+         */
+        public function set visible( flag:Boolean ):void;
+
+        /**
+         * 获取此显示对象的可见状态
+         * @returns {Boolean}
+         */
+        public function get visible():Boolean;
+
+        /**
          * 设置对象的属性
          * @param name
          * @param value

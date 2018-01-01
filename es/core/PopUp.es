@@ -8,39 +8,83 @@
 package es.core
 {
 
-import es.core.Container;
-import es.interfaces.IDisplay;
-import es.skins.PopUpSkin;
+    import es.components.SkinComponent;
+    import es.core.Container;
+    import es.core.Skin;
+    import es.interfaces.IContainer;
+    import es.interfaces.IDisplay;
+    import es.skins.PopUpSkin;
     import es.core.Skin;
 
-    public static class PopUp
+    public class PopUp extends SkinComponent
     {
-        private var _getInstanceSkin:Skin = null;
-        private function getInstance()
+        override public function get skinClass():Class
         {
-              if( _getInstanceSkin===null )
-              {
-                  _getInstanceSkin = new PopUpSkin();
-                  _getInstanceSkin.skinInstaller();
-              }
-              return _getInstanceSkin;
+            var skinClass = super.skinClass;
+            if( !skinClass )skinClass = PopUpSkin;
+            return skinClass;
         }
 
-        private var container:Container=null;
-
-        private function show()
+        override public function get viewport():IContainer
         {
-            if( container === null )
+             var _viewport:IContainer = super.viewport;
+             if( !_viewport )
+             {
+                 _viewport =  new Container( Element(document.body) );
+                 super.viewport = _viewport;
+             }
+             return _viewport;
+        }
+
+        protected function bindEvent( type:String )
+        {
+            skin.visible=false;
+        }
+
+        override protected function initializing():Boolean
+        {
+            if( super.initializing() )
             {
-                container =  new Container( Element(document.body) );
+                var skin:Skin = this.skin;
+                var bottons:Array = ["cancel","submit","close"];
+                var i=0;
+                var len = bottons.length;
+                for(;i<len;i++){
+                    var name:String = bottons[i];
+                    var btn:Skin = skin[ name ] as Skin;
+                    btn.addEventListener(MouseEvent.CLICK,function (e:MouseEvent){
+                        this.bindEvent( name );
+                    },false,0,this);
+                }
+                return true;
             }
-
-            container.addChild( getInstance() as IDisplay );
+            return false;
         }
 
-        public function info( title )
+        static private var instanceSkin:PopUp = null;
+        static protected function getInstance():PopUp
         {
-            PopUp.show();
+              if( instanceSkin===null )
+              {
+                  instanceSkin = new PopUp();
+              }
+              return instanceSkin;
+        }
+
+        static public function show(options={})
+        {
+            var popUp:PopUp = getInstance() as PopUp;
+            for( var p in options )if( p in popUp.skin )
+            {
+                popUp.skin[ p ] = options[p];
+            }
+            popUp.skin.visible = true;
+            popUp.display();
+        }
+
+        static public function info( title )
+        {
+            PopUp.show({"titleText":title,"currentState":"info"});
         }
     }
 }

@@ -299,7 +299,7 @@ function $createElement(html , flag )
         html=System.trim( html ).replace(/[\r\n]+/g,'');
         if( html )
         {
-            if( flag ===true  && html.charAt(0) !== "<" )
+            if( flag ===true && html.charAt(0) !== "<" )
             {
                 return document.createTextNode( html );
             }
@@ -829,7 +829,7 @@ Element.prototype.hide=function hide()
  */
 accessor['text']= {
     get:function(){  return typeof this.textContent === "string" ? this.textContent : this.innerText; }
-    ,set:function(newValue){
+    ,set:function(name,newValue){
         typeof this.textContent === "string" ? this.textContent=newValue : this.innerText=newValue;
         return PropertyEvent.CHANGE;
     }
