@@ -12,6 +12,7 @@ package es.core
     import es.components.Component;
     import es.events.SkinEvent;
     import es.core.State;
+    import es.interfaces.IDisplay;
 
     public class Skin extends Container
     {
@@ -24,16 +25,17 @@ package es.core
          * 皮肤类
          * @constructor
          */
-        function Skin( skinObject:Object )
+        function Skin( skinObject:Object={} )
         {
             if( !(skinObject is Element) )
             {
-                skinObject = skinObject || {};
                 var attr = skinObject.attr || {};
                 var name = skinObject.name || 'div';
                 var hash = skinObject.hash;
                 if (hash)
                 {
+                    hash = hash as JSON;
+                    attr = attr as JSON;
                     for (var h in hash)
                     {
                         if (hash[h] === '@id')
@@ -112,7 +114,7 @@ package es.core
         {
             var len = value.length;
             var i=0;
-            var stateGroup=this.stateGroup;
+            var stateGroup=this.stateGroup as JSON;
             for(;i<len;i++)
             {
                 var stateObj:State = value[i] as State;
@@ -122,7 +124,7 @@ package es.core
                 {
                     throw new TypeError('"'+name+'" has already been declared in Skin.prototype.states');
                 }
-                stateGroup[ name ] = value[i];
+                stateGroup[ name ] = stateObj;
             }
         };
 
@@ -293,14 +295,15 @@ package es.core
                     this.addChildAt( new Display( new Element( Element.createElement( child ) ) ) , -1 );
                 }
             }
+
             for (;c<len;c++)
             {
                 child = children[c];
                 if( System.isObject(child, true) )
                 {
-                    child = Skin.parseSkinObject(child, hash );
+                    child = Skin.parseSkinObject(child, hash);
 
-                } if( child instanceof Render )
+                }else if( child instanceof Render )
                 {
                     var rd:Render = child as Render;
                     child = rd.fetch();
@@ -313,6 +316,7 @@ package es.core
                         child = System.trim( child );
                         var elem = new Element( Element.createElement( child , true ) );
                         this.addChildAt( new Display( elem ) , -1);
+
                     }else if( child instanceof Skin )
                     {
                         (child as Skin).createChildren();
@@ -322,7 +326,7 @@ package es.core
             }
             if( this.hasEventListener(SkinEvent.CREATE_CHILDREN_COMPLETED) )
             {
-                var e:Object = new SkinEvent( SkinEvent.CREATE_CHILDREN_COMPLETED );
+                var e:SkinEvent = new SkinEvent( SkinEvent.CREATE_CHILDREN_COMPLETED );
                 e.parent = parent;
                 e.child = this;
                 this.dispatchEvent( e );
@@ -342,15 +346,16 @@ package es.core
          * @param currentState
          * @returns {*}
          */
-        private function getCurrentState(currentState:String)
+        private function getCurrentState(currentState:String):State
         {
-            var stateGroup = this.stateGroup;
+            var stateGroup = this.stateGroup as JSON;
             if( stateGroup.hasOwnProperty( currentState ) )return stateGroup[ currentState ];
             for( var p in stateGroup )
             {
-                if( stateGroup[p].includeIn(currentState) )
+                var state:State = stateGroup[p];
+                if( state.includeIn(currentState) )
                 {
-                    return currentState;
+                    return state;
                 }
             }
             return null;
@@ -364,28 +369,23 @@ package es.core
             var currentState = this.currentState;
             if( currentState )
             {
-                var stateGroup = getCurrentState( currentState );
+                var stateGroup:State = getCurrentState( currentState );
                 if( !stateGroup )throw new ReferenceError('"'+currentState+'"'+' is not define');
-                var isGroup = typeof stateGroup !== "string";
+                var elems = new Element('[includeIn],[excludeFrom]', this.element );
 
                 //隐藏或者显示当前已设置的状态
-                Element('[includeIn],[excludeFrom]', this.element ).forEach(function ()
+                elems.forEach(function ()
                 {
-                    var includeIn = this.property('includeIn');
-                    var _include = isGroup ? stateGroup.includeIn(includeIn) : includeIn===currentState;
-                    if( _include )
-                    {
-                        var excludeFrom = this.property('excludeFrom');
-                        if( excludeFrom ) {
-                            _include = !( isGroup ? stateGroup.includeIn(excludeFrom) : excludeFrom === currentState );
-                        }
+                    var includeIn   = elems.property('includeIn');
+                    var excludeFrom = elems.property('excludeFrom');
+                    var _include    = true;
+                    if( includeIn ){
+                        _include = stateGroup.includeIn(includeIn);
                     }
-                    if( _include )
-                    {
-                        this.show();
-                    }else{
-                        this.hide();
+                    if( excludeFrom ) {
+                        _include = !stateGroup.includeIn(excludeFrom);
                     }
+                    _include ? elems.show() : elems.hide();
                 });
             }
         }
@@ -395,27 +395,20 @@ package es.core
          * @param skin
          * @param hash
          */
-        static protected function parseSkinObject( skin:Object , hash=null ):String
+        static protected function parseSkinObject( skin:Object={} , hash={} ):String
         {
             var tag = skin.name || 'div';
-            var children:Array = skin is Skin ? skin.skinChildren : skin.children;
-            var attr = skin.attr || {};
-            var content='';
+            var children:Array = skin.children;
+            var content:String='';
             var len = children.length;
             var i = 0;
             for (;i<len;i++)
             {
-                var child = children[i];
-                if ( System.isObject(child,true) )
-                {
-                    content += Skin.parseSkinObject(child, hash );
-                } else
-                {
-                    content += typeof child ==="string" ? child : Skin.parseSkinObject(child, child.hash);
-                }
+                content += typeof children[i] ==="string" ? children[i] : Skin.parseSkinObject(children[i], hash);
             }
             if( tag==='text' )return content;
-            var str = '<' + tag;
+            var str:String = '<' + tag;
+            var attr = (skin.attr || {}) as JSON;
             for (var p in attr)
             {
                 var v = attr[p];

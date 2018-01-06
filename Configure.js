@@ -16,6 +16,10 @@ module.exports={
                 "path": "./",
                 "name": "css",
             },
+            "font": {
+                "path": "./",
+                "name": "fonts",
+            },
         },
     },
     //工作的主目录结构配置

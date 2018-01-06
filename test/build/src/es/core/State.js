@@ -1,7 +1,7 @@
 define(["es.core.State"],function(State){
 var _private=this._private;
-var proto={"constructor":{"value":State},"T10__name":{"writable":true,"value":''}
-,"T10__stateGroup":{"writable":true,"value":new Array()}
+var proto={"constructor":{"value":State},"q10__name":{"writable":true,"value":''}
+,"q10__stateGroup":{"writable":true,"value":new Array()}
 ,"Get__name":{"value":function name(){
 	return this[_private]._name;
 }},"Set__name":{"value":function name(value){
@@ -27,10 +27,9 @@ Object.defineProperty(State,"__T__",{value:{
 	"extends":null,
 	"package":"es.core",
 	"classname":"State",
-	"filename":"E:/EaseScript/es/core/State.es",
 	"implements":[],
 	"_private":_private,
-	"uri":["T10_","z29_","D21_","_"],
+	"uri":["q10_","F29_","G21_","_"],
 	"proto":proto
 }});
 return State;

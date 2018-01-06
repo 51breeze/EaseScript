@@ -143,10 +143,17 @@ System.instanceOf = function instanceOf(instanceObj, theClass)
     {
         return theClass === System.Object || theClass===$Object  ? true : false;
     }
+
     if (theClass === System.Class)
     {
         return instanceObj instanceof System.Class;
     }
+
+    if( theClass === System.JSON )
+    {
+        return System.isObject(instanceObj,true);
+    }
+
     try {
         if( theClass instanceof System.Class )theClass = theClass.constructor;
         if ( Object(instanceObj) instanceof theClass)return true;

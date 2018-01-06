@@ -58,7 +58,7 @@ var _apply = $Reflect ? $Reflect.apply : function(target, thisArgument, argument
     return target();
 };
 
-var description = function(scope, target, name , receiver , ns, accessor, flag )
+var description = function(scope, target, name , receiver , ns, accessor)
 {
     //表示获取一个类中的属性或者方法（静态属性或者静态方法）
     var isstatic = target instanceof Class;
@@ -105,7 +105,7 @@ var description = function(scope, target, name , receiver , ns, accessor, flag )
                     //静态成员
                     if( isstatic )
                     {
-                        return {"target": target, "prop": prop,"value":target[prop],  "desc": obj };
+                        return {"target": target, "prop": prop,"value":target[prop],  "desc": obj};
                     }
                     //实例成员
                     else
@@ -114,14 +114,17 @@ var description = function(scope, target, name , receiver , ns, accessor, flag )
                         if( context && context.__T__.uri[0]===uri[i] )
                         {
                             var _private = context.__T__._private.valueOf();
-                            return {
-                                "target": target[_private],
-                                "prop": name,
-                                "value": target[_private][name],
-                                "desc": proto[prop]
-                            };
+                            if( $has.call(target[_private],name) )
+                            {
+                                return {
+                                    "target": target[_private],
+                                    "prop": name,
+                                    "value": target[_private][name],
+                                    "desc": proto[prop]
+                                };
+                            }
                         }
-                        return {"target": proto, "prop": prop,"value":obj.value,  "desc": obj };
+                        return {"target": proto, "prop": prop,"value":obj.value,  "desc": obj};
                     }
                 }
                 if ( accessor )
@@ -180,8 +183,10 @@ Reflect.apply=function apply( target, thisArgument, argumentsList )
  */
 Reflect.call=function call(scope, target, propertyKey,argumentsList,thisArgument,ns)
 {
-    if( propertyKey==null )throw new ReferenceError('propertyKey is null or undefined');
     if( target == null )throw new ReferenceError('target is null or undefined');
+    if( propertyKey==null ){
+        return Reflect.apply( target, thisArgument, argumentsList );
+    }
     var fn = Reflect.get(scope,target, propertyKey, thisArgument , ns );
     if( typeof fn !== "function" )
     {

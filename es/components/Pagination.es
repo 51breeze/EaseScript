@@ -31,9 +31,7 @@
 
 package es.components
 {
-
-import es.components.Pagination;
-import es.components.SkinComponent;
+    import es.components.SkinComponent;
     import es.core.Skin;
     import es.events.PaginationEvent;
     import es.skins.PaginationSkin;

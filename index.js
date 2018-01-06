@@ -735,7 +735,7 @@ const builder={
              var options =  {
                  paths: [ lessPath ],
                  globalVars:themes[ config.themes ] || themes.default,
-                 compress: config.minify ==='enable' ,
+                 compress: config.minify === 'enable' ,
              };
              var style = styleContents.map(function (e, i) {
 
@@ -758,6 +758,8 @@ const builder={
 
              style.unshift( "\n@import 'mixins.less';\n" );
              style.unshift( "\n@import 'main.less';\n" );
+             style.push( "\n@import './less/glyphicons.less';\n" );
+
              less.render( style.join("\n") , options, function (err, output) {
                  if (err) {
                      Utils.error(err.message);
@@ -767,6 +769,15 @@ const builder={
                      fs.writeFileSync(filename, output.css );
                  }
              });
+
+             var fontPath = Utils.getBuildPath(config, 'build.font');
+             var fontfiles =  Utils.getDirectoryFiles( lessPath+'/fonts');
+             for( var i=0;i<fontfiles.length;i++)
+             {
+                 var source = fs.createReadStream(  lessPath+'/fonts/'+fontfiles[i] );
+                 var tocopy   = fs.createWriteStream( fontPath+"/"+fontfiles[i] );
+                 source.pipe( tocopy );
+             }
          }
 
          if( script && config.minify ==='enable' )

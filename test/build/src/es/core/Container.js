@@ -1,6 +1,6 @@
 define(["es.core.Container","es.core.Display","if:es.interfaces.IDisplay","if:es.interfaces.IContainer"],function(Container,Display,IDisplay,IContainer){
 var _private=this._private;
-var proto={"constructor":{"value":Container},"l8__children":{"writable":true,"value":new Array()}
+var proto={"constructor":{"value":Container},"b8__children":{"writable":true,"value":new Array()}
 ,"Get__children":{"value":function children(){
 	return this[_private]._children.slice(0);
 }},"_getChildAt":{"value":function getChildAt(index){
@@ -32,7 +32,7 @@ var proto={"constructor":{"value":Container},"l8__children":{"writable":true,"va
 	var indexAt=index<0?index+children.length:index;
 	this.Get__element().addChildAt(child.Get__element(),index);
 	children.splice(indexAt,0,child);
-	(child).Set_q7_displayParent(this);
+	(Reflect.type(child,Display)).Set_R7_displayParent(this);
 	return child;
 }}
 ,"_removeChild":{"value":function removeChild(child){
@@ -42,7 +42,7 @@ var proto={"constructor":{"value":Container},"l8__children":{"writable":true,"va
 	if(child){
 		children=this[_private]._children;
 		index=children.indexOf(child);
-		(child).Set_q7_displayParent(null);
+		(Reflect.type(child,Display)).Set_R7_displayParent(null);
 		this.Get__element().removeChild(child.Get__element());
 		this[_private]._children.splice(index,1);
 		return child;
@@ -82,10 +82,9 @@ Object.defineProperty(Container,"__T__",{value:{
 	"extends":Display,
 	"package":"es.core",
 	"classname":"Container",
-	"filename":"E:/EaseScript/es/core/Container.es",
 	"implements":[IContainer],
 	"_private":_private,
-	"uri":["l8_","q7_","D21_","_"],
+	"uri":["b8_","R7_","G21_","_"],
 	"proto":proto
 }});
 return Container;

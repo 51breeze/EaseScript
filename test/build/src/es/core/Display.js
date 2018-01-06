@@ -1,6 +1,6 @@
 define(["es.core.Display","if:es.interfaces.IDisplay"],function(Display,IDisplay){
 var _private=this._private;
-var proto={"constructor":{"value":Display},"q9__element":{"writable":true,"value":null}
+var proto={"constructor":{"value":Display},"L9__element":{"writable":true,"value":null}
 ,"Get__element":{"value":function element(){
 	return this[_private]._element;
 }},"Get__width":{"value":function width(){
@@ -13,7 +13,7 @@ var proto={"constructor":{"value":Display},"q9__element":{"writable":true,"value
 }},"Set__height":{"value":function height(value){
 	if(!System.is(value, Number))throw new TypeError("type does not match. must be Number");
 	this[_private]._element.height(value);
-}},"q9__visible":{"writable":true,"value":null}
+}},"L9__visible":{"writable":true,"value":null}
 ,"Get__visible":{"value":function visible(){
 	if(this[_private]._visible===null){
 		return Reflect.type(!(this[_private]._element.style("display")==="none"||this[_private]._element.style("visibility")==="hidden"),Boolean);
@@ -24,7 +24,7 @@ var proto={"constructor":{"value":Display},"q9__element":{"writable":true,"value
 	this[_private]._visible=flag;
 	flag===false?this[_private]._element.hide():this[_private]._element.show();
 }},"_property":{"value":function property(name,value){
-	if(System.typeOf(value) === "undefined"){value=null;}
+	if(value == null ){value=null;}
 	if(value==null){
 		if(System.isObject(name,true)){
 			this[_private]._element.property(name);
@@ -86,12 +86,12 @@ var proto={"constructor":{"value":Display},"q9__element":{"writable":true,"value
 	if(!System.is(top, Number))throw new TypeError("type does not match. must be Number");
 	return this[_private]._element.globalToLocal(left,top);
 }}
-,"Get_q7_displayParent":{"value":function(){
+,"Get_R7_displayParent":{"value":function(){
 	return this[_private].displayParent;
-}},"Set_q7_displayParent":{"value":function(val){
+}},"Set_R7_displayParent":{"value":function(val){
 	return this[_private].displayParent=val;
 }},"Get__parent":{"value":function parent(){
-	return this.Get_q7_displayParent();
+	return this.Get_R7_displayParent();
 }},"_toString":{"value":function toString(){
 	return this[_private]._element.html(true);
 }}
@@ -115,10 +115,9 @@ Object.defineProperty(Display,"__T__",{value:{
 	"extends":EventDispatcher,
 	"package":"es.core",
 	"classname":"Display",
-	"filename":"E:/EaseScript/es/core/Display.es",
 	"implements":[IDisplay],
 	"_private":_private,
-	"uri":["q9_","q7_","D21_","_"],
+	"uri":["L9_","R7_","G21_","_"],
 	"proto":proto
 }});
 return Display;

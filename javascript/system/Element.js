@@ -38,6 +38,7 @@ var fix={
         'user-select':true,
         'radial-gradient':true,
         'linear-gradient':true,
+        'transition':true,
         'animation-name':true,
         'animation-duration':true,
         'animation-iteration-count':true,

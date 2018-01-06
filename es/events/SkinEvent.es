@@ -6,12 +6,12 @@
  */
 package es.events
 {
-    import es.core.Display;
+    import es.interfaces.IDisplay;
     public class SkinEvent extends Event
     {
         static public const CREATE_CHILDREN_COMPLETED ='createChildrenCompleted';
-        public var parent:Display;
-        public var child:Display;
+        public var parent:IDisplay;
+        public var child:IDisplay;
         public function SkinEvent(type, bubbles=true, cancelable=true)
         {
             super(type, bubbles, cancelable);

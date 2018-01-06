@@ -105,7 +105,6 @@ function include(contents, name , filepath, fix, libs, callback )
     name = mapname[name] || name;
     if( loaded[name] === true )return;
     loaded[name]=true;
-
     if( !filepath )
     {
         filepath = rootPath + '/system/' + name + '.js';
@@ -285,7 +284,9 @@ function builder(config , code, requirements , replacements )
         {
             if( requirements[p]===true && requires.indexOf( p ) < 0 && ( globals.hasOwnProperty( p ) || config.globals.hasOwnProperty(p) ) )
             {
-                requires.push( p );
+                if( p!=="arguments" ){
+                    requires.push( p );
+                }
             }
         }
     }

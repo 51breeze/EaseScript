@@ -124,13 +124,13 @@ Object.defineProperty(EventDispatcher.prototype,"removeEventListener", {value:fu
  */
 Object.defineProperty(EventDispatcher.prototype,"dispatchEvent", {value:function( event )
 {
+    if( typeof event === "string" )event = new System.Event( event );
     if( !System.is(event,Event) )throw new TypeError('Invalid event');
     var target = storage(this,'target') || this;
     if( System.is(target,EventDispatcher) && target !== this )
     {
         return target.dispatchEvent(event);
     }
-
     var len = target.length >> 0;
     if( len > 0 ){
         while(len>0 && target[--len] )

@@ -1,7 +1,7 @@
 define(["es.components.Component","es.events.ComponentEvent"],function(Component,ComponentEvent){
 var _private=this._private;
-var proto={"constructor":{"value":Component},"T5___initialized__":{"writable":true,"value":false}
-,"w2_initialized":{"value":function initialized(){
+var proto={"constructor":{"value":Component},"h5___initialized__":{"writable":true,"value":false}
+,"h2_initialized":{"value":function initialized(){
 	var val=this[_private].__initialized__;
 	if(val===false){
 		this[_private].__initialized__=true;
@@ -11,8 +11,8 @@ var proto={"constructor":{"value":Component},"T5___initialized__":{"writable":tr
 	}
 	return val;
 }}
-,"T5___initializing__":{"writable":true,"value":true}
-,"w2_initializing":{"value":function initializing(){
+,"h5___initializing__":{"writable":true,"value":true}
+,"h2_initializing":{"value":function initializing(){
 	var val=this[_private].__initializing__;
 	if(val===true){
 		this[_private].__initializing__=false;
@@ -34,10 +34,9 @@ Object.defineProperty(Component,"__T__",{value:{
 	"extends":EventDispatcher,
 	"package":"es.components",
 	"classname":"Component",
-	"filename":"E:/EaseScript/es/components/Component.es",
 	"implements":[],
 	"_private":_private,
-	"uri":["T5_","w2_","U17_","_"],
+	"uri":["h5_","h2_","P17_","_"],
 	"proto":proto
 }});
 return Component;

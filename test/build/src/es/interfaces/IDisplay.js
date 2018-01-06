@@ -5,10 +5,9 @@ Object.defineProperty(IDisplay,"__T__",{value:{
 	"extends":null,
 	"package":"es.interfaces",
 	"classname":"IDisplay",
-	"filename":"E:/EaseScript/es/interfaces/IDisplay.es",
 	"implements":[],
 	"_private":_private,
-	"uri":["d22_","u23_","u24_","_"]
+	"uri":["z22_","g23_","Z24_","_"]
 }});
 return IDisplay;
 });
