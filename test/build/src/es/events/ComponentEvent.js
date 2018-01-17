@@ -22,13 +22,11 @@ Object.defineProperty(ComponentEvent,"constructor",{"value":function constructor
 ComponentEvent.constructor.prototype=Object.create( Event.prototype , proto);
 Object.defineProperty(ComponentEvent,"prototype",{value:ComponentEvent.constructor.prototype});
 Object.defineProperty(ComponentEvent,"__T__",{value:{
-	"ns":"_",
 	"extends":Event,
 	"package":"es.events",
 	"classname":"ComponentEvent",
-	"implements":[],
 	"_private":_private,
-	"uri":["k18_","S19_","I20_","_"],
+	"uri":["k18_","J19_","i20_","_"],
 	"method":method,
 	"proto":proto
 }});

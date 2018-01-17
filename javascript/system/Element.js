@@ -67,6 +67,8 @@ var fix={
     ,cssHooks:{}
     ,cssMap:{}
     ,fnHooks:{}
+    ,cssDisplayRegex:/^(none|table(?!-c[ea]).+)/
+    ,cssDisplayMap:{position:"absolute",visibility: "hidden", display:"block"}
     ,getsizeval:function( prop )
     {
         if ( Element.isWindow(this) )
@@ -89,7 +91,25 @@ var fix={
                     this['client'+prop] || 0
                 )+(this.documentElement[ prop==='Height'? 'clientTop' : 'clientLeft' ] || 0);
         }
-        return this['offset'+prop] || 0;
+        var val = this['offset'+prop] || 0;
+        if( val < 1 )
+        {
+            var style = getComputedStyle( this );
+            val = parseFloat( prop==="Width" ? style.width : style.height )||0;
+            if( val < 1 && fix.cssDisplayRegex.test( style.display ) )
+            {
+                var oldCss = {};
+                var p;
+                for( p in fix.cssDisplayMap )
+                {
+                    oldCss[p]=style[ p ];
+                    this.style[ p ]=fix.cssDisplayMap[p];
+                }
+                val = this['offset'+prop] || 0;
+                for( p in oldCss )this.style[ p ]=oldCss[p];
+            }
+        }
+        return val;
     }
 };
 
@@ -133,7 +153,6 @@ function access(callback, name, newValue)
                 EventDispatcher.prototype.dispatchEvent.call(this, event);
             }
         }
-
     });
 }
 
@@ -317,15 +336,8 @@ function $createElement(html , flag )
             {
                 var elem = document.createElement(match[1]);
                 var attr = $matchAttr(html);
-                var isset = typeof elem.setAttribute === "function";
                 for (var prop in attr) {
-                    if (isset) {
-                        elem.setAttribute(prop, attr[prop]);
-                    } else {
-                        var attrNode = document.createAttribute(prop);
-                        attrNode.nodeValue = attr[prop];
-                        elem.setAttributeNode(attrNode)
-                    }
+                    accessor['property'].set.call( elem, prop, attr[prop]);
                 }
                 return elem;
             }
@@ -452,14 +464,21 @@ function $mergeAttributes(target, oSource)
     }
     return target;
 }
-/**
- * 判断元素是否有Style
- * @returns {boolean}
- */
-function $hasStyle(elem )
+
+//判断元素是否有样式
+function $hasStyle( elem )
 {
-    return !( !elem || !elem.nodeType || elem.nodeType === 3 || elem.nodeType === 8 || !elem.style );
+    return elem && elem.nodeType && elem.style && !(elem.nodeType === 3 || elem.nodeType === 8);
 }
+
+//获取元素当前的样式
+function getComputedStyle(elem)
+{
+    if( !$hasStyle(elem) )return {};
+    return document.defaultView && document.defaultView.getComputedStyle ? document.defaultView.getComputedStyle(elem, null)
+        : elem.currentStyle || elem.style;
+}
+
 /**
  * 克隆节点元素
  * @param nodeElement
@@ -609,11 +628,18 @@ Element.prototype.current=function current( elem )
  */
 accessor['property']={
     get:function(name){
-        return ( fix.attrtrue[name] || typeof this.getAttribute !== "function"  ? this[name] : this.getAttribute(name) ) || null; }
+        name = fix.attrMap[ name ] || name;
+        return  ( fix.attrtrue[name] || !this.getAttribute  ? this[name] : this.getAttribute(name) ) || undefined;
+    }
     ,set:function(name,newValue){
-        newValue === null ?
-            ( fix.attrtrue[name] || typeof this.removeAttribute !== "function"  ? delete this[name] : this.removeAttribute(name) ) :
-            ( fix.attrtrue[name] || typeof this.setAttribute !== "function"  ? this[name] = newValue : this.setAttribute(name, newValue) );
+        name = fix.attrMap[ name ] || name;
+        if( fix.attrtrue[name] ===true && newValue === null )newValue = '';
+        if( newValue === null ){
+            fix.attrtrue[name] || !this.removeAttribute ? delete this[name] : this.removeAttribute(name);
+        }else
+        {
+            fix.attrtrue[name] || !this.setAttribute  ? this[name] = newValue : this.setAttribute(name, newValue);
+        }
         return PropertyEvent.CHANGE;
     }
 };
@@ -630,7 +656,7 @@ Element.prototype.property=function property(name, value )
     {
         for(var i in name )
         {
-            Element.prototype.property.call(this,i, name[i]);
+            this.property(i,name[i]);
         }
         return this;
     }
@@ -702,7 +728,7 @@ Element.prototype.data=function data(name, value )
 };
 
 var rgbregex = /\s*rgba\(\s*(\d+)\,\s*(\d+)\,\s*(\d+)/i;
-var rgbToHex = function (value)
+var rgbToHex = function(value)
 {
       var ret = value.match(rgbregex);
       if( ret )
@@ -723,9 +749,8 @@ var rgbToHex = function (value)
 accessor['style']= {
     get:function(name){
         var getter = fix.cssHooks[name] && typeof fix.cssHooks[name].get === "function" ? fix.cssHooks[name].get : null;
-        var currentStyle = $hasStyle(this) ? (document.defaultView && document.defaultView.getComputedStyle ?
-            document.defaultView.getComputedStyle(this, null) : this.currentStyle || this.style) : {};
-        return getter ? getter.call(this, currentStyle, name) : currentStyle[name];
+        var style = getComputedStyle(this);
+        return getter ? getter.call(this, style, name) : style[name]||'';
     }
     ,set:function(name,value, obj ){
         var type = typeof value;
@@ -733,13 +758,13 @@ accessor['style']= {
             value = System.trim(value);
             type = /^\d+$/.test( value ) ? 'number' : type;
         }
-        if( !this || !this.style || ( type === "number" && System.isNaN( value ) ) )return;
+        if( !this || !this.style || ( type === "number" && isNaN( value ) ) )return;
         var increment = type === "string" ? /^([\-+])=([\-+.\de]+)/.exec( value ) : null;
 
         //增量值
         if (increment) {
             var inc =accessor.style.get.call(this,name);
-            inc = System.parseFloat(inc) || 0;
+            inc = parseFloat(inc) || 0;
             value = ( +( increment[1] + 1 ) * +increment[2] ) + inc;
             type = "number";
         }else if(type==='string' && !fix.cssPrefixName && value.substr(0,5) === "rgba(" )
@@ -808,9 +833,7 @@ Element.prototype.style=function style(name, value )
  */
 Element.prototype.show=function show()
 {
-    return Element.prototype.forEach.call(this,function(){
-        Element.prototype.style.call(this,'display', '' );
-    });
+    return this.style('display', '' );
 };
 
 /**
@@ -819,11 +842,8 @@ Element.prototype.show=function show()
  */
 Element.prototype.hide=function hide()
 {
-    return Element.prototype.forEach.call(this,function(){
-        Element.prototype.style.call(this,'display', 'none' );
-    });
+    return this.style('display', 'none' );
 };
-
 
 /**
  * @private
@@ -857,7 +877,6 @@ accessor['value']= {
     }
 };
 
-
 /**
  * 获取设置表单元素的值。此方法只会对表单元素有用。
  * @returns {string|Element}
@@ -873,12 +892,17 @@ Element.prototype.value=function value( val )
  * @param className
  * @returns {boolean}
  */
-Element.prototype.hasClass=function hasClass(className )
+Element.prototype.hasClass=function hasClass( className )
 {
-    var elem = Element.prototype.current.call(this);
+    if( typeof className !=='string' )
+    {
+        throw new Error("className is not String");
+    }
+    var elem = this.current();
     if( !elem )return false;
-    var value=elem['className'] || '';
-    return value === '' || !value ? false : typeof className==='string' ? new RegExp('(\\s|^)' + className + '(\\s|$)').test( value ) : true ;
+    var value= System.trim( elem['className'] );
+    if( !value ) return false;
+    return new RegExp('(\\s|^)' + className + '(\\s|$)').test( value );
 };
 
 /**
@@ -886,30 +910,31 @@ Element.prototype.hasClass=function hasClass(className )
  * @param className
  * @returns {Element}
  */
-Element.prototype.addClass=function addClass(className )
+Element.prototype.addClass=function addClass( className )
 {
-    if( typeof className !== "string" )
-        throw new Error('invaild class name');
+    if( typeof className !== "string" )throw new Error('className is not String');
     className = System.trim( className );
-    Element.prototype.forEach.call(this,function(elem){
-
-        if( !Element.prototype.hasClass.call(this, className ) )
+    var exp = new RegExp('(\\s|^)' + className + '(\\s|$)');
+    this.forEach(function(elem){
+        var old = System.trim( elem['className'] );
+        if( !exp.test( old ) )
         {
-            var oldClass=System.trim( elem['className'] );
-            var old = oldClass;
-            oldClass= [ System.trim( oldClass ) ];
+            var oldClass=[ old ];
             oldClass.push( className );
             var newValue = System.trim( oldClass.join(' ') );
             elem['className'] = newValue;
-
-            if( Element.prototype.hasEventListener.call(this,StyleEvent.CHANGE) )
+            if( this.hasEventListener( StyleEvent.CHANGE) )
             {
                 var event = new StyleEvent( StyleEvent.CHANGE );
                 event.property = 'class';
                 event.newValue = newValue;
                 event.oldValue = old;
-                return event
+                if( !this.dispatchEvent( event ) )
+                {
+                    elem['className'] = old;
+                }
             }
+            elem.offsetWidth = elem.offsetWidth;
         }
     });
     return this;
@@ -920,7 +945,7 @@ Element.prototype.addClass=function addClass(className )
  * @param className
  * @returns {Element}
  */
-Element.prototype.removeClass=function removeClass(className )
+Element.prototype.removeClass=function removeClass( className )
 {
     var all = typeof className !== 'string';
     return Element.prototype.forEach.call(this,function(elem){
@@ -933,15 +958,18 @@ Element.prototype.removeClass=function removeClass(className )
         }
         newValue === '' ? elem.removeAttribute('class') : elem['className'] = System.trim(newValue);
         try {
-            elem.offsetWidth = elem.offsetWidth;
-            if( Element.prototype.hasEventListener.call(this,StyleEvent.CHANGE) )
+            if( this.hasEventListener.call(StyleEvent.CHANGE) )
             {
                 var event = new StyleEvent( StyleEvent.CHANGE );
                 event.property = 'class';
-                event.newValue = old;
-                event.oldValue = newValue;
-                return event
+                event.newValue = newValue;
+                event.oldValue = old;
+                if( !this.dispatchEvent( event ) )
+                {
+                    elem['className'] = old;
+                }
             }
+            elem.offsetWidth = elem.offsetWidth;
         }catch(e){}
     })
 };
@@ -951,9 +979,10 @@ Element.prototype.removeClass=function removeClass(className )
  * @param value
  * @returns {int|Element}
  */
-Element.prototype.width=function width(value )
+Element.prototype.width=function width( value )
 {
-    return access.call(this,'style','width',value);
+    var val = access.call(this,'style','width',value);
+    return value == null ? parseFloat( val ) : this;
 };
 
 /**
@@ -961,9 +990,10 @@ Element.prototype.width=function width(value )
  * @param value
  * @returns {int|Element}
  */
-Element.prototype.height=function height(value )
+Element.prototype.height=function height( value )
 {
-    return access.call(this,'style','height',value);
+    var val = access.call(this,'style','height',value);
+    return value == null ? parseFloat( val ) : this;
 };
 
 /**
@@ -975,23 +1005,28 @@ accessor['scroll']={
         var p= 'scroll'+prop;
         return Element.isWindow( e ) ? e[ prop.toLowerCase()==='top'?'pageYOffset':'pageXOffset'] || e.document.documentElement[p] || e.document.body[p] : e[p] ;
     },
-    set:function(prop,newValue,obj){
+    set:function(prop,newValue,obj)
+    {
         var e = this.defaultView || this.parentWindow || this;
+        var old = accessor.scroll.get.call(this, prop);
+        if( newValue == old )return;
         if( obj.style('position')==='static' )obj.style('position','relative');
         if(typeof e.scrollTo === "function")
         {
             var param = [newValue,NaN];
             if( prop.toLowerCase()==='top' )param = param.reverse();
             e.scrollTo.apply(e, param );
+
         } else
         {
             e['scroll'+prop] = newValue;
         }
-
-        if( Element.prototype.hasEventListener.call(this, ScrollEvent.CHANGE ) ){
-
+        if( this.hasEventListener.call( ScrollEvent.CHANGE ) )
+        {
             var event = new ScrollEvent( ScrollEvent.CHANGE );
             event.property = prop.toLowerCase();
+            event.newValue = newValue;
+            event.oldValue = old;
             return event;
         }
     }
@@ -1043,13 +1078,13 @@ Element.prototype.scrollHeight=function scrollHeight()
 Element.prototype.getBoundingRect=function getBoundingRect( force )
 {
     var value={ 'top': 0, 'left': 0 ,'right' : 0,'bottom':0,'width':0,'height':0};
-    var elem= Element.prototype.current.call(this);
+    var elem= this.current();
     if( Element.isWindow(elem) )
     {
         value.left = elem.screenLeft || elem.screenX;
         value.top = elem.screenTop || elem.screenY;
-        value.width = Element.prototype.width.call(this);
-        value.height = Element.prototype.height.call(this);
+        value.width = this.width();
+        value.height = this.height();
         value.right = value.width + value.left;
         value.bottom = value.height + value.top;
         return value;
@@ -1059,10 +1094,10 @@ Element.prototype.getBoundingRect=function getBoundingRect( force )
         throw new Error('invalid elem. elem not is NodeElement');
 
     var doc =  elem.ownerDocument || elem, docElem=doc.documentElement;
-    Element.prototype.current.call(this, Element.getWindow( doc ) );
-    var scrollTop = Element.prototype.scrollTop.call(this);
-    var scrollLeft = Element.prototype.scrollLeft.call(this);
-    Element.prototype.current.call(this, elem );
+    this.current( Element.getWindow( doc ) );
+    var scrollTop = this.scrollTop();
+    var scrollLeft = this.scrollLeft();
+    this.current( elem );
 
     if( "getBoundingClientRect" in document.documentElement )
     {
@@ -1091,7 +1126,7 @@ Element.prototype.getBoundingRect=function getBoundingRect( force )
     }
 
     //始终相对浏览器窗口的位置
-    if( Element.prototype.style.call(this,'position') === 'fixed' || force===true )
+    if( this.style('position') === 'fixed' || force===true )
     {
         value.top -= scrollTop;
         value.left -= scrollLeft;
@@ -1107,20 +1142,17 @@ Element.prototype.getBoundingRect=function getBoundingRect( force )
 var position_hash={'absolute':true,'relative':true,'fixed':true};
 accessor['position']={
     get:function(prop,obj){
-        return Element.prototype.getBoundingRect.call(obj)[ prop ];
+        return obj.getBoundingRect()[ prop ];
     },
     set:function(prop,newValue,obj){
-
-        var elem = Element.prototype.current.call(obj);
-        var val = accessor.style.get.call(elem,'position');
+        var val = accessor.style.get.call(this,'position');
         if( !position_hash[val] )
         {
-            accessor.style.set.call(elem,'position','relative');
+            accessor.style.set.call(this,'position','relative');
         }
-        return Element.prototype.style.call(obj,prop,newValue>>0);
+        return accessor.style.set.call(this,prop,newValue>>0,obj);
     }
 };
-
 
 /**
  * 获取或者设置相对于父元素的左边位置
@@ -1167,11 +1199,11 @@ Element.prototype.bottom=function bottom(val )
  */
 function point(left, top, local )
 {
-    var old =  storage(this,'forEachCurrentItem');
-    var target = Element.prototype.current.call(this);
-    Element.prototype.current.call(this, target.parentNode );
-    var offset=Element.prototype.getBoundingRect.call(this);
-    Element.prototype.current.call(this, old );
+    var old = storage(this,'forEachCurrentItem');
+    var target = this.current();
+    this.current( target.parentNode );
+    var offset=this.getBoundingRect();
+    this.current( old );
     left = left || 0;
     top = top || 0;
     return local===true ? {left:offset.left+left,top:offset.top+top} : {left:left-offset.left, top:top-offset.top};
@@ -1215,7 +1247,7 @@ Element.prototype.revert=function revert(step)
         step = step || -1;
         step= step < 0 ? step+len : step;
         step=step >= len ? 0 : step;
-        Element.prototype.splice.call(this,0,this.length, reverts.splice(step, len-step).shift() );
+        this.splice.call(0,this.length, reverts.splice(step, len-step).shift() );
     }
     return this;
 };
@@ -1228,7 +1260,7 @@ Element.prototype.revert=function revert(step)
 Element.prototype.find=function find(selector)
 {
     var ret=[];
-    Element.prototype.forEach.call(this,function(elem){
+    this.forEach(function(elem){
         ret = ret.concat.apply(ret,querySelector(selector, elem ) );
     });
     return $doMake.call( this, ret );
@@ -1319,13 +1351,13 @@ Element.prototype.children=function children( selector )
     }
     var is=typeof selector === "function";
     var results=[];
-    Element.prototype.forEach.call(this,function(element)
+    this.forEach(function(element)
     {
         if( !Element.isFrame(element) && element.hasChildNodes() )
         {
-            var child = Element.prototype.slice.call( element.childNodes );
-            results =  is ? Element.prototype.concat.apply( results, Array.prototype.filter.call(child, selector ) ) :
-                Element.prototype.concat.apply( results, querySelector(selector,element,null,child) );
+            var child = this.slice.call( element.childNodes );
+            results =  is ? this.concat.apply( results, Array.prototype.filter.call(child, selector ) ) :
+                this.concat.apply( results, querySelector(selector,element,null,child) );
         }
     });
     return $doMake.call( this, Array.prototype.unique.call(results) );
@@ -1356,7 +1388,7 @@ Element.prototype.html=function html( htmlObject )
             is = true;
         }
     }
-    return Element.prototype.forEach.call(this,function(elem)
+    return this.forEach(function(elem)
     {
         if( !write )
         {
@@ -1623,8 +1655,7 @@ var hasNode= typeof Node !== "undefined";
 Element.isNodeElement=function isNodeElement( elem )
 {
     if( !elem ) return false;
-    return hasNode ? elem instanceof Node : elem.nodeType && typeof elem.nodeName === "string" &&
-    (typeof elem.tagName === "string" || elem.nodeName==="#document-fragment");
+    return hasNode ? elem instanceof Node : elem.nodeType && (typeof elem.nodeName === "string" || typeof elem.tagName === "string" || elem.nodeName==="#document-fragment");
 };
 
 
@@ -1656,7 +1687,7 @@ Element.isEventElement=function isEventElement( elem )
  */
 Element.isWindow=function isWindow( elem )
 {
-    return elem && elem === Element.getWindow(elem);
+    return elem && elem == Element.getWindow(elem);
 };
 
 /**
@@ -1686,7 +1717,7 @@ Element.isFrame=function isFrame( elem )
  */
 Element.getWindow=function getWindow( elem )
 {
-    if( elem )
+    if( elem && typeof elem === "object" )
     {
         elem = elem.ownerDocument || elem;
         return elem.window || elem.defaultView || elem.contentWindow || elem.parentWindow || window || null;
@@ -1847,12 +1878,12 @@ fix.cssHooks.radialGradient=fix.cssHooks.linearGradient={
 
 //add get width hooks
 fix.cssHooks.width= {
-    get:function(style){ return ( fix.getsizeval.call(this,'Width') || style['width'] ) >> 0; }
+    get:function(){ return fix.getsizeval.call(this,'Width')+"px"; }
 };
 
 //add get height hooks
 fix.cssHooks.height={
-    get:function (style){return ( fix.getsizeval.call(this,'Height') || style['height'] ) >> 0;}
+    get:function (){return fix.getsizeval.call(this,'Height')+"px";}
 };
 
 //@internal Element.fix;

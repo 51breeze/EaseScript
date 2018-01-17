@@ -32,7 +32,7 @@ var proto={"constructor":{"value":Container},"b8__children":{"writable":true,"va
 	var indexAt=index<0?index+children.length:index;
 	this.Get__element().addChildAt(child.Get__element(),index);
 	children.splice(indexAt,0,child);
-	(Reflect.type(child,Display)).Set_R7_displayParent(this);
+	(Reflect.type(child,Display)).Set_y7_displayParent(this);
 	return child;
 }}
 ,"_removeChild":{"value":function removeChild(child){
@@ -42,7 +42,7 @@ var proto={"constructor":{"value":Container},"b8__children":{"writable":true,"va
 	if(child){
 		children=this[_private]._children;
 		index=children.indexOf(child);
-		(Reflect.type(child,Display)).Set_R7_displayParent(null);
+		(Reflect.type(child,Display)).Set_y7_displayParent(null);
 		this.Get__element().removeChild(child.Get__element());
 		this[_private]._children.splice(index,1);
 		return child;
@@ -78,13 +78,12 @@ Object.defineProperty(Container,"constructor",{"value":function constructor(elem
 Container.constructor.prototype=Object.create( Display.prototype , proto);
 Object.defineProperty(Container,"prototype",{value:Container.constructor.prototype});
 Object.defineProperty(Container,"__T__",{value:{
-	"ns":"_",
 	"extends":Display,
 	"package":"es.core",
 	"classname":"Container",
 	"implements":[IContainer],
 	"_private":_private,
-	"uri":["b8_","R7_","G21_","_"],
+	"uri":["b8_","y7_","u21_","_"],
 	"proto":proto
 }});
 return Container;

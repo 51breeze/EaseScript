@@ -15,7 +15,11 @@ Object.defineProperty( Class.prototype, "valueOf", {value:function valueOf()
     if(this==null)return this===null ? 'null' : 'undefined';
     if( this instanceof Class )
     {
-        return '[class '+this.__T__.classname+']';
+        var t = this.__T__;
+        if( t["package"] ){
+            return '[class '+t["package"]+'.'+t.classname+']';
+        }
+        return '[class '+t.classname+']';
     }
     return Object.prototype.valueOf.call( this );
 }});

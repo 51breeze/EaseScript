@@ -70,7 +70,7 @@ package es.core
             skin.style("animation", "fadeOut "+duration+"s linear "+delay+"s forwards" );
             var self = this;
             setTimeout(function () {
-                self.close("close");
+                self.action("close");
             },(delay + duration)*1000 );
         }
 
@@ -93,7 +93,7 @@ package es.core
             timeoutId = setTimeout(function () {
                 skin.style("animation", "fadeOut "+(duration)+"s linear 0s forwards" );
                 setTimeout(function () {
-                    self.close("close");
+                    self.action("close");
                 }, duration*1000+100 );
             },(delay + duration)*1000 );
         }
@@ -103,7 +103,7 @@ package es.core
          * 如果回调函数返回false则不关闭
          * @param type
          */
-        protected function close( type:String )
+        public function action(type:String )
         {
             if( callback && callback( type ) === false )
             {
@@ -112,7 +112,17 @@ package es.core
             if( maskInstance )maskInstance.hide();
             if( timeoutId )clearTimeout(timeoutId);
             skin.visible=false;
+            callback = null;
             return true;
+        }
+
+        private var win:Element = new Element(window);
+        protected function position( options={} )
+        {
+            var skin = this.skin;
+            var win = this.win;
+            skin.left=  (win.width() - skin.width ) / 2;
+            skin.top=  (win.height() - skin.height ) / 2;
         }
 
         /**
@@ -135,7 +145,7 @@ package es.core
                         var btn:Skin = skin[name] as Skin;
                         btn.addEventListener(MouseEvent.CLICK, (function (name) {
                             return function (e:MouseEvent) {
-                                self.close(name);
+                                self.action(name);
                             };
                         })(name));
                     }
@@ -148,12 +158,12 @@ package es.core
         /**
          * 遮罩层的显示层级
          */
-        static public const MASK_LEVEL = 99990;
+        static public const MASK_LEVEL = 99900;
 
         /**
          * 窗口容器的显示层级
          */
-        static public const WINDOW_LEVEL = 99995;
+        static public const WINDOW_LEVEL = 99910;
 
         /**
          * 系统弹窗的顶级层级
@@ -169,13 +179,13 @@ package es.core
          * 显示一个遮罩层
          * @param style
          */
-        static public function mask( style={} )
+        static public function mask( style:Object={} )
         {
             if( maskInstance === null )
             {
                 style.zIndex = MASK_LEVEL;
                 style = Object.merge({
-                    "backgroundColor":"#000",
+                    "backgroundColor":"#000000",
                     "opacity":0.7,
                     "width":"100%",
                     "height":"100%",
@@ -189,9 +199,7 @@ package es.core
                 elem.style( style );
                 container.addChild(elem);
                 win.addEventListener( Event.RESIZE ,function (e){
-                    var width = win.width();
                     var height = win.height();
-                    elem.width( width + Math.max(win.scrollWidth()-width, 0 ) );
                     elem.height( height + Math.max(win.scrollHeight()-height,0) );
                 });
                 win.dispatchEvent( Event.RESIZE );
@@ -216,6 +224,9 @@ package es.core
         {
             options =  Object.merge({"titleText":"提示","bodyContent":message}, options) as JSON;
             var popup:PopUp = instance;
+            if( popup ){
+                popup.action('close');
+            }
             if( options.skinClass instanceof Class )
             {
                 if( popup )
@@ -232,30 +243,37 @@ package es.core
                 PopUp.instance =popup;
             }
             var skin:Skin = popup.skin;
-            popup.callback = null;
-            popup.close('close');
-            popup.display();
-            if( options.callback != null )
+            skin.style('zIndex',TOP_LEVEL);
+            if( System.env.platform('IE') && System.env.version(8) )
             {
-                popup.callback = options.callback;
+                skin.style('position','absolute');
+            }
+
+            popup.display();
+            if( options.callback instanceof Function )
+            {
+                popup.callback =options.callback;
                 delete options.callback;
             }
 
-            var animation = options.animation || {};
+            var animation:JSON = (options.animation || {}) as JSON;
             var mask = options.mask;
             var maskStyle = options.maskStyle||{};
+            var position = options.position;
             delete options.maskStyle;
             delete options.mask;
             delete options.animation;
+            delete options.position;
             for( var p in options )if( p in skin )
             {
                 skin[ p ] = options[p];
             }
-            if(mask===true)PopUp.mask( maskStyle );
+            popup.position( position );
+            if(mask)PopUp.mask(maskStyle);
             if( animation.fadeOut != null ){
                 popup.fadeOut( animation.fadeOut , animation.delay );
             }else if( animation.fadeIn != null ){
-                popup.fadeIn( options.fadeIn , animation.delay );
+                popup.fadeIn( animation.fadeIn , animation.delay );
             }else if( animation.fadeInOut != null ){
                 popup.fadeInOut( animation.fadeInOut , animation.delay );
             }else{

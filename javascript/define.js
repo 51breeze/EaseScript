@@ -5,14 +5,6 @@
  */
 var modules={};
 var has = $Object.prototype.hasOwnProperty;
-var nsvalue={};
-var nslength = 1;
-function getValueOfNS( name )
-{
-    if( has.call(nsvalue,name) )return nsvalue[name];
-    return nsvalue[name] = '@ns:'+nslength++;
-}
-
 function getPackageName( name )
 {
     var index = name.lastIndexOf(".");
@@ -34,7 +26,6 @@ var fix = !$Array.prototype.map;
 function define(requires , callback )
 {
     var name = requires[0];
-    var context = getContext(name);
     requires = Array.prototype.map.call( requires , function (item)
     {
         if( System.hasOwnProperty( item ) )return System[item];
@@ -59,7 +50,7 @@ function define(requires , callback )
         return ref;
     });
     if(fix)requires = requires.slice(0);
-    return callback.apply({_private:Symbol(name)}, requires);
+    return callback.apply({_private:Symbol(name).valueOf()}, requires);
 }
 Internal.define = define;
 
@@ -69,7 +60,8 @@ Internal.define = define;
  * @param classModule
  * @returns {string}
  */
-function getFullname(classModule) {
+function getFullname(classModule)
+{
     return classModule.__T__.package ? classModule.__T__.package + '.' + classModule.__T__.classname : classModule.__T__.classname;
 }
 
@@ -82,9 +74,50 @@ System.getDefinitionByName = function getDefinitionByName(name) {
 
     var context = getContext(name);
     name = getClassName(name);
-    if( Object.prototype.hasOwnProperty.call(context,name) )return context[name];
-    if(Object.prototype.hasOwnProperty.call(System, name))return System[name];
+    if( has.call(context,name) )return context[name];
+    if( has.call(System, name))return System[name];
     throw new TypeError('"' + name + '" is not define');
+};
+
+var map=['System','Class','Interface','Namespace','Reflect','Object','JSON','Array','String','EventDispatcher','TypeError','Error','Symbol','Element'];
+
+/**
+ * 返回类的完全限定类名
+ * @param value 需要完全限定类名称的对象。
+ * 可以将任何类型、对象实例、原始类型和类对象
+ * @returns {string}
+ */
+System.getQualifiedClassName = function getQualifiedClassName( target )
+{
+    if( target == null )throw new ReferenceError( 'target is null or undefined' );
+    if( target===System )return 'System';
+    if( target===JSON )return 'JSON';
+    if( target===Reflect )return 'Reflect';
+    if( target instanceof Class )
+    {
+        return getFullname( target );
+    }
+    if( typeof target === "function" && target.prototype)
+    {
+        var con  = target.prototype.constructor;
+        if( con )
+        {
+            var str = con.toString();
+            if( str.indexOf('[native code]')>0 )
+            {
+                str = str.substr(0, str.indexOf('(') );
+                return str.substr(str.lastIndexOf(' ')+1);
+            }
+            for (var b in map)
+            {
+                var obj = System[ map[b] ];
+                if (con === obj) {
+                    return map[b];
+                }
+            }
+        }
+    }
+    throw new ReferenceError( 'target is not class' );
 };
 
 /**
@@ -93,39 +126,31 @@ System.getDefinitionByName = function getDefinitionByName(name) {
  * 可以将任何类型、对象实例、原始类型和类对象
  * @returns {string}
  */
-System.getQualifiedClassName = function getQualifiedClassName(value)
+System.getQualifiedObjectName = function getQualifiedObjectName( target )
 {
-    if( value==null )return 'Object';
-    if( value===System )return 'System';
-    if( value===JSON )return 'JSON';
-    if( value===Reflect )return 'Reflect';
-    if( value instanceof Class )return getFullname( value );
-    var type = typeof value;
-    if( type==='number' || type==='boolean')return System.ucfirst(type);
-    var str = (value.constructor || value).toString();
-    str = str.substr(0, str.indexOf('(') );
-    var name = str.substr(str.lastIndexOf(' ')+1);
-    if( name && !System[name] && !modules[name] )
+    if( target == null )
     {
-        throw new ReferenceError( '"'+name+'" type does not exist' );
+        throw new ReferenceError( 'target is null or undefined' );
+    }else if( typeof target !== "object" || target instanceof Class ){
+        throw new ReferenceError( 'target is not object' );
     }
-    return name;
+    if( target.constructor instanceof Class )return getFullname( target.constructor );
+    return System.getQualifiedClassName( Object.getPrototypeOf( target ).constructor );
 };
 /**
  * 获取指定实例对象的超类名称
  * @param value
  * @returns {string}
  */
-System.getQualifiedSuperclassName =function getQualifiedSuperclassName(value)
+System.getQualifiedSuperclassName =function getQualifiedSuperclassName(target)
 {
-    var classname = System.getQualifiedClassName(value);
-    if (classname)
+    if( target == null )throw new ReferenceError( 'target is null or undefined' );
+    if ( target instanceof Class )
     {
-        var classModule = System.getDefinitionByName(classname);
-        var parentModule = classModule.__T__["extends"];
-        if (parentModule)
+        var objClass = target.__T__["extends"] || Object;
+        if ( objClass )
         {
-            return parentModule.fullclassname;
+            return System.getQualifiedClassName( objClass );
         }
     }
     return null;

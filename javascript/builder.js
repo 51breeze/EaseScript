@@ -277,7 +277,7 @@ function builder(config , code, requirements , replacements )
     /**
      * 引用全局对象模块
      */
-    var requires = ['System','Class','Namespace','Interface','Iterator'].concat( globals.slice(0) );
+    var requires = ['System','Class','Namespace','Interface','Iterator','EventDispatcher'].concat( globals.slice(0) );
     if( requirements )
     {
         for ( var p in requirements )
@@ -343,8 +343,9 @@ function builder(config , code, requirements , replacements )
         //自定义模块域
         '(function(define,'+requires.join(',')+'){',
         code,
-        'var main=System.getDefinitionByName("'+config.main+'");',
-        'try{System.Reflect.construct(main);}catch(e){throw e.toString();}',
+        'try{\n\tnew EventDispatcher(document).addEventListener(Event.READY,function (e){',
+        '\t\tReflect.construct(System.getDefinitionByName("'+config.main+'"));\n\t});',
+        '}catch(e){\n\tthrow e.toString();\n}',
         '})(Internal.define,'+requires.map(function (a){
             a = mapname[a] || a;
             if(a==='System')return a;

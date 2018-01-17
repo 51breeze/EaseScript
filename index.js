@@ -786,7 +786,8 @@ const builder={
              if( script.error )throw script.error;
              script = script.code;
          }
-         filename = PATH.resolve(Utils.getBuildPath(config, 'build.js'), config.bootstrap + '.js');
+         filename = PATH.resolve( Utils.getBuildPath(config, 'build.js'), config.bootstrap.toLowerCase().replace(/\./g,'/') + '.js');
+         Utils.mkdir( PATH.dirname( filename ) );
          fs.writeFileSync(filename, script );
      },
 
@@ -966,7 +967,8 @@ function getConfigure(config)
         config = JSON.parse( Utils.getContents(makefile) );
     }
 
-    var bootstrap_file = PATH.resolve( config.project.path , config.bootstrap+config.suffix );
+    var bootstrap_file = PATH.resolve( config.project.path , config.bootstrap.replace(/\./g,"/")+config.suffix );
+    Utils.mkdir( PATH.dirname( bootstrap_file ) );
     if( !Utils.isFileExists(bootstrap_file) )
     {
         var defaultFile = [

@@ -1,7 +1,7 @@
 define(["es.core.State"],function(State){
 var _private=this._private;
-var proto={"constructor":{"value":State},"q10__name":{"writable":true,"value":''}
-,"q10__stateGroup":{"writable":true,"value":new Array()}
+var proto={"constructor":{"value":State},"S10__name":{"writable":true,"value":''}
+,"S10__stateGroup":{"writable":true,"value":new Array()}
 ,"Get__name":{"value":function name(){
 	return this[_private]._name;
 }},"Set__name":{"value":function name(value){
@@ -23,13 +23,10 @@ Object.defineProperty(State,"constructor",{"value":function constructor(name){
 State.constructor.prototype=Object.create( Object.prototype , proto);
 Object.defineProperty(State,"prototype",{value:State.constructor.prototype});
 Object.defineProperty(State,"__T__",{value:{
-	"ns":"_",
-	"extends":null,
 	"package":"es.core",
 	"classname":"State",
-	"implements":[],
 	"_private":_private,
-	"uri":["q10_","F29_","G21_","_"],
+	"uri":["S10_","a29_","u21_","_"],
 	"proto":proto
 }});
 return State;

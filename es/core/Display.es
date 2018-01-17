@@ -25,6 +25,7 @@ package es.core
         {
             if( element==null || element.length != 1 )
             {
+                log( System.getQualifiedObjectName(this) );
                 throw new TypeError("The selector elements can only is a single element");
             }
             if( !Element.isNodeElement( element[0] ) )
@@ -45,12 +46,17 @@ package es.core
         }
 
         /**
+         * @private
+         */
+        private var _width:Number=NaN;
+
+        /**
          * 设置显示对象的宽度
          * @returns {Number}
          */
         public function get width():Number
         {
-            return _element.width();
+            return isNaN(_width) ? _element.width() : _width;
         }
 
         /**
@@ -59,8 +65,14 @@ package es.core
          */
         public function set width(value:Number):void
         {
+            _width = value;
             _element.width(value);
         }
+
+        /**
+         * @private
+         */
+        private var _height:Number=NaN;
 
         /**
          * 设置显示对象的高度
@@ -68,7 +80,7 @@ package es.core
          */
         public function get height():Number
         {
-            return _element.height();
+            return isNaN(_height) ? _element.height() : _height;
         }
 
         /**
@@ -77,6 +89,7 @@ package es.core
          */
         public function set height(value:Number):void
         {
+            _height = value;
             _element.height(value);
         }
 

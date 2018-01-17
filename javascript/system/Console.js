@@ -18,7 +18,7 @@ function toString(items)
     var str=[];
     for(var i=0; i<items.length; i++)
     {
-      str.push(  items[i] !=null && typeof items[i] === "object" ? items[i].valueOf() : items[i] );
+       str.push(  items[i] !=null && typeof items[i] === "object" && items[i].valueOf ? items[i].valueOf() : items[i] );
     }
     return str;
 }

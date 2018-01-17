@@ -102,7 +102,7 @@ Object.defineProperty(EventDispatcher.prototype,"addEventListener", {value:funct
  * @param listener
  * @returns {boolean}
  */
-Object.defineProperty(EventDispatcher.prototype,"removeEventListener", {value:function(type,listener)
+Object.defineProperty(EventDispatcher.prototype,"removeEventListener", {value:function removeEventListener(type,listener)
 {
     var target = storage(this,'target') || this;
     if( System.is(target,EventDispatcher) && target !== this )
@@ -122,7 +122,7 @@ Object.defineProperty(EventDispatcher.prototype,"removeEventListener", {value:fu
  * @param event
  * @returns {boolean}
  */
-Object.defineProperty(EventDispatcher.prototype,"dispatchEvent", {value:function( event )
+Object.defineProperty(EventDispatcher.prototype,"dispatchEvent", {value:function dispatchEvent( event )
 {
     if( typeof event === "string" )event = new System.Event( event );
     if( !System.is(event,Event) )throw new TypeError('Invalid event');

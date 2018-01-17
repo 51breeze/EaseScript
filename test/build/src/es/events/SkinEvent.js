@@ -23,13 +23,11 @@ Object.defineProperty(SkinEvent,"constructor",{"value":function constructor(type
 SkinEvent.constructor.prototype=Object.create( Event.prototype , proto);
 Object.defineProperty(SkinEvent,"prototype",{value:SkinEvent.constructor.prototype});
 Object.defineProperty(SkinEvent,"__T__",{value:{
-	"ns":"_",
 	"extends":Event,
 	"package":"es.events",
 	"classname":"SkinEvent",
-	"implements":[],
 	"_private":_private,
-	"uri":["O27_","F28_","I20_","_"],
+	"uri":["e27_","g28_","i20_","_"],
 	"method":method,
 	"proto":proto
 }});

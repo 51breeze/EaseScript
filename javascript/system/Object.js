@@ -28,8 +28,9 @@ if( !Object.defineProperty || ( System.env.platform('IE') && System.env.version(
 {
     Object.defineProperty = function defineProperty(obj, prop, desc)
     {
-        if( obj == null)throw new TypeError('target is non-object');
-        if( !desc.value )throw new TypeError('description invalid');
+        if( obj == null){
+            throw new TypeError('target is non-object');
+        }
         return obj[prop] = desc.value;
     }
 }

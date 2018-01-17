@@ -1,7 +1,7 @@
 define(["es.components.Component","es.events.ComponentEvent"],function(Component,ComponentEvent){
 var _private=this._private;
-var proto={"constructor":{"value":Component},"h5___initialized__":{"writable":true,"value":false}
-,"h2_initialized":{"value":function initialized(){
+var proto={"constructor":{"value":Component},"S5___initialized__":{"writable":true,"value":false}
+,"x2_initialized":{"value":function initialized(){
 	var val=this[_private].__initialized__;
 	if(val===false){
 		this[_private].__initialized__=true;
@@ -11,8 +11,8 @@ var proto={"constructor":{"value":Component},"h5___initialized__":{"writable":tr
 	}
 	return val;
 }}
-,"h5___initializing__":{"writable":true,"value":true}
-,"h2_initializing":{"value":function initializing(){
+,"S5___initializing__":{"writable":true,"value":true}
+,"x2_initializing":{"value":function initializing(){
 	var val=this[_private].__initializing__;
 	if(val===true){
 		this[_private].__initializing__=false;
@@ -30,13 +30,11 @@ Object.defineProperty(Component,"constructor",{"value":function constructor(){
 Component.constructor.prototype=Object.create( EventDispatcher.prototype , proto);
 Object.defineProperty(Component,"prototype",{value:Component.constructor.prototype});
 Object.defineProperty(Component,"__T__",{value:{
-	"ns":"_",
 	"extends":EventDispatcher,
 	"package":"es.components",
 	"classname":"Component",
-	"implements":[],
 	"_private":_private,
-	"uri":["h5_","h2_","P17_","_"],
+	"uri":["S5_","x2_","J17_","_"],
 	"proto":proto
 }});
 return Component;

@@ -52,6 +52,7 @@ factor.prototype = Symbol.prototype;
 Symbol.prototype.toString=function toString()
 {
     return this[SYMBOL_KEY_VALUE];
+    //throw new TypeError ("can't convert symbol to string");
 };
 
 /**
@@ -60,7 +61,7 @@ Symbol.prototype.toString=function toString()
  */
 Symbol.prototype.valueOf=function valueOf()
 {
-    throw new TypeError ("can't convert symbol to string");
+    return this[SYMBOL_KEY_VALUE];
 };
 
 /**

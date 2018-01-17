@@ -257,10 +257,7 @@ DataSource.prototype.grep=function grep()
  */
 DataSource.prototype.filter=function filter( condition )
 {
-    if( typeof condition === "string" )
-    {
-        this.grep().filter( condition );
-    }
+    this.grep().filter( condition );
     return this;
 };
 

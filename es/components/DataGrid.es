@@ -52,7 +52,7 @@ package es.components
          * @param source
          * @returns {void}
          */
-        public function set source( data:Object ):void
+        public function set source( data:* ):void
         {
             this.dataSource.source( data );
         };

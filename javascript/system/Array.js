@@ -14,20 +14,16 @@ function Array(length)
         return obj;
     }
     Object.defineProperty(this,"length", {value:0, writable:true});
+    $Array.call(this);
     if( arguments.length > 0 )
     {
         if( typeof length === 'number' && arguments.length===1 )
         {
-            $Array.call(this, length );
+            this.length = length;
         }else
         {
-            $Array.call(this);
             Array.prototype.splice.apply(this, [0,0].concat( Array.prototype.slice.call(arguments,0) ) );
         }
-
-    }else
-    {
-        $Array.call(this);
     }
     return this;
 };
