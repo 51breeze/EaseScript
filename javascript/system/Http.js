@@ -184,7 +184,7 @@ Http.METHOD_DELETE='DELETE';
  * @type {Object|Function}
  */
 Http.prototype = Object.create( EventDispatcher.prototype );
-Object.defineProperty(Http.prototype,"constructor", {value:Http});
+Http.prototype.constructor=Http;
 
 /**
  * 取消请求
@@ -374,7 +374,7 @@ function ScriptRequest( async )
 }
 
 ScriptRequest.prototype = Object.create(EventDispatcher.prototype);
-Object.defineProperty(ScriptRequest.prototype,"constructor", {value:ScriptRequest});
+ScriptRequest.prototype.constructor=ScriptRequest;
 ScriptRequest.prototype.__key__ = null;
 ScriptRequest.prototype.__target__ = null;
 ScriptRequest.prototype.__async__ = null;

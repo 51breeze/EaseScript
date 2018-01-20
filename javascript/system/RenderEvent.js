@@ -15,7 +15,7 @@ RenderEvent.prototype= Object.create(Event.prototype);
 RenderEvent.prototype.view=null;
 RenderEvent.prototype.variable=null;
 RenderEvent.prototype.html='';
-Object.defineProperty(RenderEvent.prototype,"constructor", {value:RenderEvent});
+RenderEvent.prototype.constructor=RenderEvent;
 RenderEvent.START='templateStart';
 RenderEvent.DONE='templateDone';
 System.RenderEvent=RenderEvent;

@@ -125,7 +125,7 @@ var storage=Internal.createSymbolStorage( Symbol('element') );
 function access(callback, name, newValue)
 {
     var write= typeof newValue !== 'undefined';
-    if( !write && this.length < 1 )return null;
+    if( this.length < 1 )return null;
     var getter = accessor[callback].get;
     var setter = accessor[callback].set;
     if( fix.fnHooks[callback] )
@@ -133,24 +133,27 @@ function access(callback, name, newValue)
         getter = typeof fix.fnHooks[callback].get === "function" ? fix.fnHooks[callback].get : getter ;
         setter = typeof fix.fnHooks[callback].set === "function" ? fix.fnHooks[callback].set : setter ;
     }
-    if( !write )return getter.call( Element.prototype.current.call(this),name,this);
-    return Element.prototype.forEach.call(this,function(elem)
+    if( !write )return getter.call(this.current(),name,this);
+    return this.forEach(function(elem)
     {
         var oldValue= getter.call(elem,name,this);
         if( oldValue !== newValue )
         {
             var event = setter.call(elem,name,newValue,this);
-            if( typeof event === "string" )
+            if( event )
             {
-                event = event===StyleEvent.CHANGE ?  new StyleEvent( StyleEvent.CHANGE ) :  new PropertyEvent( PropertyEvent.CHANGE );
-                event.property = name;
-            }
-            if( event instanceof PropertyEvent )
-            {
-                event.property = event.property || name;
-                event.newValue = event.newValue || newValue;
-                event.oldValue = event.oldValue || oldValue;
-                EventDispatcher.prototype.dispatchEvent.call(this, event);
+                if (typeof event === "string")
+                {
+                    event = event === StyleEvent.CHANGE ? new StyleEvent(StyleEvent.CHANGE) : new PropertyEvent(PropertyEvent.CHANGE);
+                    event.property = name;
+                }
+                if (event instanceof PropertyEvent)
+                {
+                    event.property = event.property || name;
+                    event.newValue = event.newValue || newValue;
+                    event.oldValue = event.oldValue || oldValue;
+                    this.dispatchEvent(event);
+                }
             }
         }
     });
@@ -159,23 +162,19 @@ function access(callback, name, newValue)
 /**
  * @private
  */
-function $getChildNodes(elem, selector, flag)
+function getChildNodes(elem)
 {
-    var ret=[],isfn=System.isFunction(selector);
-    if( elem.hasChildNodes() )
+    var ret=[];
+    if( !Element.isFrame(elem) && elem.hasChildNodes() )
     {
         var len=elem.childNodes.length,index= 0,node;
         while( index < len )
         {
             node=elem.childNodes.item(index);
-            if( ( isfn && selector.call(this,node,index) ) || ( !isfn && (selector==='*' || node) ) )
+            if( Element.getNodeName(node) !== "#text" )
             {
-                if( Element.getNodeName(node)!=="#text")
-                {
-                    ret.push(node);
-                }
+                ret.push(node);
             }
-            if( flag===true && ret.length >0 )break;
             ++index;
         }
     }
@@ -184,50 +183,64 @@ function $getChildNodes(elem, selector, flag)
 /**
  * @private
  */
-function $dispatchEvent(thisArg, type, parent, child, result )
+function dispatchEvent(dispatch, type, parent, child, result )
 {
-    var event=new ElementEvent( type );
-    event.parent=parent;
-    event.child=child;
-    event.result=!!result;
-    return EventDispatcher.prototype.dispatchEvent.call(thisArg, event );
+    if( dispatch.hasEventListener(type) )
+    {
+        var event = new ElementEvent(type);
+        event.parent = parent;
+        event.child = child;
+        event.result = !!result;
+        return dispatch.dispatchEvent(event);
+    }
+    return true;
 }
 
 /**
  *  @private
  */
-function $doMake( elems )
+function recursion(prop, selector, deep, exclude)
 {
-    var r = storage(this,'reverts');
-    r.push( Array.prototype.splice.apply(this, [0,this.length].concat(elems) ) );
-    Element.prototype.current.call(this,null);
-    return this;
-}
-
-/**
- *  @private
- */
-function $doRecursion(propName, strainer, deep )
-{
-    var currentItem,ret=[];
-    var s = typeof strainer === "string" ? function(){return querySelector(strainer, null , null, [this]).length > 0 } :
-        typeof strainer === "undefined" ? function(){return this.nodeType===1} : strainer ;
-    Element.prototype.forEach.call(this,function(elem)
+    var results = new Array();
+    var current;
+    var nodename = '';
+    var last;
+    this.forEach(function(elem)
     {
         if( elem && elem.nodeType )
         {
-            currentItem=elem;
+            current = elem;
             do{
-                currentItem = currentItem[propName];
-                if( currentItem && s.call(currentItem) )
+                last = current;
+                current = current[prop];
+                if( exclude && (elem === exclude || current===exclude) )return;
+                if( current && ( nodename = Element.getNodeName(current) ) !== "#text" && results.indexOf( current ) < 0 )
                 {
-                    ret = ret.concat( currentItem );
-                    if( !deep )return false;
+                    results.push( current );
                 }
-            } while ( currentItem )
+            } while ( current && last !== current && ( deep===true || nodename === "#text" ) );
         }
     });
-    return ret;
+    return selector ?
+        ( typeof selector === "function" ?
+            Array.prototype.filter.call(results,function(elem){
+                this.current(elem);
+                return selector.call(this,elem);
+            },this)
+           : querySelector(selector,null,null,results) )
+        : results;
+}
+
+/**
+ * @private
+ * @param instance
+ * @param results
+ * @returns {*}
+ */
+function makeElement( instance, results , index )
+{
+    Array.prototype.splice.apply( instance, [].concat.apply([index||0,0],results) );
+    return instance;
 }
 
 /**
@@ -235,7 +248,7 @@ function $doRecursion(propName, strainer, deep )
  * @param name
  * @returns {string}
  */
-function $getStyleName(name )
+function getStyleName(name )
 {
     if( typeof name !=='string' )
         return name;
@@ -312,7 +325,7 @@ var singleTagRegex=/^<(\w+)(.*?)\/\s*>$/;
  * @param html 一个html字符串
  * @returns {Node}
  */
-function $createElement(html , flag )
+function createElement(html , flag )
 {
     if(System.isString(html) )
     {
@@ -335,7 +348,7 @@ function $createElement(html , flag )
             } else if (html.charAt(0) === "<" && ( match = singleTagRegex.exec(html) ))
             {
                 var elem = document.createElement(match[1]);
-                var attr = $matchAttr(html);
+                var attr = matchAttr(html);
                 for (var prop in attr) {
                     accessor['property'].set.call( elem, prop, attr[prop]);
                 }
@@ -393,18 +406,19 @@ function $createElement(html , flag )
         }
 
     }else if (Element.isNodeElement(html) )
-        return  html.parentNode ?$cloneNode(html,true) : html;
+        return  html.parentNode ?cloneNode(html,true) : html;
     throw new Error('createElement param invalid')
 }
 var getAttrExp = /(\w+)(\s*=\s*([\"\'])([^\3]*?)[^\\]\3)?/g;
 var lrQuoteExp = /^[\'\"]|[\'\"]$/g;
 
 /**
+ * @private
  * 匹配字符串中的属性
  * @param strAttr
  * @return {}
  */
-function $matchAttr(strAttr)
+function matchAttr(strAttr)
 {
     if( typeof strAttr === "string" && /[\S]*/.test(strAttr) )
     {
@@ -434,16 +448,17 @@ function $matchAttr(strAttr)
 }
 
 /**
+ * @private
  * 合并元素属性。
- * 将 refTarget 对象的属性合并到 target 元素
+ * 将 oSource 对象的属性合并到 target 元素
  * @param target 目标对象
  * @param oSource 引用对象
  * @returns {*}
  */
-function $mergeAttributes(target, oSource)
+function mergeAttributes(target, oSource)
 {
     var iselem=Element.isNodeElement( target );
-    if( System.isObject(oSource,true) )
+    if( System.isObject(oSource) )
     {
         for (var key in oSource)if (oSource[key] && oSource[key] != '')
         {
@@ -465,26 +480,37 @@ function $mergeAttributes(target, oSource)
     return target;
 }
 
-//判断元素是否有样式
-function $hasStyle( elem )
+/**
+ * @private
+ * 判断元素是否有样式
+ * @param elem
+ * @returns {boolean}
+ */
+function hasStyle(elem )
 {
-    return elem && elem.nodeType && elem.style && !(elem.nodeType === 3 || elem.nodeType === 8);
+    return elem && elem.nodeType && elem.style && !(elem.nodeType === 3 || elem.nodeType === 8 || elem.nodeType === 9 || elem.nodeType === 11);
 }
 
-//获取元素当前的样式
+/**
+ * @private
+ * 获取元素当前的样式
+ * @param elem
+ * @returns {Object}
+ */
 function getComputedStyle(elem)
 {
-    if( !$hasStyle(elem) )return {};
+    if( !hasStyle(elem) )return {};
     return document.defaultView && document.defaultView.getComputedStyle ? document.defaultView.getComputedStyle(elem, null)
         : elem.currentStyle || elem.style;
 }
 
 /**
+ * @private
  * 克隆节点元素
  * @param nodeElement
  * @returns {Node}
  */
-function $cloneNode(nodeElement , deep )
+function cloneNode(nodeElement , deep )
 {
     if( nodeElement.cloneNode )
     {
@@ -494,10 +520,21 @@ function $cloneNode(nodeElement , deep )
     if( typeof nodeElement.nodeName==='string' )
     {
         var node = document.createElement( nodeElement.nodeName  );
-        if( node )$mergeAttributes(node,nodeElement);
+        if( node )mergeAttributes(node,nodeElement);
         return node;
     }
     return null;
+}
+
+/**
+ * @private
+ * @param results
+ * @returns {Array}
+ */
+function filters(results) {
+     return Array.prototype.filter.call(results, function (elem) {
+        return Element.isNodeElement(elem) || Element.isWindow(elem);
+    });
 }
 
 /**
@@ -509,56 +546,100 @@ function $cloneNode(nodeElement , deep )
  */
 function Element(selector, context)
 {
-    if( !System.instanceOf(this,Element) )
+    if( !(this instanceof Element) )
     {
         return new Element( selector, context );
     }
-
-    if( context )
-    {
-        context=System.instanceOf(context,Element) ? context[0] : context;
-    }
-
+    if( context )context= context instanceof Element ? context[0] : context;
     storage(this,true,{
         'context':context,
         'forEachCurrentItem':null,
-        'forEachCurrentIndex':NaN,
-        'reverts':[]
+        'forEachCurrentIndex':NaN
     });
-
-    var result=[];
+    var result=null;
     if( selector )
     {
-        if (System.isArray(selector))
+        //复制Element的结果到当前对象
+         if( selector instanceof Element )
         {
-            result = Array.prototype.filter.call(selector, function (elem) {
-                return Element.isNodeElement(elem) || Element.isWindow(elem);
-            });
-
-        } else if ( System.instanceOf(selector,Element) )
+            result = Array.prototype.slice.call(selector,0);
+        }
+        //指定的选择器是一组元素
+        else if ( System.isArray(selector) )
         {
-            result = Element.prototype.slice.call( selector, 0);
-
-        } else if (typeof selector === "string")
+            result = filters( selector );
+        }
+        //是一个选择器或者指定一个需要创建的html标签
+        else if (typeof selector === "string")
         {
-            result = selector.charAt(0) === '<' && selector.charAt(selector.length - 1) === '>' ? $createElement(selector) : querySelector(selector, context);
-        } else if ( Element.isNodeElement(selector) || Element.isWindow(selector) )
+            //创建一个指定标签的新元素
+            if( selector.charAt(0) === '<' && selector.charAt(selector.length - 1) === '>' )
+            {
+                result=[createElement(selector)];
+            }
+            //查询指定选择器的元素
+            else
+            {
+                result = querySelector(selector, context);
+            }
+        }
+        //指定的选择器为元素对象
+        else if ( Element.isNodeElement(selector) || Element.isWindow(selector) )
         {
-            result = selector;
+            result = [selector];
         }
     }
     Object.defineProperty(this,"length", {value:0,writable:true});
-    Array.prototype.splice.apply(this,[0,0].concat(result) );
+    if( result )makeElement( this, result);
     EventDispatcher.call(this);
 }
 
 Element.prototype= Object.create( EventDispatcher.prototype );
-Object.defineProperty(Element,"querySelector", {value:querySelector});
-Object.defineProperty(Element.prototype,"constructor", {value:Element});
+Element.prototype.constructor=Element;
 
-Element.prototype.slice  = Array.prototype.slice;
-Element.prototype.splice = Array.prototype.splice;
-Element.prototype.concat = Array.prototype.concat;
+/**
+ * 返回一个指定开始索引到结束索引的元素并返回新的Element集合
+ */
+Element.prototype.slice = Array.prototype.slice;
+
+/**
+ * 替换或者增加一个或者多个元素并返回新的Element集合
+ */
+Element.prototype.splice= function splice(start,deleteLenght)
+{
+    var results = Element.prototype.concat.apply([],Element.prototype.slice.call(arguments,2) );
+    var items = Array.prototype.splice.call( this, start, deleteLenght);
+    Array.prototype.splice.apply( this, Array.prototype.concat.apply( [0,this.length],  this.concat( results ) ) );
+    return items;
+}
+
+/**
+ * 合并一个或者多个元素并返回一个新的Element集合
+ */
+Element.prototype.concat = function concat()
+{
+    var results = this.slice(0);
+    var index = 0;
+    while ( arguments.length > index )
+    {
+        var items = [];
+        if( arguments[index] instanceof Element )
+        {
+            items = arguments[index].slice(0);
+        }
+        else
+        {
+            items = filters( System.isArray(arguments[index]) ? arguments[index] : [ arguments[index] ] );
+        }
+        results = Array.prototype.concat.apply( results,items);
+        index++;
+    }
+    return Array.prototype.unique.call(results);
+}
+
+/**
+ * 搜索一个指定的元素在当前匹配的集合中的位置
+ */
 Element.prototype.indexOf= Array.prototype.indexOf;
 
 /**
@@ -567,17 +648,17 @@ Element.prototype.indexOf= Array.prototype.indexOf;
  * @param object refObject
  * @returns {*}
  */
-Element.prototype.forEach=function forEach(callback , refObject )
+Element.prototype.forEach=function forEach(callback , refObject)
 {
-    var result;
+    var result=null;
     refObject=refObject || this;
     var current = storage(this,'forEachCurrentItem');
-    if( current  )
+    if( current )
     {
         result=callback.call( refObject ,current, storage(this,'forEachCurrentIndex') );
     }else
     {
-        var items=Element.prototype.slice.call(this,0),
+        var items=this.slice(0),
             index = 0,
             len=items.length;
         for( ; index < len ; index++ )
@@ -585,14 +666,13 @@ Element.prototype.forEach=function forEach(callback , refObject )
             current = items[ index ];
             storage(this,'forEachCurrentItem',current);
             storage(this,'forEachCurrentIndex',index);
-            result=callback.call( refObject ,current,index);
-            if( result !== undefined )
-                break;
+            result=callback.call(refObject ,current,index);
+            if( result != null )break;
         }
         storage(this,'forEachCurrentItem',null);
         storage(this,'forEachCurrentIndex',NaN);
     }
-    return typeof result === 'undefined' ? this : result;
+    return result == null ? this : result;
 };
 
 /**
@@ -604,22 +684,17 @@ Element.prototype.forEach=function forEach(callback , refObject )
  */
 Element.prototype.current=function current( elem )
 {
-    if( elem == null )return storage(this,'forEachCurrentItem') || this[0];
-    if( typeof elem=== "string" )
+    if( typeof elem === "undefined" )return storage(this,'forEachCurrentItem') || this[0];
+    if( elem )
     {
-        elem=querySelector(elem, this.context || document );
-        elem = elem && elem.length > 0 ? elem[0] : null;
-        storage(this,'forEachCurrentItem',elem);
-        storage(this,'forEachCurrentIndex',NaN);
-    }else if( Element.isNodeElement(elem) || Element.isWindow(elem) )
-    {
-        storage(this,'forEachCurrentItem',elem);
-        storage(this,'forEachCurrentIndex',NaN);
-    }else
-    {
-        storage(this,'forEachCurrentItem',null);
-        storage(this,'forEachCurrentIndex',NaN);
+        if (typeof elem === "string") {
+            elem = querySelector(elem, this.context || document);
+            elem = elem && elem.length > 0 ? elem[0] : null;
+        }
+        elem = elem && ( Element.isNodeElement(elem) || Element.isWindow(elem) ) ? elem : null;
     }
+    storage(this, 'forEachCurrentIndex', NaN);
+    storage(this, 'forEachCurrentItem', elem);
     return this;
 };
 
@@ -650,34 +725,12 @@ accessor['property']={
  * @param value
  * @returns {Element}
  */
-Element.prototype.property=function property(name, value )
+Element.prototype.property=function property(name,value)
 {
-    if( name+"" === "[object Object]")
+    if( System.isObject(name) )
     {
-        for(var i in name )
-        {
-            this.property(i,name[i]);
-        }
+        for(var i in name )access.call(this,'property',i,name[i]);
         return this;
-    }
-
-    name =  fix.attrMap[name] || name;
-    var lower=name.toLowerCase();
-    if( lower==='innerhtml' || lower==='html' )
-    {
-        return Element.prototype.html.call(this,value);
-
-    }else if( lower==='value' || lower==='text' )
-    {
-        return Element.prototype[lower].call(this,value);
-
-    }else if( lower === 'classname' && typeof value === "string" )
-    {
-        Element.prototype.addClass.call(this,value);
-
-    }else if( lower === 'style' )
-    {
-        throw new Error( 'the style property names only use style method to operate in property' );
     }
     return access.call(this,'property',name,value);
 };
@@ -689,7 +742,7 @@ Element.prototype.property=function property(name, value )
  */
 Element.prototype.hasProperty=function hasProperty(prop)
 {
-    var elem = Element.prototype.current.call(this);
+    var elem = this.current();
     if( !elem )return false;
     if( fix.attrtrue[prop] === true )
     {
@@ -699,29 +752,30 @@ Element.prototype.hasProperty=function hasProperty(prop)
 };
 
 /**
- * 获取设置数据对象,支持带'.'操作
+ * 获取设置数据对象
  * @param name
  * @param value
  * @returns {*}
  */
-Element.prototype.data=function data(name, value )
+Element.prototype.data=function data(name, value)
 {
     var type =  typeof name;
     var write = typeof value !== "undefined";
     var data;
-    return Element.prototype.forEach.call(this,function(target)
+    return this.forEach(function(elem)
     {
         if( type === "object" )
         {
-            storage(target,'data',name);
+            storage(elem,'data',name);
 
         }else if( type === 'string' && write )
         {
-            data = storage(target,'data') || storage(target,'data',{});
+            data = storage(elem,'data') || storage(elem,'data',{});
             data[ name ]=value;
+
         }else
         {
-            data = storage(target,'data');
+            data = storage(elem,'data');
             return type === 'string' && data ? data[name] : data || null;
         }
     });
@@ -735,9 +789,9 @@ var rgbToHex = function(value)
       {
           return [
               '#',
-              ("0" + System.Number(ret[1] >> 0).toString(16) ).slice(-2),
-              ("0" + System.Number(ret[2] >> 0).toString(16) ).slice(-2),
-              ("0" + System.Number(ret[3] >> 0).toString(16) ).slice(-2),
+              ("0" + Number(ret[1] >> 0).toString(16) ).slice(-2),
+              ("0" + Number(ret[2] >> 0).toString(16) ).slice(-2),
+              ("0" + Number(ret[3] >> 0).toString(16) ).slice(-2),
           ].join('');
       }
       return value;
@@ -790,12 +844,12 @@ accessor['style']= {
                     fix.cssHooks[name].set.call(elem, obj, value);
                     return System.serialize(obj, 'style');
                 }
-                return $getStyleName(name) + ':' + value;
+                return getStyleName(name) + ':' + value;
             });
         }
 
         try {
-            var orgname = $getStyleName(name);
+            var orgname = getStyleName(name);
             if ( !fix.cssHooks[name] || typeof fix.cssHooks[name].set !== "function"
                 || !fix.cssHooks[name].set.call(this, this.style, value, orgname) )
             {
@@ -812,7 +866,7 @@ accessor['style']= {
  * @param value
  * @returns {Element}
  */
-Element.prototype.style=function style(name, value )
+Element.prototype.style=function style(name, value)
 {
     if( typeof name === 'string' && name.indexOf(':')>0 )
     {
@@ -821,7 +875,7 @@ Element.prototype.style=function style(name, value )
     }
     else if( System.isObject(name) )
     {
-        value=System.serialize( name,'style');
+        value=System.serialize(name,'style');
         name='cssText';
     }
     return access.call(this,'style',name,value);
@@ -833,7 +887,7 @@ Element.prototype.style=function style(name, value )
  */
 Element.prototype.show=function show()
 {
-    return this.style('display', '' );
+    return this.style('display','');
 };
 
 /**
@@ -855,7 +909,6 @@ accessor['text']= {
         return PropertyEvent.CHANGE;
     }
 };
-
 
 /**
  * 获取设置当前元素的文本内容。
@@ -886,7 +939,6 @@ Element.prototype.value=function value( val )
     return access.call(this,'value','value',val);
 };
 
-
 /**
  * 判断是否有指定的类名
  * @param className
@@ -898,11 +950,9 @@ Element.prototype.hasClass=function hasClass( className )
     {
         throw new Error("className is not String");
     }
-    var elem = this.current();
-    if( !elem )return false;
-    var value= System.trim( elem['className'] );
+    var value=this.property("class");
     if( !value ) return false;
-    return new RegExp('(\\s|^)' + className + '(\\s|$)').test( value );
+    return new RegExp('(\\s|^)' + className + '(\\s|$)').test(  System.trim(value) );
 };
 
 /**
@@ -910,27 +960,28 @@ Element.prototype.hasClass=function hasClass( className )
  * @param className
  * @returns {Element}
  */
-Element.prototype.addClass=function addClass( className )
+Element.prototype.addClass=function addClass( className , replace )
 {
     if( typeof className !== "string" )throw new Error('className is not String');
     className = System.trim( className );
-    var exp = new RegExp('(\\s|^)' + className + '(\\s|$)');
+    var exp = replace===true ? null : new RegExp('(\\s|^)' + className + '(\\s|$)');
     this.forEach(function(elem){
-        var old = System.trim( elem['className'] );
-        if( !exp.test( old ) )
-        {
-            var oldClass=[ old ];
-            oldClass.push( className );
-            var newValue = System.trim( oldClass.join(' ') );
+        if( !hasStyle(elem) )return;
+        var old = System.trim( this.property("class") || '' );
+        if (!( old && exp && exp.test(old) )) {
+            var oldClass = [old];
+            var newValue = className;
+            if (replace !== true) {
+                oldClass.push(className);
+                newValue = oldClass.join(' ');
+            }
             elem['className'] = newValue;
-            if( this.hasEventListener( StyleEvent.CHANGE) )
-            {
-                var event = new StyleEvent( StyleEvent.CHANGE );
+            if (this.hasEventListener(StyleEvent.CHANGE)) {
+                var event = new StyleEvent(StyleEvent.CHANGE);
                 event.property = 'class';
                 event.newValue = newValue;
                 event.oldValue = old;
-                if( !this.dispatchEvent( event ) )
-                {
+                if (!this.dispatchEvent(event)) {
                     elem['className'] = old;
                 }
             }
@@ -947,31 +998,13 @@ Element.prototype.addClass=function addClass( className )
  */
 Element.prototype.removeClass=function removeClass( className )
 {
-    var all = typeof className !== 'string';
-    return Element.prototype.forEach.call(this,function(elem){
-        var newValue='';
-        var old=elem['className'] || '';
-        if( !all )
-        {
-            var reg = new RegExp('(\\s|^)' + className + '(\\s|$)');
-            newValue=old.replace(reg, '');
-        }
-        newValue === '' ? elem.removeAttribute('class') : elem['className'] = System.trim(newValue);
-        try {
-            if( this.hasEventListener.call(StyleEvent.CHANGE) )
-            {
-                var event = new StyleEvent( StyleEvent.CHANGE );
-                event.property = 'class';
-                event.newValue = newValue;
-                event.oldValue = old;
-                if( !this.dispatchEvent( event ) )
-                {
-                    elem['className'] = old;
-                }
-            }
-            elem.offsetWidth = elem.offsetWidth;
-        }catch(e){}
-    })
+    var all = !className || typeof className !== 'string';
+    return this.forEach(function(elem){
+        if(!hasStyle(elem))return;
+        var old = elem['className']||'';
+        var newValue = !all && old ? old.replace( new RegExp('(\\s|^)' + className + '(\\s|$)'), '') : '';
+        this.addClass(newValue,true);
+    });
 };
 
 /**
@@ -1234,36 +1267,35 @@ Element.prototype.globalToLocal=function globalToLocal(left, top )
 //============================================元素选择===================================
 
 /**
- * 回撒到指定步骤的选择器所匹配的元素,不包含初始化的步骤。
- * @param step
- * @returns {Element}
- */
-Element.prototype.revert=function revert(step)
-{
-    var reverts = storage(this,'reverts');
-    if( reverts && reverts.length > 0 )
-    {
-        var len=reverts.length;
-        step = step || -1;
-        step= step < 0 ? step+len : step;
-        step=step >= len ? 0 : step;
-        this.splice.call(0,this.length, reverts.splice(step, len-step).shift() );
-    }
-    return this;
-};
-
-/**
  * 查找当前匹配的第一个元素下的指定选择器的元素
  * @param selector
  * @returns {Element}
  */
-Element.prototype.find=function find(selector)
+Element.prototype.find=function find( selector )
 {
-    var ret=[];
-    this.forEach(function(elem){
-        ret = ret.concat.apply(ret,querySelector(selector, elem ) );
-    });
-    return $doMake.call( this, ret );
+    if( selector == null )
+    {
+        throw new TypeError("selector is null or is undefined");
+    }
+    var resutls = [];
+    if( typeof selector === "function" )
+    {
+        resutls= Array.prototype.filter.call( this.slice(0), function(elem){
+            this.current(elem);
+            return selector.call(this,elem);
+        },this);
+
+    }else
+    {
+        this.forEach(function (elem) {
+            if (elem === selector) {
+                resutls = [elem];
+                return elem;
+            }
+            resutls = [].concat.apply(resutls, querySelector(selector, elem));
+        });
+    }
+    return makeElement( new Element() , resutls );
 };
 
 /**
@@ -1273,7 +1305,7 @@ Element.prototype.find=function find(selector)
  */
 Element.prototype.parent=function parent( selector )
 {
-    return $doMake.call( this, Array.prototype.unique.call( $doRecursion.call(this,'parentNode',selector ) ) );
+    return makeElement( new Element() , recursion.call(this,"parentNode",selector) );
 };
 
 /**
@@ -1282,9 +1314,9 @@ Element.prototype.parent=function parent( selector )
  * @param selector
  * @returns {Element}
  */
-Element.prototype.parents=function parents(selector )
+Element.prototype.parents=function parents( selector )
 {
-    return $doMake.call( this, Array.prototype.unique.call( $doRecursion.call(this,'parentNode',selector, true ) ) );
+    return makeElement( new Element() , recursion.call(this,"parentNode",selector,true,document.body) );
 };
 
 /**
@@ -1292,9 +1324,9 @@ Element.prototype.parents=function parents(selector )
  * @param selector
  * @returns {Element}
  */
-Element.prototype.prevAll=function prevAll(selector )
+Element.prototype.prevAll=function prevAll( selector )
 {
-    return $doMake.call( this, $doRecursion.call(this,'previousSibling', selector, true ) );
+    return makeElement( new Element() , recursion.call(this,"previousSibling",selector,true) );
 };
 
 /**
@@ -1302,9 +1334,9 @@ Element.prototype.prevAll=function prevAll(selector )
  * @param selector
  * @returns {Element}
  */
-Element.prototype.prev=function prev(selector )
+Element.prototype.prev=function prev( selector )
 {
-    return $doMake.call( this, $doRecursion.call(this,'previousSibling', selector ) );
+    return makeElement( new Element() ,recursion.call(this,"previousSibling",selector) );
 };
 
 /**
@@ -1312,9 +1344,9 @@ Element.prototype.prev=function prev(selector )
  * @param selector
  * @returns {Element}
  */
-Element.prototype.nextAll=function nextAll(selector )
+Element.prototype.nextAll=function nextAll( selector )
 {
-    return $doMake.call( this, $doRecursion.call(this,'nextSibling', selector , true ) );
+    return makeElement(new Element() ,recursion.call(this,"nextSibling",selector, true));
 };
 
 /**
@@ -1324,7 +1356,7 @@ Element.prototype.nextAll=function nextAll(selector )
  */
 Element.prototype.next=function next(selector )
 {
-    return $doMake.call( this, $doRecursion.call(this,'nextSibling', selector ) );
+    return makeElement( new Element() ,recursion.call(this,"nextSibling",selector) );
 };
 
 /**
@@ -1332,10 +1364,11 @@ Element.prototype.next=function next(selector )
  * @param selector
  * @returns {Element}
  */
-Element.prototype.siblings=function siblings(selector )
+Element.prototype.siblings=function siblings( selector )
 {
-    var results=[].concat( $doRecursion.call(this,'previousSibling',selector,true) , $doRecursion.call(this,'nextSibling',selector, true) );
-    return $doMake.call( this, results );
+    var instance = makeElement( new Element(),recursion.call(this,"previousSibling",selector,true) );
+    makeElement(instance,recursion.call(this,"nextSibling",selector,true),instance.length);
+    return instance;
 };
 
 /**
@@ -1345,22 +1378,18 @@ Element.prototype.siblings=function siblings(selector )
  */
 Element.prototype.children=function children( selector )
 {
-    if( typeof selector === 'undefined' )
-    {
-        selector= function(item){ return item.nodeType===1 };
-    }
-    var is=typeof selector === "function";
     var results=[];
-    this.forEach(function(element)
+    this.forEach(function(elem)
     {
-        if( !Element.isFrame(element) && element.hasChildNodes() )
-        {
-            var child = this.slice.call( element.childNodes );
-            results =  is ? this.concat.apply( results, Array.prototype.filter.call(child, selector ) ) :
-                this.concat.apply( results, querySelector(selector,element,null,child) );
-        }
+        results = results.concat( getChildNodes( elem ) );
     });
-    return $doMake.call( this, Array.prototype.unique.call(results) );
+    if( typeof selector === "function" )
+    {
+        results = Array.prototype.filter.call(results,selector);
+    }else if( selector ) {
+        results = querySelector(selector,null,null,results);
+    }
+    return makeElement( new Element(), results );
 };
 
 //========================操作元素===========================
@@ -1382,9 +1411,9 @@ Element.prototype.html=function html( htmlObject )
         {
             htmlObject = System.trim( htmlObject ).replace(/[\r\n\t]+/g,'');
 
-        }else if( System.instanceOf(htmlObject,Element) )
+        }else if( htmlObject instanceof Element )
         {
-            htmlObject = Element.prototype.current.call(htmlObject);
+            htmlObject = htmlObject.current();
             is = true;
         }
     }
@@ -1400,7 +1429,7 @@ Element.prototype.html=function html( htmlObject )
                     htmlObject=elem.outerHTML;
                 }else
                 {
-                    var cloneElem=$cloneNode( elem, true);
+                    var cloneElem=cloneNode( elem, true);
                     if( cloneElem )
                     {
                         htmlObject=document.createElement( 'div' ).appendChild( cloneElem ).innerHTML;
@@ -1413,28 +1442,29 @@ Element.prototype.html=function html( htmlObject )
         //清空所有的子节点
         while( elem.hasChildNodes() )
         {
-            Element.prototype.removeChild.call(this, elem.childNodes.item(0) );
+            this.removeChild( elem.childNodes.item(0) );
         }
         if( htmlObject )
         {
-            if(is)return Element.prototype.addChild.call(this, htmlObject);
+            if(is)return this.addChild.call(htmlObject);
             try
             {
                 elem.innerHTML = htmlObject;
             } catch (e)
             {
                 var nodename = Element.getNodeName(elem);
-                if (!new RegExp("^<" + nodename).exec(htmlObject)) {
-                    htmlObject = System.sprintf('<%s>%s</%s>', nodename, htmlObject, nodename);
+                if ( !( new RegExp("^<" + nodename).exec(htmlObject) ) )
+                {
+                    htmlObject ="<"+nodename+">"+htmlObject+"</"+nodename+">";
                 }
-                var child = $createElement(htmlObject);
+                var child = createElement(htmlObject);
                 var deep = nodename === 'tr' ? 2 : 1, d = 0;
                 while (d < deep && child.firstChild)
                 {
                     d++;
                     child = child.firstChild;
                 }
-                $mergeAttributes(child, elem);
+                mergeAttributes(child, elem);
                 elem.parentNode.replaceChild(child, elem);
             }
         }
@@ -1448,7 +1478,7 @@ Element.prototype.html=function html( htmlObject )
  */
 Element.prototype.addChild=function addChild(childElemnet)
 {
-    return Element.prototype.addChildAt.call(this, childElemnet,-1);
+    return this.addChildAt(childElemnet,-1);
 };
 
 /**
@@ -1463,27 +1493,27 @@ Element.prototype.addChildAt=function addChildAt( childElemnet, index )
      if( System.isNaN(index) )throw new Error('Invalid param the index in addChildAt');
      if( System.instanceOf(childElemnet,Element) )
      {
-         childElemnet =  Element.prototype.current.call(childElemnet);
+         childElemnet =  childElemnet.current();
      }
      if( !Element.isNodeElement( childElemnet ) )
      {
          throw new TypeError('is not Element in addChildAt');
      }
-     var parent = Element.prototype.current.call(this);
+     var parent = this.current();
      if( !Element.isHTMLElement( parent ) )
      {
         throw new Error('parent is null of child elemnet in addChildAt');
      }
 
-    var refChild=index===-1 ? null : Element.prototype.getChildAt.call(this,index);
-    if( childElemnet.parentNode )Element.prototype.removeChild.call(this, childElemnet );
+    var refChild=index===-1 ? null : this.getChildAt(index);
+    if( childElemnet.parentNode )this.removeChild( childElemnet );
     var result = parent.insertBefore( childElemnet , refChild || null );
     if( Element.getNodeName(childElemnet)==="#document-fragment" )
     {
         childElemnet['parent-element'] = parent;
     }
-    $dispatchEvent( EventDispatcher( childElemnet ) ,ElementEvent.ADD, parent, childElemnet , result );
-    $dispatchEvent( EventDispatcher( parent ) , ElementEvent.CHNAGED, parent, childElemnet , result );
+    dispatchEvent( EventDispatcher( childElemnet ) ,ElementEvent.ADD, parent, childElemnet , result );
+    dispatchEvent( EventDispatcher( parent ) , ElementEvent.CHNAGED, parent, childElemnet , result );
     return childElemnet;
 };
 
@@ -1495,41 +1525,33 @@ Element.prototype.addChildAt=function addChildAt( childElemnet, index )
  */
 Element.prototype.getChildAt=function getChildAt( index )
 {
-    var parent = Element.prototype.current.call(this);
-    if( !parent || !parent.hasChildNodes() )return null;
-    var childNodes,child=null;
-    if( typeof index === 'function' )
-    {
-        child=$getChildNodes.call(this, parent ,index ,true)[0];
-
-    }else if( typeof index === 'number' )
-    {
-        childNodes=$getChildNodes.call(this,parent);
-        index=index < 0 ? index+childNodes.length : index;
-        child=index >= 0 && index < childNodes.length ? childNodes[index] : null;
-    }
-    return child;
+    if( typeof index !== 'number' )throw new TypeError("index is not Number");
+    var elem = this.current();
+    if( !elem || !elem.hasChildNodes() )return null;
+    var childNodes = getChildNodes(elem);
+    index=index < 0 ? index+childNodes.length : index;
+    return index >= 0 && index < childNodes.length ? childNodes[index] : null;
 };
 
 /**
- * 返回子级元素的索引位置( 匹配选择器的第一个元素 )
+ * 返回子级元素相对于父元素的索引位置( 匹配选择器的第一个元素 )
  * @param childElemnet | selector
  * @returns {Number}
  */
 Element.prototype.getChildIndex=function getChildIndex( childElemnet )
 {
-    var parent = Element.prototype.current.call(this);
+    if( childElemnet instanceof Element )
+    {
+        childElemnet = childElemnet.current();
+    }
+    if( !Element.isNodeElement(childElemnet)  )
+    {
+        throw new TypeError('is not HTMLElement in getChildIndex');
+    }
+    var parent = childElemnet.parentNode;
     if( !parent || !parent.hasChildNodes() )return -1;
-    var children = $getChildNodes(parent);
-    if( typeof childElemnet==='string' )
-    {
-        childElemnet = querySelector(childElemnet,null,null,children);
-    }
-    if( childElemnet.parentNode === parent )
-    {
-        return Array.prototype.indexOf.call( children, childElemnet);
-    }
-    return -1;
+    var childNodes = getChildNodes(parent);
+    return Array.prototype.indexOf.call( childNodes, childElemnet);
 };
 
 /**
@@ -1541,14 +1563,12 @@ Element.prototype.removeChild=function removeChild( childElemnet )
 {
     if( System.instanceOf(childElemnet,Element) )
     {
-        childElemnet = Element.prototype.current.call(childElemnet);
+        childElemnet = childElemnet.current();
     }
-
     if( !Element.isNodeElement(childElemnet) )
     {
         throw new TypeError('is not HTMLElement in removeChild');
     }
-
     var parent = childElemnet.parentNode;
     if( !parent )
     {
@@ -1567,8 +1587,8 @@ Element.prototype.removeChild=function removeChild( childElemnet )
         throw new TypeError('parentNode is null of child elemnet');
     }
     var result = parent.removeChild( childElemnet );
-    $dispatchEvent( EventDispatcher( childElemnet ) , ElementEvent.REMOVE, parent, childElemnet , result );
-    $dispatchEvent( EventDispatcher( parent ) , ElementEvent.CHNAGED, parent, childElemnet , result );
+    dispatchEvent( EventDispatcher( childElemnet ) , ElementEvent.REMOVE, parent, childElemnet , result );
+    dispatchEvent( EventDispatcher( parent ) , ElementEvent.CHNAGED, parent, childElemnet , result );
     return childElemnet;
 };
 
@@ -1580,17 +1600,12 @@ Element.prototype.removeChild=function removeChild( childElemnet )
  */
 Element.prototype.removeChildAt=function removeChildAt( index )
 {
-    var parent = Element.prototype.current.call(this);
-    var child= Element.prototype.getChildAt.call(this, index );
+    var child= this.getChildAt( index );
     if( !child )
     {
         throw new Error('Not found child. in removeChildAt');
     }
-    if( child.parentNode === parent )
-    {
-        return Element.prototype.removeChild.call(this, child );
-    }
-    return null;
+    return this.removeChild( child );
 };
 
 /**
@@ -1654,7 +1669,7 @@ Element.isForm=function isForm(elem, exclude)
 var hasNode= typeof Node !== "undefined";
 Element.isNodeElement=function isNodeElement( elem )
 {
-    if( !elem ) return false;
+    if( !elem || typeof elem !== "object" ) return false;
     return hasNode ? elem instanceof Node : elem.nodeType && (typeof elem.nodeName === "string" || typeof elem.tagName === "string" || elem.nodeName==="#document-fragment");
 };
 
@@ -1758,11 +1773,11 @@ fix.cssHooks.userSelect={
 
     get: function( style )
     {
-        return style[ $getStyleName('userSelect') ] || '';
+        return style[ getStyleName('userSelect') ] || '';
     },
     set: function( style, value )
     {
-        style[ $getStyleName('userSelect') ] = value;
+        style[ getStyleName('userSelect') ] = value;
         style['-moz-user-fetch'] = value;
         style['-webkit-touch-callout'] = value;
         style['-khtml-user-fetch'] = value;
@@ -1869,7 +1884,7 @@ fix.cssHooks.radialGradient=fix.cssHooks.linearGradient={
 
         }else
         {
-            value= System.sprintf('%s(%s)', $getStyleName( name ) , value ) ;
+            value= System.sprintf('%s(%s)', getStyleName( name ) , value ) ;
         }
         style[ prop ] = value ;
         return true;
@@ -1888,7 +1903,6 @@ fix.cssHooks.height={
 
 //@internal Element.fix;
 Element.fix = fix;
-
-Element.createElement = $createElement;
-
+Element.createElement = createElement;
+Element.querySelector=querySelector;
 System.Element = Element;

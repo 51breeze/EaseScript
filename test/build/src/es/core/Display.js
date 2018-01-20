@@ -1,23 +1,23 @@
 define(["es.core.Display","if:es.interfaces.IDisplay"],function(Display,IDisplay){
 var _private=this._private;
-var proto={"constructor":{"value":Display},"s9__element":{"writable":true,"value":null}
+var proto={"constructor":{"value":Display},"U9__element":{"writable":true,"value":null}
 ,"Get__element":{"value":function element(){
 	return this[_private]._element;
-}},"s9__width":{"writable":true,"value":NaN}
+}},"U9__width":{"writable":true,"value":NaN}
 ,"Get__width":{"value":function width(){
 	return Reflect.type(System.isNaN(this[_private]._width)?this[_private]._element.width():this[_private]._width,Number);
 }},"Set__width":{"value":function width(value){
 	if(!System.is(value, Number))throw new TypeError("type does not match. must be Number");
 	this[_private]._width=value;
 	this[_private]._element.width(value);
-}},"s9__height":{"writable":true,"value":NaN}
+}},"U9__height":{"writable":true,"value":NaN}
 ,"Get__height":{"value":function height(){
 	return Reflect.type(System.isNaN(this[_private]._height)?this[_private]._element.height():this[_private]._height,Number);
 }},"Set__height":{"value":function height(value){
 	if(!System.is(value, Number))throw new TypeError("type does not match. must be Number");
 	this[_private]._height=value;
 	this[_private]._element.height(value);
-}},"s9__visible":{"writable":true,"value":null}
+}},"U9__visible":{"writable":true,"value":null}
 ,"Get__visible":{"value":function visible(){
 	if(this[_private]._visible===null){
 		return Reflect.type(!(this[_private]._element.style("display")==="none"||this[_private]._element.style("visibility")==="hidden"),Boolean);
@@ -30,7 +30,7 @@ var proto={"constructor":{"value":Display},"s9__element":{"writable":true,"value
 }},"_property":{"value":function property(name,value){
 	if(value == null ){value=null;}
 	if(value==null){
-		if(System.isObject(name,true)){
+		if(System.isObject(name)){
 			this[_private]._element.property(name);
 			return this;
 		}
@@ -90,12 +90,12 @@ var proto={"constructor":{"value":Display},"s9__element":{"writable":true,"value
 	if(!System.is(top, Number))throw new TypeError("type does not match. must be Number");
 	return this[_private]._element.globalToLocal(left,top);
 }}
-,"Get_y7_displayParent":{"value":function(){
+,"Get_D7_displayParent":{"value":function(){
 	return this[_private].displayParent;
-}},"Set_y7_displayParent":{"value":function(val){
+}},"Set_D7_displayParent":{"value":function(val){
 	return this[_private].displayParent=val;
 }},"Get__parent":{"value":function parent(){
-	return this.Get_y7_displayParent();
+	return this.Get_D7_displayParent();
 }},"_toString":{"value":function toString(){
 	return this[_private]._element.html(true);
 }}
@@ -121,7 +121,7 @@ Object.defineProperty(Display,"__T__",{value:{
 	"classname":"Display",
 	"implements":[IDisplay],
 	"_private":_private,
-	"uri":["s9_","y7_","u21_","_"],
+	"uri":["U9_","D7_","V21_","_"],
 	"proto":proto
 }});
 return Display;

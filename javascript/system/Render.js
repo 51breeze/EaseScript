@@ -155,7 +155,7 @@ function Render( options )
 }
 
 Render.prototype = Object.create(EventDispatcher.prototype);
-Object.defineProperty(Render.prototype,"constructor", {value:Render});
+Render.prototype.constructor=Render;
 Render.prototype.__variable__=null;
 Render.prototype.__split__=  new RegExp(_options.left+'(.*?)'+_options.right+'|'+_options.shortLeft+'(.*?)'+_options.shortRight,'gi');
 
@@ -296,7 +296,7 @@ Variable.prototype.remove=function(name)
  */
 Variable.prototype.isObject=function(val)
 {
-    return System.isObject(val);
+    return System.isObject(val)||System.isArray(val);
 };
 
 /**

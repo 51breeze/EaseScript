@@ -299,7 +299,7 @@ package es.core
             for (;c<len;c++)
             {
                 child = children[c];
-                if( System.isObject(child, true) )
+                if( System.isObject(child) )
                 {
                     child = Skin.parseSkinObject(child, hash);
 

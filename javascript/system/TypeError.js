@@ -11,6 +11,6 @@ function TypeError( message , filename, line)
     Error.call(this, message , filename, line);
 }
 TypeError.prototype =Object.create( Error.prototype );
-Object.defineProperty(TypeError.prototype,"constructor", {value:TypeError});
+TypeError.prototype.constructor=TypeError;
 TypeError.prototype.name='TypeError';
 System.TypeError=TypeError;

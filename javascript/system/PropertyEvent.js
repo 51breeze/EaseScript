@@ -16,7 +16,7 @@ PropertyEvent.prototype=Object.create( Event.prototype );
 PropertyEvent.prototype.property=null;
 PropertyEvent.prototype.newValue=null;
 PropertyEvent.prototype.oldValue=null;
-Object.defineProperty(PropertyEvent.prototype,"constructor", {value:PropertyEvent});
+PropertyEvent.prototype.constructor=PropertyEvent;
 PropertyEvent.CHANGE='propertychange';
 PropertyEvent.COMMIT='propertycommit';
 Event.fix.map[ PropertyEvent.CHANGE ] = 'input';

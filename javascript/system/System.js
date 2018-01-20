@@ -151,7 +151,7 @@ System.instanceOf = function instanceOf(instanceObj, theClass)
 
     if( theClass === System.JSON )
     {
-        return System.isObject(instanceObj,true);
+        return System.isObject(instanceObj);
     }
 
     try {
@@ -210,13 +210,11 @@ System.is=function is(instanceObj, theClass)
 };
 
 /**
- * 判断是否为一个可遍历的对象
- * null, undefined 属于对象类型但也会返回 false
+ * 判断是否为一个单纯的对象
  * @param val
- * @param flag 默认为 false。如为true表示一个纯对象,否则数组对象也会返回true
  * @returns {boolean}
  */
-System.isObject =function isObject(val, flag)
+System.isObject = function isObject(val)
 {
     if (!val || typeof val !== "object")return false;
     var proto = System.Object.getPrototypeOf(val);
@@ -224,7 +222,7 @@ System.isObject =function isObject(val, flag)
     {
         return true;
     }
-    return flag !== true && System.isArray(val);
+    return false;
 };
 /**
  * 检查所有传入的值定义
@@ -300,7 +298,7 @@ System.isNumber = function isNumber(val) {
  */
 System.isEmpty =function isEmpty(val, flag) {
     if (!val)return flag !== true || val !== 0;
-    if (System.isObject(val)) {
+    if (System.isObject(val)||System.isArray(val)) {
         var ret;
         for (ret in val)break;
         return typeof ret === "undefined";
@@ -440,7 +438,7 @@ System.serialize = function serialize(object, type, group) {
         joint = ' ';
         group = false;
     }
-    if (System.isObject(object, true))for (key in object) {
+    if (System.isObject(object))for (key in object) {
         val = type === 'attr' ? '"' + object[key] + '"' : object[key];
         key = prefix ? prefix + '[' + key + ']' : key;
         str = str.concat(typeof val === 'object' ? System.serialize(val, type, group ? key : false) : key + separate + val);

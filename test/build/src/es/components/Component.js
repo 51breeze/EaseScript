@@ -1,7 +1,7 @@
 define(["es.components.Component","es.events.ComponentEvent"],function(Component,ComponentEvent){
 var _private=this._private;
-var proto={"constructor":{"value":Component},"S5___initialized__":{"writable":true,"value":false}
-,"x2_initialized":{"value":function initialized(){
+var proto={"constructor":{"value":Component},"R5___initialized__":{"writable":true,"value":false}
+,"L2_initialized":{"value":function initialized(){
 	var val=this[_private].__initialized__;
 	if(val===false){
 		this[_private].__initialized__=true;
@@ -11,8 +11,8 @@ var proto={"constructor":{"value":Component},"S5___initialized__":{"writable":tr
 	}
 	return val;
 }}
-,"S5___initializing__":{"writable":true,"value":true}
-,"x2_initializing":{"value":function initializing(){
+,"R5___initializing__":{"writable":true,"value":true}
+,"L2_initializing":{"value":function initializing(){
 	var val=this[_private].__initializing__;
 	if(val===true){
 		this[_private].__initializing__=false;
@@ -34,7 +34,7 @@ Object.defineProperty(Component,"__T__",{value:{
 	"package":"es.components",
 	"classname":"Component",
 	"_private":_private,
-	"uri":["S5_","x2_","J17_","_"],
+	"uri":["R5_","L2_","m17_","_"],
 	"proto":proto
 }});
 return Component;

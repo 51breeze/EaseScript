@@ -12,4 +12,4 @@ function URIError( message , filename, line) {
 System.URIError=URIError;
 URIError.prototype = Object.create( Error.prototype );
 URIError.prototype.name = 'URIError';
-Object.defineProperty(URIError.prototype,"constructor", {value:URIError});
+URIError.prototype.constructor=URIError;

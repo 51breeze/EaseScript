@@ -29,32 +29,32 @@ function Array(length)
 };
 System.Array = Array;
 Array.prototype = Object.create( Object.prototype );
-Object.defineProperty(Array.prototype,"constructor", {value:Array});
-Object.defineProperty(Array.prototype,"length", {value:0, writable:true});
-Object.defineProperty(Array.prototype,"slice", {value:$Array.prototype.slice});
-Object.defineProperty(Array.prototype,"splice", {value:$Array.prototype.splice});
-Object.defineProperty(Array.prototype,"concat", {value:$Array.prototype.concat});
-Object.defineProperty(Array.prototype,"join", {value:$Array.prototype.join});
-Object.defineProperty(Array.prototype,"pop", {value:$Array.prototype.pop});
-Object.defineProperty(Array.prototype,"push", {value:$Array.prototype.push});
-Object.defineProperty(Array.prototype,"shift", {value:$Array.prototype.shift});
-Object.defineProperty(Array.prototype,"unshift", {value:$Array.prototype.unshift});
-Object.defineProperty(Array.prototype,"sort", {value:$Array.prototype.sort});
-Object.defineProperty(Array.prototype, "reverse", {value: $Array.prototype.reverse});
-Object.defineProperty(Array.prototype, "toLocaleString", {value: $Array.prototype.toLocaleString});
-
-if( $Array.prototype.indexOf ) {
-    Object.defineProperty(Array.prototype, "indexOf", {value: $Array.prototype.indexOf});
+Array.prototype.constructor=Array;
+Array.prototype.length=0;
+Array.prototype.slice=$Array.prototype.slice;
+Array.prototype.concat=$Array.prototype.concat;
+Array.prototype.splice=$Array.prototype.splice;
+Array.prototype.join=$Array.prototype.join;
+Array.prototype.pop=$Array.prototype.pop;
+Array.prototype.push=$Array.prototype.push;
+Array.prototype.shift=$Array.prototype.shift;
+Array.prototype.unshift=$Array.prototype.unshift;
+Array.prototype.sort=$Array.prototype.sort;
+Array.prototype.reverse=$Array.prototype.reverse;
+Array.prototype.toLocaleString=$Array.prototype.toLocaleString;
+if( $Array.prototype.indexOf )
+{
+   Array.prototype.indexOf=$Array.prototype.indexOf;
 }
 
 if( $Array.prototype.lastIndexOf )
 {
-    Object.defineProperty(Array.prototype, "lastIndexOf", {value: $Array.prototype.lastIndexOf});
+   Array.prototype.lastIndexOf=$Array.prototype.lastIndexOf;
 }
 
 if( $Array.prototype.map )
 {
-    Object.defineProperty(Array.prototype,"map", {value:$Array.prototype.map});
+    Array.prototype.map=$Array.prototype.map;
 }
 
 /**
@@ -64,7 +64,7 @@ if( $Array.prototype.map )
  * 如果返回 false 则退出循环
  * @returns {Object}
  */
-Object.defineProperty(Array.prototype,"forEach", {value:function forEach(callback, thisArg)
+Array.prototype.forEach=function forEach(callback, thisArg)
 {
     if (!System.isFunction(callback))throw new TypeError(callback + " is not a function");
     if (this==null)throw new ReferenceError('this is null or not defined');
@@ -74,7 +74,7 @@ Object.defineProperty(Array.prototype,"forEach", {value:function forEach(callbac
     thisArg = thisArg || this;
     while (k<len)if (k in obj)callback.call(thisArg, obj[k++], k, obj);
     return this;
-}});
+};
 
 /**
  * 方法使用指定的函数测试所有元素，并创建一个包含所有通过测试的元素的新数组。
@@ -82,7 +82,7 @@ Object.defineProperty(Array.prototype,"forEach", {value:function forEach(callbac
  * @param thisArg
  * @returns {Array}
  */
-Object.defineProperty(Array.prototype,"filter", {value:function filter(callback, thisArg)
+Array.prototype.filter=function filter(callback, thisArg)
 {
     if (typeof callback !== 'function')throw new TypeError('callback must be a function');
     if (this==null)throw new ReferenceError('this is null or not defined');
@@ -100,13 +100,13 @@ Object.defineProperty(Array.prototype,"filter", {value:function filter(callback,
         k++;
     }
     return items;
-}});
+};
 
 /**
  * 返回一个唯一元素的数组
  * @returns {Array}
  */
-Object.defineProperty(Array.prototype,"unique", {value:function unique()
+Array.prototype.unique=function unique()
 {
     if (this==null)throw new ReferenceError('this is null or not defined');
     var obj = System.Object(this);
@@ -120,7 +120,7 @@ Object.defineProperty(Array.prototype,"unique", {value:function unique()
         for (;b<len;b++)if(arr[i]===arr[b])arr.splice(b, 1);
     }
     return arr;
-}});
+};
 
 /**
  * 将一个数组的所有元素从开始索引填充到具有静态值的结束索引
@@ -129,7 +129,7 @@ Object.defineProperty(Array.prototype,"unique", {value:function unique()
  * @param end
  * @returns {Object}
  */
-Object.defineProperty(Array.prototype,"fill", {value:function fill(value, start, end)
+Array.prototype.fill=function fill(value, start, end)
 {
     if (this==null)throw new ReferenceError('this is null or not defined');
     if (!(System.is(this, System.Array) || System.isArray(this)))throw new ReferenceError('this is not Array');
@@ -143,7 +143,7 @@ Object.defineProperty(Array.prototype,"fill", {value:function fill(value, start,
         k++;
     }
     return this;
-}});
+};
 
 /**
  * 返回数组中满足提供的测试函数的第一个元素的值。否则返回 undefined。
@@ -151,7 +151,7 @@ Object.defineProperty(Array.prototype,"fill", {value:function fill(value, start,
  * @param thisArg
  * @returns {*}
  */
-Object.defineProperty(Array.prototype,"find", {value:function find(callback, thisArg)
+Array.prototype.find=function find(callback, thisArg)
 {
     if (typeof callback !== 'function')throw new TypeError('callback must be a function');
     if (this==null)throw new ReferenceError('this is null or not defined');
@@ -167,4 +167,4 @@ Object.defineProperty(Array.prototype,"find", {value:function find(callback, thi
         }
     }
     return;
-}});
+};

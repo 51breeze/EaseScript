@@ -13,7 +13,7 @@ function MouseEvent( type, bubbles,cancelable  )
 }
 System.MouseEvent=MouseEvent;
 MouseEvent.prototype=Object.create( Event.prototype );
-Object.defineProperty(MouseEvent.prototype,"constructor", {value:MouseEvent});
+MouseEvent.prototype.constructor=MouseEvent;
 MouseEvent.prototype.wheelDelta= null;
 MouseEvent.prototype.pageX= NaN;
 MouseEvent.prototype.pageY= NaN;

@@ -27,7 +27,7 @@ Object.defineProperty(SkinEvent,"__T__",{value:{
 	"package":"es.events",
 	"classname":"SkinEvent",
 	"_private":_private,
-	"uri":["e27_","g28_","i20_","_"],
+	"uri":["G27_","j28_","l20_","_"],
 	"method":method,
 	"proto":proto
 }});

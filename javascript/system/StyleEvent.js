@@ -13,7 +13,7 @@ function StyleEvent( type, bubbles,cancelable ){
 };
 System.StyleEvent =StyleEvent;
 StyleEvent.prototype=Object.create( PropertyEvent.prototype );
-Object.defineProperty(StyleEvent.prototype,"constructor", {value:StyleEvent});
+StyleEvent.prototype.constructor=StyleEvent;
 StyleEvent.CHANGE='styleChange';
 
 //属性事件

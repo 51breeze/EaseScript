@@ -38,7 +38,7 @@ if( !Object.defineProperty || ( System.env.platform('IE') && System.env.version(
 /**
  * 对象的构造函数
  */
-Object.defineProperty(Object.prototype,"constructor", {configurable:true,value:Object});
+Object.prototype.constructor=Object;
 
 /**
  * 合并其它参数到指定的 target 对象中
@@ -48,7 +48,7 @@ Object.defineProperty(Object.prototype,"constructor", {configurable:true,value:O
  * @param ...valueObj object 待合并到目标源上的对象
  * @returns Object
  */
-Object.defineProperty(Object,"merge", {value:function merge()
+Object.merge=function merge()
 {
     var options, name, src, copy, copyIsArray, clone,
         target = arguments[0] || {},
@@ -113,12 +113,12 @@ Object.defineProperty(Object,"merge", {value:function merge()
         }
     }
     return target;
-}});
+};
 
 /**
  * 获取对象的原型
  */
-Object.defineProperty( Object, "getPrototypeOf", {value:$Object.getPrototypeOf || function getPrototypeOf(obj)
+Object.getPrototypeOf=$Object.getPrototypeOf || function getPrototypeOf(obj)
 {
     if( obj == null )throw new TypeError("non-object");
     if( obj instanceof System.Class || obj.constructor instanceof System.Class )
@@ -126,12 +126,12 @@ Object.defineProperty( Object, "getPrototypeOf", {value:$Object.getPrototypeOf |
         return null;
     }
     return obj.__proto__ ? obj.__proto__ : (obj.constructor ? obj.constructor.prototype : null);
-}});
+};
 
 /**
  * 返回对象的原始值
  */
-Object.defineProperty( Object.prototype, "valueOf", {configurable:true,value:function valueOf()
+Object.prototype.valueOf=function valueOf()
 {
     if( this.constructor instanceof System.Class )
     {
@@ -140,9 +140,9 @@ Object.defineProperty( Object.prototype, "valueOf", {configurable:true,value:fun
         return '[object '+(p ? p+'.' : '')+objClass.__T__.classname+"]";
     }
     return $Object.prototype.valueOf.call(this);
-}});
+};
 
-Object.defineProperty( Object.prototype, "toString", {configurable:true,value:function toString()
+Object.prototype.toString=function toString()
 {
     if( this.constructor instanceof System.Class )
     {
@@ -151,7 +151,7 @@ Object.defineProperty( Object.prototype, "toString", {configurable:true,value:fu
         return '[object '+(p ? p+'.' : '')+objClass.__T__.classname+"]";
     }
     return $Object.prototype.toString.call(this);
-}});
+};
 
 /**
  * 设置对象的原型链
@@ -173,7 +173,7 @@ Object.setPrototypeOf = $Object.setPrototypeOf || function setPrototypeOf(obj, p
  * @param theClass
  * @returns {Boolean}
  */
-Object.defineProperty(Object.prototype, "isPrototypeOf", {value:$Object.prototype.isPrototypeOf});
+Object.prototype.isPrototypeOf=$Object.prototype.isPrototypeOf;
 
 /**
  * 表示对象本身是否已经定义了指定的属性。
@@ -182,7 +182,7 @@ Object.defineProperty(Object.prototype, "isPrototypeOf", {value:$Object.prototyp
  * @returns {Boolean}
  */
 var $hasOwnProperty = $Object.prototype.hasOwnProperty;
-Object.defineProperty(Object.prototype, "hasOwnProperty", {configurable:true,value:function hasOwnProperty( name )
+Object.prototype.hasOwnProperty=function hasOwnProperty( name )
 {
     if( this == null )throw new TypeError("non-object");
     if( this instanceof  System.Class ) return false;
@@ -192,7 +192,7 @@ Object.defineProperty(Object.prototype, "hasOwnProperty", {configurable:true,val
         if( this.constructor.__T__.uri[0] === name )return false;
     }
     return $hasOwnProperty.call(this,name);
-}});
+};
 
 /**
  * 表示指定的属性是否存在、是否可枚举。
@@ -202,7 +202,7 @@ Object.defineProperty(Object.prototype, "hasOwnProperty", {configurable:true,val
  * @returns {Boolean}
  */
 var $propertyIsEnumerable=$Object.prototype.propertyIsEnumerable;
-Object.defineProperty(Object.prototype, "propertyIsEnumerable", {configurable:true,value:function propertyIsEnumerable( name )
+Object.prototype.propertyIsEnumerable=function propertyIsEnumerable( name )
 {
     if( this == null )throw new TypeError("non-object");
     if( this instanceof System.Class ) return false;
@@ -213,32 +213,32 @@ Object.defineProperty(Object.prototype, "propertyIsEnumerable", {configurable:tr
     }
     if( System.Symbol.isSymbolPropertyName && System.Symbol.isSymbolPropertyName(name) )return false;
     return $propertyIsEnumerable.call(this,name);
-}});
+};
 
 /**
  * 返回对象可枚举的属性的键名
  * @returns {Array}
  */
-Object.defineProperty(Object.prototype, "keys", {configurable:true,value:function keys()
+Object.prototype.keys=function keys()
 {
     return Object.prototype.getEnumerableProperties.call(this,-1);
-}});
+};
 
 /**
  * 返回对象可枚举的属性值
  * @returns {Array}
  */
-Object.defineProperty(Object.prototype, "values", {configurable:true,value:function values()
+Object.prototype.values=function values()
 {
     return Object.prototype.getEnumerableProperties.call(this,1);
-}});
+};
 
 /**
  * 获取可枚举的属性
  * @param state
  * @returns {Array}
  */
-Object.defineProperty(Object.prototype, "getEnumerableProperties", {configurable:true,value:function getEnumerableProperties( state )
+Object.prototype.getEnumerableProperties=function getEnumerableProperties( state )
 {
     if( this == null )throw new TypeError("non-object");
     if( this instanceof System.Class )return [];
@@ -266,4 +266,4 @@ Object.defineProperty(Object.prototype, "getEnumerableProperties", {configurable
         }
     }
     return items;
-}});
+};

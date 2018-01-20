@@ -14,7 +14,7 @@ function KeyboardEvent( type, bubbles,cancelable  )
 };
 System.KeyboardEvent=KeyboardEvent;
 KeyboardEvent.prototype=Object.create( Event.prototype );
-Object.defineProperty(KeyboardEvent.prototype,"constructor", {value:KeyboardEvent});
+KeyboardEvent.prototype.constructor=KeyboardEvent;
 KeyboardEvent.prototype.keycode=null;
 KeyboardEvent.KEY_PRESS='keypress';
 KeyboardEvent.KEY_UP='keyup';

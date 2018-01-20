@@ -109,7 +109,7 @@ DataGrep.prototype = Object.create( Object.prototype );
  * constructor.
  * @type {DataGrep}
  */
-Object.defineProperty(DataGrep.prototype,"constructor", {value:DataGrep});
+DataGrep.prototype.constructor=DataGrep;
 
 /**
  * 获取设置过滤器

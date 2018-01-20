@@ -4,7 +4,7 @@
  */
 if( !Array.prototype.map )
 {
-    Object.defineProperty(Array.prototype,"map", {value:function map(callback, thisArg)
+    Array.prototype.map =function map(callback, thisArg)
     {
         var T, A, k;
         if (this == null)throw new TypeError("this is null or not defined");
@@ -24,7 +24,7 @@ if( !Array.prototype.map )
             k++;
         }
         return A;
-    }});
+    };
 }
 /**
  * 返回指定元素的索引位置
@@ -33,7 +33,7 @@ if( !Array.prototype.map )
  */
 if ( !Array.prototype.indexOf )
 {
-    Object.defineProperty(Array.prototype,"indexOf", {value:function indexOf(searchElement, fromIndex)
+   Array.prototype.indexOf=function indexOf(searchElement, fromIndex)
     {
         if (this == null)throw new TypeError('this is null or not defined');
         var obj = Object(this);
@@ -49,12 +49,12 @@ if ( !Array.prototype.indexOf )
             k++;
         }
         return -1;
-    }});
+    };
 }
 
 if (!Array.prototype.lastIndexOf)
 {
-    Object.defineProperty(Array.prototype,"lastIndexOf", {value: function lastIndexOf(searchElement)
+    Array.prototype.lastIndexOf=function lastIndexOf(searchElement)
     {
         if (this == null)throw new TypeError('this is null or not defined');
         var n, k, t = Object(this), len = t.length >>> 0;
@@ -81,5 +81,5 @@ if (!Array.prototype.lastIndexOf)
             }
         }
         return -1;
-    }});
+    };
 }

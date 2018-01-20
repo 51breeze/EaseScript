@@ -130,7 +130,7 @@ package es.core
         {
             if( value==null )
             {
-                if( System.isObject(name,true) )
+                if( System.isObject(name) )
                 {
                     _element.property( name );
                     return this;

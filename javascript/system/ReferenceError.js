@@ -12,5 +12,5 @@ function ReferenceError( message , filename,line )
 }
 System.ReferenceError =ReferenceError;
 ReferenceError.prototype = Object.create( Error.prototype );
-Object.defineProperty(ReferenceError.prototype,"constructor", {value:ReferenceError});
+ReferenceError.prototype.constructor=ReferenceError;
 ReferenceError.prototype.name='ReferenceError';

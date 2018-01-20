@@ -13,26 +13,24 @@ function Namespace(prefix, uri)
     storage(this, true, {prefix:prefix||'',uri:uri||''});
 }
 
-Object.defineProperty(Namespace,"getCodeByUri", {value:function getCodeByUri(uri){
+Namespace.getCodeByUri=function getCodeByUri(uri){
     return codeMap[uri] || '';
-}});
+};
 
-Object.defineProperty(Namespace,"valueOf", {value:function valueOf(){
+Namespace.valueOf=function valueOf(){
     return '[object Namespace]';
-}});
+};
 
-Object.defineProperty(Namespace,"toString", {value:function toString(){
+Namespace.toString=function toString(){
     return '[object Namespace]';
-}});
+};
 
-Object.defineProperty(Namespace.prototype,"constructor", {value:Namespace});
-Object.defineProperty( Namespace.prototype, "toString", {value:function toString(){
+Namespace.prototype.constructor=Namespace;
+Namespace.prototype.toString=function toString(){
     return '[object Namespace]';
-}});
-
-Object.defineProperty( Namespace.prototype, "valueOf", {value:function valueOf(){
+};
+Namespace.prototype.valueOf=function valueOf(){
     var data = storage(this);
     return data.prefix+data.uri;
-}});
-
+};
 System.Namespace = Namespace;

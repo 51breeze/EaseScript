@@ -26,14 +26,14 @@ function EventDispatcher( target )
 }
 System.EventDispatcher=EventDispatcher;
 EventDispatcher.prototype=Object.create( Object.prototype );
-Object.defineProperty(EventDispatcher.prototype,"constructor", {value:EventDispatcher});
+EventDispatcher.prototype.constructor=EventDispatcher;
 
 /**
  * 判断是否有指定类型的侦听器
  * @param type
  * @returns {boolean}
  */
-Object.defineProperty(EventDispatcher.prototype,"hasEventListener", {value:function hasEventListener( type )
+EventDispatcher.prototype.hasEventListener=function hasEventListener( type )
 {
     var target =  storage(this,'target') || this;
     if( System.is(target,EventDispatcher) && target !== this )
@@ -62,7 +62,7 @@ Object.defineProperty(EventDispatcher.prototype,"hasEventListener", {value:funct
         return events[type].length > 0;
     }
     return false;
-}});
+};
 
 /**
  * 添加侦听器
@@ -71,7 +71,7 @@ Object.defineProperty(EventDispatcher.prototype,"hasEventListener", {value:funct
  * @param priority
  * @returns {EventDispatcher}
  */
-Object.defineProperty(EventDispatcher.prototype,"addEventListener", {value:function addEventListener(type,callback,useCapture,priority,reference)
+EventDispatcher.prototype.addEventListener=function addEventListener(type,callback,useCapture,priority,reference)
 {
     if( typeof type !== 'string' )throw new TypeError('Invalid event type');
     if( typeof callback !== 'function' )throw new TypeError('Invalid callback function');
@@ -94,7 +94,7 @@ Object.defineProperty(EventDispatcher.prototype,"addEventListener", {value:funct
     }
     $addEventListener(target, listener);
     return this;
-}});
+};
 
 /**
  * 移除指定类型的侦听器
@@ -102,7 +102,7 @@ Object.defineProperty(EventDispatcher.prototype,"addEventListener", {value:funct
  * @param listener
  * @returns {boolean}
  */
-Object.defineProperty(EventDispatcher.prototype,"removeEventListener", {value:function removeEventListener(type,listener)
+EventDispatcher.prototype.removeEventListener=function removeEventListener(type,listener)
 {
     var target = storage(this,'target') || this;
     if( System.is(target,EventDispatcher) && target !== this )
@@ -115,14 +115,14 @@ Object.defineProperty(EventDispatcher.prototype,"removeEventListener", {value:fu
         return true;
     }
     return $removeEventListener(target,type,listener,this);
-}});
+};
 
 /**
  * 调度指定事件
  * @param event
  * @returns {boolean}
  */
-Object.defineProperty(EventDispatcher.prototype,"dispatchEvent", {value:function dispatchEvent( event )
+EventDispatcher.prototype.dispatchEvent=function dispatchEvent( event )
 {
     if( typeof event === "string" )event = new System.Event( event );
     if( !System.is(event,Event) )throw new TypeError('Invalid event');
@@ -142,7 +142,7 @@ Object.defineProperty(EventDispatcher.prototype,"dispatchEvent", {value:function
     }
     event.target = event.currentTarget=target;
     return $dispatchEvent( event );
-}});
+};
 
 /**
  * 添加侦听器到元素中

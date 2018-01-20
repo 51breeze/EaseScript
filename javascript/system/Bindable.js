@@ -111,7 +111,7 @@ function Bindable(source,properties)
     this.addEventListener(PropertyEvent.CHANGE,commitProperties);
 }
 Bindable.prototype=  Object.create( EventDispatcher.prototype );
-Object.defineProperty(Bindable.prototype,"constructor", {value:Bindable});
+Bindable.prototype.constructor=Bindable;
 
 /**
  * 指定对象到当前绑定器。

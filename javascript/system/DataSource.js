@@ -54,7 +54,7 @@ function DataSource()
 }
 System.DataSource=DataSource;
 DataSource.prototype = Object.create( EventDispatcher.prototype );
-Object.defineProperty( DataSource.prototype, 'constructor', {value:DataSource});
+DataSource.prototype.constructor=DataSource;
 
 /**
  * 是否为一个远程数据源
@@ -72,7 +72,7 @@ DataSource.prototype.isRemote=function isRemote()
  */
 DataSource.prototype.options=function options( opt )
 {
-    if( System.isObject(opt, true) )
+    if( System.isObject(opt) )
     {
         Object.merge( storage(this,"options") , opt);
     }
