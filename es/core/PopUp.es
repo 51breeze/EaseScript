@@ -112,17 +112,21 @@ package es.core
             if( maskInstance )maskInstance.hide();
             if( timeoutId )clearTimeout(timeoutId);
             skin.visible=false;
+            enableScroll();
             callback = null;
             return true;
         }
 
-        private var win:Element = new Element(window);
         protected function position( options={} )
         {
             var skin = this.skin;
-            var win = this.win;
-            skin.left=  (win.width() - skin.width ) / 2;
-            skin.top=  (win.height() - skin.height ) / 2;
+            var win = getWindow();
+            var resize = function (e) {
+                skin.left= ( win.width() - skin.width ) / 2;
+                skin.top= ( win.height() - skin.height ) / 2;
+            };
+            win.addEventListener(Event.RESIZE, resize);
+            resize();
         }
 
         /**
@@ -175,6 +179,40 @@ package es.core
          */
         static private var maskInstance:Element=null;
 
+        static private var _win:Element;
+        static private function getWindow():Element
+        {
+            if( !_win )_win = new Element(window);
+            return _win;
+        }
+
+        static private var _root:Element;
+        static private function getRoot():Element
+        {
+            if( !_root )_root = new Element(document.body);
+            return _root;
+        }
+
+        static private var _disableScroll=false;
+        static private function disableScroll()
+        {
+            var root  = getRoot();
+            _disableScroll = true;
+            root.style("overflowX", "hidden");
+            root.style("overflowY", "hidden");
+        }
+
+        static private function enableScroll()
+        {
+            if( _disableScroll===true )
+            {
+                _disableScroll = false;
+                var root  = getRoot();
+                root.style("overflowX", "auto");
+                root.style("overflowY", "auto");
+            }
+        }
+
         /**
          * 显示一个遮罩层
          * @param style
@@ -193,14 +231,15 @@ package es.core
                     "left":"0px",
                     "top":"0px",
                 },style);
+
+                var win = getWindow();
+                var root  = getRoot();
                 var elem:Element = new Element('<div />');
-                var container = new Element(document.body);
-                var win = new Element(window);
                 elem.style( style );
-                container.addChild(elem);
+                root.addChild(elem);
                 win.addEventListener( Event.RESIZE ,function (e){
                     var height = win.height();
-                    elem.height( height + Math.max(win.scrollHeight()-height,0) );
+                    elem.height( height + Math.max( win.scrollHeight()-height,0) );
                 });
                 win.dispatchEvent( Event.RESIZE );
                 maskInstance = elem;
@@ -222,7 +261,7 @@ package es.core
          */
         static public function show(message:String, options:Object={}):PopUp
         {
-            options =  Object.merge({"titleText":"提示","bodyContent":message}, options) as JSON;
+            options =  Object.merge(true,{"profile":{"titleText":"提示","bodyContent":message},"disableScroll":true}, options) as JSON;
             var popup:PopUp = instance;
             if( popup ){
                 popup.action('close');
@@ -260,16 +299,17 @@ package es.core
             var mask = options.mask;
             var maskStyle = options.maskStyle||{};
             var position = options.position;
-            delete options.maskStyle;
-            delete options.mask;
-            delete options.animation;
-            delete options.position;
-            for( var p in options )if( p in skin )
+            var profile = options.profile as JSON;
+            for( var p in profile )if( p in skin )
             {
-                skin[ p ] = options[p];
+                skin[ p ] = profile[p];
             }
             popup.position( position );
             if(mask)PopUp.mask(maskStyle);
+            if( options.disableScroll )
+            {
+                disableScroll();
+            }
             if( animation.fadeOut != null ){
                 popup.fadeOut( animation.fadeOut , animation.delay );
             }else if( animation.fadeIn != null ){
@@ -289,7 +329,7 @@ package es.core
          */
         static public function info( message:String ,options:Object={}):PopUp
         {
-            options =  Object.merge(true,{"animation":{"fadeInOut":0.2,"delay":2},"currentState":"info"},options);
+            options =  Object.merge(true,{"animation":{"fadeInOut":0.2,"delay":2},"profile":{"currentState":"info"},"disableScroll":false},options);
             return PopUp.show(message, options);
         }
 
@@ -300,7 +340,7 @@ package es.core
          */
         static public function alert( message:String, options:Object={} ):PopUp
         {
-            options =  Object.merge({"currentState":"alert","mask":true} ,options);
+            options =  Object.merge({"mask":true,"profile":{"currentState":"alert"}} ,options);
             return PopUp.show(message,options);
         }
 
@@ -313,7 +353,7 @@ package es.core
          */
         static public function confirm(message:String,callback:Function,options:Object={}):PopUp
         {
-            options =  Object.merge({"currentState":"confirm","mask":true,"callback":callback},options);
+            options =  Object.merge({"mask":true,"callback":callback,"profile":{"currentState":"confirm"}},options);
             return PopUp.show(message,options);
         }
     }

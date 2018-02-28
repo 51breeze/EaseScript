@@ -19,7 +19,7 @@ ElementEvent.prototype.child=null;
 ElementEvent.prototype.constructor=ElementEvent;
 ElementEvent.ADD='elementAdd';
 ElementEvent.REMOVE='elementRemove';
-ElementEvent.CHNAGED='elementContentChanged';
+ElementEvent.CHANGE='elementChildrenChange';
 
 //鼠标事件
 Event.registerEvent(function ( type , target, originalEvent )

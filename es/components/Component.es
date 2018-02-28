@@ -17,7 +17,7 @@ package es.components
         /**
          * @private
          */
-        private var __initialized__=false;
+        private var _initialized=false;
 
         /**
          * 组件初始完成
@@ -25,22 +25,15 @@ package es.components
          */
         protected function initialized()
         {
-            var val = this.__initialized__;
+            var val = this._initialized;
             if( val===false )
             {
-                this.__initialized__=true;
-                if( this.hasEventListener( ComponentEvent.INITIALIZED) )
-                {
-                    this.dispatchEvent(new ComponentEvent(ComponentEvent.INITIALIZED));
-                }
+                this._initialized=true;
+                this.hasEventListener( ComponentEvent.INITIALIZED) && this.dispatchEvent(new ComponentEvent(ComponentEvent.INITIALIZED) );
             }
             return val;
         }
 
-        /**
-         * @private
-         */
-        private var __initializing__=true;
 
         /**
          * 组件初始化进行中
@@ -48,14 +41,10 @@ package es.components
          */
         protected function initializing()
         {
-            var val = this.__initializing__;
-            if( val===true )
+            var val = this._initialized===false;
+            if( val===true && this.hasEventListener( ComponentEvent.INITIALIZING) )
             {
-                this.__initializing__=false;
-                if( this.hasEventListener( ComponentEvent.INITIALIZING) )
-                {
-                    this.dispatchEvent(new ComponentEvent(ComponentEvent.INITIALIZING));
-                }
+                this.dispatchEvent(new ComponentEvent(ComponentEvent.INITIALIZING));
             }
             return val;
         };

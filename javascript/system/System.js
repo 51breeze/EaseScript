@@ -83,8 +83,13 @@ System.env = {
      * 获取当前运行平台
      * @returns {*}
      */
-    env.platform = function platform(name) {
-        if (name != null)return name == _platform[0];
+    env.platform = function platform(name, version)
+    {
+        if (name != null){
+            name = name.toUpperCase();
+            if( version > 0 )return name == _platform[0] && env.version( version );
+            return name == _platform[0];
+        }
         return _platform[0];
     };
 
@@ -124,7 +129,10 @@ System.env = {
  */
 System.typeOf = function typeOf(instanceObj)
 {
-    if (instanceObj == null )return 'object';
+    if (instanceObj == null )
+    {
+        return instanceObj===null ? 'object' : 'undefined';
+    }
     if (instanceObj instanceof System.Class )return 'class';
     if (instanceObj instanceof System.Interface)return 'interface';
     if (instanceObj instanceof System.Namespace)return 'namespace';
@@ -521,6 +529,16 @@ System.storage=function storage(target, name , value)
     }
     return target[name];
 };
+
+var _globalEvent=null;
+System.getGlobalEvent=function getGlobalEvent()
+{
+      if( _globalEvent===null )
+      {
+          _globalEvent = new System.EventDispatcher( window );
+      }
+      return _globalEvent;
+}
 
 Internal.createSymbolStorage=function(symbol)
 {

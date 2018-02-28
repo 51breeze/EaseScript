@@ -4,7 +4,7 @@ Object.defineProperty(IDisplay,"__T__",{value:{
 	"package":"es.interfaces",
 	"classname":"IDisplay",
 	"_private":_private,
-	"uri":["U22_","W23_","Q24_","_"]
+	"uri":["j22_","B23_","I24_","_"]
 }});
 return IDisplay;
 });

@@ -37,7 +37,7 @@ Event.BEFOREPASTE='beforepaste';
 Event.SELECTSTART='selectstart';
 Event.READY='ready';
 Event.SCROLL='scroll';
-Event.INITIALIZED='systemInitialized';
+Event.INITIALIZE_COMPLETED = "initializeCompleted";
 
 /**
  * 事件原型

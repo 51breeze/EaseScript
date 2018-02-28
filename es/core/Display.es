@@ -25,7 +25,6 @@ package es.core
         {
             if( element==null || element.length != 1 )
             {
-                log( System.getQualifiedObjectName(this) );
                 throw new TypeError("The selector elements can only is a single element");
             }
             if( !Element.isNodeElement( element[0] ) )
@@ -307,6 +306,11 @@ package es.core
         {
             return _element.globalToLocal(left, top);
         };
+
+        public function contains( child:IDisplay ):Boolean
+        {
+            return _element.contains( child.element );
+        }
 
         /**
          * @protected

@@ -1,6 +1,6 @@
 {
   "name": "easescript",
-  "version": "1.0.15",
+  "version": "1.0.18",
   "description": "EaseScript Beta",
   "main": "./bin/es.js",
   "bin": {

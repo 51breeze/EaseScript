@@ -15,10 +15,3 @@ System.StyleEvent =StyleEvent;
 StyleEvent.prototype=Object.create( PropertyEvent.prototype );
 StyleEvent.prototype.constructor=StyleEvent;
 StyleEvent.CHANGE='styleChange';
-
-//属性事件
-Event.registerEvent(function ( type , target, originalEvent )
-{
-     if( originalEvent instanceof StyleEvent )return originalEvent;
-     if( type === StyleEvent.CHANGE )return new StyleEvent( StyleEvent.CHANGE );
-});

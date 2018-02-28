@@ -70,6 +70,13 @@ package es.interfaces
          */
         public function html( strHtml:String ):IDisplay;
 
+        /**
+         * 测是否当前的子级元素
+         * @param child
+         * @return
+         */
+        public function contains( child:IDisplay ):Boolean
+
     }
 }
 

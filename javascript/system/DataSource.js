@@ -378,7 +378,6 @@ DataSource.prototype.update=function update( value, condition)
     var data=[];
     var flag=false;
     var e;
-
     for (var i = 0; i < result.length; i++)
     {
         flag=false;

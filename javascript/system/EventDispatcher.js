@@ -10,15 +10,14 @@
 var storage=Internal.createSymbolStorage( Symbol('event') );
 function EventDispatcher( target )
 {
-    if( !System.instanceOf(this,EventDispatcher) )
+    if( !(this instanceof EventDispatcher) )
     {
-        if( target && System.instanceOf(target, EventDispatcher) )return target;
-        return new EventDispatcher( target );
+        return target && target instanceof EventDispatcher ? target : new EventDispatcher( target );
     }
     if( target != null && !( typeof target.addEventListener === "function" ||
         typeof target.attachEvent=== "function" ||
         typeof target.onreadystatechange !== "undefined" ||
-        System.instanceOf(target, EventDispatcher) ) )
+        target instanceof EventDispatcher ) )
     {
         target = null;
     }
@@ -36,7 +35,7 @@ EventDispatcher.prototype.constructor=EventDispatcher;
 EventDispatcher.prototype.hasEventListener=function hasEventListener( type )
 {
     var target =  storage(this,'target') || this;
-    if( System.is(target,EventDispatcher) && target !== this )
+    if( target instanceof EventDispatcher && target !== this )
     {
         return target.hasEventListener(type);
     }
@@ -76,7 +75,7 @@ EventDispatcher.prototype.addEventListener=function addEventListener(type,callba
     if( typeof type !== 'string' )throw new TypeError('Invalid event type');
     if( typeof callback !== 'function' )throw new TypeError('Invalid callback function');
     var target = storage(this,'target') || this;
-    if( System.is(target,EventDispatcher) && target !== this )
+    if( target instanceof EventDispatcher && target !== this )
     {
         target.addEventListener(type,callback,useCapture,priority,reference||this);
         return this;
@@ -105,7 +104,7 @@ EventDispatcher.prototype.addEventListener=function addEventListener(type,callba
 EventDispatcher.prototype.removeEventListener=function removeEventListener(type,listener)
 {
     var target = storage(this,'target') || this;
-    if( System.is(target,EventDispatcher) && target !== this )
+    if(target instanceof EventDispatcher && target !== this )
     {
         return target.removeEventListener(type,listener);
     }
@@ -127,7 +126,7 @@ EventDispatcher.prototype.dispatchEvent=function dispatchEvent( event )
     if( typeof event === "string" )event = new System.Event( event );
     if( !System.is(event,Event) )throw new TypeError('Invalid event');
     var target = storage(this,'target') || this;
-    if( System.is(target,EventDispatcher) && target !== this )
+    if( target instanceof EventDispatcher && target !== this )
     {
         return target.dispatchEvent(event);
     }
@@ -163,7 +162,7 @@ function $addEventListener(target, listener )
     events = events[ type ] || ( events[ type ]=[] );
 
     //如果不是 EventDispatcher 则在第一个事件中添加事件代理。
-    if( events.length===0 && !System.is(target,EventDispatcher) )
+    if( events.length===0 && !(target instanceof EventDispatcher) )
     {
         //自定义事件处理
         if( Object.prototype.hasOwnProperty.call(Event.fix.hooks,type) )
@@ -222,7 +221,7 @@ function $removeEventListener(target, type, listener , dispatcher )
     }
 
     //如果是元素并且没有侦听器就删除
-    if( events.length < 1 && !System.is(target,EventDispatcher)  )
+    if( events.length < 1 && !(target instanceof EventDispatcher)  )
     {
         var eventType= Event.type( type );
         if( target.removeEventListener )
@@ -245,7 +244,7 @@ function $removeEventListener(target, type, listener , dispatcher )
  */
 function $dispatchEvent(e, currentTarget )
 {
-    if( !System.is(e,Event) )
+    if( !(e instanceof Event) )
     {
         e = Event.create( e );
         if(currentTarget)e.currentTarget = currentTarget;
@@ -260,6 +259,10 @@ function $dispatchEvent(e, currentTarget )
     {
         listener = events[ length++ ];
         thisArg = listener.reference || listener.dispatcher;
+        //如果是一个元素对象，设置当前元素为事件元素
+        if( thisArg.setCurrentElementTarget===true && e.target && (e.target.nodeType === 1 || e.target.nodeType === 9 || e.target.window) ){
+            thisArg.current( e.target );
+        }
         //调度侦听项
         listener.callback.call( thisArg , e );
         if( e.immediatePropagationStopped===true )

@@ -16,14 +16,14 @@ var storage=Internal.createSymbolStorage( Symbol('bindable') );
  */
 function commitProperties(event)
 {
-    var property = Reflect.get(event,'property');
+    var property = Reflect.get(null,event,'property');
     var binding = storage(this,'binding');
     var hash = storage(this,'hash');
     var bind =  binding[ property ];
     
     if( bind )
     {
-        var newValue = Reflect.get(event, 'newValue');
+        var newValue = Reflect.get(null,event, 'newValue');
 
         //相同的属性值不再提交
         if (typeof newValue !== "undefined" && newValue !== hash[property] )
@@ -56,11 +56,17 @@ function setProperty(object, prop, newValue )
 
     }else if( object instanceof Element )
     {
-       Element.prototype.property.call(object,prop,newValue);
+        if( typeof object[prop] === "function" )
+        {
+            object[prop]( newValue );
+        }else
+        {
+            Element.prototype.property.call(object,prop,newValue);
+        }
 
-    }else if( Reflect.has( object, prop) )
+    }else if( Reflect.has(null, object, prop) )
     {
-        Reflect.set( object, prop, newValue );
+        Reflect.set(null, object, prop, newValue );
     }
 }
 
@@ -76,11 +82,16 @@ function getProperty(object, prop )
 
     }else if( object instanceof Element )
     {
-        return Element.prototype.property.call(object,prop);
+        if( typeof object[prop] === "function" )
+        {
+            return object[prop]();
+        }else {
+            return Element.prototype.property.call(object, prop);
+        }
 
-    }else if( Reflect.has( object, prop) )
+    }else if( Reflect.has(null, object, prop) )
     {
-        return Reflect.get( object, prop );
+        return Reflect.get(null, object, prop );
     }
     return undefined;
 }
@@ -110,7 +121,7 @@ function Bindable(source,properties)
     storage(this,true,{"source":source,"properties":properties,"hash":{},"subscriber":new Dictionary(),"binding":{}});
     this.addEventListener(PropertyEvent.CHANGE,commitProperties);
 }
-Bindable.prototype=  Object.create( EventDispatcher.prototype );
+Bindable.prototype=Object.create( EventDispatcher.prototype );
 Bindable.prototype.constructor=Bindable;
 
 /**
@@ -155,7 +166,7 @@ Bindable.prototype.bind=function bind(target, property, name, flag)
                 item.element = new Element(target);
                 dispatch = item.element;
             }
-            if( dispatch === target && !System.instanceOf(target, EventDispatcher) )dispatch = null;
+            if( dispatch === target && !(target instanceof EventDispatcher) )dispatch = null;
             if( dispatch )item.dispatcher = dispatch;
         }
 
@@ -164,16 +175,16 @@ Bindable.prototype.bind=function bind(target, property, name, flag)
         {
             item.handle = function (event)
             {
-                var property = Reflect.get(event,'property');
-                var newValue = Reflect.get(event,'newValue');
-                var oldValue = Reflect.get(event,'oldValue');
+                var property = Reflect.get(null,event,'property');
+                var newValue = Reflect.get(null,event,'newValue');
+                var oldValue = Reflect.get(null,event,'oldValue');
                 if( property && typeof newValue !== "undefined" && newValue!==oldValue && item.binding.hasOwnProperty(property) )
                 {
                     this.property( item.binding[ property ] , newValue );
                 }
             };
             //如果目标对象的属性发生变化
-            Reflect.apply( Reflect.get(item.dispatcher,'addEventListener'), item.dispatcher, [PropertyEvent.CHANGE,item.handle,false,0,this]);
+            Reflect.call(null,item.dispatcher,'addEventListener',[PropertyEvent.CHANGE,item.handle,false,0,this] );
         }
     }
 
@@ -185,11 +196,11 @@ Bindable.prototype.bind=function bind(target, property, name, flag)
     var source = storage(this,'source');
     if( source )
     {
-        if( !Reflect.has(source, name) )
+        if( !Reflect.has(null,source, name) )
         {
             throw new TypeError("target source property is not exists for '"+name+"'");
         }
-        var value = Reflect.get(source, name);
+        var value = Reflect.get(null,source, name);
         if( value )
         {
             setProperty(item.element, property, value );
@@ -297,7 +308,7 @@ Bindable.prototype.hasProperty=function hasProperty(name)
     var properties = storage(this,'properties');
     if( properties[0] === '*' )
     {
-        return Reflect.has(storage(this,'source'),name);
+        return Reflect.has(null,storage(this,'source'),name);
     }
     return properties.indexOf(name) >= 0;
 };

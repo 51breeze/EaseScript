@@ -80,7 +80,7 @@ var fix={
                 this.document.documentElement['client'+prop] || 0
             );
 
-        } else if ( Element.isDocument.call(this) )
+        } else if ( Element.isDocument(this) )
         {
             return Math.max(
                     this.body['scroll'+prop] || 0,
@@ -125,7 +125,6 @@ var storage=Internal.createSymbolStorage( Symbol('element') );
 function access(callback, name, newValue)
 {
     var write= typeof newValue !== 'undefined';
-    if( this.length < 1 )return null;
     var getter = accessor[callback].get;
     var setter = accessor[callback].set;
     if( fix.fnHooks[callback] )
@@ -133,7 +132,11 @@ function access(callback, name, newValue)
         getter = typeof fix.fnHooks[callback].get === "function" ? fix.fnHooks[callback].get : getter ;
         setter = typeof fix.fnHooks[callback].set === "function" ? fix.fnHooks[callback].set : setter ;
     }
-    if( !write )return getter.call(this.current(),name,this);
+    if( !write )
+    {
+        var elem = this.current();
+        return elem ? getter.call(elem,name,this) : false;
+    }
     return this.forEach(function(elem)
     {
         var oldValue= getter.call(elem,name,this);
@@ -263,6 +266,20 @@ function getStyleName(name )
     }
     return name;
 }
+//获取并设置id
+function getIdSelector( elem )
+{
+    if( !Element.isNodeElement(elem) )return null;
+    var id = elem.getAttribute('id');
+    var has = false;
+    if( !id )
+    {
+        has = true;
+        id = 'sq_' + Math.ceil(Math.random() * 1000000);
+        elem.setAttribute('id', id);
+    }
+    return {id:'#' + id,has:has,elem:elem};
+}
 /**
  * 选择元素
  * @param mixed selector CSS3选择器
@@ -275,39 +292,56 @@ var querySelector = typeof Sizzle === "function" ?  function(selector, context, 
 {
     if( !results || !System.isArray(results) )
     {
-        //如果选择器不是一个字符串
-        if (typeof selector !== "string")
+        results = null;
+        if( context && (context === document || Element.isWindow(context) ) )
         {
-            results = Element.isNodeElement(selector) || Element.isWindow(selector) ? [selector] : [];
-        }else
-        {
-            var has = false;
-            //设置上下文
-            if (context && typeof context.nodeName === "string" && context.nodeType === 1) {
-                var id = context.getAttribute('id');
-                if (!id || id == '') {
-                    has = true;
-                    id = 'sq_' + Math.ceil( Math.random() * 1000000);
-                    context.setAttribute('id', id);
-                }
-                selector = '#' + id + ' ' + selector;
-            } else if (typeof context === "string") {
-                selector = context + ' ' + selector;
-            }
-            var tem=[];
-            results = document.querySelectorAll(selector);
-            if( results.length > 0 )for(var i=0; i< results.length ; i++)tem[i]=results[i];
-            results = tem;
-            if(has)context.removeAttribute('id');
+            context = null;
         }
+
+        //设置上下文
+        var contextId = context ? getIdSelector( context ) : null;
+        var selectorId = null;
+
+        //如果选择器不是一个字符串
+        if( typeof selector !== "string" )
+        {
+            if( ( Element.isNodeElement(selector) || Element.isWindow(selector) ) && !context )
+            {
+                results = [selector];
+            }else
+            {
+                selectorId = getIdSelector( selector );
+                if( selectorId )
+                {
+                    selector = selectorId.id;
+                }else{
+                    results = [];
+                }
+            }
+        }
+
+        if( results==null )
+        {
+            var tem = [];
+            selector = (contextId ? contextId.id : typeof context==="string" ? context : '') + ' ' + selector;
+            results = document.querySelectorAll(selector);
+            if (results.length > 0)for(var i = 0; i < results.length; i++)tem[i] = results[i];
+            results = tem;
+        }
+        if (contextId && contextId.has === true)contextId.elem.removeAttribute('id');
+        if (selectorId && selectorId.has === true)selectorId.elem.removeAttribute('id');
     }
+
     if( seed && System.isArray(seed) )
     {
         var i=0;
         var ret=[];
-        while( i<seed.length )if( Array.prototype.indexOf.call(results, seed[i]) >=0 )
+        while( i<seed.length )
         {
-            ret.push( seed[i] );
+            if( Array.prototype.indexOf.call(results, seed[i]) >=0 && Array.prototype.indexOf.call(ret,seed[i]) < 0)
+            {
+                ret.push( seed[i] );
+            }
             i++;
         }
         return ret;
@@ -596,6 +630,7 @@ function Element(selector, context)
 
 Element.prototype= Object.create( EventDispatcher.prototype );
 Element.prototype.constructor=Element;
+Element.prototype.setCurrentElementTarget=true;
 
 /**
  * 返回一个指定开始索引到结束索引的元素并返回新的Element集合
@@ -687,7 +722,8 @@ Element.prototype.current=function current( elem )
     if( typeof elem === "undefined" )return storage(this,'forEachCurrentItem') || this[0];
     if( elem )
     {
-        if (typeof elem === "string") {
+        if (typeof elem === "string")
+        {
             elem = querySelector(elem, this.context || document);
             elem = elem && elem.length > 0 ? elem[0] : null;
         }
@@ -1513,7 +1549,7 @@ Element.prototype.addChildAt=function addChildAt( childElemnet, index )
         childElemnet['parent-element'] = parent;
     }
     dispatchEvent( EventDispatcher( childElemnet ) ,ElementEvent.ADD, parent, childElemnet , result );
-    dispatchEvent( EventDispatcher( parent ) , ElementEvent.CHNAGED, parent, childElemnet , result );
+    dispatchEvent( EventDispatcher( parent ) , ElementEvent.CHANGE, parent, childElemnet , result );
     return childElemnet;
 };
 
@@ -1588,7 +1624,7 @@ Element.prototype.removeChild=function removeChild( childElemnet )
     }
     var result = parent.removeChild( childElemnet );
     dispatchEvent( EventDispatcher( childElemnet ) , ElementEvent.REMOVE, parent, childElemnet , result );
-    dispatchEvent( EventDispatcher( parent ) , ElementEvent.CHNAGED, parent, childElemnet , result );
+    dispatchEvent( EventDispatcher( parent ) , ElementEvent.CHANGE, parent, childElemnet , result );
     return childElemnet;
 };
 
@@ -1609,16 +1645,34 @@ Element.prototype.removeChildAt=function removeChildAt( index )
 };
 
 /**
- * 测试指定的元素（或者是一个选择器）是否为当前元素的子级
+ * 测试指定的元素是否为当前匹配集合元素中第一个元素的子级
  * @param child
  * @returns {boolean}
  */
-Element.contains=function contains( child , parent )
+Element.prototype.contains=function contains( child )
 {
+    child = child instanceof Element ? child[0] : child;
+    return Element.contains(this[0], child);
+}
+
+/**
+ * 测试指定的元素（或者是一个选择器）是否为当前元素的子级
+ * @param parent
+ * @param child
+ * @returns {boolean}
+ */
+Element.contains=function contains(parent,child)
+{
+    if( !parent || !child )return false;
     if( Element.isNodeElement(child) && Element.isNodeElement(parent) )
     {
-        if('contains' in parent)return parent.contains( child ) && parent !== child;
-        return !!(parent.compareDocumentPosition(child) & 16) && parent !== child ;
+        if('contains' in parent){
+            return parent.contains( child ) && parent !== child;
+        }
+        if( parent.compareDocumentPosition )
+        {
+            return !!(parent.compareDocumentPosition(child) & 16) && parent !== child;
+        }
     }
     return querySelector( child, parent ).length > 0;
 };

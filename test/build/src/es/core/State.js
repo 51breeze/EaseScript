@@ -1,16 +1,16 @@
 define(["es.core.State"],function(State){
 var _private=this._private;
-var proto={"constructor":{"value":State},"R10__name":{"writable":true,"value":''}
-,"R10__stateGroup":{"writable":true,"value":new Array()}
+var proto={"constructor":{"value":State},"e10__name":{"writable":true,"value":''}
+,"e10__stateGroup":{"writable":true,"value":new Array()}
 ,"Get__name":{"value":function name(){
 	return this[_private]._name;
 }},"Set__name":{"value":function name(value){
-	if(!System.is(value, String))throw new TypeError("type does not match. must be String");
+	if( value && !System.is(value, String))throw new TypeError("type does not match. must be String");
 	this[_private]._name=value;
 }},"Get__stateGroup":{"value":function stateGroup(){
 	return this[_private]._stateGroup;
 }},"Set__stateGroup":{"value":function stateGroup(value){
-	if(!System.is(value, Array))throw new TypeError("type does not match. must be Array");
+	if( value && !System.is(value, Array))throw new TypeError("type does not match. must be Array");
 	this[_private]._stateGroup=value;
 }},"_includeIn":{"value":function includeIn(value){
 	return value===this[_private]._name||this[_private]._stateGroup.indexOf(value)>=0;
@@ -26,7 +26,7 @@ Object.defineProperty(State,"__T__",{value:{
 	"package":"es.core",
 	"classname":"State",
 	"_private":_private,
-	"uri":["R10_","q29_","V21_","_"],
+	"uri":["e10_","m29_","T21_","_"],
 	"proto":proto
 }});
 return State;

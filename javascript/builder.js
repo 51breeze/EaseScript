@@ -284,7 +284,8 @@ function builder(config , code, requirements , replacements )
         {
             if( requirements[p]===true && requires.indexOf( p ) < 0 && ( globals.hasOwnProperty( p ) || config.globals.hasOwnProperty(p) ) )
             {
-                if( p!=="arguments" ){
+                if( p !== "arguments" )
+                {
                     requires.push( p );
                 }
             }
@@ -298,6 +299,9 @@ function builder(config , code, requirements , replacements )
 
     //模块定义器
     include(contents, 'define' , rootPath+'/define.js', fix , libs);
+
+    //系统引导器
+    var bootstrap = utils.getContents( rootPath+'/bootstrap.js' );
 
      //模块描述
     //contents.unshift('var descriptions = '+JSON.stringify(descriptions)+';\n');
@@ -331,6 +335,8 @@ function builder(config , code, requirements , replacements )
         run = '(function(System,Internal,Object,Class,Reflect){\n'+ utils.getContents( rootPath+'/run-dev.js' )+'\n}(System,Internal,System.Object,System.Class,System.Reflect));';
     }
 
+
+
     return [
         '(function(System,Internal,undefined){',
         '"use strict";',
@@ -343,9 +349,7 @@ function builder(config , code, requirements , replacements )
         //自定义模块域
         '(function(define,'+requires.join(',')+'){',
         code,
-        'try{\n\tnew EventDispatcher(document).addEventListener(Event.READY,function (e){',
-        '\t\tReflect.construct(System.getDefinitionByName("'+config.main+'"));\n\t});',
-        '}catch(e){\n\tthrow e.toString();\n}',
+        bootstrap.replace("{config.main}", config.main ),
         '})(Internal.define,'+requires.map(function (a){
             a = mapname[a] || a;
             if(a==='System')return a;

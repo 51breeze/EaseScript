@@ -9,7 +9,7 @@ if( !Array.prototype.map )
         var T, A, k;
         if (this == null)throw new TypeError("this is null or not defined");
         if (!System.isFunction(callback))throw new TypeError(callback + " is not a function");
-        var O =  System.isObject(this) ? this : [];
+        var O =  System.isArray(this) ? this : [];
         var len = O.length >>> 0;
         if (thisArg)T = thisArg;
         A = new Array(len);

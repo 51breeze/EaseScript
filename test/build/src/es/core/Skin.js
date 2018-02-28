@@ -1,6 +1,6 @@
 define(["es.core.Skin","es.core.Container","es.core.Display","ns:es.core.es_internal","es.components.Component","es.events.SkinEvent","es.core.State","if:es.interfaces.IDisplay"],function(Skin,Container,Display,es_internal,Component,SkinEvent,State,IDisplay){
 var _private=this._private;
-var method={"D7_parseSkinObject":{"value":function parseSkinObject(skin,hash){
+var method={"R7_parseSkinObject":{"value":function parseSkinObject(skin,hash){
 	if(skin == null ){skin={};}
 	if(hash == null ){hash={};}
 	var v;
@@ -11,7 +11,7 @@ var method={"D7_parseSkinObject":{"value":function parseSkinObject(skin,hash){
 	var len=children.length;
 	var i=0;
 	for(;i<len;i++){
-		content+=System.typeOf(children[i])==="string"?children[i]:Skin.D7_parseSkinObject(children[i],hash);
+		content+=System.typeOf(children[i])==="string"?children[i]:Skin.R7_parseSkinObject(children[i],hash);
 	}
 	if(tag==='text')return content;
 	var str='<'+tag;
@@ -28,16 +28,16 @@ var method={"D7_parseSkinObject":{"value":function parseSkinObject(skin,hash){
 for(var prop in method){
 	Object.defineProperty(Skin, prop, method[prop]);
 }
-var proto={"constructor":{"value":Skin},"n6__hash":{"writable":true,"value":null}
-,"n6__skinChildren":{"writable":true,"value":null}
-,"n6__name":{"writable":true,"value":null}
-,"n6__attr":{"writable":true,"value":null}
-,"Get_D7_skinChildren":{"value":function skinChildren(){
+var proto={"constructor":{"value":Skin},"X6__hash":{"writable":true,"value":null}
+,"X6__skinChildren":{"writable":true,"value":null}
+,"X6__name":{"writable":true,"value":null}
+,"X6__attr":{"writable":true,"value":null}
+,"Get_R7_skinChildren":{"value":function skinChildren(){
 	return Reflect.type(this[_private]._skinChildren,Array);
 }},"Get__name":{"value":function name(){
 	return this[_private]._name;
 }},"Set__name":{"value":function name(value){
-	if(!System.is(value, String))throw new TypeError("type does not match. must be String");
+	if( value && !System.is(value, String))throw new TypeError("type does not match. must be String");
 	this[_private]._name=value;
 }},"Get__attr":{"value":function attr(){
 	return this[_private]._attr;
@@ -50,9 +50,9 @@ var proto={"constructor":{"value":Skin},"n6__hash":{"writable":true,"value":null
 	}
 	return null;
 }}
-,"n6_stateGroup":{"writable":true,"value":{}}
+,"X6_stateGroup":{"writable":true,"value":{}}
 ,"Set__states":{"value":function states(value){
-	if(!System.is(value, Array))throw new TypeError("type does not match. must be Array");
+	if( value && !System.is(value, Array))throw new TypeError("type does not match. must be Array");
 	var name;
 	var stateObj;
 	var len=value.length;
@@ -67,17 +67,17 @@ var proto={"constructor":{"value":Skin},"n6__hash":{"writable":true,"value":null
 		}
 		stateGroup[name]=stateObj;
 	}
-}},"n6__currentState":{"writable":true,"value":null}
+}},"X6__currentState":{"writable":true,"value":null}
 ,"Get__currentState":{"value":function currentState(){
 	return Reflect.type(this[_private]._currentState,String);
 }},"Set__currentState":{"value":function currentState(name){
-	if(!System.is(name, String))throw new TypeError("type does not match. must be String");
+	if( name && !System.is(name, String))throw new TypeError("type does not match. must be String");
 	var current=this[_private]._currentState;
 	if(current!==name){
 		this[_private]._currentState=name;
-		this.D7_updateDisplayList();
+		this.R7_updateDisplayList();
 	}
-}},"n6__layout":{"writable":true,"value":null}
+}},"X6__layout":{"writable":true,"value":null}
 ,"Get__layout":{"value":function layout(){
 	return this[_private]._layout;
 }},"Set__layout":{"value":function layout(layoutObject){
@@ -85,47 +85,47 @@ var proto={"constructor":{"value":Skin},"n6__hash":{"writable":true,"value":null
 	if(current!==layoutObject){
 		this[_private]._layout=layoutObject;
 	}
-}},"D7_initializing":{"value":function initializing(){
+}},"R7_initializing":{"value":function initializing(){
 }}
-,"n6__hostComponent":{"writable":true,"value":null}
-,"Set_X3_hostComponent":{"value":function hostComponent(host){
-	if(!System.is(host, Component))throw new TypeError("type does not match. must be Component");
+,"X6__hostComponent":{"writable":true,"value":null}
+,"Set_D3_hostComponent":{"value":function hostComponent(host){
+	if( host && !System.is(host, Component))throw new TypeError("type does not match. must be Component");
 	if(host==null)throw new ReferenceError("hostComponent is null","E:/EaseScript/es/core/Skin.es","202:78");
 	this[_private]._hostComponent=host;
-	this.D7_initializing();
-}},"Get_D7_hostComponent":{"value":function hostComponent(){
+	this.R7_initializing();
+}},"Get_R7_hostComponent":{"value":function hostComponent(){
 	return this[_private]._hostComponent;
-}},"n6__render":{"writable":true,"value":null}
+}},"X6__render":{"writable":true,"value":null}
 ,"Get__render":{"value":function render(){
 	var obj=this[_private]._render;
 	if(!obj)obj=new Render();
 	this[_private]._render=obj;
 	return obj;
 }},"Set__render":{"value":function render(value){
-	if(!System.is(value, Render))throw new TypeError("type does not match. must be Render");
+	if( value && !System.is(value, Render))throw new TypeError("type does not match. must be Render");
 	this[_private]._render=value;
 }},"Get__template":{"value":function template(){
 	return this.Get__render().template(null);
 }},"Set__template":{"value":function template(value){
-	if(!System.is(value, String))throw new TypeError("type does not match. must be String");
+	if( value && !System.is(value, String))throw new TypeError("type does not match. must be String");
 	this.Get__render().template(value);
 }},"_variable":{"value":function variable(name,value){
 	return this.Get__render().variable(name,value);
 }}
 ,"_skinInstaller":{"value":function skinInstaller(){
-	this.D7_createChildren();
+	this.R7_createChildren();
 }}
-,"D7_createChildren":{"value":function createChildren(){
+,"R7_createChildren":{"value":function createChildren(){
 	var e;
 	var elem;
 	var rd;
-	var children=this.Get_D7_skinChildren();
+	var children=this.Get_R7_skinChildren();
 	var hash=this[_private]._hash;
 	var len=children.length;
 	var c=0;
 	var child;
 	var render=this[_private]._render;
-	var parent=this.Get_D7_displayParent();
+	var parent=this.Get_R7_displayParent();
 	this._removeAllChild();
 	if(render){
 		child=Reflect.call(Skin,render,"fetch");
@@ -136,7 +136,7 @@ var proto={"constructor":{"value":Skin},"n6__hash":{"writable":true,"value":null
 	for(;c<len;c++){
 		child=children[c];
 		if(System.isObject(child)){
-			child=Skin.D7_parseSkinObject(child,hash);
+			child=Skin.R7_parseSkinObject(child,hash);
 		}
 		else if(System.instanceOf(child,Render)){
 			rd=Reflect.type(child,Render);
@@ -149,7 +149,7 @@ var proto={"constructor":{"value":Skin},"n6__hash":{"writable":true,"value":null
 				this._addChildAt(new Display.constructor(elem),-1);
 			}
 			else if(System.instanceOf(child,Skin)){
-				(child).D7_createChildren();
+				(child).R7_createChildren();
 				this._addChild(Reflect.type(child,Display));
 			}
 		}
@@ -160,14 +160,14 @@ var proto={"constructor":{"value":Skin},"n6__hash":{"writable":true,"value":null
 		e.Set__child(this);
 		this.dispatchEvent(e);
 	}
-	this.D7_updateDisplayList();
+	this.R7_updateDisplayList();
 }}
 ,"_toString":{"value":function toString(){
-	this.D7_createChildren();
+	this.R7_createChildren();
 	return Container.prototype._toString.call(this);
 }}
-,"n6_getCurrentState":{"value":function getCurrentState(currentState){
-	if(!System.is(currentState, String))throw new TypeError("type does not match. must be String");
+,"X6_getCurrentState":{"value":function getCurrentState(currentState){
+	if( currentState && !System.is(currentState, String))throw new TypeError("type does not match. must be String");
 	var state;
 	var p;
 	var stateGroup=this[_private].stateGroup;
@@ -180,12 +180,12 @@ var proto={"constructor":{"value":Skin},"n6__hash":{"writable":true,"value":null
 	}
 	return null;
 }}
-,"D7_updateDisplayList":{"value":function updateDisplayList(){
+,"R7_updateDisplayList":{"value":function updateDisplayList(){
 	var elems;
 	var stateGroup;
 	var currentState=this.Get__currentState();
 	if(currentState){
-		stateGroup=this.n6_getCurrentState(currentState);
+		stateGroup=this.X6_getCurrentState(currentState);
 		if(!stateGroup)throw new ReferenceError('"'+currentState+'"'+' is not define',"E:/EaseScript/es/core/Skin.es","373:95");
 		elems=new Element('[includeIn],[excludeFrom]',this.Get__element());
 		elems.forEach(function(){
@@ -241,7 +241,7 @@ Object.defineProperty(Skin,"__T__",{value:{
 	"package":"es.core",
 	"classname":"Skin",
 	"_private":_private,
-	"uri":["n6_","D7_","V21_","_"],
+	"uri":["X6_","R7_","T21_","_"],
 	"method":method,
 	"proto":proto
 }});
