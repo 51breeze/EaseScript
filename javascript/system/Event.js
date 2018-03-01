@@ -39,6 +39,11 @@ Event.READY='ready';
 Event.SCROLL='scroll';
 Event.INITIALIZE_COMPLETED = "initializeCompleted";
 
+Event.ANIMATION_START="animationstart";
+Event.ANIMATION_END="animationend";
+Event.ANIMATION_ITERATION="animationiteration";
+Event.TRANSITION_END="transitionend";
+
 /**
  * 事件原型
  * @type {Object}
@@ -112,17 +117,21 @@ Event.prototype.stopImmediatePropagation = function stopImmediatePropagation()
  * map event name
  * @internal Event.fix;
  */
-Event.fix    =   {
+Event.fix={
     map:{},
     hooks:{},
     prefix:'',
+    cssprefix:'',
+    cssevent:{},
     eventname:{
-        'webkitAnimationEnd':true,
-        'webkitAnimationIteration':true,
         'DOMContentLoaded':true
     }
 };
 Event.fix.map[ Event.READY ]='DOMContentLoaded';
+Event.fix.cssevent[ Event.ANIMATION_START ]     ="AnimationStart";
+Event.fix.cssevent[ Event.ANIMATION_END ]       ="AnimationEnd";
+Event.fix.cssevent[ Event.ANIMATION_ITERATION ] ="AnimationIteration";
+Event.fix.cssevent[ Event.TRANSITION_END ]      ="TransitionEnd";
 
 /**
  * 获取统一的事件名
@@ -138,6 +147,10 @@ Event.type = function type( eventType, flag )
     {
         eventType= Event.fix.prefix==='on' ? eventType.replace(/^on/i,'') : eventType;
         var lower =  eventType.toLowerCase();
+        if( Event.fix.cssprefix && lower.substr(0, Event.fix.cssprefix.length )===Event.fix.cssprefix )
+        {
+            return lower.substr(Event.fix.cssprefix.length);
+        }
         for(var prop in Event.fix.map)
         {
             if( Event.fix.map[prop].toLowerCase() === lower )
@@ -146,6 +159,9 @@ Event.type = function type( eventType, flag )
             }
         }
         return eventType;
+    }
+    if( Event.fix.cssevent[ eventType ] ){
+        return Event.fix.cssprefix ? Event.fix.cssprefix+Event.fix.cssevent[ eventType ] : eventType;
     }
     if( Event.fix.eventname[ eventType ]===true )return eventType;
     return Event.fix.map[ eventType ] ? Event.fix.map[ eventType ] : Event.fix.prefix+eventType.toLowerCase();

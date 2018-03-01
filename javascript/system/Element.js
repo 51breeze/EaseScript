@@ -1066,6 +1066,26 @@ Element.prototype.height=function height( value )
 };
 
 /**
+ * 为当前选择的元素集应用动画效果
+ * @param name  动画名
+ * @param duration 持续时间
+ * @param timing 运行函数名  linear ease ease-in ease-out ease-in-out cubic-bezier(n,n,n,n)
+ * @param delay  延时
+ * @param count 重复次数
+ * @param direction 是否应该轮流反向播放动画
+ * @param mode 属性规定动画在播放之前或之后，其动画效果是否可见  none | forwards | backwards | both
+ */
+Element.prototype.animation=function animation(name, duration, timing, delay, count, direction, mode)
+{
+    var cmd = name+" "+(duration || 3)+"s "+(timing ||"ease");
+    if(delay)cmd+=" "+delay+"s";
+    if(count)cmd+=" "+count;
+    if(direction)cmd+=" alternate";
+    this.style("animation",cmd+" "+(mode||"forwards"));
+    return this;
+}
+
+/**
  * @private
  */
 accessor['scroll']={
@@ -1820,6 +1840,11 @@ if( System.env.platform( System.env.BROWSER_FIREFOX ) && System.env.version(4) )
 }else if( System.env.platform(System.env.BROWSER_IE) && System.env.version(9,'>=') )
 {
     fix.cssPrefixName='-ms-';
+}
+
+if( fix.cssPrefixName==="-webkit-" && typeof Event !== "undefined" )
+{
+    Event.fix.cssprefix="webkit";
 }
 
 //set hooks for userSelect style

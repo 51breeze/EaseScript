@@ -88,7 +88,19 @@ package es.core
         {
             var skin:Skin = this.skin;
             skin.visible = true;
-            skin.style("animation", "fadeIn "+duration+"s linear 0s forwards" );
+           // skin.style("animation", "fadeIn "+duration+"s ease-in 0s forwards" );
+
+            skin.element.animation("fadeIn", duration);
+
+            skin.element.addEventListener(Event.ANIMATION_START,function (e) {
+
+                log("animation START");
+
+                skin.element.removeEventListener(Event.ANIMATION_START);
+
+            });
+
+
             var self = this;
             timeoutId = setTimeout(function () {
                 skin.style("animation", "fadeOut "+(duration)+"s linear 0s forwards" );
