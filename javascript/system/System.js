@@ -85,7 +85,8 @@ System.env = {
      */
     env.platform = function platform(name, version)
     {
-        if (name != null){
+        if ( typeof name === "string" )
+        {
             name = name.toUpperCase();
             if( version > 0 )return name == _platform[0] && env.version( version );
             return name == _platform[0];

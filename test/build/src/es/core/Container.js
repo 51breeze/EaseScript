@@ -1,6 +1,6 @@
 define(["es.core.Container","es.core.Display","if:es.interfaces.IDisplay","if:es.interfaces.IContainer"],function(Container,Display,IDisplay,IContainer){
 var _private=this._private;
-var proto={"constructor":{"value":Container},"v8__children":{"writable":true,"value":new Array()}
+var proto={"constructor":{"value":Container},"K8__children":{"writable":true,"value":new Array()}
 ,"Get__children":{"value":function children(){
 	return this[_private]._children.slice(0);
 }},"_getChildAt":{"value":function getChildAt(index){
@@ -32,7 +32,7 @@ var proto={"constructor":{"value":Container},"v8__children":{"writable":true,"va
 	var indexAt=index<0?index+children.length:index;
 	this.Get__element().addChildAt(child.Get__element(),index);
 	children.splice(indexAt,0,child);
-	(Reflect.type(child,Display)).Set_E7_displayParent(this);
+	(Reflect.type(child,Display)).Set_W7_displayParent(this);
 	return child;
 }}
 ,"_removeChild":{"value":function removeChild(child){
@@ -42,7 +42,7 @@ var proto={"constructor":{"value":Container},"v8__children":{"writable":true,"va
 	if(child){
 		children=this[_private]._children;
 		index=children.indexOf(child);
-		(Reflect.type(child,Display)).Set_E7_displayParent(null);
+		(Reflect.type(child,Display)).Set_W7_displayParent(null);
 		this.Get__element().removeChild(child.Get__element());
 		this[_private]._children.splice(index,1);
 		return child;
@@ -57,7 +57,7 @@ var proto={"constructor":{"value":Container},"v8__children":{"writable":true,"va
 	var children=this[_private]._children;
 	var len=children.length;
 	while(len>0){
-		this._removeChild(children[--len]);
+		this._removeChild(Reflect.type(children[--len],IDisplay));
 	}
 	this[_private]._children=new Array();
 }}
@@ -83,7 +83,7 @@ Object.defineProperty(Container,"__T__",{value:{
 	"classname":"Container",
 	"implements":[IContainer],
 	"_private":_private,
-	"uri":["v8_","E7_","s21_","_"],
+	"uri":["K8_","W7_","l21_","_"],
 	"proto":proto
 }});
 return Container;

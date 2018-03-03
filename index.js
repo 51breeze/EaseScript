@@ -113,6 +113,25 @@ function createDescription( syntax, stack , owner , moduleClass )
         desc['type'] = stack.returnType;
     }
 
+    var scope2 = stack.getScopeOf().define(  stack.name() )
+    if(  scope2 && scope2.value )
+    {
+        var content = scope2.value.content();
+        var reftype = "";
+        if( content[2] instanceof Ruler.STACK )
+        {
+            reftype = content[2].type();
+            switch ( reftype )
+            {
+                case "(JSON)" : reftype = "JSON"; break;
+                case "(Array)" : reftype = "Array"; break;
+            }
+        }else{
+            reftype = Utils.getConstantType( content[2].value ) || Utils.getValueTypeof( content[2].type );
+        }
+        desc.referenceType = reftype;
+    }
+
     desc['origintype'] = desc['type'];
     desc['privilege'] =stack.qualifier() || "internal";
     desc['static'] = !!stack.static();
@@ -758,8 +777,13 @@ const builder={
 
              style.unshift( "\n@import 'mixins.less';\n" );
              style.unshift( "\n@import 'main.less';\n" );
-             style.push( "\n@import './less/glyphicons.less';\n" );
-
+             if( config.animate ) {
+                 style.unshift("\n@import 'animate.less';\n");
+             }
+             if( config.font )
+             {
+                 style.push("\n@import './less/glyphicons.less';\n");
+             }
              less.render( style.join("\n") , options, function (err, output) {
                  if (err) {
                      Utils.error(err.message);

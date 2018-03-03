@@ -47,7 +47,7 @@ package es.core
         {
             var children:Array = this._children;
             index = index < 0 ? index+children.length : index;
-            var result:IDisplay = children[index];
+            var result:IDisplay = children[index] as IDisplay;
             if( result == null )
             {
                 throw new RangeError('The index out of range');
@@ -135,7 +135,7 @@ package es.core
             var len = children.length;
             while( len>0 )
             {
-                this.removeChild( children[ --len ] );
+                this.removeChild( children[ --len ] as IDisplay );
             }
             this._children = [];
         }

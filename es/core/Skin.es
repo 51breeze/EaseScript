@@ -349,10 +349,10 @@ package es.core
         private function getCurrentState(currentState:String):State
         {
             var stateGroup = this.stateGroup as JSON;
-            if( stateGroup.hasOwnProperty( currentState ) )return stateGroup[ currentState ];
+            if( stateGroup.hasOwnProperty( currentState ) )return stateGroup[ currentState ] as State;
             for( var p in stateGroup )
             {
-                var state:State = stateGroup[p];
+                var state:State = stateGroup[p] as State;
                 if( state.includeIn(currentState) )
                 {
                     return state;
@@ -398,7 +398,7 @@ package es.core
         static protected function parseSkinObject( skin:Object={} , hash={} ):String
         {
             var tag = skin.name || 'div';
-            var children:Array = skin.children;
+            var children:Array = skin.children as Array;
             var content:String='';
             var len = children.length;
             var i = 0;

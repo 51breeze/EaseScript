@@ -23,6 +23,16 @@ package es.core
         private var callback:Function;
 
         /**
+         * @private
+         */
+        private var timeoutId:Number=null;
+
+        /**
+         * @private
+         */
+        private var options={};
+
+        /**
          * @override
          */
         override public function get skinClass():Class
@@ -47,98 +57,70 @@ package es.core
         }
 
         /**
-         * 淡入显示窗体
-         * @param duration
-         * @param delay
-         */
-        protected function fadeIn( duration:Number=0 , delay:Number=0):void
-        {
-            var skin:Skin = this.skin;
-            skin.visible  = true;
-            skin.style("animation", "fadeIn "+duration+"s linear "+delay+"s forwards" );
-        }
-
-        /**
-         * 淡出关闭窗体
-         * @param duration
-         * @param delay
-         */
-        protected function fadeOut( duration:Number=0.8 , delay:Number=3 ):void
-        {
-            var skin:Skin = this.skin;
-            skin.visible = true;
-            skin.style("animation", "fadeOut "+duration+"s linear "+delay+"s forwards" );
-            var self = this;
-            setTimeout(function () {
-                self.action("close");
-            },(delay + duration)*1000 );
-        }
-
-        /**
-         * @private
-         */
-        private var timeoutId=null;
-
-        /**
-         * 淡入淡出窗体
-         * @param duration
-         * @param delay
-         */
-        protected function fadeInOut( duration:Number=1, delay:Number=3 ):void
-        {
-            var skin:Skin = this.skin;
-            skin.visible = true;
-           // skin.style("animation", "fadeIn "+duration+"s ease-in 0s forwards" );
-
-            skin.element.animation("fadeIn", duration);
-
-            skin.element.addEventListener(Event.ANIMATION_START,function (e) {
-
-                log("animation START");
-
-                skin.element.removeEventListener(Event.ANIMATION_START);
-
-            });
-
-
-            var self = this;
-            timeoutId = setTimeout(function () {
-                skin.style("animation", "fadeOut "+(duration)+"s linear 0s forwards" );
-                setTimeout(function () {
-                    self.action("close");
-                }, duration*1000+100 );
-            },(delay + duration)*1000 );
-        }
-
-        /**
          * 是否关闭窗体。
          * 如果回调函数返回false则不关闭
          * @param type
          */
-        public function action(type:String )
+        public function action(type:String , flag )
         {
-            if( callback && callback( type ) === false )
+            if( callback )
             {
-                return false;
+                if( callback( type ) === false ) return false;
+                callback = null;
             }
             if( maskInstance )maskInstance.hide();
             if( timeoutId )clearTimeout(timeoutId);
-            skin.visible=false;
             enableScroll();
-            callback = null;
+            var options = this.options;
+            var animation = options.animation;
+            var skin = this.skin;
+            if( !flag && animation && animation.enabled )
+            {
+                var anHidden = animation.hidden;
+                skin.style("animation", anHidden.name+" "+anHidden.duration+"s "+anHidden.timing+" "+anHidden.delay+"s "+anHidden.fillMode);
+                setTimeout(function () {
+                    skin.visible=false;
+                }, (anHidden.delay+anHidden.duration)*1000);
+
+            }else{
+                skin.visible=false;
+            }
+            this.showing = false;
             return true;
         }
 
-        protected function position( options={} )
+        /**
+         * 设置窗体的位置
+         */
+        protected function position()
         {
+            var opt = this.options;
             var skin = this.skin;
             var win = getWindow();
-            var resize = function (e) {
-                skin.left= ( win.width() - skin.width ) / 2;
-                skin.top= ( win.height() - skin.height ) / 2;
-            };
-            win.addEventListener(Event.RESIZE, resize);
-            resize();
+            var offsetX = opt.offsetX || 0;
+            var offsetY = opt.offsetY || 0;
+            switch ( opt.horizontal )
+            {
+                case "left" :
+                    skin.left = offsetX+0;
+                break;
+                case "right" :
+                    skin.left = offsetX+( win.width() - skin.width );
+                break;
+                default :
+                    skin.left = offsetX+( win.width() - skin.width ) / 2;
+            }
+            switch ( opt.vertical )
+            {
+                case "top" :
+                    skin.top = offsetY+0;
+                    break;
+                case "bottom" :
+                    skin.top = offsetY+( win.height() - skin.height );
+                    break;
+                default :
+                    skin.top = offsetY+( win.height() - skin.height ) / 2;
+            }
         }
 
         /**
@@ -155,7 +137,7 @@ package es.core
                 var len = bottons.length;
                 var self = this;
                 for(;i<len;i++){
-                    var name:String = bottons[i];
+                    var name:String = bottons[i] as String;
                     if( name in skin )
                     {
                         var btn:Skin = skin[name] as Skin;
@@ -166,9 +148,94 @@ package es.core
                         })(name));
                     }
                 }
+                var win = getWindow();
+                win.addEventListener(Event.RESIZE,this.position,false,0,this);
                 return true;
             }
             return false;
+        }
+
+        /**
+         * @private
+         */
+        private var showing = false;
+
+        /**
+         * 显示弹窗
+         * @param options
+         * @returns {PopUp}
+         */
+        public function show(message:String, options:Object={})
+        {
+            var skin:Skin = this.skin;
+
+            //关闭在显示中的窗体
+            if( this.showing )
+            {
+                this.action('close', false);
+            }
+            this.showing = true;
+            //初始化配置
+            options = Object.merge(true,defaultOptions,options) as JSON;
+            options.profile.bodyContent=message;
+            skin.style('zIndex',TOP_LEVEL);
+            if( System.env.platform('IE', 8) )
+            {
+                skin.style('position','absolute');
+            }
+            this.callback = options.callback as Function;
+            this.options = options;
+            var mask = options.mask;
+            var maskStyle = options.maskStyle||{};
+            var profile = options.profile as JSON;
+
+            //初始化皮肤对象
+            this.display();
+
+            //设置皮肤元素属性
+            for( var p in profile )if( p in skin )
+            {
+                skin[ p ] = profile[p];
+            }
+
+            //设置窗体位置
+            if( !isNaN( options.x ) || !isNaN(options.y) )
+            {
+                skin.left = options.x >> 0;
+                skin.top  = options.y >> 0;
+            }else
+            {
+                this.position();
+            }
+
+            //启用背景遮罩
+            if(mask)PopUp.mask(maskStyle);
+
+            //禁用滚动条
+            if( options.disableScroll )
+            {
+                disableScroll();
+            }
+
+            //应该效果
+            skin.visible=true;
+            var animation = options.animation;
+            var timeout = options.timeout * 1000;
+            if( animation.enabled )
+            {
+                var anShow = animation.show;
+                skin.style("animation", anShow.name+" "+anShow.duration+"s "+anShow.timing+" "+anShow.delay+"s "+anShow.fillMode);
+                timeout = ( options.timeout +anShow.delay+anShow.duration )*1000;
+            }
+
+            //定时关闭窗体
+            if( options.timeout > 0 )
+            {
+                var self = this;
+                timeoutId = setTimeout(function () {
+                    self.action("close");
+                }, timeout );
+            }
         }
 
         /**
@@ -260,24 +327,46 @@ package es.core
             return maskInstance;
         }
 
+        static public var defaultOptions={
+            "profile":{"titleText":"提示"},
+            "disableScroll":true,
+            "callback":null,
+            "timeout":0,
+            "animation":{
+                "enabled":true,
+                "show": {
+                    "name":"fadeIn",
+                    "duration":0.2,
+                    "timing":"linear",
+                    "delay":0,
+                    "fillMode":"forwards",
+                },
+                "hidden": {
+                    "name":"fadeOut",
+                    "duration":0.2,
+                    "timing":"linear",
+                    "delay":0,
+                    "fillMode":"forwards",
+                }
+            },
+            "horizontal":"center",
+            "vertical":"middle",
+            "offsetX":0,
+            "offsetY":0,
+            "x":NaN,
+            "y":NaN,
+        };
+
         /**
          * @pirvate
          * 弹框实例对象
          */
-        static private var instance:PopUp = null;
-
-        /**
-         * 显示弹窗
-         * @param options
-         * @returns {PopUp}
-         */
-        static public function show(message:String, options:Object={}):PopUp
+        static private var _instance:PopUp = null;
+        static private function getInstance( options:JSON ):PopUp
         {
-            options =  Object.merge(true,{"profile":{"titleText":"提示","bodyContent":message},"disableScroll":true}, options) as JSON;
-            var popup:PopUp = instance;
-            if( popup ){
-                popup.action('close');
-            }
+            //引用实例
+            var popup:PopUp = _instance;
+            //指定自定义的皮肤对象
             if( options.skinClass instanceof Class )
             {
                 if( popup )
@@ -285,51 +374,13 @@ package es.core
                     popup.viewport.removeChild( popup.skin );
                 }
                 popup = new PopUp();
-                PopUp.instance =popup;
+                _instance =popup;
                 popup.skinClass = options.skinClass;
 
             }else if( !popup )
             {
                 popup = new PopUp();
-                PopUp.instance =popup;
-            }
-            var skin:Skin = popup.skin;
-            skin.style('zIndex',TOP_LEVEL);
-            if( System.env.platform('IE') && System.env.version(8) )
-            {
-                skin.style('position','absolute');
-            }
-
-            popup.display();
-            if( options.callback instanceof Function )
-            {
-                popup.callback =options.callback;
-                delete options.callback;
-            }
-
-            var animation:JSON = (options.animation || {}) as JSON;
-            var mask = options.mask;
-            var maskStyle = options.maskStyle||{};
-            var position = options.position;
-            var profile = options.profile as JSON;
-            for( var p in profile )if( p in skin )
-            {
-                skin[ p ] = profile[p];
-            }
-            popup.position( position );
-            if(mask)PopUp.mask(maskStyle);
-            if( options.disableScroll )
-            {
-                disableScroll();
-            }
-            if( animation.fadeOut != null ){
-                popup.fadeOut( animation.fadeOut , animation.delay );
-            }else if( animation.fadeIn != null ){
-                popup.fadeIn( animation.fadeIn , animation.delay );
-            }else if( animation.fadeInOut != null ){
-                popup.fadeInOut( animation.fadeInOut , animation.delay );
-            }else{
-                skin.visible = true;
+                _instance =popup;
             }
             return popup;
         }
@@ -341,8 +392,12 @@ package es.core
          */
         static public function info( message:String ,options:Object={}):PopUp
         {
-            options =  Object.merge(true,{"animation":{"fadeInOut":0.2,"delay":2},"profile":{"currentState":"info"},"disableScroll":false},options);
-            return PopUp.show(message, options);
+            options =  Object.merge(true,{
+                "timeout":2,
+                "profile":{"currentState":"info"},
+                "disableScroll":false
+            },options);
+            return getInstance(options).show(message, options);
         }
 
         /**
@@ -352,8 +407,8 @@ package es.core
          */
         static public function alert( message:String, options:Object={} ):PopUp
         {
-            options =  Object.merge({"mask":true,"profile":{"currentState":"alert"}} ,options);
-            return PopUp.show(message,options);
+            options =  Object.merge(true,{"mask":true,"profile":{"currentState":"alert"}} ,options);
+            return getInstance(options).show(message,options);
         }
 
         /**
@@ -365,8 +420,8 @@ package es.core
          */
         static public function confirm(message:String,callback:Function,options:Object={}):PopUp
         {
-            options =  Object.merge({"mask":true,"callback":callback,"profile":{"currentState":"confirm"}},options);
-            return PopUp.show(message,options);
+            options =  Object.merge(true,{"mask":true,"callback":callback,"profile":{"currentState":"confirm"}},options);
+            return getInstance(options).show(message,options);
         }
     }
 }

@@ -115,7 +115,7 @@ package es.core
         {
             if( _visible===null )
             {
-                return !( _element.style("display") === "none" || _element.style("visibility") === "hidden");
+                return !( _element.style("display") === "none");
             }
             return _visible;
         }

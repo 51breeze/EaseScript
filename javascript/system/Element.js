@@ -1073,15 +1073,16 @@ Element.prototype.height=function height( value )
  * @param delay  延时
  * @param count 重复次数
  * @param direction 是否应该轮流反向播放动画
- * @param mode 属性规定动画在播放之前或之后，其动画效果是否可见  none | forwards | backwards | both
+ * @param fillMode 属性规定动画在播放之前或之后，其动画效果是否可见  none | forwards | backwards | both
  */
-Element.prototype.animation=function animation(name, duration, timing, delay, count, direction, mode)
+Element.prototype.animation=function animation(name, duration, timing, delay, count, direction, fillMode)
 {
     var cmd = name+" "+(duration || 3)+"s "+(timing ||"ease");
-    if(delay)cmd+=" "+delay+"s";
-    if(count)cmd+=" "+count;
+    if(delay>0)cmd+=" "+delay+"s";
+    if(count>1)cmd+=" "+count;
     if(direction)cmd+=" alternate";
-    this.style("animation",cmd+" "+(mode||"forwards"));
+    if(fillMode)cmd+=" "+(fillMode||"forwards");
+    this.style("animation",cmd);
     return this;
 }
 
