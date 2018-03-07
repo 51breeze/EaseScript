@@ -132,6 +132,10 @@ function createDescription( syntax, stack , owner , moduleClass )
         desc.referenceType = reftype;
     }
 
+    if( moduleClass['id'] === 'interface'){
+       desc['isInterface'] =true;
+    }
+
     desc['origintype'] = desc['type'];
     desc['privilege'] =stack.qualifier() || "internal";
     desc['static'] = !!stack.static();

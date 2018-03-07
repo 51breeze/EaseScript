@@ -7,11 +7,14 @@
 package es.events
 {
     import es.interfaces.IDisplay;
+    import es.core.State;
     public class SkinEvent extends Event
     {
         static public const CREATE_CHILDREN_COMPLETED ='createChildrenCompleted';
+        static public const INTERNAL_UPDATE_STATE ='internalUpdateState';
         public var parent:IDisplay;
         public var child:IDisplay;
+        public var state:State;
         public function SkinEvent(type, bubbles=true, cancelable=true)
         {
             super(type, bubbles, cancelable);

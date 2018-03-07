@@ -54,6 +54,16 @@
             return body.element.html();
         }
 
+        public function set tipsContent( content:String ):void
+        {
+           tipsBody.element.html( content );
+        }
+
+        public function get tipsContent():String
+        {
+            return tipsBody.element.html();
+        }
+
     ]]>
 
     <style>
@@ -107,23 +117,23 @@
         }
 
     </style>
-
     <s:states>
-        <s:State name="info" />
-        <s:State name="alert" />
-        <s:State name="confirm" />
+        <s:State name="tips" stateGroup="simple" />
+        <s:State name="title" stateGroup="simple" />
+        <s:State name="alert" stateGroup="normal" />
+        <s:State name="confirm" stateGroup="normal" />
     </s:states>
     <s:currentState>alert</s:currentState>
-
-    <div class="popup-head" id="@head">
+    <div class="popup-head" id="@head" excludeFrom="tips">
         <span class="popup-title" id="@title">title</span>
         <button type="button" class="close" id="@close" >×</button>
     </div>
-    <div class="popup-body" id="@body">
+    <div class="popup-body" id="@body" excludeFrom="tips">
     </div>
-    <div class="popup-footer" id="@footer" excludeFrom="info">
+    <div class="popup-footer" id="@footer" excludeFrom="simple">
         <button type="button" class="btn btn-sm btn-primary" id="@submit">确 定</button>
         <button type="button" class="btn btn-sm btn-default" id="@cancel" excludeFrom="alert">取 消</button>
     </div>
-
+    <div class="popup-body" style.tips="background,#ff0000" id="@tipsBody" includeIn="tips">
+    </div>
 </s:Skin>

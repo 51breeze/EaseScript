@@ -20,6 +20,7 @@ package es.core
         private var _skinChildren;
         private var _name:String;
         private var _attr:Object;
+        private var createChildFlag:Boolean = false;
 
         /**
          * 皮肤类
@@ -102,7 +103,7 @@ package es.core
         /**
          * @private
          */
-        private var stateGroup:Object={};
+        private var stateGroup={};
 
         /**
          * 设置状态对象
@@ -114,7 +115,7 @@ package es.core
         {
             var len = value.length;
             var i=0;
-            var stateGroup=this.stateGroup as JSON;
+            var stateGroup=this.stateGroup;
             for(;i<len;i++)
             {
                 var stateObj:State = value[i] as State;
@@ -142,7 +143,11 @@ package es.core
             if( current !== name )
             {
                 this._currentState=name;
-                this.updateDisplayList();
+                currentStateObject = null;
+                if( this.createChildFlag === true )
+                {
+                    this.createChildren();
+                }
             }
         };
 
@@ -153,32 +158,6 @@ package es.core
         public function get currentState():String
         {
             return this._currentState;
-        }
-
-        /**
-         * @private
-         */
-        private var _layout=null;
-
-        /**
-         * 设置布局对象
-         */
-        public function set layout( layoutObject:Object ):void
-        {
-            var current = this._layout;
-            if( current !== layoutObject )
-            {
-                this._layout=layoutObject;
-            }
-        };
-
-        /**
-         * 获取布局对象
-         * @returns {Object}
-         */
-        public function get layout():Object
-        {
-            return this._layout;
         }
 
         /**
@@ -279,6 +258,7 @@ package es.core
          */
         protected function createChildren()
         {
+            this.createChildFlag = true;
             var children:Array = this.skinChildren;
             var hash = this._hash;
             var len = children.length;
@@ -342,23 +322,34 @@ package es.core
 
         /**
          * @private
+         */
+        private var currentStateObject:State=null;
+
+        /**
+         * @private
          * @param stateGroup
          * @param currentState
          * @returns {*}
          */
-        private function getCurrentState(currentState:String):State
+        private function getCurrentState():State
         {
-            var stateGroup = this.stateGroup as JSON;
+            var currentState = this.currentState;
+            if( !currentState )return null;
+            if( this.currentStateObject ){
+                return this.currentStateObject;
+            }
+            var stateGroup = this.stateGroup;
             if( stateGroup.hasOwnProperty( currentState ) )return stateGroup[ currentState ] as State;
             for( var p in stateGroup )
             {
                 var state:State = stateGroup[p] as State;
                 if( state.includeIn(currentState) )
                 {
+                    this.currentStateObject = state;
                     return state;
                 }
             }
-            return null;
+            throw new ReferenceError('"' + currentState + '"' + ' is not define');
         }
 
         /**
@@ -366,13 +357,10 @@ package es.core
          */
         protected function updateDisplayList()
         {
-            var currentState = this.currentState;
-            if( currentState )
+            var stateGroup:State = getCurrentState();
+            if( stateGroup )
             {
-                var stateGroup:State = getCurrentState( currentState );
-                if( !stateGroup )throw new ReferenceError('"'+currentState+'"'+' is not define');
                 var elems = new Element('[includeIn],[excludeFrom]', this.element );
-
                 //隐藏或者显示当前已设置的状态
                 elems.forEach(function ()
                 {
@@ -387,6 +375,13 @@ package es.core
                     }
                     _include ? elems.show() : elems.hide();
                 });
+
+                if( this.hasEventListener(SkinEvent.INTERNAL_UPDATE_STATE) )
+                {
+                    var e:SkinEvent = new SkinEvent( SkinEvent.INTERNAL_UPDATE_STATE );
+                    e.state = stateGroup;
+                    this.dispatchEvent( e );
+                }
             }
         }
 

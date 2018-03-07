@@ -1,6 +1,6 @@
 define(["es.core.Skin","es.core.Container","es.core.Display","ns:es.core.es_internal","es.components.Component","es.events.SkinEvent","es.core.State","if:es.interfaces.IDisplay"],function(Skin,Container,Display,es_internal,Component,SkinEvent,State,IDisplay){
 var _private=this._private;
-var method={"W7_parseSkinObject":{"value":function parseSkinObject(skin,hash){
+var method={"M7_parseSkinObject":{"value":function parseSkinObject(skin,hash){
 	if(skin == null ){skin={};}
 	if(hash == null ){hash={};}
 	var v;
@@ -11,7 +11,7 @@ var method={"W7_parseSkinObject":{"value":function parseSkinObject(skin,hash){
 	var len=children.length;
 	var i=0;
 	for(;i<len;i++){
-		content+=System.typeOf(children[i])==="string"?children[i]:Skin.W7_parseSkinObject(children[i],hash);
+		content+=System.typeOf(children[i])==="string"?children[i]:Skin.M7_parseSkinObject(children[i],hash);
 	}
 	if(tag==='text')return content;
 	var str='<'+tag;
@@ -28,11 +28,12 @@ var method={"W7_parseSkinObject":{"value":function parseSkinObject(skin,hash){
 for(var prop in method){
 	Object.defineProperty(Skin, prop, method[prop]);
 }
-var proto={"constructor":{"value":Skin},"N6__hash":{"writable":true,"value":null}
-,"N6__skinChildren":{"writable":true,"value":null}
-,"N6__name":{"writable":true,"value":null}
-,"N6__attr":{"writable":true,"value":null}
-,"Get_W7_skinChildren":{"value":function skinChildren(){
+var proto={"constructor":{"value":Skin},"k6__hash":{"writable":true,"value":null}
+,"k6__skinChildren":{"writable":true,"value":null}
+,"k6__name":{"writable":true,"value":null}
+,"k6__attr":{"writable":true,"value":null}
+,"k6_createChildFlag":{"writable":true,"value":false}
+,"Get_M7_skinChildren":{"value":function skinChildren(){
 	return Reflect.type(this[_private]._skinChildren,Array);
 }},"Get__name":{"value":function name(){
 	return this[_private]._name;
@@ -50,7 +51,7 @@ var proto={"constructor":{"value":Skin},"N6__hash":{"writable":true,"value":null
 	}
 	return null;
 }}
-,"N6_stateGroup":{"writable":true,"value":{}}
+,"k6_stateGroup":{"writable":true,"value":{}}
 ,"Set__states":{"value":function states(value){
 	if( value && !System.is(value, Array))throw new TypeError("type does not match. must be Array");
 	var name;
@@ -61,13 +62,13 @@ var proto={"constructor":{"value":Skin},"N6__hash":{"writable":true,"value":null
 	for(;i<len;i++){
 		stateObj=Reflect.type(value[i],State);
 		name=stateObj.Get__name();
-		if(!name)throw new TypeError('name is not define in Skin.prototype.states',"E:/EaseScript/es/core/Skin.es","122:92");
+		if(!name)throw new TypeError('name is not define in Skin.prototype.states',"E:/EaseScript/es/core/Skin.es","123:92");
 		if(stateGroup.hasOwnProperty(name)){
-			throw new TypeError('"'+name+'" has already been declared in Skin.prototype.states',"E:/EaseScript/es/core/Skin.es","125:103");
+			throw new TypeError('"'+name+'" has already been declared in Skin.prototype.states',"E:/EaseScript/es/core/Skin.es","126:103");
 		}
 		stateGroup[name]=stateObj;
 	}
-}},"N6__currentState":{"writable":true,"value":null}
+}},"k6__currentState":{"writable":true,"value":null}
 ,"Get__currentState":{"value":function currentState(){
 	return this[_private]._currentState;
 }},"Set__currentState":{"value":function currentState(name){
@@ -75,27 +76,22 @@ var proto={"constructor":{"value":Skin},"N6__hash":{"writable":true,"value":null
 	var current=this[_private]._currentState;
 	if(current!==name){
 		this[_private]._currentState=name;
-		this.W7_updateDisplayList();
+		this[_private].currentStateObject=null;
+		if(this[_private].createChildFlag===true){
+			this.M7_createChildren();
+		}
 	}
-}},"N6__layout":{"writable":true,"value":null}
-,"Get__layout":{"value":function layout(){
-	return this[_private]._layout;
-}},"Set__layout":{"value":function layout(layoutObject){
-	var current=this[_private]._layout;
-	if(current!==layoutObject){
-		this[_private]._layout=layoutObject;
-	}
-}},"W7_initializing":{"value":function initializing(){
+}},"M7_initializing":{"value":function initializing(){
 }}
-,"N6__hostComponent":{"writable":true,"value":null}
-,"Set_J3_hostComponent":{"value":function hostComponent(host){
+,"k6__hostComponent":{"writable":true,"value":null}
+,"Set_y3_hostComponent":{"value":function hostComponent(host){
 	if( host && !System.is(host, Component))throw new TypeError("type does not match. must be Component");
-	if(host==null)throw new ReferenceError("hostComponent is null","E:/EaseScript/es/core/Skin.es","202:78");
+	if(host==null)throw new ReferenceError("hostComponent is null","E:/EaseScript/es/core/Skin.es","181:78");
 	this[_private]._hostComponent=host;
-	this.W7_initializing();
-}},"Get_W7_hostComponent":{"value":function hostComponent(){
+	this.M7_initializing();
+}},"Get_M7_hostComponent":{"value":function hostComponent(){
 	return this[_private]._hostComponent;
-}},"N6__render":{"writable":true,"value":null}
+}},"k6__render":{"writable":true,"value":null}
 ,"Get__render":{"value":function render(){
 	var obj=this[_private]._render;
 	if(!obj)obj=new Render();
@@ -113,19 +109,20 @@ var proto={"constructor":{"value":Skin},"N6__hash":{"writable":true,"value":null
 	return this.Get__render().variable(name,value);
 }}
 ,"_skinInstaller":{"value":function skinInstaller(){
-	this.W7_createChildren();
+	this.M7_createChildren();
 }}
-,"W7_createChildren":{"value":function createChildren(){
+,"M7_createChildren":{"value":function createChildren(){
 	var e;
 	var elem;
 	var rd;
-	var children=this.Get_W7_skinChildren();
+	this[_private].createChildFlag=true;
+	var children=this.Get_M7_skinChildren();
 	var hash=this[_private]._hash;
 	var len=children.length;
 	var c=0;
 	var child;
 	var render=this[_private]._render;
-	var parent=this.Get_W7_displayParent();
+	var parent=this.Get_M7_displayParent();
 	this._removeAllChild();
 	if(render){
 		child=render.fetch();
@@ -136,7 +133,7 @@ var proto={"constructor":{"value":Skin},"N6__hash":{"writable":true,"value":null
 	for(;c<len;c++){
 		child=children[c];
 		if(System.isObject(child)){
-			child=Skin.W7_parseSkinObject(child,hash);
+			child=Skin.M7_parseSkinObject(child,hash);
 		}
 		else if(System.instanceOf(child,Render)){
 			rd=Reflect.type(child,Render);
@@ -149,7 +146,7 @@ var proto={"constructor":{"value":Skin},"N6__hash":{"writable":true,"value":null
 				this._addChildAt(new Display.constructor(elem),-1);
 			}
 			else if(System.instanceOf(child,Skin)){
-				(child).W7_createChildren();
+				(child).M7_createChildren();
 				this._addChild(Reflect.type(child,Display));
 			}
 		}
@@ -160,33 +157,37 @@ var proto={"constructor":{"value":Skin},"N6__hash":{"writable":true,"value":null
 		e.Set__child(this);
 		this.dispatchEvent(e);
 	}
-	this.W7_updateDisplayList();
+	this.M7_updateDisplayList();
 }}
 ,"_toString":{"value":function toString(){
-	this.W7_createChildren();
+	this.M7_createChildren();
 	return Container.prototype._toString.call(this);
 }}
-,"N6_getCurrentState":{"value":function getCurrentState(currentState){
-	if( currentState && !System.is(currentState, String))throw new TypeError("type does not match. must be String");
+,"k6_currentStateObject":{"writable":true,"value":null}
+,"k6_getCurrentState":{"value":function getCurrentState(){
 	var state;
 	var p;
+	var currentState=this.Get__currentState();
+	if(!currentState)return null;
+	if(this[_private].currentStateObject){
+		return this[_private].currentStateObject;
+	}
 	var stateGroup=this[_private].stateGroup;
 	if(stateGroup.hasOwnProperty(currentState))return Reflect.type(stateGroup[currentState],State);
 	for(var __$0__ = Iterator(stateGroup);__$0__.seek() && (p=__$0__.key)!==false;){
 		state=Reflect.type(stateGroup[p],State);
 		if(state._includeIn(currentState)){
+			this[_private].currentStateObject=state;
 			return state;
 		}
 	}
-	return null;
+	throw new ReferenceError('"'+currentState+'"'+' is not define',"E:/EaseScript/es/core/Skin.es","352:80");
 }}
-,"W7_updateDisplayList":{"value":function updateDisplayList(){
+,"M7_updateDisplayList":{"value":function updateDisplayList(){
+	var e;
 	var elems;
-	var stateGroup;
-	var currentState=this.Get__currentState();
-	if(currentState){
-		stateGroup=this.N6_getCurrentState(currentState);
-		if(!stateGroup)throw new ReferenceError('"'+currentState+'"'+' is not define',"E:/EaseScript/es/core/Skin.es","373:95");
+	var stateGroup=this.k6_getCurrentState();
+	if(stateGroup){
 		elems=new Element('[includeIn],[excludeFrom]',this.Get__element());
 		elems.forEach(function(){
 			var includeIn=elems.property('includeIn');
@@ -200,11 +201,16 @@ var proto={"constructor":{"value":Skin},"N6__hash":{"writable":true,"value":null
 			}
 			_include?elems.show():elems.hide();
 		});
+		if(this.hasEventListener(SkinEvent._INTERNAL_UPDATE_STATE)){
+			e=new SkinEvent.constructor(SkinEvent._INTERNAL_UPDATE_STATE);
+			e.Set__state(stateGroup);
+			this.dispatchEvent(e);
+		}
 	}
 }}
 };
 Object.defineProperty(Skin,"constructor",{"value":function constructor(skinObject){
-	Object.defineProperty(this,_private,{value:{"_hash":null,"_skinChildren":null,"_name":null,"_attr":null,"stateGroup":{},"_currentState":null,"_layout":null,"_hostComponent":null,"_render":null}});
+	Object.defineProperty(this,_private,{value:{"_hash":null,"_skinChildren":null,"_name":null,"_attr":null,"createChildFlag":false,"stateGroup":{},"_currentState":null,"_hostComponent":null,"_render":null,"currentStateObject":null}});
 	if(skinObject == null ){skinObject={};}
 	var str;
 	var h;
@@ -241,7 +247,7 @@ Object.defineProperty(Skin,"__T__",{value:{
 	"package":"es.core",
 	"classname":"Skin",
 	"_private":_private,
-	"uri":["N6_","W7_","l21_","_"],
+	"uri":["k6_","M7_","E21_","_"],
 	"method":method,
 	"proto":proto
 }});

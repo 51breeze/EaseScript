@@ -1,23 +1,23 @@
 define(["es.core.Display","if:es.interfaces.IDisplay"],function(Display,IDisplay){
 var _private=this._private;
-var proto={"constructor":{"value":Display},"z9__element":{"writable":true,"value":null}
+var proto={"constructor":{"value":Display},"c9__element":{"writable":true,"value":null}
 ,"Get__element":{"value":function element(){
 	return this[_private]._element;
-}},"z9__width":{"writable":true,"value":NaN}
+}},"c9__width":{"writable":true,"value":NaN}
 ,"Get__width":{"value":function width(){
 	return Reflect.type(System.isNaN(this[_private]._width)?this[_private]._element.width():this[_private]._width,Number);
 }},"Set__width":{"value":function width(value){
 	if( value && !System.is(value, Number))throw new TypeError("type does not match. must be Number");
 	this[_private]._width=value;
 	this[_private]._element.width(value);
-}},"z9__height":{"writable":true,"value":NaN}
+}},"c9__height":{"writable":true,"value":NaN}
 ,"Get__height":{"value":function height(){
 	return Reflect.type(System.isNaN(this[_private]._height)?this[_private]._element.height():this[_private]._height,Number);
 }},"Set__height":{"value":function height(value){
 	if( value && !System.is(value, Number))throw new TypeError("type does not match. must be Number");
 	this[_private]._height=value;
 	this[_private]._element.height(value);
-}},"z9__visible":{"writable":true,"value":null}
+}},"c9__visible":{"writable":true,"value":null}
 ,"Get__visible":{"value":function visible(){
 	if(this[_private]._visible===null){
 		return Reflect.type(!(this[_private]._element.style("display")==="none"),Boolean);
@@ -94,12 +94,12 @@ var proto={"constructor":{"value":Display},"z9__element":{"writable":true,"value
 	if( child && !System.is(child, IDisplay))throw new TypeError("type does not match. must be IDisplay");
 	return this[_private]._element.contains(child.Get__element());
 }}
-,"Get_W7_displayParent":{"value":function(){
+,"Get_M7_displayParent":{"value":function(){
 	return this[_private].displayParent;
-}},"Set_W7_displayParent":{"value":function(val){
+}},"Set_M7_displayParent":{"value":function(val){
 	return this[_private].displayParent=val;
 }},"Get__parent":{"value":function parent(){
-	return this.Get_W7_displayParent();
+	return this.Get_M7_displayParent();
 }},"_toString":{"value":function toString(){
 	return this[_private]._element.html(true);
 }}
@@ -124,7 +124,7 @@ Object.defineProperty(Display,"__T__",{value:{
 	"classname":"Display",
 	"implements":[IDisplay],
 	"_private":_private,
-	"uri":["z9_","W7_","l21_","_"],
+	"uri":["c9_","M7_","E21_","_"],
 	"proto":proto
 }});
 return Display;

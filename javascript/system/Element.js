@@ -38,7 +38,9 @@ var fix={
         'user-select':true,
         'radial-gradient':true,
         'linear-gradient':true,
+        'transform':true,
         'transition':true,
+        'animation':true,
         'animation-name':true,
         'animation-duration':true,
         'animation-iteration-count':true,
@@ -266,6 +268,27 @@ function getStyleName(name )
     }
     return name;
 }
+
+/**
+ * @param cssText
+ * @returns {string}
+ */
+function formatStyleSheet( cssText, elem)
+{
+    return cssText.replace(/([\w\-]+)\s*\:([^\;]*)/g, function (all, name, value) {
+        if( value.substr(0,5).toLowerCase() === "rgba(" && System.env.platform("IE",8) )
+        {
+            value = value.replace( /rgba\(.*?\)/i, rgbToHex( value ) );
+        }
+        if (fix.cssHooks[name] && typeof fix.cssHooks[name].set === "function") {
+            var obj = {};
+            fix.cssHooks[name].set.call(elem||{}, obj, value);
+            return System.serialize(obj, 'style');
+        }
+        return getStyleName(name) + ':' + value;
+    });
+}
+
 //获取并设置id
 function getIdSelector( elem )
 {
@@ -857,9 +880,9 @@ accessor['style']= {
             inc = parseFloat(inc) || 0;
             value = ( +( increment[1] + 1 ) * +increment[2] ) + inc;
             type = "number";
-        }else if(type==='string' && !fix.cssPrefixName && value.substr(0,5) === "rgba(" )
+        }else if(type==='string' && value.substr(0,5) === "rgba(" && System.env.platform("IE",8) )
         {
-            value = rgbToHex( value );
+            value = value.replace( /rgba\(.*?\)/i, rgbToHex( value ) );
         }
 
         //添加单位
@@ -869,19 +892,7 @@ accessor['style']= {
         //解析 cssText 样式名
         if (name === 'cssText')
         {
-            var elem = this;
-            value = value.replace(/([\w\-]+)\s*\:([^\;]*)/g, function (all, name, value) {
-                if( !fix.cssPrefixName && value.substr(0,5) === "rgba(" )
-                {
-                    value = rgbToHex( value );
-                }
-                if (fix.cssHooks[name] && typeof fix.cssHooks[name].set === "function") {
-                    var obj = {};
-                    fix.cssHooks[name].set.call(elem, obj, value);
-                    return System.serialize(obj, 'style');
-                }
-                return getStyleName(name) + ':' + value;
-            });
+            value = formatStyleSheet(value,this);
         }
 
         try {
@@ -1641,11 +1652,12 @@ Element.prototype.removeChild=function removeChild( childElemnet )
                 return childElemnet;
             }
         }
-        throw new TypeError('parentNode is null of child elemnet');
+    }else
+    {
+        var result = parent.removeChild(childElemnet);
+        dispatchEvent( EventDispatcher( childElemnet ) , ElementEvent.REMOVE, parent, childElemnet , result );
+        dispatchEvent( EventDispatcher( parent ) , ElementEvent.CHANGE, parent, childElemnet , result );
     }
-    var result = parent.removeChild( childElemnet );
-    dispatchEvent( EventDispatcher( childElemnet ) , ElementEvent.REMOVE, parent, childElemnet , result );
-    dispatchEvent( EventDispatcher( parent ) , ElementEvent.CHANGE, parent, childElemnet , result );
     return childElemnet;
 };
 
@@ -1829,15 +1841,12 @@ Element.getNodeName = function getNodeName( elem )
 if( System.env.platform( System.env.BROWSER_FIREFOX ) && System.env.version(4) )
 {
     fix.cssPrefixName='-moz-';
-
 }else if( System.env.platform( System.env.BROWSER_SAFARI )  || System.env.platform( System.env.BROWSER_CHROME ) )
 {
     fix.cssPrefixName='-webkit-';
-
 }else if( System.env.platform(System.env.BROWSER_OPERA) )
 {
     fix.cssPrefixName='-o-';
-
 }else if( System.env.platform(System.env.BROWSER_IE) && System.env.version(9,'>=') )
 {
     fix.cssPrefixName='-ms-';
@@ -1985,4 +1994,99 @@ fix.cssHooks.height={
 Element.fix = fix;
 Element.createElement = createElement;
 Element.querySelector=querySelector;
+
+/**
+ * @private
+ */
+var animationSupport=null;
+
+/**
+ * 判断是否支持css3动画
+ * @returns {boolean}
+ */
+Element.isAnimationSupport = function isAnimationSupport()
+{
+    if( animationSupport === null )
+    {
+        var prefix = fix.cssPrefixName;
+        var div = Element.createElement('div');
+        var prop = prefix+'animation-play-state';
+        div.style[prop] = 'paused';
+        animationSupport = div.style[prop] === 'paused';
+    }
+    return animationSupport;
+};
+
+/**
+ * 生成css3样式动画
+ * properties={
+*    '0%':'left:10px;',
+*    '100%':'left:100px;'
+* }
+ */
+Element.createAnimationStyleSheet=function(stylename, properties)
+{
+    if( !Element.isAnimationSupport() )return false;
+    var css=["{"];
+    for( var i in properties )
+    {
+        css.push( i + ' {');
+        if( typeof properties[i] === "string" )
+        {
+            css.push( properties[i] );
+        }else if( System.isObject(properties[i]) )
+        {
+            css.push( System.serialize( properties[i], 'style' ) );
+        }
+        css.push( '}' );
+    }
+    css.push('}');
+    return Element.addStyleSheet( '@'+fix.cssPrefixName+'keyframes '+stylename, css.join("\r\n") );
+};
+
+/**
+ * @private
+ */
+var headStyle =null;
+
+/**
+ * @param string style
+ */
+Element.addStyleSheet=function addStyleSheet(styleName, StyleSheetObject)
+{
+    if( headStyle=== null )
+    {
+        var head = document.getElementsByTagName('head')[0];
+        headStyle = document.createElement('style');
+        document.getElementsByTagName('head')[0].appendChild( headStyle );
+    }
+    if( System.isObject(StyleSheetObject) )
+    {
+        StyleSheetObject=System.serialize( StyleSheetObject, 'style' );
+    }
+    if( typeof StyleSheetObject === "string" )
+    {
+        StyleSheetObject = formatStyleSheet( System.trim( StyleSheetObject ) );
+        if( System.env.platform( System.env.BROWSER_IE, 9 ) )
+        {
+            var styleName = styleName.split(',');
+            StyleSheetObject = StyleSheetObject.replace(/^\{/,'').replace(/\}$/,'');
+            for(var i=0; i<styleName.length; i++ )
+            {
+                headStyle.StyleSheet.addRule(styleName[i], StyleSheetObject, -1);
+            }
+
+        }else
+        {
+            if (StyleSheetObject.charAt(0) !== '{')
+            {
+                StyleSheetObject = '{' + StyleSheetObject + '}';
+            }
+            headStyle.appendChild( document.createTextNode(styleName + StyleSheetObject ) );
+        }
+        return true;
+    }
+    return false;
+};
+
 System.Element = Element;

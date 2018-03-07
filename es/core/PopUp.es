@@ -85,7 +85,6 @@ package es.core
             }else{
                 skin.visible=false;
             }
-            this.showing = false;
             return true;
         }
 
@@ -165,19 +164,12 @@ package es.core
          * @param options
          * @returns {PopUp}
          */
-        public function show(message:String, options:Object={})
+        private function show(options:Object={}):es.core.PopUp
         {
             var skin:Skin = this.skin;
-
-            //关闭在显示中的窗体
-            if( this.showing )
-            {
-                this.action('close', false);
-            }
-            this.showing = true;
+            this.action('close', true);
             //初始化配置
             options = Object.merge(true,defaultOptions,options) as JSON;
-            options.profile.bodyContent=message;
             skin.style('zIndex',TOP_LEVEL);
             if( System.env.platform('IE', 8) )
             {
@@ -236,6 +228,7 @@ package es.core
                     self.action("close");
                 }, timeout );
             }
+            return this;
         }
 
         /**
@@ -304,12 +297,19 @@ package es.core
                 style = Object.merge({
                     "backgroundColor":"#000000",
                     "opacity":0.7,
+                    "fadeIn":0.2,
                     "width":"100%",
                     "height":"100%",
                     "position":"absolute",
                     "left":"0px",
                     "top":"0px",
                 },style);
+
+                if( style.fadeIn>0 )
+                {
+                    Element.createAnimationStyleSheet("maskFadeIn", {"from":{"opacity":0}, "to": {"opacity":style.opacity}});
+                    style.animation="maskFadeIn "+style.fadeIn+"s forwards";
+                }
 
                 var win = getWindow();
                 var root  = getRoot();
@@ -327,9 +327,12 @@ package es.core
             return maskInstance;
         }
 
+        /**
+         * 默认配置选项
+         */
         static public var defaultOptions={
             "profile":{"titleText":"提示"},
-            "disableScroll":true,
+            "disableScroll":false,
             "callback":null,
             "timeout":0,
             "animation":{
@@ -390,14 +393,33 @@ package es.core
          * @param title
          * @returns {PopUp}
          */
-        static public function info( message:String ,options:Object={}):PopUp
+        static public function tips( message:String ,options:Object={}):PopUp
         {
-            options =  Object.merge(true,{
+            return getInstance(options).show(Object.merge(true,{
                 "timeout":2,
-                "profile":{"currentState":"info"},
+                "profile":{
+                    "currentState":"tips",
+                    "tipsContent":message
+                },
                 "disableScroll":false
-            },options);
-            return getInstance(options).show(message, options);
+            },options));
+        }
+
+        /**
+         * 弹出提示框
+         * @param title
+         * @returns {PopUp}
+         */
+        static public function title( message:String ,options:Object={}):PopUp
+        {
+            return getInstance(options).show(Object.merge(true,{
+                "timeout":2,
+                "profile":{
+                    "currentState":"title",
+                    "bodyContent":message
+                },
+                "disableScroll":false
+            },options));
         }
 
         /**
@@ -407,8 +429,13 @@ package es.core
          */
         static public function alert( message:String, options:Object={} ):PopUp
         {
-            options =  Object.merge(true,{"mask":true,"profile":{"currentState":"alert"}} ,options);
-            return getInstance(options).show(message,options);
+            return getInstance(options).show(Object.merge(true,{
+                "mask":true,
+                "profile":{
+                    "currentState":"alert",
+                    "bodyContent":message
+                }
+            } ,options));
         }
 
         /**
@@ -420,8 +447,14 @@ package es.core
          */
         static public function confirm(message:String,callback:Function,options:Object={}):PopUp
         {
-            options =  Object.merge(true,{"mask":true,"callback":callback,"profile":{"currentState":"confirm"}},options);
-            return getInstance(options).show(message,options);
+            return getInstance(options).show(Object.merge(true,{
+                "mask":true,
+                "callback":callback,
+                "profile":{
+                    "currentState":"confirm",
+                    "bodyContent":message
+                }
+            },options));
         }
     }
 }
