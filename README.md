@@ -26,12 +26,9 @@ package client
             function Index()
             {
                   super(document);
-                  this.addEventListener(Event.READY,function(e:Event)
-                  {
-                      var container:Element = new Element('#container');
-                      var text = Element.createElement( label );
-                      container.addChildAt( text, 0 );
-                  });
+	          var container:Element = new Element('#container');
+	          var text = Element.createElement( label );
+	          container.addChildAt( text, 0 );
             }
 
             private var _label:String = "<h1>Hello world!</h1>";
