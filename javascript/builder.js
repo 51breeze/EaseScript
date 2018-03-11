@@ -277,7 +277,7 @@ function builder(config , code, requirements , replacements )
     /**
      * 引用全局对象模块
      */
-    var requires = ['System','Class','Namespace','Interface','Iterator','EventDispatcher'].concat( globals.slice(0) );
+    var requires = ['System','Class','Namespace','Interface','Iterator','EventDispatcher','Event'].concat( globals.slice(0) );
     if( requirements )
     {
         for ( var p in requirements )
@@ -348,14 +348,14 @@ function builder(config , code, requirements , replacements )
     //框架代码
     var framework = [
         '(function(System,Internal,undefined){',
-        '"use strict";',
-        //系统全局模块域
-        '(function(System,$'+globals.join(',$')+'){',
-        internal,
-        contents,
-        run,
-        '}(System,' + g.join(',') + '));',
-        business.join('\n'),
+            '"use strict";',
+            //系统全局模块域
+            '(function(System,$'+globals.join(',$')+'){',
+                internal,
+                contents,
+                run,
+            '}(System,' + g.join(',') + '));',
+            business.join('\n'),
         '}({},{}));'
     ];
     return framework.join('\n');

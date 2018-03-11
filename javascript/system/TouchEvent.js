@@ -15,15 +15,18 @@ function TouchEvent(type, bubbles, cancelable)
 System.TouchEvent=TouchEvent;
 TouchEvent.prototype.constructor=TouchEvent ;
 TouchEvent.prototype=Object.create( MouseEvent.prototype );
-TouchEvent.TOUCH_START='touchStart';
-TouchEvent.TOUCH_MOVE='touchMove';
-TouchEvent.TOUCH_END='touchEnd';
-TouchEvent.TOUCH_CANCEL='touchCancel';
+TouchEvent.TOUCH_START='touchstart';
+TouchEvent.TOUCH_MOVE='touchmove';
+TouchEvent.TOUCH_END='touchend';
+TouchEvent.TOUCH_CANCEL='touchcancel';
 TouchEvent.setting = {
     longpress: {
         requiredTouches: 1,
         msThresh: 800,
         triggerStartPhase: false
+    },
+    swipe:{
+        velocityThresh:0.25
     },
     rotate: {
         requiredTouches: 1
@@ -48,6 +51,9 @@ Event.registerEvent(function ( type ,target, originalEvent ) {
                 event.screenX= originalEvent.screenX;
                 event.screenY= originalEvent.screenY;
             }
+            event.targetTouches = originalEvent.targetTouches;
+            event.changedTouches = originalEvent.changedTouches;
+            event.touches=originalEvent.touches;
             event.originalEvent = originalEvent;
             return event;
     }

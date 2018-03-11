@@ -43,14 +43,14 @@ function getDistance(startX,endX,startY,endY)
     return endX === startX && endY === startY ? 0 : Math.sqrt( Math.pow( (endX - startX), 2 ) + Math.pow( (endY - startY), 2 ) );
 };
 
-var dragDataKey='__touchDragData__';
+var dataKey='__$touchDragData__';
 function invoke(listener, dispatchHandle )
 {
     var handle = function( event )
     {
-        var target = event.currentTarget,
-        data = target[dragDataKey],
-        touches = event.targetTouches;
+        var target = event.currentTarget;
+        var data = target[dataKey];
+        var touches = event.targetTouches;
         var pinchEvent;
         if (touches && touches.length === 2)
         {
@@ -64,15 +64,17 @@ function invoke(listener, dispatchHandle )
             points.centerY = (points.y1 + points.y2) / 2;
             switch (event.type) {
                 case TouchEvent.TOUCH_START:
-                    data = target[dragDataKey] = {
+                    data = target[dataKey] = {
                         'startX': points.centerX,
                         'startY': points.centerY,
+                        'moveDistance' : 0,
+                        'scale' : 1,
                         'startDistance': getDistance(points.x1, points.x2, points.y1, points.y2)
                     };
                     pinchEvent = new TouchPinchEvent(TouchPinchEvent.TOUCH_PINCH_START);
                     break;
                 case TouchEvent.TOUCH_MOVE:
-                    data = target[dragDataKey] || {};
+                    data = target[dataKey] || {};
                     data.previousScale = data.scale || 1;
                     var moveDistance = getDistance(points.x1, points.x2, points.y1, points.y2);
                     var startDistance = data.startDistance;
@@ -90,16 +92,18 @@ function invoke(listener, dispatchHandle )
         } else if (event.type === TouchEvent.TOUCH_END && data)
         {
             pinchEvent = new TouchPinchEvent(TouchPinchEvent.TOUCH_PINCH_END);
-            delete target[dataName];
+            delete target[dataKey];
         }
         if( pinchEvent )
         {
-            pinchEvent.originalEvent = event;
             Object.merge(pinchEvent, data);
+            pinchEvent.originalEvent = event;
+            pinchEvent.currentTarget = event.currentTarget;
+            pinchEvent.target = event.target;
             dispatchHandle(pinchEvent);
         }
     }
-    EventDispatcher( this ).addEventListener(TouchEvent.TOUCH_START,handle, false, -1000)
+    listener.dispatcher.addEventListener(TouchEvent.TOUCH_START,handle, false, -1000)
         .addEventListener(TouchEvent.TOUCH_MOVE,handle, false, -1000)
         .addEventListener(TouchEvent.TOUCH_END,handle, false, -1000);
 };

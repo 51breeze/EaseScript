@@ -26,7 +26,7 @@ Object.defineProperty(ComponentEvent,"__T__",{value:{
 	"package":"es.events",
 	"classname":"ComponentEvent",
 	"_private":_private,
-	"uri":["P18_","j19_","Q20_","_"],
+	"uri":["I18_","S19_","s20_","_"],
 	"method":method,
 	"proto":proto
 }});

@@ -47,19 +47,18 @@ function getDistance(startX,endX,startY,endY)
     return endX === startX && endY === startY ? 0 : Math.sqrt( Math.pow( (endX - startX), 2 ) + Math.pow( (endY - startY), 2 ) );
 };
 
-var dragDataKey='__touch_swipe_data__';
+var dataKey='__$touchSwipeData__';
 function invoke(listener, dispatchHandle )
 {
     var handle = function( event )
     {
-        var settings=TouchEvent.setting['swipe'],
+        var settings=TouchEvent.setting.swipe,
             target = event.currentTarget,
             x=0,
             y= 0,
             swipeEvent,
-            data=target[dragDataKey],
+            data=target[dataKey],
             touches=event.targetTouches;
-
         if( touches && touches.length === 1 )
         {
             if( touches.length > 0 )
@@ -70,7 +69,7 @@ function invoke(listener, dispatchHandle )
 
             if( !data )
             {
-                data=target[dragDataKey]={};
+                data=target[dataKey]={};
                 data.startX=x;
                 data.startY=y;
                 data.startDate=event.timeStamp;
@@ -86,7 +85,7 @@ function invoke(listener, dispatchHandle )
             data.vDistance    = data.moveY - data.startY;
             var ms = data.moveDate - data.lastMoveDate;
 
-            if(  !data.swiped  &&  Math.abs(data.hDistance) / ms > settings.velocityThresh ||
+            if( !data.swiped  &&  Math.abs(data.hDistance) / ms > settings.velocityThresh ||
                 Math.abs(data.vDistance) / ms > settings.velocityThresh )
             {
                 data.swiped = true;
@@ -103,7 +102,7 @@ function invoke(listener, dispatchHandle )
                         var distance = getDistance( data.lastMoveX,data.moveX,data.lastMoveY,data.moveY );
                         var velocity = ms === 0 ? 0 : distance / ms;
                         var direction=null;
-                        if ( velocity > 1 )
+                        if ( velocity > 0.25 )
                         {
                             if ( Math.abs(data.hDistance) > Math.abs( data.vDistance) )
                                 direction = data.hDistance > 0 ? 'right' : 'left';
@@ -116,7 +115,7 @@ function invoke(listener, dispatchHandle )
                         {
                             data.swipeExecuted = true;
                             swipeEvent= new TouchSwipeEvent(TouchSwipeEvent.TOUCH_SWIPE_MOVE);
-                            target[dragDataKey]={};
+                            target[dataKey]={};
                         }
                     }
                 break;
@@ -124,18 +123,19 @@ function invoke(listener, dispatchHandle )
 
         }else if( event.type===TouchEvent.TOUCH_END && data )
         {
-            delete target[dataName];
+            delete target[dataKey];
             swipeEvent= new TouchSwipeEvent(TouchSwipeEvent.TOUCH_SWIPE_END);
         }
-
         if( swipeEvent )
         {
-            swipeEvent.originalEvent = event;
             Object.merge(swipeEvent, data);
+            swipeEvent.originalEvent = event;
+            swipeEvent.currentTarget = event.currentTarget;
+            swipeEvent.target = event.target;
             dispatchHandle(swipeEvent);
         }
     }
-    EventDispatcher( this ).addEventListener(TouchEvent.TOUCH_START,handle, false, -1000)
+    listener.dispatcher.addEventListener(TouchEvent.TOUCH_START,handle, false, -1000)
         .addEventListener(TouchEvent.TOUCH_MOVE,handle, false, -1000)
         .addEventListener(TouchEvent.TOUCH_END,handle, false, -1000);
 };
