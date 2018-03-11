@@ -1,7 +1,7 @@
 define(["es.components.Component","es.events.ComponentEvent"],function(Component,ComponentEvent){
 var _private=this._private;
-var proto={"constructor":{"value":Component},"n5__initialized":{"writable":true,"value":false}
-,"s2_initialized":{"value":function initialized(){
+var proto={"constructor":{"value":Component},"P5__initialized":{"writable":true,"value":false}
+,"R2_initialized":{"value":function initialized(){
 	var val=this[_private]._initialized;
 	if(val===false){
 		this[_private]._initialized=true;
@@ -9,7 +9,7 @@ var proto={"constructor":{"value":Component},"n5__initialized":{"writable":true,
 	}
 	return val;
 }}
-,"s2_initializing":{"value":function initializing(){
+,"R2_initializing":{"value":function initializing(){
 	var val=this[_private]._initialized===false;
 	if(val===true&&this.hasEventListener(ComponentEvent._INITIALIZING)){
 		this.dispatchEvent(new ComponentEvent.constructor(ComponentEvent._INITIALIZING));
@@ -28,7 +28,7 @@ Object.defineProperty(Component,"__T__",{value:{
 	"package":"es.components",
 	"classname":"Component",
 	"_private":_private,
-	"uri":["n5_","s2_","F17_","_"],
+	"uri":["P5_","R2_","V15_","_"],
 	"proto":proto
 }});
 return Component;

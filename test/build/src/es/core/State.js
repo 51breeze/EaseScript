@@ -1,7 +1,7 @@
 define(["es.core.State"],function(State){
 var _private=this._private;
-var proto={"constructor":{"value":State},"T10__name":{"writable":true,"value":''}
-,"T10__stateGroup":{"writable":true,"value":new Array()}
+var proto={"constructor":{"value":State},"l10__name":{"writable":true,"value":''}
+,"l10__stateGroup":{"writable":true,"value":new Array()}
 ,"Get__name":{"value":function name(){
 	return this[_private]._name;
 }},"Set__name":{"value":function name(value){
@@ -26,7 +26,7 @@ Object.defineProperty(State,"__T__",{value:{
 	"package":"es.core",
 	"classname":"State",
 	"_private":_private,
-	"uri":["T10_","S29_","j21_","_"],
+	"uri":["l10_","K27_","E19_","_"],
 	"proto":proto
 }});
 return State;
