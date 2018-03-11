@@ -34,7 +34,6 @@ package es.components
     import es.components.SkinComponent;
     import es.core.Skin;
     import es.events.PaginationEvent;
-    import es.skins.PaginationSkin;
     import es.core.Display;
 
     public class Pagination extends SkinComponent
@@ -42,17 +41,6 @@ package es.components
         function Pagination()
         {
             super();
-        }
-
-        /**
-         * 获取皮肤类
-         * @returns Class
-         */
-        override public function get skinClass():Class
-        {
-            var value=super.skinClass;
-            if( value===null )return PaginationSkin;
-            return value;
         }
 
         /**

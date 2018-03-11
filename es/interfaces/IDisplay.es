@@ -56,14 +56,14 @@ package es.interfaces
          * @param name
          * @param value
          */
-        public function property(name,value):Object;
+        public function property(name:String,value:*):Object;
 
         /**
          * 设置显示对象的样式
          * @param name
          * @param value
          */
-        public function style(name, value):Object;
+        public function style(name:String, value:*):Object;
 
         /**
          * 获取滚动条在上边的位置

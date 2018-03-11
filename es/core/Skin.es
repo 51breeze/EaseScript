@@ -78,7 +78,7 @@ package es.core
         public function set attr(value:Object):void
         {
             Object.merge( _attr, value );
-            this.property( value );
+            this.element.setProperties( value );
         }
 
         public function get attr():Object
@@ -231,7 +231,7 @@ package es.core
          */
         public function get template():String
         {
-            return this.render.template(null);
+            return this.render.template();
         };
 
         /**

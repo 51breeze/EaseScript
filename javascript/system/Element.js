@@ -786,13 +786,19 @@ accessor['property']={
  */
 Element.prototype.property=function property(name,value)
 {
-    if( System.isObject(name) )
-    {
-        for(var i in name )access.call(this,'property',i,name[i]);
-        return this;
-    }
     return access.call(this,'property',name,value);
 };
+
+/**
+ * 设置一组属性
+ * @param propsObject
+ * @returns {Element}
+ */
+Element.prototype.setProperties=function setProperties( propsObject )
+{
+    for(var i in propsObject )access.call(this,'property',i,propsObject[i]);
+    return this;
+}
 
 /**
  * 判断当前匹配元素是否有指定的属性名
@@ -871,6 +877,7 @@ accessor['style']= {
             value = System.trim(value);
             type = /^\d+$/.test( value ) ? 'number' : type;
         }
+
         if( !this || !this.style || ( type === "number" && isNaN( value ) ) )return;
         var increment = type === "string" ? /^([\-+])=([\-+.\de]+)/.exec( value ) : null;
 
@@ -892,9 +899,8 @@ accessor['style']= {
         //解析 cssText 样式名
         if (name === 'cssText')
         {
-            value = formatStyleSheet(value,this);
+           value = value === null ? "" : (this.style.cssText || "") + ";" + formatStyleSheet(value, this);
         }
-
         try {
             var orgname = getStyleName(name);
             if ( !fix.cssHooks[name] || typeof fix.cssHooks[name].set !== "function"
@@ -915,16 +921,6 @@ accessor['style']= {
  */
 Element.prototype.style=function style(name, value)
 {
-    if( typeof name === 'string' && name.indexOf(':')>0 )
-    {
-        value=name;
-        name='cssText';
-    }
-    else if( System.isObject(name) )
-    {
-        value=System.serialize(name,'style');
-        name='cssText';
-    }
     return access.call(this,'style',name,value);
 };
 
@@ -1032,7 +1028,7 @@ Element.prototype.addClass=function addClass( className , replace )
                     elem['className'] = old;
                 }
             }
-            elem.offsetWidth = elem.offsetWidth;
+            try{elem.offsetWidth = elem.offsetWidth}catch(e){};
         }
     });
     return this;
@@ -1859,7 +1855,6 @@ if( fix.cssPrefixName==="-webkit-" && typeof Event !== "undefined" )
 
 //set hooks for userSelect style
 fix.cssHooks.userSelect={
-
     get: function( style )
     {
         return style[ getStyleName('userSelect') ] || '';
@@ -1952,7 +1947,7 @@ fix.cssHooks.radialGradient=fix.cssHooks.linearGradient={
         }
 
         var prop = 'background-image';
-        if( System.env.platform(System.env.BROWSER_IE) && System.env.version(10,'<') )
+        if( System.env.platform(System.env.BROWSER_IE,9) )
         {
             value=value.split(',');
             var deg = value.splice(0,1).toString();

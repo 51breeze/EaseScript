@@ -15,8 +15,8 @@ var proto={"constructor":{"value":ComponentEvent},"Get__hostComponent":{"value":
 }}};
 Object.defineProperty(ComponentEvent,"constructor",{"value":function constructor(type,bubbles,cancelable){
 	Object.defineProperty(this,_private,{value:{"hostComponent":null}});
-	if(bubbles == null ){bubbles=true;}
 	if(cancelable == null ){cancelable=true;}
+	if(bubbles == null ){bubbles=true;}
 	Event.call(this,type,bubbles,cancelable);
 }});
 ComponentEvent.constructor.prototype=Object.create( Event.prototype , proto);
@@ -26,7 +26,7 @@ Object.defineProperty(ComponentEvent,"__T__",{value:{
 	"package":"es.events",
 	"classname":"ComponentEvent",
 	"_private":_private,
-	"uri":["f18_","m19_","z20_","_"],
+	"uri":["P18_","j19_","Q20_","_"],
 	"method":method,
 	"proto":proto
 }});

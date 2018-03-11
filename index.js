@@ -132,13 +132,15 @@ function createDescription( syntax, stack , owner , moduleClass )
         desc.referenceType = reftype;
     }
 
-    if( moduleClass['id'] === 'interface'){
+    if( moduleClass['id'] === 'interface')
+    {
        desc['isInterface'] =true;
     }
 
     desc['origintype'] = desc['type'];
     desc['privilege'] =stack.qualifier() || "internal";
     desc['static'] = !!stack.static();
+    desc['nonglobal'] = true;
     desc['isStatic'] = desc['static'];
     desc['owner'] = owner;
     if( stack.final() )
@@ -268,6 +270,9 @@ function parseMetaType( describe, currentStack, metaTypeStack , config, project,
     metatype = Utils.executeMetaType(metatype);
     switch ( metatype.type )
     {
+        case "ArrayElementType" :
+                describe[ currentStack.name() ].arrayElementType = metatype.param.source;
+            break;
         case 'Skin' :
             var source = metatype.param.source;
             var modules = makeSkin( metatype.param.source , config , project, syntax, loadModuleDescription );
@@ -385,6 +390,10 @@ function getDeclareClassDescription( stack , isInternal, config, project , synta
     }
 
     mergeImportClass( list.import, stack.scope().define() );
+    if( list['inherit'] && !list.import.hasOwnProperty( list['inherit'] ) && !globals.hasOwnProperty( list['inherit'] ) )
+    {
+        list.import[ list['inherit'] ] = list['package']+"."+list['inherit'];
+    }
 
     for (; i < len; i++)
     {

@@ -1,8 +1,8 @@
 define(["es.core.Skin","es.core.Container","es.core.Display","ns:es.core.es_internal","es.components.Component","es.events.SkinEvent","es.core.State","if:es.interfaces.IDisplay"],function(Skin,Container,Display,es_internal,Component,SkinEvent,State,IDisplay){
 var _private=this._private;
-var method={"M7_parseSkinObject":{"value":function parseSkinObject(skin,hash){
-	if(skin == null ){skin={};}
+var method={"S7_parseSkinObject":{"value":function parseSkinObject(skin,hash){
 	if(hash == null ){hash={};}
+	if(skin == null ){skin={};}
 	var v;
 	var p;
 	var tag=skin.name||'div';
@@ -11,7 +11,7 @@ var method={"M7_parseSkinObject":{"value":function parseSkinObject(skin,hash){
 	var len=children.length;
 	var i=0;
 	for(;i<len;i++){
-		content+=System.typeOf(children[i])==="string"?children[i]:Skin.M7_parseSkinObject(children[i],hash);
+		content+=System.typeOf(children[i])==="string"?children[i]:Skin.S7_parseSkinObject(children[i],hash);
 	}
 	if(tag==='text')return content;
 	var str='<'+tag;
@@ -28,32 +28,32 @@ var method={"M7_parseSkinObject":{"value":function parseSkinObject(skin,hash){
 for(var prop in method){
 	Object.defineProperty(Skin, prop, method[prop]);
 }
-var proto={"constructor":{"value":Skin},"k6__hash":{"writable":true,"value":null}
-,"k6__skinChildren":{"writable":true,"value":null}
-,"k6__name":{"writable":true,"value":null}
-,"k6__attr":{"writable":true,"value":null}
-,"k6_createChildFlag":{"writable":true,"value":false}
-,"Get_M7_skinChildren":{"value":function skinChildren(){
+var proto={"constructor":{"value":Skin},"F6__hash":{"writable":true,"value":null}
+,"F6__skinChildren":{"writable":true,"value":null}
+,"F6__name":{"writable":true,"value":null}
+,"F6__attr":{"writable":true,"value":null}
+,"F6_createChildFlag":{"writable":true,"value":false}
+,"Get_S7_skinChildren":{"value":function skinChildren(){
 	return Reflect.type(this[_private]._skinChildren,Array);
 }},"Get__name":{"value":function name(){
 	return this[_private]._name;
 }},"Set__name":{"value":function name(value){
-	if( value && !System.is(value, String))throw new TypeError("type does not match. must be String");
+	if( !System.is(value, String))throw new TypeError("type does not match. must be String");
 	this[_private]._name=value;
 }},"Get__attr":{"value":function attr(){
 	return this[_private]._attr;
 }},"Set__attr":{"value":function attr(value){
 	Object.merge(this[_private]._attr,value);
-	this._property(value);
+	this.Get__element().setProperties(value);
 }},"_getChildById":{"value":function getChildById(id){
 	if(this[_private]._hash.hasOwnProperty(id)){
 		return Reflect.get(Skin,this[_private]._hash,id);
 	}
 	return null;
 }}
-,"k6_stateGroup":{"writable":true,"value":{}}
+,"F6_stateGroup":{"writable":true,"value":{}}
 ,"Set__states":{"value":function states(value){
-	if( value && !System.is(value, Array))throw new TypeError("type does not match. must be Array");
+	if( !System.is(value, Array))throw new TypeError("type does not match. must be Array");
 	var name;
 	var stateObj;
 	var len=value.length;
@@ -68,61 +68,61 @@ var proto={"constructor":{"value":Skin},"k6__hash":{"writable":true,"value":null
 		}
 		stateGroup[name]=stateObj;
 	}
-}},"k6__currentState":{"writable":true,"value":null}
+}},"F6__currentState":{"writable":true,"value":null}
 ,"Get__currentState":{"value":function currentState(){
 	return this[_private]._currentState;
 }},"Set__currentState":{"value":function currentState(name){
-	if( name && !System.is(name, String))throw new TypeError("type does not match. must be String");
+	if( !System.is(name, String))throw new TypeError("type does not match. must be String");
 	var current=this[_private]._currentState;
 	if(current!==name){
 		this[_private]._currentState=name;
 		this[_private].currentStateObject=null;
 		if(this[_private].createChildFlag===true){
-			this.M7_createChildren();
+			this.S7_createChildren();
 		}
 	}
-}},"M7_initializing":{"value":function initializing(){
+}},"S7_initializing":{"value":function initializing(){
 }}
-,"k6__hostComponent":{"writable":true,"value":null}
-,"Set_y3_hostComponent":{"value":function hostComponent(host){
-	if( host && !System.is(host, Component))throw new TypeError("type does not match. must be Component");
+,"F6__hostComponent":{"writable":true,"value":null}
+,"Set_I3_hostComponent":{"value":function hostComponent(host){
+	if( !System.is(host, Component))throw new TypeError("type does not match. must be Component");
 	if(host==null)throw new ReferenceError("hostComponent is null","E:/EaseScript/es/core/Skin.es","181:78");
 	this[_private]._hostComponent=host;
-	this.M7_initializing();
-}},"Get_M7_hostComponent":{"value":function hostComponent(){
+	this.S7_initializing();
+}},"Get_S7_hostComponent":{"value":function hostComponent(){
 	return this[_private]._hostComponent;
-}},"k6__render":{"writable":true,"value":null}
+}},"F6__render":{"writable":true,"value":null}
 ,"Get__render":{"value":function render(){
 	var obj=this[_private]._render;
 	if(!obj)obj=new Render();
 	this[_private]._render=obj;
 	return obj;
 }},"Set__render":{"value":function render(value){
-	if( value && !System.is(value, Render))throw new TypeError("type does not match. must be Render");
+	if( !System.is(value, Render))throw new TypeError("type does not match. must be Render");
 	this[_private]._render=value;
 }},"Get__template":{"value":function template(){
-	return this.Get__render().template(null);
+	return this.Get__render().template();
 }},"Set__template":{"value":function template(value){
-	if( value && !System.is(value, String))throw new TypeError("type does not match. must be String");
+	if( !System.is(value, String))throw new TypeError("type does not match. must be String");
 	this.Get__render().template(value);
 }},"_variable":{"value":function variable(name,value){
 	return this.Get__render().variable(name,value);
 }}
 ,"_skinInstaller":{"value":function skinInstaller(){
-	this.M7_createChildren();
+	this.S7_createChildren();
 }}
-,"M7_createChildren":{"value":function createChildren(){
+,"S7_createChildren":{"value":function createChildren(){
 	var e;
 	var elem;
 	var rd;
 	this[_private].createChildFlag=true;
-	var children=this.Get_M7_skinChildren();
+	var children=this.Get_S7_skinChildren();
 	var hash=this[_private]._hash;
 	var len=children.length;
 	var c=0;
 	var child;
 	var render=this[_private]._render;
-	var parent=this.Get_M7_displayParent();
+	var parent=this.Get_S7_displayParent();
 	this._removeAllChild();
 	if(render){
 		child=render.fetch();
@@ -133,7 +133,7 @@ var proto={"constructor":{"value":Skin},"k6__hash":{"writable":true,"value":null
 	for(;c<len;c++){
 		child=children[c];
 		if(System.isObject(child)){
-			child=Skin.M7_parseSkinObject(child,hash);
+			child=Skin.S7_parseSkinObject(child,hash);
 		}
 		else if(System.instanceOf(child,Render)){
 			rd=Reflect.type(child,Render);
@@ -146,7 +146,7 @@ var proto={"constructor":{"value":Skin},"k6__hash":{"writable":true,"value":null
 				this._addChildAt(new Display.constructor(elem),-1);
 			}
 			else if(System.instanceOf(child,Skin)){
-				(child).M7_createChildren();
+				(child).S7_createChildren();
 				this._addChild(Reflect.type(child,Display));
 			}
 		}
@@ -157,14 +157,14 @@ var proto={"constructor":{"value":Skin},"k6__hash":{"writable":true,"value":null
 		e.Set__child(this);
 		this.dispatchEvent(e);
 	}
-	this.M7_updateDisplayList();
+	this.S7_updateDisplayList();
 }}
 ,"_toString":{"value":function toString(){
-	this.M7_createChildren();
+	this.S7_createChildren();
 	return Container.prototype._toString.call(this);
 }}
-,"k6_currentStateObject":{"writable":true,"value":null}
-,"k6_getCurrentState":{"value":function getCurrentState(){
+,"F6_currentStateObject":{"writable":true,"value":null}
+,"F6_getCurrentState":{"value":function getCurrentState(){
 	var state;
 	var p;
 	var currentState=this.Get__currentState();
@@ -183,10 +183,10 @@ var proto={"constructor":{"value":Skin},"k6__hash":{"writable":true,"value":null
 	}
 	throw new ReferenceError('"'+currentState+'"'+' is not define',"E:/EaseScript/es/core/Skin.es","352:80");
 }}
-,"M7_updateDisplayList":{"value":function updateDisplayList(){
+,"S7_updateDisplayList":{"value":function updateDisplayList(){
 	var e;
 	var elems;
-	var stateGroup=this.k6_getCurrentState();
+	var stateGroup=this.F6_getCurrentState();
 	if(stateGroup){
 		elems=new Element('[includeIn],[excludeFrom]',this.Get__element());
 		elems.forEach(function(){
@@ -247,7 +247,7 @@ Object.defineProperty(Skin,"__T__",{value:{
 	"package":"es.core",
 	"classname":"Skin",
 	"_private":_private,
-	"uri":["k6_","M7_","E21_","_"],
+	"uri":["F6_","S7_","p21_","_"],
 	"method":method,
 	"proto":proto
 }});

@@ -7,24 +7,11 @@
 package es.components
 {
     import es.components.SkinComponent;
-    import es.skins.DataGridSkin;
-
     public class DataGrid extends SkinComponent
     {
         public function DataGrid()
         {
             super();
-        }
-
-        /**
-         * 获取皮肤类
-         * @returns Class
-         */
-        override public function get skinClass():Class
-        {
-            var value:Class=super.skinClass;
-            if( value===null )return DataGridSkin;
-            return value;
         }
 
         /**
@@ -69,12 +56,12 @@ package es.components
         /**
          * @private
          */
-        private var __columns__:Object = {};
+        private var __columns__:* = {};
 
         /**
          * @returns {Object}
          */
-        public function get columns():Object
+        public function get columns():*
         {
             return this.__columns__;
         };
@@ -83,7 +70,7 @@ package es.components
          * 设置指定的列名
          * @param columns {'column':'text',...} | "column1,column2,..."
          */
-        public function set columns( columns:Object ):void
+        public function set columns( columns:* ):void
         {
             this.__columns__ = isString(columns) ? columns.split(',') : columns;
         };

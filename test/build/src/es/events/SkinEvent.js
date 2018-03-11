@@ -21,8 +21,8 @@ var proto={"constructor":{"value":SkinEvent},"Get__parent":{"value":function(){
 }}};
 Object.defineProperty(SkinEvent,"constructor",{"value":function constructor(type,bubbles,cancelable){
 	Object.defineProperty(this,_private,{value:{"parent":null,"child":null,"state":null}});
-	if(bubbles == null ){bubbles=true;}
 	if(cancelable == null ){cancelable=true;}
+	if(bubbles == null ){bubbles=true;}
 	Event.call(this,type,bubbles,cancelable);
 }});
 SkinEvent.constructor.prototype=Object.create( Event.prototype , proto);
@@ -32,7 +32,7 @@ Object.defineProperty(SkinEvent,"__T__",{value:{
 	"package":"es.events",
 	"classname":"SkinEvent",
 	"_private":_private,
-	"uri":["e27_","m28_","z20_","_"],
+	"uri":["m27_","W28_","Q20_","_"],
 	"method":method,
 	"proto":proto
 }});

@@ -23,6 +23,8 @@ package es.core
             }
             super( element );
         }
+
+        [ArrayElementType("es.interfaces.IDisplay")]
         
         /**
          * @private
@@ -141,14 +143,14 @@ package es.core
         }
 
         /**
-         * 添加一个html子级元素, 并清空当前容器中之前的所有子极
-         * @param strHtml 如果是一个有效的html标签则生成对应的html元素，否则生成一个文本元素添加到当前容器中。
-         * @return IDisplay
+         * 测是是否包括指定的子级（包括孙级）元素
+         * 此操作与Element.contains()一致
+         * @param child
+         * @return Boolean
          */
-        public function html( strHtml:String ):IDisplay
+        public function contains( child:IDisplay ):Boolean
         {
-            removeAllChild();
-            return addChild( new Display( new Element( Element.createElement( strHtml , true ) ) ) );
+            return element.contains( child.element );
         }
     }
 }

@@ -300,9 +300,6 @@ function builder(config , code, requirements , replacements )
     //模块定义器
     include(contents, 'define' , rootPath+'/define.js', fix , libs);
 
-    //系统引导器
-    var bootstrap = utils.getContents( rootPath+'/bootstrap.js' );
-
      //模块描述
     //contents.unshift('var descriptions = '+JSON.stringify(descriptions)+';\n');
 
@@ -335,27 +332,32 @@ function builder(config , code, requirements , replacements )
         run = '(function(System,Internal,Object,Class,Reflect){\n'+ utils.getContents( rootPath+'/run-dev.js' )+'\n}(System,Internal,System.Object,System.Class,System.Reflect));';
     }
 
+    //系统引导器
+    var bootstrap = utils.getContents( rootPath+'/bootstrap.js' );
 
-
-    return [
-        '(function(System,Internal,undefined){',
-        '"use strict";',
-        //系统全局模块域
-        '(function(System,$'+globals.join(',$')+'){',
-         internal,
-         contents,
-         run,
-        '}(System,' + g.join(',') + '));',
-        //自定义模块域
-        '(function(define,'+requires.join(',')+'){',
+    //开发业务代码
+    var business = ['(function(define,'+requires.join(',')+'){',
         code,
         bootstrap.replace("{config.main}", config.main ),
         '})(Internal.define,'+requires.map(function (a){
             a = mapname[a] || a;
             if(a==='System')return a;
             return 'System.'+a;
-        }).join(',')+');',
+        }).join(',')+');'];
+
+    //框架代码
+    var framework = [
+        '(function(System,Internal,undefined){',
+        '"use strict";',
+        //系统全局模块域
+        '(function(System,$'+globals.join(',$')+'){',
+        internal,
+        contents,
+        run,
+        '}(System,' + g.join(',') + '));',
+        business.join('\n'),
         '}({},{}));'
-    ].join('\n');
+    ];
+    return framework.join('\n');
 }
 module.exports = builder;

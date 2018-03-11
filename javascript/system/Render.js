@@ -193,15 +193,12 @@ Render.prototype.__template__='';
  */
 Render.prototype.template=function template( val )
 {
-    if( val != null )
+    if( typeof val !== "string" )
     {
-        if( typeof val !== "string" )
-        {
-            throw new TypeError('Invalid param type, must be a String. in Render.prototype.template');
-        }
-        this.__template__= val ;
+        return this.__template__;
     }
-    return this.__template__;
+    this.__template__= val;
+    return this;
 };
 
 /**

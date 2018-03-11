@@ -116,6 +116,31 @@ Object.merge=function merge()
 };
 
 /**
+ * 循环每一个元素并应用到指定的回调函数上
+ * @param object
+ * @param callback
+ */
+Object.forEach=function forEach(object,callback)
+{
+    if( object == null || object instanceof System.Class || typeof callback !== "function" )return;
+    var token;
+    if( object.constructor instanceof System.Class )
+    {
+        if( object.constructor.__T__.dynamic !==true )return;
+        token = object.constructor.__T__.uri[0];
+    }
+    var prop;
+    for( prop in object )
+    {
+        if( System.Symbol.isSymbolPropertyName && System.Symbol.isSymbolPropertyName(prop) )continue;
+        if( prop !== token && $propertyIsEnumerable.call(object,prop) )
+        {
+            callback.call(object, object[prop], prop );
+        }
+    }
+};
+
+/**
  * 获取对象的原型
  */
 Object.getPrototypeOf=$Object.getPrototypeOf || function getPrototypeOf(obj)
@@ -267,3 +292,5 @@ Object.prototype.getEnumerableProperties=function getEnumerableProperties( state
     }
     return items;
 };
+
+

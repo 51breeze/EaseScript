@@ -57,7 +57,7 @@ package es.components
         /**
          * @private
          */
-        private var __skin__ = null;
+        private var __skin__:Skin = null;
 
         /**
          * 获取皮肤对象
@@ -68,8 +68,13 @@ package es.components
             if (this.__skin__ === null)
             {
                 var skinClass:Class = this.skinClass;
-                if( skinClass===null )skinClass = Skin;
+                if( skinClass===null ){
+                    throw new TypeError("skinClass is not assign");
+                }
                 this.__skin__ = new skinClass();
+                if( !(this.__skin__ instanceof Skin) ){
+                    throw new TypeError("skinClass is not Skin");
+                }
             }
             return this.__skin__;
         };
@@ -99,7 +104,10 @@ package es.components
                 this.__skinClass__ = value;
                 if( this.initializeCompleted )
                 {
-                    this.__skin__ = new value();
+                    this.__skin__ =  new value();
+                    if( !(this.__skin__ instanceof Skin) ){
+                        throw new TypeError("skinClass is not Skin");
+                    }
                     this.skin.es_internal::hostComponent= this;
                     this.skinInstaller();
                     if( this.hasEventListener(PropertyEvent.CHANGE) )

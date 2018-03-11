@@ -54,16 +54,6 @@
             return body.element.html();
         }
 
-        public function set tipsContent( content:String ):void
-        {
-           tipsBody.element.html( content );
-        }
-
-        public function get tipsContent():String
-        {
-            return tipsBody.element.html();
-        }
-
     ]]>
 
     <style>
@@ -73,18 +63,18 @@
         @background_color:@secondary;
 
         .popup-skin{
-            position:fixed;
-            background-color: #ffffff;
             left:0px;
             top:0px;
-            width: 280px;
-            height:auto;
-            border:1px solid @border_color;
             margin:0px;
             z-index: 99999;
+            width:auto;
+            height:auto;
+            background-color: #ffffff;
+            border:1px solid @border_color;
             .border-radius( @radius, @radius,  @radius,  @radius);
             .box-shadow( 0px 1px 3px rgba(0,0,0,.3) );
         }
+
         .popup-head{
             height: 30px;
             line-height: 30px;
@@ -128,12 +118,10 @@
         <span class="popup-title" id="@title">title</span>
         <button type="button" class="close" id="@close" >×</button>
     </div>
-    <div class="popup-body" id="@body" excludeFrom="tips">
+    <div class="popup-body" id="@body">
     </div>
     <div class="popup-footer" id="@footer" excludeFrom="simple">
         <button type="button" class="btn btn-sm btn-primary" id="@submit">确 定</button>
         <button type="button" class="btn btn-sm btn-default" id="@cancel" excludeFrom="alert">取 消</button>
-    </div>
-    <div class="popup-body" style.tips="background,#ff0000" id="@tipsBody" includeIn="tips">
     </div>
 </s:Skin>

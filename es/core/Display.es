@@ -119,36 +119,27 @@ package es.core
             }
             return _visible;
         }
-
+        
         /**
          * 设置对象的属性
          * @param name
          * @param value
+         * @returns {Object}
          */
-        public function property(name,value=null):Object
+        public function property(name:String,value:*=null):Object
         {
-            if( value==null )
-            {
-                if( System.isObject(name) )
-                {
-                    _element.property( name );
-                    return this;
-                }
-                return _element.property( name );
-            }
-            _element.property( name , value );
-            return this;
+            return _element.property(name,value);
         }
 
         /**
          * 设置显示对象的样式
          * @param name
          * @param value
+         * @returns {Object}
          */
-        public function style(name, value):Object
+        public function style(name:String, value:*=null):Object
         {
-             var obj = _element.style( name, value );
-             return _element===obj ? this : obj;
+             return _element.style(name,value);
         }
 
         /**
@@ -306,12 +297,7 @@ package es.core
         {
             return _element.globalToLocal(left, top);
         };
-
-        public function contains( child:IDisplay ):Boolean
-        {
-            return _element.contains( child.element );
-        }
-
+        
         /**
          * @protected
          */
