@@ -13,36 +13,55 @@ npm install easescript
 
 //创建一个工程项目
 es -p ./project
+
+执行此命令后会生成以下目录结构
+
+project
+|-------build
+|------------css  //样式目录文件
+|------------fonts //字体目录文件
+|------------img   //图片目录文件
+|------------js    //构建后的js
+|------------src   //构建后的js源文件
+|--------Index.es  //EaseScript 脚本文件, 默认 Index 作为入口文件
+
+把 js 目录中的 Index.js 文件引入到网页中， 就可以看 Hello world! 的效果了。
+
+//编译工程文件
+es -p ./project -C -m test
+
+//查看命令
+es -h
 ```
 
-### 语法
+### 语法格式
 ```
-package client
+package
 {
     import EventDispatcher;
-
 	public class Index extends EventDispatcher
 	{
-            function Index()
-            {
-                  super(document);
-	          var container:Element = new Element('#container');
-	          var text = Element.createElement( label );
-	          container.addChildAt( text, 0 );
-            }
+        function Index()
+        {
+           super(document);
+           var container:Element = new Element('#container');
+           var text = Element.createElement( label );
+           container.addChildAt( text, 0 );
+        }
 
-            private var _label:String = "<h1>Hello world!</h1>";
+        private var _label:String = "<h1>Hello world!</h1>";
 
-            public function get label():String
-            {
-                return _label;
-            }
+        public function get label():String
+        {
+            return _label;
+        }
 
-            public function set label(val:String):void
-            {
-                this._label = val;
-            }
+        public function set label(val:String):void
+        {
+            this._label = val;
+        }
 	}
 }
+
 ```
 
