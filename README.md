@@ -5,6 +5,9 @@
 ### 安装
 ```
 npm install easescript
+
+如果有报 Error: Could not locate the bindings file. Tried: 错误信息，请先安装 npm install -g grunt-node-inspector
+
 ```
 
 ### 使用

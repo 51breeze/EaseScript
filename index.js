@@ -1016,10 +1016,8 @@ function getConfigure(config)
             '()\n',
             '\t\t{\n',
             '\t\t\tsuper(document);\n',
-            '\t\t\tthis.addEventListener(Event.READY,function (e){\n',
             '\t\t\t\tvar body = new Element("body");\n',
-            '\t\t\t\tbody.addChildAt( Element.createElement("<h1>Hello world!</h1>"),0);\n',
-            '\t\t\t});\n',
+            '\t\t\t\tbody.addChildAt( Element.createElement("<h1>Hello world!</h1>") );\n',
             '\t\t}\n',
             '\t}\n',
             '}',
@@ -1117,14 +1115,11 @@ function loadFragmentModuleDescription( syntax, fragmentModule, config , project
     //解析代码语法
     var scope = makeCodeDescription( fragmentModule.script , config);
 
-    var file = fragmentModule.filepath.replace( new RegExp( config.skin_file_suffix+"$" ),"").replace(/\\/g,'/');
-
     //获取源文件的路径
-    var sourcefile = filepath(file, config.project_path ).replace(/\\/g,'/');
+    var file = fragmentModule.filepath;
 
     //获取对应的包和类名
-    var fullclassname = PATH.relative( config.project_path, sourcefile ).replace(/\\/g,'/').replace(/\//g,'.');
-    fullclassname=fullclassname.replace(/^[\.]+/g,'');
+    var fullclassname = fragmentModule.fullclassname;
     scope.fullclassname = fullclassname;
 
     //需要编译的模块

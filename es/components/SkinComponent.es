@@ -73,7 +73,7 @@ package es.components
                 }
                 this.__skin__ = new skinClass();
                 if( !(this.__skin__ instanceof Skin) ){
-                    throw new TypeError("skinClass is not Skin");
+                    throw new TypeError("skin instance is not Skin");
                 }
             }
             return this.__skin__;
