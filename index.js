@@ -1017,7 +1017,7 @@ function getConfigure(config)
             '\t\t{\n',
             '\t\t\tsuper(document);\n',
             '\t\t\t\tvar body = new Element("body");\n',
-            '\t\t\t\tbody.addChildAt( Element.createElement("<h1>Hello world!</h1>") );\n',
+            '\t\t\t\tbody.addChild( Element.createElement("<h1>Hello world!</h1>") );\n',
             '\t\t}\n',
             '\t}\n',
             '}',

@@ -167,7 +167,6 @@ package es.core
                     "width":"100%",
                     "height":"100%",
                     "position":"absolute",
-                    "pointerEvents":"none",
                     "left":"0px",
                     "top":"0px",
                 },style);
