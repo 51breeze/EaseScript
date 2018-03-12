@@ -49,7 +49,7 @@ package
            super(document);
            var container:Element = new Element('#container');
            var text = Element.createElement( label );
-           container.addChildAt( text, 0 );
+           container.addChild( text );
         }
 
         private var _label:String = "<h1>Hello world!</h1>";
