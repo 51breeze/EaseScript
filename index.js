@@ -1041,7 +1041,15 @@ function getConfigure(config)
     //在加载类文件时发现是此路径名打头的都转到系统库路径中查找文件。
     config.system_lib_path_name = 'es';
     config.system_lib_path = config.root_path;
+    config.system_core_class={
+        "iteratorClass":"es.interfaces.IIterator",
+    };
 
+    var system_main_class = [];
+    for( var scc in config.system_core_class ){
+        system_main_class.push( config.system_core_class[scc] );
+    }
+    config.system_require_main_class = system_main_class;
     return config;
 }
 
@@ -1086,6 +1094,14 @@ function make( config, isGlobalConfig )
         {
             if( syntax_supported[ project.config.syntax ] === true )
             {
+                //主要的类
+                for (var i in config.system_require_main_class )
+                {
+                    var description = loadModuleDescription( project.config.syntax, config.system_require_main_class[i],  project.config, project);
+                    description.hasUsed = true;
+                }
+
+                //自定义类
                 var classname = PATH.relative( project.path, filepath( project.config.bootstrap, project.path ) );
                 var mainDescription = loadModuleDescription( project.config.syntax, classname,  project.config, project);
                 mainDescription.hasUsed = true;

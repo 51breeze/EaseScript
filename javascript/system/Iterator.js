@@ -4,7 +4,7 @@
  * Released under the MIT license
  * https://github.com/51breeze/EaseScript
  * @author Jun Ye <664371281@qq.com>
- * @require Object,Symbol
+ * @require Object,Symbol,TypeError,Reflect
  */
 var storage=Internal.createSymbolStorage( Symbol('iterator') );
 var has = $Object.prototype.hasOwnProperty;
@@ -12,9 +12,11 @@ function Iterator( target )
 {
     if( System.is(target,Iterator) )return target;
     if( !(this instanceof Iterator) )return new Iterator(target);
+    var isIterator = System.is(target, System.getDefinitionByName( Internal.iteratorClass ) );
     storage(this,true,{
+        "isIterator":isIterator,
         "target":target,
-        "items": Object.prototype.getEnumerableProperties.call( target || [] ),
+        "items": isIterator ? [] : Object.prototype.getEnumerableProperties.call( target || [] ),
         "cursor":-1
     });
 }
@@ -40,26 +42,49 @@ Iterator.prototype.value = undefined;
  */
 Iterator.prototype.current = undefined;
 
+//@private
+function callMethod(target, name)
+{
+    target=storage(target,"target");
+    var current = target["_"+name]();
+    if( current != null )
+    {
+        if( typeof current.key ==="undefined"  || typeof current.value === "undefined" )
+        {
+            throw new TypeError("Iterator.seek return object must be {key:'propName',value:'propValue'}");
+        }
+    }
+    return current;
+}
+
 /**
  * 将指针向前移动一个位置并返回当前元素
  * @returns object{key:'keyname',value:'value'} | false;
  */
 Iterator.prototype.seek=function seek()
 {
-    var items = storage(this,"items");
-    var cursor = storage(this,"cursor");
-    storage(this,"cursor", ++cursor );
-    if( items.length <= cursor )
+    var current;
+    if( storage(this,"isIterator") )
     {
-        this.key = undefined;
-        this.value = undefined;
-        this.current = undefined;
-        return false;
+        current = callMethod(this,"seek");
+    }else
+    {
+        var items = storage(this, "items");
+        var cursor = storage(this, "cursor");
+        storage(this, "cursor", ++cursor);
+        if (items.length <= cursor) {
+            this.key = undefined;
+            this.value = undefined;
+            this.current = undefined;
+            return false;
+        }
+        current = items[cursor]||null;
     }
-    var current = items[ cursor ];
-    this.current = current;
-    this.key = current.key;
-    this.value = current.value;
+    if( current ) {
+        this.current = current;
+        this.key = current.key;
+        this.value = current.value;
+    }
     return current;
 };
 
@@ -70,10 +95,18 @@ Iterator.prototype.seek=function seek()
  */
 Iterator.prototype.prev=function prev()
 {
-    var cursor = storage(this,"cursor");
-    if( cursor < 1 )return false;
-    var items = storage(this,"items");
-    return items[ cursor-1 ];
+    var current;
+    if( storage(this,"isIterator") )
+    {
+        current =  callMethod(this,"prev");
+    }else
+    {
+        var cursor = storage(this, "cursor");
+        if (cursor < 1)return null;
+        var items = storage(this, "items");
+        current = items[ cursor-1 ]||null;
+    }
+    return current;
 };
 
 /**
@@ -83,10 +116,17 @@ Iterator.prototype.prev=function prev()
  */
 Iterator.prototype.next=function next()
 {
-    var cursor = storage(this,"cursor");
-    var items = storage(this,"items");
-    if( cursor >= items.length )return false;
-    return items[ cursor+1 ];
+    var current;
+    if( storage(this,"isIterator") )
+    {
+        current =  callMethod(this,"next");
+    }else
+    {
+        var cursor = storage(this, "cursor");
+        var items = storage(this, "items");
+        current = items[ cursor+1 ] || null;
+    }
+    return current;
 };
 
 /**
@@ -96,19 +136,30 @@ Iterator.prototype.next=function next()
  */
 Iterator.prototype.move=function move( cursor )
 {
-    cursor=cursor >> 0;
-    var items = storage(this,"items");
-
-    if( cursor < 0 )
+    var current;
+    if( storage(this,"isIterator") )
     {
-        cursor = items.length+cursor;
+        current =  callMethod(this,"move");
+    }else
+    {
+        cursor=cursor >> 0;
+        var items = storage(this,"items");
+        if( cursor < 0 )
+        {
+            cursor = items.length+cursor;
+        }
+        if( cursor < 0 || cursor >= items.length )return null;
+        current = items[ cursor ] || null;
+        if( current ){
+            storage(this, "cursor", cursor);
+        }
     }
-    if( cursor < 0 || cursor >= items.length )return false;
-    storage(this, "cursor", cursor);
-    var current = items[ cursor ];
-    this.current = current;
-    this.key = current.key;
-    this.value = current.value;
+    if( current )
+    {
+        this.current = current;
+        this.key = current.key;
+        this.value = current.value;
+    }
     return current;
 };
 
@@ -118,9 +169,15 @@ Iterator.prototype.move=function move( cursor )
  */
 Iterator.prototype.reset=function reset()
 {
-    this.key = undefined;
-    this.value = undefined;
-    this.current = undefined;
-    storage(this,"cursor", -1);
-    return this;
+    if( storage(this,"isIterator") )
+    {
+        return callMethod(this,"reset");
+    }else
+    {
+        this.key = undefined;
+        this.value = undefined;
+        this.current = undefined;
+        storage(this, "cursor", -1);
+    }
+    return true;
 };

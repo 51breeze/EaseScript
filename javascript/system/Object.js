@@ -3,7 +3,7 @@
  * @param value
  * @returns {*}
  * @constructor
- * @require System,Internal.$get,Internal.$set;
+ * @require System;
  */
 function Object( value )
 {
@@ -120,22 +120,35 @@ Object.merge=function merge()
  * @param object
  * @param callback
  */
-Object.forEach=function forEach(object,callback)
+Object.forEach=function forEach(object,callback,thisObject)
 {
     if( object == null || object instanceof System.Class || typeof callback !== "function" )return;
-    var token;
-    if( object.constructor instanceof System.Class )
+    var isIterator = System.is(object, System.getDefinitionByName( Internal.iteratorClass ) );
+    if( isIterator )
     {
-        if( object.constructor.__T__.dynamic !==true )return;
-        token = object.constructor.__T__.uri[0];
-    }
-    var prop;
-    for( prop in object )
-    {
-        if( System.Symbol.isSymbolPropertyName && System.Symbol.isSymbolPropertyName(prop) )continue;
-        if( prop !== token && $propertyIsEnumerable.call(object,prop) )
+        var current;
+        var fn = object[ object instanceof System.Iterator ? "seek" : "_seek" ];
+        while ( current = fn.call(object) )
         {
-            callback.call(object, object[prop], prop );
+            callback.call(thisObject||object, current.value, current.key);
+        }
+
+    }else
+    {
+        var token;
+        if (object.constructor instanceof System.Class)
+        {
+            if (object.constructor.__T__.dynamic !== true)return;
+            token = object.constructor.__T__.uri[0];
+        }
+        var prop;
+        for (prop in object)
+        {
+            if (System.Symbol.isSymbolPropertyName && System.Symbol.isSymbolPropertyName(prop))continue;
+            if (prop !== token && $propertyIsEnumerable.call(object, prop))
+            {
+                callback.call(thisObject || object, object[prop], prop);
+            }
         }
     }
 };

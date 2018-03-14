@@ -322,9 +322,18 @@ function builder(config , code, requirements , replacements )
     index = requires.indexOf('Symbol');
     if( index > 0 )requires.splice(index,1);
 
-    var internal = '';
-    if( config.mode==1  ){
-        internal='(function(System,Internal,environment){\n'+ utils.getContents( rootPath+'/internal.js' )+ '\n}(System,Internal,'+config.mode+'));'
+    var internal = [];
+    for (var scc in  config.system_core_class )
+    {
+        internal.push("Internal."+scc+"='"+config.system_core_class[scc]+"';" );
+    }
+    if( config.mode==1  )
+    {
+        internal.push( utils.getContents( rootPath+'/internal.js' ) );
+    }
+    if( internal.length > 0 )
+    {
+        internal='(function(System,Internal,environment){\n'+ internal.join('\n') + '\n}(System,Internal,'+config.mode+'));'
     }
 
     var run='';
