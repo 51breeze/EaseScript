@@ -1,7 +1,7 @@
 /**
  * IE8 以下
  */
-if( System.env.platform('IE') && System.env.version(8) )
+if( System.env.platform('IE',8) )
 {
 
 Event.fix.map[ Event.READY ] = 'readystatechange';

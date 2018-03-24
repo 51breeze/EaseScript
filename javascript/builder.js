@@ -215,7 +215,7 @@ function isEmpty( obj ) {
  * 在特定的版本下需要加载的库文件
  */
 const library={
-    'ie-9':{'Element':'Sizzle.js'}
+    /*'ie-9':{'Element':'Sizzle.js'}*/
 };
 
 /**
@@ -317,9 +317,10 @@ function builder(config , code, requirements , replacements )
          return val;
     });
 
-    var index = requires.indexOf('console');
-    if( index > 0 )requires.splice(index,1);
-    index = requires.indexOf('Symbol');
+   /* var index = requires.indexOf('console');
+    if( index > 0 )requires.splice(index,1);*/
+
+    var index = requires.indexOf('Symbol');
     if( index > 0 )requires.splice(index,1);
 
     var internal = [];
@@ -343,6 +344,7 @@ function builder(config , code, requirements , replacements )
 
     //系统引导器
     var bootstrap = utils.getContents( rootPath+'/bootstrap.js' );
+
 
     //开发业务代码
     var business = ['(function(define,'+requires.join(',')+'){',

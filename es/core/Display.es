@@ -312,14 +312,5 @@ package es.core
         {
             return displayParent;
         };
-
-        /**
-         * 输出html字符串格式
-         * @return
-         */
-        override public function toString():String
-        {
-            return _element.html( true );
-        }
     }
 }

@@ -168,3 +168,27 @@ Array.prototype.find=function find(callback, thisArg)
     }
     return;
 };
+
+/**
+ * 返回此对象的字符串
+ * @returns {*}
+ */
+Array.prototype.toString=function toString()
+{
+    if( this.constructor === Array ){
+        return "[object Array]";
+    }
+    return Object.prototype.toString.call(this);
+}
+
+/**
+ * 返回此对象的数据值
+ * @returns {*}
+ */
+Array.prototype.valueOf=function valueOf()
+{
+    if( this.constructor === Array ){
+        return this.slice(0);
+    }
+    return Object.prototype.valueOf.call(this);
+}

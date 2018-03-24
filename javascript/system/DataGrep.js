@@ -91,15 +91,18 @@ function createFilter()
 /**
  * @returns {DataGrep}
  * @constructor
- * @require Object,Math,DataArray,Array,Function,Error
+ * @require Object,Math,DataArray,Array,Function,Error,Symbol
  */
+var storage=Internal.createSymbolStorage( Symbol('DataGrep') );
 function DataGrep( dataItems )
 {
     if( !(System.instanceOf(this,DataGrep)) )return new DataGrep( dataItems );
     if( !System.instanceOf( dataItems, Array ) )throw new Error('error','Invalid data list');
+    storage(this,true,{
+        'dataItems':dataItems,
+        'filter':dataItems,
+    });
     Object.defineProperty(this,"length", {value:0,writable:true});
-    Object.defineProperty(this,"dataItems", {value:dataItems});
-    Object.defineProperty(this,"__filter__", {value:dataItems,writable:true});
 }
 
 System.DataGrep=DataGrep;
@@ -120,11 +123,12 @@ DataGrep.prototype.filter=function filter( condition )
 {
     if( typeof condition === "undefined" )
     {
-        this.__filter__ = createFilter.call(this);
+        storage(this,"filter", createFilter.call(this) );
 
     }else if( typeof condition === 'function' )
     {
-        this.__filter__ = condition;
+        storage(this,"filter",condition);
+
     }else if ( typeof condition === 'string' && condition!='' )
     {
         var old = condition;
@@ -167,13 +171,13 @@ DataGrep.prototype.filter=function filter( condition )
         {
             return b.toLowerCase()=='or' ? ' || ' : ' && ';
         });
-        this.__filter__=new Function('try{ return !!('+condition+') }catch(e){ throw new SyntaxError("is not grep:'+old+'");}');
+        storage(this,"filter",new Function('try{ return !!('+condition+') }catch(e){ throw new SyntaxError("is not grep:'+old+'");}') );
 
     }else if( condition === null )
     {
-        this.__filter__=null;
+        storage(this,"filter",null);
     }
-    return this.__filter__;
+    return storage(this,"filter");
 };
 
 /**
@@ -185,7 +189,7 @@ DataGrep.prototype.clean=function()
     {
         delete this[i];
     }
-    this.__filter__=null;
+    storage(this,"filter",null);
     this.length=0;
     return this;
 };
@@ -198,7 +202,7 @@ DataGrep.prototype.clean=function()
  */
 DataGrep.prototype.execute=function(filter)
 {
-    var data=this.dataItems;
+    var data=storage(this,"dataItems");
     filter = this.filter( filter );
     if( !filter )return data;
     var result=[];
@@ -349,8 +353,6 @@ DataGrep.prototype.notLike=function(column, value, type, logic)
     strainer.call(this,column,value,'notlike',logic,type);
     return this;
 };
-
 DataGrep.LIKE_LEFT='left';
 DataGrep.LIKE_RIGHT='right';
 DataGrep.LIKE_BOTH='both';
-

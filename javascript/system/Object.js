@@ -24,7 +24,7 @@ Object.create = $Object.create;
  * 定义属性描述
  */
 Object.defineProperty = $Object.defineProperty;
-if( !Object.defineProperty || ( System.env.platform('IE') && System.env.version(8) ) )
+if( !Object.defineProperty || System.env.platform('IE',8) )
 {
     Object.defineProperty = function defineProperty(obj, prop, desc)
     {
@@ -279,14 +279,14 @@ Object.prototype.values=function values()
 Object.prototype.getEnumerableProperties=function getEnumerableProperties( state )
 {
     if( this == null )throw new TypeError("non-object");
-    if( this instanceof System.Class )return [];
+    var items=state===2 ? {} : [];
+    if( this instanceof System.Class )return null;
     var token;
     if( this.constructor instanceof System.Class )
     {
-        if( this.constructor.__T__.dynamic !==true )return [];
+        if( this.constructor.__T__.dynamic !==true )return null;
         token = this.constructor.__T__.uri[0];
     }
-    var items=[];
     var prop;
     for( prop in this )
     {

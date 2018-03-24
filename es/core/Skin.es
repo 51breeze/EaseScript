@@ -314,12 +314,6 @@ package es.core
             this.updateDisplayList();
         };
 
-        override public function toString()
-        {
-            createChildren();
-            return super.toString();
-        }
-
         /**
          * @private
          */

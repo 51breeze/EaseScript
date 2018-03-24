@@ -15,20 +15,17 @@ System.isNaN = isNaN;
 System.Infinity = Infinity;
 System.parseFloat = parseFloat;
 System.parseInt = parseInt;
-System.Math = Math;
-System.String = String;
-System.Number = Number;
-System.Boolean  = Boolean;
-System.RegExp = RegExp;
-System.Date = Date;
-System.RegExp = RegExp;
-System.Error  = Error;
-System.TypeError  = TypeError;
-System.ReferenceError  = ReferenceError;
-System.SyntaxError = SyntaxError;
-System.alert=function(a){
-    window.alert(a);
-}
+System.Math = $Math;
+System.String = $String;
+System.Number = $Number;
+System.Boolean  = $Boolean;
+System.RegExp = $RegExp;
+System.Date = $Date;
+System.RegExp = $RegExp;
+System.Error  = $Error;
+System.TypeError  = $TypeError;
+System.ReferenceError  = $ReferenceError;
+System.SyntaxError = $SyntaxError;
 
 ;(function(f){
     System.setTimeout =f(setTimeout);
@@ -37,7 +34,6 @@ System.alert=function(a){
     var a=[].slice.call(arguments,2);
     return f( function(){ c.apply(this,a) }, t ) };
 });
-
 System.clearTimeout = function(id){
     return clearTimeout( id );
 };

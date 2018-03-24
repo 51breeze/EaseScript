@@ -1,4 +1,4 @@
-if (System.env.platform(System.env.BROWSER_IE) && System.env.version(8, '<='))
+if (System.env.platform(System.env.BROWSER_IE,8))
 {
     System.typeOf = function typeOf(instanceObj)
     {

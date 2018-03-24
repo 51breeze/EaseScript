@@ -788,15 +788,20 @@ const builder={
                  return e;
              });
 
-             style.unshift( "\n@import 'mixins.less';\n" );
-             style.unshift( "\n@import 'main.less';\n" );
-             if( config.animate ) {
-                 style.unshift("\n@import 'animate.less';\n");
-             }
              if( config.font )
              {
-                 style.push("\n@import './less/glyphicons.less';\n");
+                 style.unshift("\n@import './less/glyphicons.less';\n");
              }
+
+             if( config.animate ) {
+                 style.unshift("\n@import 'animate.less';\n");
+             }else{
+                 style.unshift("\n@import 'animate-base.less';\n");
+             }
+
+             style.unshift( "\n@import 'mixins.less';\n" );
+             style.unshift( "\n@import 'main.less';\n" );
+
              less.render( style.join("\n") , options, function (err, output) {
                  if (err) {
                      Utils.error(err.message);
@@ -1114,6 +1119,8 @@ function make( config, isGlobalConfig )
             builder[s](project.config, project);
             Utils.info('Making '+s+' done ...');
         }
+        Utils.info('\r\nCompleted !!!');
+        Utils.info('Make path : '+config.build_path );
 
     }catch (e)
     {

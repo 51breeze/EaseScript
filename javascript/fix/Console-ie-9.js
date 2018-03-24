@@ -63,14 +63,5 @@ if(!window.console)
         System.Console.timeEnd=function timeEnd()
         {
         }
-        System.log = System.Console.log;
-        System.info = System.Console.log;
-        System.trace = System.Console.trace;
-        System.warn = System.Console.warn;
-        System.error = System.Console.error;
-        System.dir = System.Console.dir;
-        System.assert = System.Console.assert;
-        System.time = System.Console.time;
-        System.timeEnd = System.Console.timeEnd;
     }(System));
 }

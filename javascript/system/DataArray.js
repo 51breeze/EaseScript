@@ -3,18 +3,23 @@
  * Released under the MIT license
  * https://github.com/51breeze/EaseScript
  * @author Jun Ye <664371281@qq.com>
- * @require System,Object,Array
+ * @require System,Object,Array,ReferenceError
  */
 function DataArray()
 {
-    if( !System.instanceOf(this,DataArray) ){
+    if( !System.instanceOf(this,DataArray) )
+    {
         return Array.apply( Object.create( DataArray.prototype ), Array.prototype.slice.call(arguments,0) );
     }
-    Array.apply(this, Array.prototype.slice.call(arguments,0) );
+    if( arguments.length === 1 && System.instanceOf(arguments[0],Array) )
+    {
+        Array.apply(this, arguments[0]);
+    }else{
+        Array.apply(this, Array.prototype.slice.call(arguments,0) );
+    }
     return this;
 }
 System.DataArray=DataArray;
-
 DataArray.DESC='desc';
 DataArray.ASC='asc';
 DataArray.prototype= Object.create( Array.prototype );
@@ -28,13 +33,19 @@ DataArray.prototype.constructor=DataArray;
  */
 DataArray.prototype.orderBy=function(column,type)
 {
-    if( column === DataArray.DESC || column === DataArray.ASC || column==null )
+    if( this.length < 2 )return this;
+    if( (column === DataArray.DESC || column === DataArray.ASC || column==null) && type==null )
     {
+        if( typeof this[0] === "object" )
+        {
+            throw new ReferenceError('Missing column name.');
+        }
         this.sort(function (a,b) {
             return column === DataArray.DESC ? System.compare(b,a) : System.compare(a,b);
         });
         return this;
     }
+
     var field=column,orderby=['var a=arguments[0],b=arguments[1],s=0,cp=arguments[2];'];
     if( typeof column !== "object" )
     {
@@ -64,13 +75,43 @@ DataArray.prototype.orderBy=function(column,type)
 DataArray.prototype.sum=function( callback )
 {
     var result = 0;
-    if( typeof callback !== "function" )callback = function( value ){return System.isNaN(value) ? 0 : value>>0;}
-    var index=0,
-    len=this.length >> 0;
+    var type = typeof callback;
+    var index=0,len=this.length >> 0;
+    if( len===0 )return 0;
+    if( type !== "function" ){
+        if( type === "string" ){
+            var field = callback;
+            if( typeof this[0][ field ] === "undefined" )
+            {
+                throw new ReferenceError('assign field does not define. for "'+type+'"');
+            }
+            callback = function( value ){return value[field]>>0;}
+        }else
+        {
+            if( typeof this[0] === "object" )
+            {
+                throw new ReferenceError('Missing field name.');
+            }
+            callback = function( value ){return System.isNaN(value) ? 0 : value>>0;}
+        }
+    }
     for(;index<len;index++)
     {
         result+=callback.call(this,this[index])>>0;
     }
     return result;
 };
+
+/**
+ * 返回此对象的字符串
+ * @returns {*}
+ */
+DataArray.prototype.toString=function toString()
+{
+    if( this.constructor === DataArray )
+    {
+        return "[object DataArray]";
+    }
+    return Array.prototype.toString.call(this);
+}
 

@@ -71,10 +71,7 @@ package es.components
                 if( skinClass===null ){
                     throw new TypeError("skinClass is not assign");
                 }
-                this.__skin__ = new skinClass();
-                if( !(this.__skin__ instanceof Skin) ){
-                    throw new TypeError("skin instance is not Skin");
-                }
+                this.__skin__ = (Skin)new skinClass();
             }
             return this.__skin__;
         };
@@ -104,7 +101,7 @@ package es.components
                 this.__skinClass__ = value;
                 if( this.initializeCompleted )
                 {
-                    this.__skin__ =  new value();
+                    this.__skin__ = (Skin)new value();
                     if( !(this.__skin__ instanceof Skin) ){
                         throw new TypeError("skinClass is not Skin");
                     }

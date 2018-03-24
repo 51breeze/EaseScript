@@ -3,7 +3,6 @@
  * 返回一个函数
  * @type {bind}
  */
-Function.prototype.bind = $Function.prototype.bind;
 if( !$Function.prototype.bind )
 {
     Function.prototype.bind = function bind(thisArg)

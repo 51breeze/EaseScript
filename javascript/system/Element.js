@@ -656,6 +656,30 @@ Element.prototype.constructor=Element;
 Element.prototype.setCurrentElementTarget=true;
 
 /**
+ * 返回此对象的字符串
+ * @returns {*}
+ */
+Element.prototype.toString=function toString()
+{
+     if( this.constructor === Element ){
+         return "[object Element]";
+     }
+     return EventDispatcher.prototype.toString.call(this);
+}
+
+/**
+ * 返回此对象的数据值
+ * @returns {*}
+ */
+Element.prototype.valueOf=function valueOf()
+{
+    if( this.constructor === Element ){
+        return this.slice(0);
+    }
+    return EventDispatcher.prototype.valueOf.call(this);
+}
+
+/**
  * 返回一个指定开始索引到结束索引的元素并返回新的Element集合
  */
 Element.prototype.slice = Array.prototype.slice;

@@ -9,13 +9,9 @@ package es.core
    {
        public function Appliction()
        {
-           super();
-           Element( document ).addEventListener(Event.READY,function (e:Event) {
-
-               this._viewport = new Container( new Element(document.documentElement) );
-               this.display();
-
-           },false,0,this);
+           super(document);
+           this._viewport = new Container( new Element(document.documentElement) );
+           this.display();
        }
 
        override protected function skinInstaller()
@@ -44,17 +40,6 @@ package es.core
        {
           return _viewport;
        };
-
-       /**
-        * 获取皮肤类
-        * @returns Class
-        */
-       override public function get skinClass():Class
-       {
-           var value=super.skinClass;
-           if( value===null )return ApplictionSkin;
-           return value;
-       }
 
        /**
         * 设置此组件在指定的视口中
