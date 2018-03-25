@@ -70,7 +70,7 @@ package es.components
          * 设置指定的列名
          * @param columns {'column':'text',...} | "column1,column2,..."
          */
-        public function set columns( columns:* ):void
+        public function set columns( columns:Object ):void
         {
             this.__columns__ = isString(columns) ? columns.split(',') : columns;
         };

@@ -20,6 +20,10 @@ module.exports={
                 "path": "./",
                 "name": "fonts",
             },
+            "view": {
+                "path": "./",
+                "name": "views",
+            },
         },
     },
     //工作的主目录结构配置

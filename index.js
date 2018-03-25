@@ -268,10 +268,17 @@ function parseMetaType( describe, currentStack, metaTypeStack , config, project,
 {
     var metatype = metaTypeToString( metaTypeStack );
     metatype = Utils.executeMetaType(metatype);
+    var defineMetaTypeList = describe.defineMetaTypeList || (describe.defineMetaTypeList={});
+    if( defineMetaTypeList[ metatype.type ] )
+    {
+        error('Metatype binding has already exists in same object for "'+metatype.type+'"');
+    }
+    metatype.metaTypeStack = metaTypeStack;
+    defineMetaTypeList[ metatype.type ] = metatype;
     switch ( metatype.type )
     {
         case "ArrayElementType" :
-                describe[ currentStack.name() ].arrayElementType = metatype.param.source;
+                describe.arrayElementType = metatype.param.source;
             break;
         case 'Skin' :
             var source = metatype.param.source;
@@ -282,16 +289,16 @@ function parseMetaType( describe, currentStack, metaTypeStack , config, project,
             {
                 loadFragmentModuleDescription(syntax, modules[ index ], config, project);
             }
-            describe[ currentStack.name() ].value = ' System.getDefinitionByName("'+source+'")';
+            describe.value = ' System.getDefinitionByName("'+source+'")';
         break;
         case 'Embed' :
             var dest = parseMetaEmbed(metatype, config );
             dest= PATH.relative(config.build_path,dest ).replace(/\\/g,'/');
-            describe[ currentStack.name() ].value = '"./'+dest+'"';
+            describe.value = '"./'+dest+'"';
         break;
         case 'Bindable' :
             var name = currentStack.name();
-            var item = describe[ name ];
+            var item = describe;
             if( item.bindable===true )return;
             var eventType = "PropertyEvent.CHANGE";
             if( metatype.param.eventType )
@@ -353,11 +360,11 @@ function getDeclareClassDescription( stack , isInternal, config, project , synta
         'isInternal': isInternal,"privilege":"internal",'requirements':{},'hasUsed':false};
     var isstatic = stack.static();
     var type = stack.fullclassname();
-    var prev = null;
     var data = stack.content();
     var i = 0;
     var len = data.length;
     var item;
+    var metatypelist = [];
 
     list['inherit'] = stack.extends() ? stack.extends() : null;
     list['package'] = stack.parent().keyword()==="package" ? stack.parent().name() : "";
@@ -412,20 +419,26 @@ function getDeclareClassDescription( stack , isInternal, config, project , synta
                 list.use[ ns ] = "namespace";
             }
 
-            //跳过构造函数
+            var isConstructor = false;
+            //构造函数
             if (item.keyword() === 'function' && item.name() === stack.name() && !isstatic)
             {
                 list.constructor = createDescription(syntax, item, null, list );
-                continue;
-
-            } else if ( item.keyword() === "use" )
+                isConstructor = true;
+            }
+            //使用命名空间
+            else if ( item.keyword() === "use" )
             {
                 list.use[ item.name() ] = "namespace";
                 continue;
             }
-
+            //先保存声明的数据元
+            else if( item.keyword() === 'metatype' )
+            {
+                metatypelist.push( item );
+            }
             //访问器
-            if (item instanceof Ruler.SCOPE && item.accessor())
+            else if (item instanceof Ruler.SCOPE && item.accessor())
             {
                 var refObj = ref[item.name()];
                 if (!refObj) {
@@ -441,19 +454,24 @@ function getDeclareClassDescription( stack , isInternal, config, project , synta
                     refObj.paramType = refObj.value[item.accessor()].paramType;
                     refObj.param = refObj.paramType;
                 }
-
-            }else if (item.keyword() !== 'metatype')
+            }
+            else
             {
                 ref[item.name()] = createDescription(syntax,item, type, list);
             }
 
-            //为当前的成员绑定一个数据元
-            if (prev && prev.keyword() === 'metatype')
+            //为当前的成员绑定数据元
+            if ( metatypelist.length > 0 && item.keyword() !== 'metatype')
             {
-                parseMetaType(ref, item, prev, config, project, syntax, list);
-                prev = null;
+                var mLen = metatypelist.length;
+                var mI = 0;
+                var desc =  isConstructor ? list.constructor : ref[item.name()];
+                for(;mI<mLen;mI++)
+                {
+                    parseMetaType(desc, item, metatypelist[mI], config, project, syntax, list);
+                }
+                metatypelist = [];
             }
-            prev = item;
         }
     }
     return list;
@@ -495,7 +513,7 @@ var root_block_declared=['class','interface','const','var','let','use','function
  */
 function getPropertyDescription( stack , config , project , syntax )
 {
-    var moduleClass = {'static':{},'proto':{},'import':{},'constructor':{},'attachContent':{},"rootContent":[],
+    var moduleClass = {'static':{},'proto':{},'import':{},'constructor':{},'attachContent':{},"rootContent":[],'defineMetaTypeList':{},
         "namespaces":{}, "use":{},"declared":{},"nonglobal":true,"type":'' ,"privilege":"internal",'requirements':{},'hasUsed':false};
     moduleClass.fullclassname = stack.fullclassname;
     var fullclassname = stack.fullclassname.split('.');
@@ -509,6 +527,8 @@ function getPropertyDescription( stack , config , project , syntax )
     var item;
     var len = data.length;
     var count = 0;
+
+    var metatypelist = [];
 
     for( ;i<len ;i++ )
     {
@@ -553,6 +573,18 @@ function getPropertyDescription( stack , config , project , syntax )
                     else if ( value.keyword() === "use" )
                     {
                         moduleClass.use[ value.name() ] = "namespace";
+
+                    } else if ( value.keyword() === "metatype" )
+                    {
+                        var metatype = metaTypeToString( value );
+                        metatype = Utils.executeMetaType(metatype);
+                        metatype.metaTypeStack = value;
+                        var defineMetaTypeList = moduleClass.defineMetaTypeList;
+                        if( defineMetaTypeList[ metatype.type ] )
+                        {
+                            error('Metatype binding has already exists in same object for "'+metatype.type+'"');
+                        }
+                        defineMetaTypeList[ metatype.type ] = metatype;
                     }
                 }
             }
@@ -691,7 +723,13 @@ function loadModuleDescription( syntax , file , config , project , resource , su
     Utils.info('Checking file '+sourcefile+'...');
 
     //解析代码语法
-    var scope = makeCodeDescription(fs.readFileSync( sourcefile , 'utf-8'), config );
+    var scope = null;
+    try{
+        scope = makeCodeDescription(fs.readFileSync( sourcefile , 'utf-8'), config );
+    }catch (e)
+    {
+        throw new SyntaxError(  e.message +"\r\nfile: "+sourcefile );
+    }
 
     //需要编译的模块
     var module = makeModules[syntax] || (makeModules[syntax]={});
@@ -707,8 +745,7 @@ function loadModuleDescription( syntax , file , config , project , resource , su
 
     if( fullclassname !== description.fullclassname )
     {
-        Utils.error("the file path with the package path inconformity");
-        throw new SyntaxError( "the file path with the package path inconformity" );
+        throw new SyntaxError( "Inconformity of file path. the '"+fullclassname+"' with the '"+ description.fullclassname+"' package" );
     }
 
     for( var p in description.declared )
@@ -1135,11 +1172,17 @@ function make( config, isGlobalConfig )
  */
 function loadFragmentModuleDescription( syntax, fragmentModule, config , project )
 {
-    //解析代码语法
-    var scope = makeCodeDescription( fragmentModule.script , config);
-
     //获取源文件的路径
     var file = fragmentModule.filepath;
+
+    //解析代码语法
+    var scope=null;
+    try{
+        scope = makeCodeDescription( fragmentModule.script , config);
+    }catch (e)
+    {
+        throw new SyntaxError(  e.message +"\r\nfile: "+file );
+    }
 
     //获取对应的包和类名
     var fullclassname = fragmentModule.fullclassname;
