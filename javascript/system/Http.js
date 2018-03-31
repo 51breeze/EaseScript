@@ -190,6 +190,20 @@ Http.prototype.constructor=Http;
  * 取消请求
  * @returns {Boolean}
  */
+Object.defineProperty(Http.prototype,"option", {value:function option(name, value)
+{
+    var options = this.__options__;
+    if( value == null ){
+        return options[ name ];
+    }
+    options[ name ] = value;
+    return this;
+}});
+
+/**
+ * 取消请求
+ * @returns {Boolean}
+ */
 Object.defineProperty(Http.prototype,"abort", {value:function abort()
 {
     var options = this.__options__;

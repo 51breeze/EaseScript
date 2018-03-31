@@ -16,7 +16,7 @@ Reflect._call=function(info,scope,target, name, argumentsList, receiver, ns)
 Reflect._construct=function(info,scope,target,argumentsList)
 {
      Internal.addStack(scope.__T__.filename, "new "+info);
-     return Reflect.construct(target, argumentsList);
+     return Reflect.construct(scope,target, argumentsList);
 };
 
 Reflect._get=function(info,scope,target, propertyKey, receiver, ns)

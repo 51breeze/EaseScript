@@ -36,6 +36,7 @@ const defaultConfig = {
 var  descriptions={};
 var  makeModules={};
 var  styleContents=[];
+var  viewContents=[];
 var  requirements={};
 var  clientScriptContents = [];
 
@@ -275,6 +276,7 @@ function parseMetaType( describe, currentStack, metaTypeStack , config, project,
     }
     metatype.metaTypeStack = metaTypeStack;
     defineMetaTypeList[ metatype.type ] = metatype;
+    
     switch ( metatype.type )
     {
         case "ArrayElementType" :
@@ -657,6 +659,39 @@ function makeCodeDescription( content ,config )
 }
 
 /**
+ * 加载皮肤模块的描述信息
+ * @returns
+ */
+function loadSkinModuleDescription( skinClassName , config , project, syntax )
+{
+    //加载皮肤
+    var modules = makeSkin( skinClassName , config , project, syntax, loadModuleDescription );
+    var scriptConfig =  Utils.merge({}, config, {syntax: 'javascript'});
+    for( var index in modules )
+    {
+        var _module = modules[ index ];
+        if( _module.styleContent ) {
+            styleContents.push(_module);
+        }
+        if( _module.isMakeView )
+        {
+            viewContents.push(_module);
+        }
+        //运行在程序中的组件
+        if( _module.componentModule )
+        {
+            loadFragmentModuleDescription(syntax, _module.componentModule, config, project);
+        }
+        //运行在客户端的脚本
+        if( _module.script )
+        {
+            loadFragmentModuleDescription("javascript", _module,scriptConfig, project);
+        }
+    }
+    return define(syntax, skinClassName);
+}
+
+/**
  * 加载并解析模块的描述信息
  * @returns
  */
@@ -689,24 +724,8 @@ function loadModuleDescription( syntax , file , config , project , resource , su
             Utils.error(resource || sourcefile);
             throw new Error('Not found '+sourcefile+suffix);
         }
-
         //加载皮肤
-        var modules = makeSkin( fullclassname , config , project, syntax, loadModuleDescription );
-
-        //构建客户端运行的脚本
-        if( modules.clientScriptContents )
-        {
-            loadFragmentModuleDescription('javascript',  modules.clientScriptContents , modules.clientScriptContents.config || config , project);
-        }
-
-        styleContents = styleContents.concat( modules.styleContents );
-        modules = modules.moduleContents;
-        for( var index in modules )
-        {
-            var _module = modules[ index ];
-            loadFragmentModuleDescription(syntax, _module, config, project);
-        }
-        return define(syntax, fullclassname);
+        return loadSkinModuleDescription( fullclassname , config , project, syntax );
     }
     sourcefile+=suffix;
 
@@ -795,7 +814,6 @@ const builder={
          var jsSyntax = require('./lib/javascript.js');
          var script = jsSyntax(config, makeModules['javascript'], descriptions['javascript'], project );
          var filename;
-
          if( styleContents.length > 0  )
          {
              var less = require('less');
@@ -807,10 +825,9 @@ const builder={
                  compress: config.minify === 'enable' ,
              };
              var style = styleContents.map(function (e, i) {
-
-                 var ownerModule = descriptions['javascript'][e.ownerModule];
+                 var ownerModule = descriptions['javascript'][e.fullclassname];
                  if( ownerModule.hasUsed !==true )return '';
-                 e = e.style;
+                 e = e.styleContent;
                  e=e.replace(/@Embed\(.*?\)/g, function (a,b) {
                      var metatype = Utils.executeMetaType( a.substr(1) );
                      var dest = parseMetaEmbed(metatype, config);
@@ -1127,6 +1144,7 @@ function make( config, isGlobalConfig )
     }
     config.globals=globals;
     config.$getDescriptionAndGlobals = getDescriptionAndGlobals;
+    config.$loadSkinModuleDescription = loadSkinModuleDescription;
 
     try
     {

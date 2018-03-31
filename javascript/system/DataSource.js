@@ -80,6 +80,71 @@ DataSource.prototype.options=function options( opt )
 };
 
 /**
+ * @private
+ * @param name
+ * @param value
+ * @returns {*}
+ */
+function access( name, value)
+{
+    var options = storage(this,"options");
+    if( value == null ){
+        return options[ name ];
+    }
+    options[name] = value;
+    if( this.isRemote() )
+    {
+        var source = storage(this,"source");
+        if ( source instanceof Http )
+        {
+            source.option( name, value )
+        }
+    }
+    return this;
+};
+
+
+/**
+ * 设置数据的响应类型
+ * @param value
+ * @returns {*}
+ */
+DataSource.prototype.dataType=function dataType( value )
+{
+    return access.call(this,'dataType', value);
+};
+
+/**
+ * 设置数据的请求方法
+ * @param value
+ * @returns {*}
+ */
+DataSource.prototype.method=function method( value )
+{
+    return access.call(this,'method', value);
+};
+
+/**
+ * 设置请求超时
+ * @param value
+ * @returns {*}
+ */
+DataSource.prototype.timeout=function timeout( value )
+{
+    return access.call(this,'timeout', value);
+};
+
+/**
+ * 设置请求的参数对象
+ * @param value
+ * @returns {*}
+ */
+DataSource.prototype.parameter=function parameter( value )
+{
+    return access.call(this,'param', value);
+};
+
+/**
  * 设置获取数据源
  * 允许是一个数据数组或者是一个远程请求源
  * @param Array source | String url | Http httpObject
