@@ -1,11 +1,10 @@
 const utils = require('../lib/utils.js');
 const globals=['Object','Function','Array','String','Number','Boolean','Math','Date','RegExp','Error','ReferenceError','TypeError','SyntaxError','JSON','Reflect','Symbol','console'];
-var contents=[];
 const rootPath =  utils.getResolvePath( __dirname );
 /**
  *  已加载的模块
  */
-const loaded = {'HTMLElement':true,'Node':true};
+var loaded = {'HTMLElement':true,'Node':true};
 
 /**
  * 根据指定的版本加载对应的策略文件
@@ -255,8 +254,10 @@ function Context( name )
  * @param config
  * @returns {string}
  */
-function builder(config , code, requirements , replacements )
+function builder(main, config , code, requirements , replacements )
 {
+    loaded = {};
+    var contents = [];
     var fix = polyfill( config );
     
     /**
@@ -282,11 +283,12 @@ function builder(config , code, requirements , replacements )
     {
         for ( var p in requirements )
         {
-            if( requirements[p]===true && requires.indexOf( p ) < 0 && ( globals.hasOwnProperty( p ) || config.globals.hasOwnProperty(p) ) )
+            var name = requirements[p];
+            if( requires.indexOf( name ) < 0 && ( globals.hasOwnProperty( name ) || config.globals.hasOwnProperty(name) ) )
             {
                 if( p !== "arguments" )
                 {
-                    requires.push( p );
+                    requires.push( name );
                 }
             }
         }
@@ -294,7 +296,7 @@ function builder(config , code, requirements , replacements )
 
     for(var prop in requires)
     {
-        include(contents, requires[prop], null, fix, libs, replacements[ requires[prop].toLowerCase()] );
+        include(contents, requires[prop], null, fix, libs, replacements[ requires[prop].toLowerCase() ] );
     }
 
     //模块定义器
@@ -349,7 +351,7 @@ function builder(config , code, requirements , replacements )
     //开发业务代码
     var business = ['(function(define,'+requires.join(',')+'){',
         code,
-        bootstrap.replace("{config.main}", config.main ),
+        main ? bootstrap.replace("{config.main}",  main  ) : '',
         '})(Internal.define,'+requires.map(function (a){
             a = mapname[a] || a;
             if(a==='System')return a;

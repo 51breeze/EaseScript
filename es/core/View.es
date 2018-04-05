@@ -11,6 +11,9 @@ package es.core
     import es.core.Application;
     public class View extends EventDispatcher
     {
+        /**
+         * 字符集常量值
+         */
         public static const CHARSET_GB2312 = 'GB2312';
         public static const CHARSET_GBK    = 'GBK';
         public static const CHARSET_UTF8   = 'UTF-8';
@@ -31,7 +34,7 @@ package es.core
         }
 
         /**
-         * 当前第一次调用display方法时，调用此方法来初始化一些属性
+         * 当前第一次调用display方法时，会调用此方法来初始化一些属性，无需手动调用。
          * 此方法由子类继承来实现
          */
         protected function initializing(){}
@@ -42,25 +45,6 @@ package es.core
         public function get context():Application
         {
             return _context;
-        }
-
-        /**
-         * 设置此视图的标题
-         * @param value
-         */
-        public function set title( value:String ):void
-        {
-            this.assign("title",value);
-        }
-
-        /**
-         * 获取此视图的标题
-         * @param value
-         * @returns String;
-         */
-        public function get title():String
-        {
-            return this.assign("title");
         }
 
         /**

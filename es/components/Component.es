@@ -20,7 +20,8 @@ package es.components
         private var _initialized=false;
 
         /**
-         * 组件初始完成
+         * 组件初始完成后调用
+         * 此方法无需手动调用
          * @returns {boolean}
          */
         protected function initialized()
@@ -36,7 +37,8 @@ package es.components
 
 
         /**
-         * 组件初始化进行中
+         * 组件初始化时调用
+         * 此方法无需手动调用
          * @returns {Boolean}
          */
         protected function initializing()

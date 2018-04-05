@@ -45,14 +45,13 @@ package es.core
        {
            return assignments.title as String;
        }
-
+       
        /**
         * 执行此视图，并初始化相关属性
         */
-       public function display( viewClass:Class )
+       public function display( viewObject:View )
        {
-           var viewObj:View = (View)new viewClass( this );
-           viewObj.display();
+           viewObject.display();
        }
    }
 }

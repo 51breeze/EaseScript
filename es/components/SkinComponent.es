@@ -57,7 +57,7 @@ package es.components
         /**
          * @private
          */
-        private var __skin__:Skin = null;
+        private var _skin:Skin = null;
 
         /**
          * 获取皮肤对象
@@ -65,28 +65,28 @@ package es.components
          */
         public function get skin():Skin
         {
-            if (this.__skin__ === null)
+            if (this._skin === null)
             {
                 var skinClass:Class = this.skinClass;
                 if( skinClass===null ){
                     throw new TypeError("skinClass is not assign");
                 }
-                this.__skin__ = (Skin)new skinClass();
+                this._skin = (Skin)new skinClass();
             }
-            return this.__skin__;
+            return this._skin;
         };
 
         /**
          * @protected
          */
-        private var __skinClass__:Class=null;
+        private var _skinClass:Class=null;
 
         /**
          * 获取皮肤类
          */
         public function get skinClass():Class
         {
-            return this.__skinClass__;
+            return this._skinClass;
         }
 
         /**
@@ -95,14 +95,14 @@ package es.components
          */
         public function set skinClass(value:Class):void
         {
-            var old = this.__skinClass__;
+            var old = this._skinClass;
             if( old !== value )
             {
-                this.__skinClass__ = value;
+                this._skinClass = value;
                 if( this.initializeCompleted )
                 {
-                    this.__skin__ = (Skin)new value();
-                    if( !(this.__skin__ instanceof Skin) ){
+                    this._skin = (Skin)new value();
+                    if( !(this._skin instanceof Skin) ){
                         throw new TypeError("skinClass is not Skin");
                     }
                     this.skin.es_internal::hostComponent= this;
@@ -122,14 +122,14 @@ package es.components
         /**
          * @private
          */
-        private var __viewport__:IContainer = null;
+        private var _viewport:IContainer = null;
 
         /**
          * @returns {Object}
          */
         public function get viewport():IContainer
         {
-            return this.__viewport__;
+            return this._viewport;
         };
 
         /**
@@ -139,20 +139,20 @@ package es.components
          */
         public function set viewport(container:IContainer):void
         {
-            var old:IContainer = this.__viewport__;
+            var old:IContainer = this._viewport;
             if( container !== old )
             {
                 if( old )
                 {
                     (old as EventDispatcher).removeEventListener( ElementEvent.ADD, this.display);
                 }
-                this.__viewport__ = container;
+                this._viewport = container;
                 
                 //自动显示组件
-                if( this.__auto__ )
+                if( this._auto )
                 {
                     //当视图被添加时渲染显示此组件
-                    (container as EventDispatcher).addEventListener( ElementEvent.ADD, this.display, false, 0, this);
+                    (container as EventDispatcher).addEventListener(ElementEvent.ADD, this.display, false, 0, this);
                 }
             }
         };
@@ -160,7 +160,7 @@ package es.components
         /**
          * @private
          */
-        private var __auto__=true;
+        private var _auto=true;
 
         /**
          * 标记为是否自动显示组件, 如果为 false 则必须手动调用 display 方法才会显示此组件
@@ -168,7 +168,7 @@ package es.components
          */
         public function set auto( value:Boolean ):void
         {
-             this.__auto__=value;
+             this._auto=value;
              if( value===false )
              {
                  var viewport:IContainer = this.viewport;
@@ -184,7 +184,7 @@ package es.components
          */
         public function get auto():Boolean
         {
-            return this.__auto__;
+            return this._auto;
         }
 
         /**

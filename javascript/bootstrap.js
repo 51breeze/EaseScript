@@ -8,7 +8,9 @@ System.getGlobalEvent().addEventListener(Event.READY,function (e) {
         }
     }catch(e)
     {
-        window.console.log( Internal.getStack().join("\n") );
+        if( Internal.environment == 1) {
+            window.console.log(Internal.getStack().join("\n"));
+        }
         throw e.valueOf();
     }
 },false,-500);

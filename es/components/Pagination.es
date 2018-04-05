@@ -46,7 +46,7 @@ package es.components
         /**
          * @private
          */
-        private var __dataSource__=null;
+        private var _dataSource=null;
 
         /**
          * 设置需要要页的数据源
@@ -54,10 +54,10 @@ package es.components
          */
         public function set dataSource( value:DataSource ):void
         {
-            var old = this.__dataSource__;
+            var old = this._dataSource;
             if( old !== value )
             {
-                this.__dataSource__ = value;
+                this._dataSource = value;
                 value.addEventListener( DataSourceEvent.SELECT,function (e) {
                     if( !e.waiting )this.skinInstaller();
                 },false,0, this);
@@ -74,13 +74,13 @@ package es.components
          */
         public function get dataSource():DataSource
         {
-            return this.__dataSource__;
+            return this._dataSource;
         }
 
         /**
          * @private
          */
-        private var __profile__='page';
+        private var _profile='page';
 
         /**
          * 获取分页在地址中的属性名
@@ -88,7 +88,7 @@ package es.components
          */
         public function get profile():String
         {
-            return  this.__profile__;
+            return  this._profile;
         }
 
         /**
@@ -97,9 +97,9 @@ package es.components
          */
         public function set profile( value:String ):void
         {
-            if( this.__profile__ !== value )
+            if( this._profile !== value )
             {
-                this.__profile__ = value;
+                this._profile = value;
                 commitPropertyAndUpdateSkin();
             }
         }
@@ -107,7 +107,7 @@ package es.components
         /**
          * @private
          */
-        private var __url__='';
+        private var _url='';
 
         /**
          * 设置返回一个回调函数,用来返回一个url地址
@@ -116,9 +116,9 @@ package es.components
          */
         public function set url( value ):void
         {
-           if( this.__url__ !== value )
+           if( this._url !== value )
            {
-               this.__url__ = value;
+               this._url = value;
                this.commitPropertyAndUpdateSkin();
            }
         };
@@ -129,7 +129,7 @@ package es.components
          */
         public function get url()
         {
-            return this.__url__;
+            return this._url;
         };
 
         /**
@@ -164,7 +164,7 @@ package es.components
         /**
          * @private
          */
-        private var __pageSize__ = NaN;
+        private var _pageSize = NaN;
 
         /**
          * 获取每页显示多少行数据
@@ -177,14 +177,14 @@ package es.components
             {
                 return dataSource.pageSize();
             }
-            return this.__pageSize__;
+            return this._pageSize;
         };
 
         public function set pageSize(num:Number):void
         {
-            if( this.__pageSize__ !== num )
+            if( this._pageSize !== num )
             {
-                this.__pageSize__ = num;
+                this._pageSize = num;
                 var dataSource = this.dataSource;
                 if( dataSource )
                 {
@@ -200,7 +200,7 @@ package es.components
         /**
          * @private
          */
-        private var __current__:Number = 1;
+        private var _current:Number = 1;
 
         /**
          * 设置当前需要显示的分页
@@ -213,7 +213,7 @@ package es.components
             {
                 return this.dataSource.current();
             }
-            return this.__current__;
+            return this._current;
         };
 
         /**
@@ -223,10 +223,10 @@ package es.components
         public function set current(num:Number):void
         {
             num = isNaN( this.totalSize ) ? num :  Math.min( Math.max(1, num), this.totalPage );
-            var current = this.__current__;
+            var current = this._current;
             if( num !== current )
             {
-                this.__current__ = num;
+                this._current = num;
                 var event = new PaginationEvent(PaginationEvent.CHANGE);
                 event.oldValue = current;
                 event.newValue = num;
@@ -239,7 +239,7 @@ package es.components
         /**
          * @private
          */
-        private var __link__:Number = 7;
+        private var _link:Number = 7;
 
         /**
          * 获取分页的按扭数
@@ -247,7 +247,7 @@ package es.components
          */
         public function get link():Number
         {
-            return this.__link__;
+            return this._link;
         }
 
         /**
@@ -256,9 +256,9 @@ package es.components
          */
         public function set link( num:Number ):void
         {
-            if( this.__link__ !== num )
+            if( this._link !== num )
             {
-                this.__link__ = num;
+                this._link = num;
                 commitPropertyAndUpdateSkin();
             }
         }
@@ -305,7 +305,7 @@ package es.components
         /**
          * @private
          */
-        private var __wheelTarget__;
+        private var _wheelTarget;
 
         /**
          * 获取侦听鼠标滚轮事件的目标对象
@@ -313,7 +313,7 @@ package es.components
          */
         public function get wheelTarget():Display
         {
-            return this.__wheelTarget__;
+            return this._wheelTarget;
         }
 
         /**
@@ -321,10 +321,10 @@ package es.components
          */
         public function set wheelTarget( value:Display )
         {
-            var old = this.__wheelTarget__;
+            var old = this._wheelTarget;
             if( old  !== value )
             {
-                this.__wheelTarget__ = value;
+                this._wheelTarget = value;
                 if (old)old.removeEventListener(MouseEvent.MOUSE_WHEEL);
                 if( value )
                 {
@@ -359,7 +359,7 @@ package es.components
         {
             if( super.initializing() )
             {
-                var dataSource:DataSource = __dataSource__;
+                var dataSource:DataSource = _dataSource;
                 if( !dataSource )throw new ReferenceError('dataSource is not defined');
                 var size = pageSize;
                 if( !isNaN(size) )

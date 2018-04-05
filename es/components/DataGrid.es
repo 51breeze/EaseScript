@@ -17,7 +17,7 @@ package es.components
         /**
          * @private
          */
-        private var __dataSource__:DataSource = null;
+        private var _dataSource:DataSource = null;
 
         /**
          * 获取数据源对象
@@ -25,11 +25,11 @@ package es.components
          */
         public function get dataSource():DataSource
         {
-            var dataSource = this.__dataSource__;
+            var dataSource = this._dataSource;
             if ( dataSource === null )
             {
                 dataSource = new DataSource();
-                this.__dataSource__ = dataSource;
+                this._dataSource = dataSource;
             }
             return dataSource;
         };
@@ -56,14 +56,14 @@ package es.components
         /**
          * @private
          */
-        private var __columns__:* = {};
+        private var _columns:Object = {};
 
         /**
          * @returns {Object}
          */
-        public function get columns():*
+        public function get columns():Object
         {
-            return this.__columns__;
+            return this._columns;
         };
 
         /**
@@ -72,7 +72,7 @@ package es.components
          */
         public function set columns( columns:Object ):void
         {
-            this.__columns__ = isString(columns) ? columns.split(',') : columns;
+            this._columns = isString(columns) ? columns.split(',') : columns;
         };
 
         /**
@@ -97,7 +97,7 @@ package es.components
          * @type {string}
          * @private
          */
-        private var __columnProfile__ = 'columns';
+        private var _columnProfile = 'columns';
 
         /**
          * @param profile
@@ -107,17 +107,17 @@ package es.components
         {
             if (typeof profile === "string")
             {
-                this.__columnProfile__ = profile;
+                this._columnProfile = profile;
                 return this;
             }
-            return this.__columnProfile__;
+            return this._columnProfile;
         };
 
         /**
          * @type {string}
          * @private
          */
-        private var __dataProfile__ = 'datalist';
+        private var _dataProfile = 'datalist';
 
         /**
          * @param profile
@@ -126,10 +126,10 @@ package es.components
         public function dataProfile(profile=null)
         {
             if (typeof profile === "string") {
-                this.__dataProfile__ = profile;
+                this._dataProfile = profile;
                 return this;
             }
-            return this.__dataProfile__;
+            return this._dataProfile;
         };
 
         /**
