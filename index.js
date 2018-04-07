@@ -944,15 +944,112 @@ const builder={
 
      'php':function(config,project)
      {
-         var bootstrap = PATH.resolve(project.path, config.bootstrap );
+
+         var jsSyntax = require('./lib/javascript.js');
+         // var script = jsSyntax(config, makeModules['javascript'], descriptions['javascript'], project );
+
+         var less = require('less');
+         var themes = require('./style/themes.js');
+         var lessPath = PATH.resolve(config.root_path, './style/');
+         var options = {
+             paths: [lessPath],
+             globalVars: themes[config.themes] || themes.default,
+             compress: config.minify === 'enable',
+         };
+         var appLen = applicationModules.length;
+         var appIndex = 0;
+         for( ;appIndex<appLen;appIndex++ )
+         {
+             var mainModule = applicationModules[ appIndex ];
+             var viewModule = mainModule.defineMetaTypeList.View;
+             var script = jsSyntax(config, makeModules['php'], descriptions['php'], mainModule.fullclassname );
+
+
+             filename = PATH.resolve(Utils.getBuildPath(config, 'build.js'), 'index.php');
+             Utils.mkdir(PATH.dirname(filename));
+             fs.writeFileSync(filename, script );
+             process.exit();
+
+             if( viewModule )
+             {
+                 viewModule = skinModuleContents[ viewModule.param.source ];
+                 var _styleContent = getSkinModuleStyles( getRequirementsAllSkinModules(viewModule) );
+                 var style = [];
+                 if (_styleContent.length > 0) {
+                     style = _styleContent.map(function (e, i) {
+                         var ownerModule = descriptions['javascript'][e.fullclassname];
+                         if (ownerModule.hasUsed !== true)return '';
+                         e = e.styleContent;
+                         e = e.replace(/@Embed\(.*?\)/g, function (a, b) {
+                             var metatype = Utils.executeMetaType(a.substr(1));
+                             var dest = parseMetaEmbed(metatype, config);
+                             return '"./' + PATH.relative(Utils.getBuildPath(config, 'build.css'), dest).replace(/\\/g, '/') + '"';
+                         });
+
+                         e.replace(/\B@(\w+)\s*:/gi, function (a, b, c) {
+                             e = e.replace(new RegExp('@' + b, "gi"), function (a) {
+                                 return '@' + b + i;
+                             });
+                         });
+                         return e;
+                     });
+                 }
+
+                 if (config.font) {
+                     style.unshift("\n@import './less/glyphicons.less';\n");
+                 }
+
+                 if (config.animate) {
+                     style.unshift("\n@import 'animate.less';\n");
+                 } else {
+                     style.unshift("\n@import 'animate-base.less';\n");
+                 }
+
+                 style.unshift("\n@import 'mixins.less';\n");
+                 style.unshift("\n@import 'main.less';\n");
+
+                 (function (style, options, viewModule, config) {
+                     less.render(style.join("\n"), options, function (err, output) {
+                         if (err) {
+                             Utils.error(err.message);
+                             Utils.error(err.extract.join('\n'));
+                         } else {
+                             var filename = viewModule.fullclassname.toLowerCase();
+                             filename = PATH.resolve(Utils.getBuildPath(config, 'build.css'), filename + '.css');
+                             fs.writeFileSync(filename, output.css);
+                         }
+                     });
+                 })(style, options, viewModule, config);
+
+                 var fontPath = Utils.getBuildPath(config, 'build.font');
+                 var fontfiles = Utils.getDirectoryFiles(lessPath + '/fonts');
+                 for (var i = 0; i < fontfiles.length; i++) {
+                     var source = fs.createReadStream(lessPath + '/fonts/' + fontfiles[i]);
+                     var tocopy = fs.createWriteStream(fontPath + "/" + fontfiles[i]);
+                     source.pipe(tocopy);
+                 }
+
+                 if (script && config.minify === 'enable') {
+                     script = uglify.minify(script, {ie8: true});
+                     if (script.error)throw script.error;
+                     script = script.code;
+                 }
+
+                 var filename = viewModule.fullclassname.toLowerCase();
+                 filename = PATH.resolve(Utils.getBuildPath(config, 'build.js'), filename + '.js');
+                 Utils.mkdir(PATH.dirname(filename));
+                 fs.writeFileSync(filename, script);
+             }
+         }
+
+        /* var bootstrap = PATH.resolve(project.path, config.bootstrap );
          var fullclassname = PATH.relative( config.project.path, bootstrap ).replace(/\\/g,'/').replace(/\//g,'.');
          config.main = fullclassname;
-         var phpSyntax = require('./lib/php.js');
+         var phpSyntax = require('./lib/javascript.js');
          var script = phpSyntax(config, makeModules['php'], descriptions['php'], project );
          var filename;
-
          filename = PATH.resolve(Utils.getBuildPath(config, 'build.webroot'), config.bootstrap + '.php');
-         fs.writeFileSync(filename, script );
+         fs.writeFileSync(filename, script );*/
      }
 };
 

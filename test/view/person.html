@@ -1,9 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <s:View xmlns:s="es.core"  xmlns:c="es.components">
 
+    <![CDATA[
+
+        public function get title():String
+        {
+             return this.assign("title");
+         }
+
+         public function set title(value:String):void
+         {
+               this.assign("title",value);
+               document.title = value;
+         }
+
+    ]]>
     <body>
-         <div><c:Navigate skinClass="es.skins.NavigateSkin"></c:Navigate></div>
+        <c:Navigate skinClass="es.skins.NavigateSkin"></c:Navigate>
+        <input value="{{this.title}}" />
          <div>
+             <h1>{{message}}</h1>
              <h1>这里是内容 Person</h1>
              <c:DataGrid source="http://working.com/json.php" skinClass="es.skins.DataGridSkin">
                  <c:dataSource>

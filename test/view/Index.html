@@ -17,11 +17,11 @@
 
 
     <body>
-        <div><c:Navigate skinClass="es.skins.NavigateSkin"></c:Navigate></div>
+        <c:Navigate skinClass="es.skins.NavigateSkin"></c:Navigate>
         <button type="button" class="btn btn-success" style="width: 100px;">点 我</button>
         <div>
             <h1>这里是内容</h1>
-            <c:DataGrid source="http://working.com/json.php" skinClass="es.skins.DataGridSkin">
+            <c:DataGrid source="http://working.com/json.php" skinClass="es.skins.DataGridSkin" width="500">
                 <c:dataSource>
                     <c:dataType>@Http.TYPE_JSONP</c:dataType>
                 </c:dataSource>
