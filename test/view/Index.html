@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<s:View xmlns:s="es.core"  xmlns:c="es.components">
+    <![CDATA[
+        import es.core.PopUp;
+        import es.skins.PopUpSkin;
+        override protected function initializing()
+        {
+            PopUp.defaultOptions.skinClass =PopUpSkin;
+            Element(".btn-success").addEventListener( MouseEvent.CLICK, function () {
+                console.log("click");
+                PopUp.confirm("您有3条信息未处理2", function (type) {
+                    console.log( type );
+                });
+            });
+        }
+    ]]>
+
+
+    <body>
+        <div><c:Navigate skinClass="es.skins.NavigateSkin"></c:Navigate></div>
+        <button type="button" class="btn btn-success" style="width: 100px;">点 我</button>
+        <div>
+            <h1>这里是内容</h1>
+            <c:DataGrid source="http://working.com/json.php" skinClass="es.skins.DataGridSkin">
+                <c:dataSource>
+                    <c:dataType>@Http.TYPE_JSONP</c:dataType>
+                </c:dataSource>
+                <c:columns>
+                    <id>ID</id>
+                    <name>名称</name>
+                    <phone>电话</phone>
+                </c:columns>
+            </c:DataGrid>
+        </div>
+    </body>
+</s:View>
