@@ -52,63 +52,6 @@ package es.interfaces
         public function get visible():Boolean;
 
         /**
-         * 设置对象的属性
-         * @param name
-         * @param value
-         */
-        public function property(name:String,value:*):Object;
-
-        /**
-         * 设置显示对象的样式
-         * @param name
-         * @param value
-         */
-        public function style(name:String, value:*):Object;
-
-        /**
-         * 获取滚动条在上边的位置
-         * @returns {Number}
-         */
-        public function get scrollTop():Number;
-        /**
-         * 设置滚动条在上边的位置
-         * @param value
-         */
-        public function set scrollTop(value:Number):void;
-
-        /**
-         * 获取滚动条在左边的位置
-         * @returns {Number}
-         */
-        public function get scrollLeft():Number;
-
-        /**
-         * 设置滚动条在左边的位置
-         * @param value
-         */
-        public function set scrollLeft(value:Number):void;
-
-        /**
-         * 获取滚动条的宽度
-         * @returns {Number}
-         */
-        public function get scrollWidth():Number;
-
-        /**
-         * 获取滚动条的高度
-         * @returns {Number}
-         */
-        public function get scrollHeight():Number;
-
-        /**
-         * 获取元素相对文档页面边界的矩形坐标。
-         * 如果元素的 position = fixed 或者 force=== true 则相对浏览器窗口的位置
-         * @param boolean global 是否为全局坐标
-         * @returns {left,top,right,bottom,width,height}
-         */
-        public function getBoundingRect( global ):Object;
-
-        /**
          * 获取元素相对父元素的左边距
          * @returns {Number}
          */
@@ -155,22 +98,6 @@ package es.interfaces
          * @returns {Number}
          */
         public function set bottom( value:Number ):void;
-
-        /**
-         *  将本地坐标点转成相对视图的全局点
-         *  @param left
-         *  @param top
-         *  @returns {object} left top
-         */
-        public function localToGlobal(left:Number, top:Number):Object;
-
-        /**
-         *  将视图的全局点转成相对本地坐标点
-         *  @param left
-         *  @param top
-         *  @returns {object}  left top
-         */
-        public function globalToLocal(left:Number, top:Number ):Object;
 
         /**
          * 获取父级皮肤元素

@@ -12,46 +12,13 @@ package es.components
     import es.interfaces.IContainer;
     import es.interfaces.IDisplay;
     import es.core.es_internal;
-    use namespace es_internal;
 
-    public class SkinComponent extends Component
+    use namespace es_internal;
+    public class SkinComponent extends Component implements IDisplay
     {
         public function SkinComponent()
         {
             super();
-        }
-        
-        /**
-         * 安装皮肤。
-         * 此阶段为编译阶段将皮肤转化成html
-         * 此函数无需要手动调用，皮肤在初始化时会自动调用
-         */
-        protected function skinInstaller()
-        {
-            skin.skinInstaller();
-            this.viewport.addChild( skin );
-        }
-
-        /**
-         * 组件初始化进行中
-         * @returns {Boolean}
-         */
-        override protected function initializing():Boolean
-        {
-            if( super.initializing() )
-            {
-                this.skin.es_internal::hostComponent = this;
-                var _height = this.height;
-                if( _height !== NaN ){
-                    (this.skin as IDisplay).height = _height;
-                }
-                var _width  = this.width;
-                if( _width !== NaN ){
-                    (this.skin as IDisplay).width = _width;
-                }
-                return true;
-            }
-            return false;
         }
 
         /**
@@ -71,7 +38,9 @@ package es.components
                 if( skinClass===null ){
                     throw new TypeError("skinClass is not assign");
                 }
-                this._skin = (Skin)new skinClass();
+                var skin = (Skin)new skinClass( this );
+                skin.addEventListener( ElementEvent.ADD, this.display, false, 0, this );
+                this._skin = skin;
             }
             return this._skin;
         };
@@ -99,14 +68,13 @@ package es.components
             if( old !== value )
             {
                 this._skinClass = value;
-                if( this.initializeCompleted )
+                if( this.initialized )
                 {
-                    this._skin = (Skin)new value();
-                    if( !(this._skin instanceof Skin) ){
+                    var skin = (Skin)new value( this );
+                    this._skin = skin;
+                    if( !(skin instanceof Skin) ){
                         throw new TypeError("skinClass is not Skin");
                     }
-                    this.skin.es_internal::hostComponent= this;
-                    this.skinInstaller();
                     if( this.hasEventListener(PropertyEvent.CHANGE) )
                     {
                         var event = new PropertyEvent(PropertyEvent.CHANGE);
@@ -115,6 +83,7 @@ package es.components
                         event.property = 'skinClass';
                         this.dispatchEvent(event);
                     }
+                    skin.addEventListener( ElementEvent.ADD, this.display, false, 0, this );
                 }
             }
         }
@@ -122,86 +91,18 @@ package es.components
         /**
          * @private
          */
-        private var _viewport:IContainer = null;
-
-        /**
-         * @returns {Object}
-         */
-        public function get viewport():IContainer
-        {
-            return this._viewport;
-        };
-
-        /**
-         * 设置此组件在指定的视口中
-         * @param Object obj
-         * @returns {void}
-         */
-        public function set viewport(container:IContainer):void
-        {
-            var old:IContainer = this._viewport;
-            if( container !== old )
-            {
-                if( old )
-                {
-                    (old as EventDispatcher).removeEventListener( ElementEvent.ADD, this.display);
-                }
-                this._viewport = container;
-                
-                //自动显示组件
-                if( this._auto )
-                {
-                    //当视图被添加时渲染显示此组件
-                    (container as EventDispatcher).addEventListener(ElementEvent.ADD, this.display, false, 0, this);
-                }
-            }
-        };
-
-        /**
-         * @private
-         */
-        private var _auto=true;
-
-        /**
-         * 标记为是否自动显示组件, 如果为 false 则必须手动调用 display 方法才会显示此组件
-         * @param value
-         */
-        public function set auto( value:Boolean ):void
-        {
-             this._auto=value;
-             if( value===false )
-             {
-                 var viewport:IContainer = this.viewport;
-                 if( viewport )
-                 {
-                     (viewport as EventDispatcher).removeEventListener(ElementEvent.ADD,this.display);
-                 }
-             }
-        }
-
-        /**
-         * @public
-         */
-        public function get auto():Boolean
-        {
-            return this._auto;
-        }
-
-        /**
-         * @private
-         */
-        private var _height:Number=NaN;
+        private var properties:Object={};
 
         /**
          * 获取此对象的高度
          */
         public function get height():Number
         {
-            if( initializeCompleted )
+            if( this.initialized )
             {
-                return (this.skin as IDisplay).height;
+                return this.skin.height;
             }
-            return _height;
+            return properties.height;
         }
 
         /**
@@ -209,28 +110,23 @@ package es.components
          */
         public function set height(value:Number):void
         {
-            _height = value;
-            if( initializeCompleted )
+            if( this.initialized )
             {
-                (this.skin as IDisplay).height = value;
+                this.skin.height = value;
             }
+            properties.height = value;
         }
-
-        /**
-         * @private
-         */
-        private var _width:Number=NaN;
 
         /**
          * 获取此对象的高度
          */
         public function get width():Number
         {
-            if( initializeCompleted )
+            if( this.initialized )
             {
-                return (this.skin as IDisplay).width;
+                return this.skin.width;
             }
-            return _width;
+            return properties.width;
         }
 
         /**
@@ -238,60 +134,189 @@ package es.components
          */
         public function set width(value:Number):void
         {
-            _width = value;
-            if( initializeCompleted )
-            {
-                (this.skin as IDisplay).width = value;
+            if( this.initialized ) {
+                this.skin.width = value;
             }
+            properties.width=value;
         }
 
         /**
-         * 提交属性并更新到皮肤
+         * 获取元素对象
+         * @returns {Element}
          */
-        protected function commitPropertyAndUpdateSkin()
+        public function get element():Element
         {
-            if( initializeCompleted )
-            {
-                updateSkin();
-                display();
+            if( this.initialized ) {
+                return this.skin.element;
             }
+            return null;
         }
 
         /**
-         * 标记组件是否初始化完成
+         * 标记此显示对象是否可见
+         * @param flag
          */
-        protected var initializeCompleted = false;
+        public function set visible( flag:Boolean ):void
+        {
+            if( this.initialized )
+            {
+                this.skin.visible = flag;
+            }
+            properties.visible=flag;
+        };
 
         /**
-         * 标记组件在是否需要更新皮肤
-         * 此标记主要是用来优化重复渲染皮肤造成性能的问题。
+         * 获取此显示对象的可见状态
+         * @returns {Boolean}
          */
-        private var _updateSkin=true;
-        protected function updateSkin()
+        public function get visible():Boolean
         {
-            this._updateSkin=true;
+            if( this.initialized ) {
+                return this.skin.visible;
+            }
+            return properties.visible;
+        };
+
+        /**
+         * 获取元素相对父元素的左边距
+         * @returns {Number}
+         */
+        public function get left():Number
+        {
+            if( this.initialized ) {
+                return this.skin.left;
+            }
+            return properties.left;
+        };
+
+        /**
+         * 设置元素相对父元素的左边距
+         * @returns {Number}
+         */
+        public function set left( value:Number ):void
+        {
+            if( this.initialized )
+            {
+                this.skin.left = value;
+            }
+            properties.left=value;
+        };
+
+        /**
+         * 获取元素相对父元素的上边距
+         * @returns {Number}
+         */
+        public function get top():Number
+        {
+            if( this.initialized ) {
+                return this.skin.top;
+            }
+            return properties.top;
+        };
+
+        /**
+         * 设置元素相对父元素的上边距
+         * @returns {Number}
+         */
+        public function set top( value:Number ):void
+        {
+            if( this.initialized )
+            {
+                this.skin.top = value;
+            }
+            properties.top=value;
+        };
+
+        /**
+         * 获取元素相对父元素的右边距
+         * @returns {Number}
+         */
+        public function get right():Number
+        {
+            if( this.initialized ) {
+                return this.skin.right;
+            }
+            return properties.right;
+        };
+
+        /**
+         * 设置元素相对父元素的右边距
+         * @returns {Number}
+         */
+        public function set right( value:Number ):void
+        {
+            if( this.initialized )
+            {
+                this.skin.right = value;
+            }
+            properties.right=value;
+        };
+
+        /**
+         * 获取元素相对父元素的下边距
+         * @returns {Number}
+         */
+        public function get bottom():Number
+        {
+            if( this.initialized )
+            {
+                return this.skin.bottom;
+            }
+            return properties.bottom;
+        };
+
+        /**
+         * 设置元素相对父元素的下边距
+         * @returns {Number}
+         */
+        public function set bottom( value:Number ):void
+        {
+            if( this.initialized )
+            {
+                this.skin.bottom = value;
+            }
+            properties.bottom=value;
+        };
+
+        /**
+         * 获取父级皮肤元素
+         * 只有已经添加到父级元素中才会返回父级皮肤元素，否则返回 null
+         * @returns {Display}
+         */
+        public function get parent():IDisplay
+        {
+            if( this.initialized ) {
+                return this.skin.parent;
+            }
+            return null;
         }
 
         /**
          * 渲染显示皮肤对象。
          * 调用此方法会重新创建子级对象，在非必要情况下请谨慎使用，可以节省资源。
          */
-        public function display()
+        public function display():Element
         {
-            var flag = this.initializeCompleted;
-            if( !flag )
+            if( !this.initialized )
             {
                 this.initializing();
-                this.skinInstaller();
-                this.initialized();
-                this.initializeCompleted = true;
-
-            }else if( this._updateSkin===true )
-            {
-                this.skinInstaller();
+                this.commitPropertyAndUpdateSkin();
             }
-            this._updateSkin=false;
-            return flag;
+            return this.skin.element;
         };
+
+        /**
+         * 提交属性并且立即刷新视图
+         * 此方法只对使用模板渲染的皮肤对象才管用。
+         * 并且要在调用方法之前有重新分配过数据,才会重新创建视图。
+         */
+        protected function commitPropertyAndUpdateSkin()
+        {
+            var skin = this.skin;
+            Object.forEach(properties, function (value, name){
+                skin[ name ] = value;
+            });
+            skin.commitPropertyAndUpdateSkin();
+        }
     }
 }

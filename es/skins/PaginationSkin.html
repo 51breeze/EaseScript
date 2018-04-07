@@ -1,12 +1,85 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <s:Skin xmlns:s="es.core" class="pagination">
-
+    <s:Metadata>[HostComponent("es.components.Pagination")]</s:Metadata>
     <![CDATA[
-        import es.components.Pagination;
+
+
+        import es.core.Display;
+
+
+       /**
+         * @private
+         */
+        private var _wheelTarget;
+
+
+        /**
+         * 获取侦听鼠标滚轮事件的目标对象
+         * @returns {Element};
+         */
+        public function get wheelTarget():Display
+        {
+            return this._wheelTarget;
+        }
+
+
+        /**
+         * 设置侦听鼠标滚轮事件的目标对象
+         */
+        public function set wheelTarget( value:Display )
+        {
+            var old = this._wheelTarget;
+            if( old !== value && value )
+            {
+                this._wheelTarget = value;
+                if (old)old.removeEventListener(MouseEvent.MOUSE_WHEEL);
+                if( value )
+                {
+                    var host = this.hostComponent;
+                    value.addEventListener(MouseEvent.MOUSE_WHEEL, function (e) {
+                        e.preventDefault();
+                        var page = host.current;
+                        host.current = e.wheelDelta > 0 ? page + 1 : page - 1;
+                    }, false, 0, this);
+                }
+            }
+        }
+
+
+        override public function commitPropertyAndUpdateSkin()
+        {
+
+            this.wheelTarget = this.hostComponent.wheelTarget;
+            super.commitPropertyAndUpdateSkin();
+        }
+
+
+       override protected function initializing()
+       {
+           
+            var host = this.hostComponent;
+            var profile = new RegExp( host.profile+'\\s*=\\s*(\\d+)');
+            this.addEventListener(MouseEvent.CLICK, function (e:MouseEvent)
+            {
+                if (Element.getNodeName(e.target) === 'a')
+                {
+                    e.preventDefault();
+                    var url:String = Element(e.target).property('href');
+                    var _profile:Array = url.match(profile);
+                    var page:Number = parseInt(_profile ? _profile[1] : 0);
+                    if(page > 0)
+                    {
+                        host.current = page;
+                    }
+                }
+            });
+
+       }
+
         override protected function updateDisplayList()
         {
              super.updateDisplayList();
-             var hostComponent:Pagination = this.hostComponent as Pagination;
+             var hostComponent:Pagination = this.hostComponent;
              var _radius = hostComponent.radius;
              if(_radius>0)
              {
@@ -57,6 +130,7 @@
         }
 
     </style>
+
   <s:template>
       <li class="first">
           <a href="{url(first,profile)}">第一页</a>

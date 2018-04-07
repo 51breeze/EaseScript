@@ -6,6 +6,8 @@
  */
 package es.core
 {
+
+    import es.components.SkinComponent;
     import es.core.Display;
     import es.interfaces.IDisplay;
     import es.interfaces.IContainer;
@@ -92,9 +94,12 @@ package es.core
                 (parent as Container).removeChild( child );
             }
             var children:Array = this._children;
-            var indexAt = index < 0 ? index+children.length : index;
-            this.element.addChildAt( child.element, index);
-            children.splice(indexAt, 0, child);
+            var at = index < 0 ? index+children.length+1 : index;
+            children.splice(at, 0, child);
+            if( child is SkinComponent )
+            {
+                child = (child as SkinComponent).skin as IDisplay;
+            }
             (child as Display).displayParent = this;
             return child;
         };
@@ -110,8 +115,11 @@ package es.core
             {
                 var children:Array = this._children;
                 var index = children.indexOf( child );
+                if( child is SkinComponent )
+                {
+                    child = (child as SkinComponent).skin as IDisplay;
+                }
                 (child as Display).displayParent = null;
-                this.element.removeChild( child.element );
                 this._children.splice(index, 1);
                 return child;
             }

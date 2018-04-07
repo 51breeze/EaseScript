@@ -1,16 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <s:Skin name="table" class="table data-grid-skin"  xmlns:c="es.components" xmlns:s="es.core">
+    <s:Metadata>[HostComponent("es.components.DataGrid")]</s:Metadata>
     <![CDATA[
        import es.events.PaginationEvent;
-       import es.components.DataGrid;
        import es.core.Display;
        import es.core.Skin;
-       import es.core.PopUp;
 
        override protected function updateDisplayList()
        {
             super.updateDisplayList();
-            var hostComponent:DataGrid = this.hostComponent as DataGrid;
+            var hostComponent:DataGrid = this.hostComponent;
             var radius= hostComponent.radius+'px';
             var table =  this.element;
             table.style('borderRadius', radius );
@@ -23,7 +22,7 @@
 
         override protected function initializing()
         {
-            var hostComponent:DataGrid = this.hostComponent as DataGrid;
+            var hostComponent:DataGrid = this.hostComponent;
             var dataSource:DataSource =  hostComponent.dataSource;
             var body:Skin = this.body;
             var dataProfile:String =  hostComponent.dataProfile();
@@ -37,12 +36,11 @@
                 if ( !event.waiting )
                 {
                     body.variable( dataProfile , event.data );
-                    body.skinInstaller();
+                    body.commitPropertyAndUpdateSkin();
                 }
             });
            pagination.display();
         }
-
     ]]>
 
     <style>
@@ -168,7 +166,7 @@
     <tfoot id="@foot">
          <tr>
              <td colspan="3">
-                 <c:Pagination id="@pagination" wheelTarget="@foot" radius="3" auto="false" skinClass="es.skins.PaginationSkin">
+                 <c:Pagination id="@pagination" wheelTarget="@foot" radius="3"  skinClass="es.skins.PaginationSkin">
                  </c:Pagination>
              </td>
          </tr>

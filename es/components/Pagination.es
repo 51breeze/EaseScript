@@ -27,8 +27,6 @@
  *  pagination.wheelTarget = viewport;
  *  pagination.display();
  */
-
-
 package es.components
 {
     import es.components.SkinComponent;
@@ -58,10 +56,12 @@ package es.components
             if( old !== value )
             {
                 this._dataSource = value;
-                value.addEventListener( DataSourceEvent.SELECT,function (e) {
-                    if( !e.waiting )this.skinInstaller();
-                },false,0, this);
-                if( this.initializeCompleted )
+                var self = this;
+                value.addEventListener( DataSourceEvent.SELECT,function (e)
+                {
+                    if( !e.waiting )self.commitPropertyAndUpdateSkin();
+                });
+                if( this.initialized )
                 {
                     value.select( this.current );
                 }
@@ -100,7 +100,10 @@ package es.components
             if( this._profile !== value )
             {
                 this._profile = value;
-                commitPropertyAndUpdateSkin();
+                if( this.initialized )
+                {
+                    commitPropertyAndUpdateSkin();
+                }
             }
         }
 
@@ -119,7 +122,10 @@ package es.components
            if( this._url !== value )
            {
                this._url = value;
-               this.commitPropertyAndUpdateSkin();
+               if( this.initialized )
+               {
+                   commitPropertyAndUpdateSkin();
+               }
            }
         };
 
@@ -189,7 +195,7 @@ package es.components
                 if( dataSource )
                 {
                     dataSource.pageSize( num );
-                    if( this.initializeCompleted )
+                    if( this.initialized )
                     {
                         dataSource.select( this.current );
                     }
@@ -209,7 +215,7 @@ package es.components
         public function get current():Number
         {
             var dataSource = this.dataSource;
-            if( dataSource && this.initializeCompleted )
+            if( dataSource && this.initialized )
             {
                 return this.dataSource.current();
             }
@@ -259,19 +265,76 @@ package es.components
             if( this._link !== num )
             {
                 this._link = num;
-                commitPropertyAndUpdateSkin();
+                if( this.initialized )
+                {
+                    commitPropertyAndUpdateSkin();
+                }
             }
         }
 
         /**
-         * 初始化皮肤
-         *  @inherit
-         * @returns {String}
+         * @private
          */
-        override protected function skinInstaller()
+        private var _wheelTarget:Display=null;
+
+        /**
+         * 获取侦听鼠标滚轮事件的目标对象
+         * @returns {Element};
+         */
+        public function get wheelTarget():Display
+        {
+            return this._wheelTarget;
+        }
+
+        /**
+         * 设置侦听鼠标滚轮事件的目标对象
+         */
+        public function set wheelTarget( value:Display )
+        {
+            this._wheelTarget = value;
+            if( initialized )
+            {
+               commitPropertyAndUpdateSkin();
+            }
+        }
+
+        private var _radius=0;
+        public function set radius( val:Number ):void
+        {
+            if( _radius !== val )
+            {
+                _radius=val;
+                if( this.initialized )
+                {
+                    commitPropertyAndUpdateSkin();
+                }
+            }
+        }
+
+        public function get radius():Number
+        {
+            return _radius;
+        }
+
+        /**
+         * @inherit
+         */
+        override protected function initializing()
+        {
+            super.initializing();
+            var dataSource:DataSource = _dataSource;
+            if( !dataSource )throw new ReferenceError('dataSource is not defined');
+            var size = pageSize;
+            if( !isNaN(size) )dataSource.pageSize(size);
+            dataSource.select( this.current );
+        }
+
+        /**
+         * 提交数据并且立即更新视图
+         */
+        override protected function commitPropertyAndUpdateSkin()
         {
             var skin = this.skin;
-            var render = skin.render;
             var current = this.current;
             var totalPage = this.totalPage;
             var pageSize = this.pageSize;
@@ -288,111 +351,18 @@ package es.components
                 };
             }
             offset = (offset + link) > totalPage ? offset - ( offset + link - totalPage ) : offset;
-            render.variable('totalPage', totalPage);
-            render.variable('pageSize', pageSize );
-            render.variable('offset',  (current - 1) * pageSize );
-            render.variable('profile', this.profile );
-            render.variable('url', url );
-            render.variable('current', current);
-            render.variable('first', 1);
-            render.variable('prev', Math.max(current - 1, 1));
-            render.variable('next', Math.min(current + 1, totalPage));
-            render.variable('last', totalPage);
-            render.variable('link', System.range( Math.max(1 + offset, 1 ), link + offset, 1) );
-            super.skinInstaller();
-        }
-
-        /**
-         * @private
-         */
-        private var _wheelTarget;
-
-        /**
-         * 获取侦听鼠标滚轮事件的目标对象
-         * @returns {Element};
-         */
-        public function get wheelTarget():Display
-        {
-            return this._wheelTarget;
-        }
-
-        /**
-         * 设置侦听鼠标滚轮事件的目标对象
-         */
-        public function set wheelTarget( value:Display )
-        {
-            var old = this._wheelTarget;
-            if( old  !== value )
-            {
-                this._wheelTarget = value;
-                if (old)old.removeEventListener(MouseEvent.MOUSE_WHEEL);
-                if( value )
-                {
-                    value.addEventListener(MouseEvent.MOUSE_WHEEL, function (e) {
-                        e.preventDefault();
-                        var page = this.current;
-                        this.current = e.wheelDelta > 0 ? page + 1 : page - 1;
-                    }, false, 0, this);
-                }
-            }
-        }
-
-        private var _radius=0;
-        public function set radius( val:Number ):void
-        {
-            if( _radius !== val )
-            {
-                _radius=val;
-                commitPropertyAndUpdateSkin();
-            }
-        }
-
-        public function get radius():Number
-        {
-            return _radius;
-        }
-
-        /**
-         * @inherit
-         */
-        override protected function initializing()
-        {
-            if( super.initializing() )
-            {
-                var dataSource:DataSource = _dataSource;
-                if( !dataSource )throw new ReferenceError('dataSource is not defined');
-                var size = pageSize;
-                if( !isNaN(size) )
-                {
-                    dataSource.pageSize(size);
-                }
-                var profile = new RegExp( this.profile+'\\s*=\\s*(\\d+)');
-                var self = this;
-                this.skin.addEventListener(MouseEvent.CLICK, function (e:MouseEvent)
-                {
-                    if (Element.getNodeName(e.target) === 'a')
-                    {
-                        e.preventDefault();
-                        var url:String = Element(e.target).property('href');
-                        var _profile:Array = url.match(profile);
-                        var page:Number = parseInt(_profile ? _profile[1] : 0);
-                        if (page > 0)
-                        {
-                            self.current = page;
-                        }
-                    }
-                });
-                return true;
-            }
-            return false;
-        }
-
-        override public function display()
-        {
-            if( !super.display() )
-            {
-                this.dataSource.select( this.current );
-            }
+            skin.variable('totalPage', totalPage);
+            skin.variable('pageSize', pageSize );
+            skin.variable('offset',  (current - 1) * pageSize );
+            skin.variable('profile', this.profile );
+            skin.variable('url', url );
+            skin.variable('current', current);
+            skin.variable('first', 1);
+            skin.variable('prev', Math.max(current - 1, 1));
+            skin.variable('next', Math.min(current + 1, totalPage));
+            skin.variable('last', totalPage);
+            skin.variable('link', System.range( Math.max(1 + offset, 1 ), link + offset, 1) );
+            super.commitPropertyAndUpdateSkin();
         }
     }
 }

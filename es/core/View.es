@@ -9,7 +9,8 @@ package es.core
     import es.core.State;
     import es.events.SkinEvent;
     import es.core.Application;
-    public class View extends EventDispatcher
+    import es.components.Component;
+    public class View extends Component
     {
         /**
          * 字符集常量值
@@ -34,12 +35,6 @@ package es.core
         }
 
         /**
-         * 当前第一次调用display方法时，会调用此方法来初始化一些属性，无需手动调用。
-         * 此方法由子类继承来实现
-         */
-        protected function initializing(){}
-
-        /**
          * 获取应用上下文
          */
         public function get context():Application
@@ -59,18 +54,12 @@ package es.core
         }
 
         /**
-         * @private
-         */
-        private var _initialized = false;
-
-        /**
          * 执行此视图，并初始化相关属性
          */
         public function display()
         {
-            if( !_initialized )
+            if( !initialized )
             {
-                _initialized = true;
                 this.initializing();
             }
         }

@@ -365,32 +365,29 @@ package es.core
          * @override
          * @return Boolean
          */
-        override protected function initializing():Boolean
+        override protected function initializing()
         {
-            if( super.initializing() )
-            {
-                var skin:Skin = this.skin;
-                var bottons:Array = ["cancel","submit","close"];
-                var i=0;
-                var len = bottons.length;
-                var self = this;
-                for(;i<len;i++){
-                    var name:String = bottons[i] as String;
-                    if( name in skin )
-                    {
-                        var btn:Skin = skin[name] as Skin;
-                        btn.addEventListener(MouseEvent.CLICK, (function (name) {
-                            return function (e:MouseEvent) {
-                                self.action(name);
-                            };
-                        })(name));
-                    }
+            super.initializing();
+            var skin:Skin = this.skin;
+            var bottons:Array = ["cancel","submit","close"];
+            var i=0;
+            var len = bottons.length;
+            var self = this;
+            for(;i<len;i++){
+                var name:String = bottons[i] as String;
+                if( name in skin )
+                {
+                    var btn:Skin = skin[name] as Skin;
+                    btn.addEventListener(MouseEvent.CLICK, (function (name) {
+                        return function (e:MouseEvent) {
+                            self.action(name);
+                        };
+                    })(name));
                 }
-                var win = getWindow();
-                win.addEventListener(Event.RESIZE,this.position,false,0,this);
-                return true;
             }
-            return false;
+            var win = getWindow();
+            win.addEventListener(Event.RESIZE,this.position,false,0,this);
+            Element(document.body).addChild( skin.element );
         }
 
         /**
@@ -406,10 +403,8 @@ package es.core
             {
                 this.skinClass = options.skinClass;
             }
-
             var skin:Skin = this.skin;
             this.action('close', true);
-
             skin.style('zIndex',TOP_LEVEL);
             if( System.env.platform('IE', 8) )
             {
@@ -475,20 +470,6 @@ package es.core
                 }, timeout );
             }
             return this;
-        }
-
-        /**
-         *  @override
-         */
-        override public function get viewport():IContainer
-        {
-            var _viewport:IContainer = super.viewport;
-            if( !_viewport )
-            {
-                _viewport =  new Container( Element(document.body) );
-                super.viewport = _viewport;
-            }
-            return _viewport;
         }
 
         /**

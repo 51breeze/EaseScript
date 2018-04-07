@@ -107,10 +107,14 @@ function createDescription( syntax, stack , owner , moduleClass )
     desc['type'] = getType( stack.type() );
     desc['type'] = getImportType(syntax, moduleClass, getType( stack.type() ) );
 
-    if( stack.returnType && desc['id']==='function' )
+    if( desc['id']==='function' )
     {
-        stack.returnType = getImportType(syntax, moduleClass, stack.returnType );
-        desc['type'] = stack.returnType;
+        if( stack.returnType )
+        {
+            stack.returnType = getImportType(syntax, moduleClass, stack.returnType);
+            desc['type'] = stack.returnType;
+        }
+        desc.isReturn = stack.getScopeOf().isReturn;
     }
 
     var scope2 = stack.getScopeOf().define(  stack.name() )

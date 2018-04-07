@@ -115,9 +115,15 @@ var description = function(scope, target, name , receiver , ns, accessor)
                 }
                 if ( accessor )
                 {
-                    obj = proto[ prop= accessor + prop ];
-                    if (obj){
+                    obj = proto[ accessor + prop ];
+                    if (obj)
+                    {
+                        prop=accessor + prop;
                         return accessor === "Set_" ? {"set": obj.value, "prop": prop, "desc": obj} : {"get":obj.value, "prop": prop, "desc": obj};
+                    }
+                    if( accessor === "Set_" && proto[ "Get_"+prop ] )
+                    {
+                        throw new ReferenceError( '"'+name +'" is not writable');
                     }
                 }
             }

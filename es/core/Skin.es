@@ -6,6 +6,7 @@
  */
 package es.core
 {
+    import es.components.SkinComponent;
     import es.core.Container;
     import es.core.Display;
     import es.core.es_internal;
@@ -13,92 +14,28 @@ package es.core
     import es.events.SkinEvent;
     import es.core.State;
     import es.interfaces.IDisplay;
-
     public class Skin extends Container
     {
-        private var _hash:Object;
-        private var _skinChildren;
-        private var _name:String;
-        private var _attr:Object;
-        private var createChildFlag:Boolean = false;
-
         /**
          * 皮肤类
          * @constructor
          */
-        function Skin( skinObject:Object={} )
+        function Skin( name:String="div", attr:Object=null)
         {
-            if( !(skinObject is Element) )
+            if( name.charAt(0) ==="#" )
             {
-                var attr = skinObject.attr || {};
-                var name = skinObject.name || 'div';
-                var hash = skinObject.hash;
-                if (hash)
-                {
-                    hash = hash as JSON;
-                    attr = attr as JSON;
-                    for (var h in hash)
-                    {
-                        if (hash[h] === '@id')
-                        {
-                            hash[h] = System.uid();
-                            if (attr.id === h) attr.id = hash[h];
-                        }
-                    }
+                super( new Element(name) );
+
+            }else
+            {
+                var strAttr = '';
+                if (attr) {
+                    strAttr = System.serialize(attr, 'attr');
                 }
-                this._skinChildren = skinObject.children || [];
-                this._hash = skinObject.hash || {};
-                this._name = name;
-                this._attr = attr;
-                var str = System.serialize(attr, 'attr');
-                skinObject = new Element('<' + name + " " + str + '/>');
+                super(new Element('<' + name + " " + strAttr + '/>'));
             }
-            super( skinObject );
+            this.addEventListener(ElementEvent.ADD,this.commitPropertyAndUpdateSkin);
         }
-
-        protected function get skinChildren():Array
-        {
-            return _skinChildren;
-        }
-
-        /**
-         * 获取皮肤的节点名
-         *  @returns String
-         */
-        public function get name():String
-        {
-            return _name;
-        }
-
-        public function set name(value:String)
-        {
-            _name = value;
-        }
-
-        public function set attr(value:Object):void
-        {
-            Object.merge( _attr, value );
-            this.element.setProperties( value );
-        }
-
-        public function get attr():Object
-        {
-             return _attr;
-        }
-
-        /**
-         * 根据id获取子级元素
-         * @param id
-         * @returns Object
-         */
-        public function getChildById( id ):Object
-        {
-            if( _hash.hasOwnProperty(id) )
-            {
-                return _hash[id];
-            }
-            return null;
-        };
 
         /**
          * @private
@@ -144,9 +81,9 @@ package es.core
             {
                 this._currentState=name;
                 currentStateObject = null;
-                if( this.createChildFlag === true )
+                if( this.initialized )
                 {
-                    this.createChildren();
+                    this.updateDisplayList();
                 }
             }
         };
@@ -169,31 +106,7 @@ package es.core
         /**
          * @private
          */
-        private var _hostComponent;
-
-        /**
-         * 设置皮肤的宿主组件
-         * @param host
-         * @returns {Component}
-         */
-        es_internal function set hostComponent(host:Component):void
-        {
-            if( host == null )throw new ReferenceError("hostComponent is null");
-            _hostComponent = host;
-            initializing();
-        };
-
-        /**
-         * 获取皮肤的宿主组件
-         * @param host
-         * @returns {Component}
-         */
-        protected function get hostComponent():Component
-        {
-            return _hostComponent;
-        };
-
-        private var _render;
+        private var _render:Render;
 
         /**
          * 设置一个渲染器
@@ -201,7 +114,7 @@ package es.core
          */
         public function set render( value:Render ):void
         {
-             this._render = value;
+             _render = value;
         };
 
         /**
@@ -210,8 +123,12 @@ package es.core
          */
         public function get render():Render
         {
-            var obj = this._render;
-            if( !obj )this._render = obj = new Render();
+            var obj = _render;
+            if( !obj )
+            {
+                obj = new Render();
+                _render = obj;
+            }
             return obj;
         };
 
@@ -241,16 +158,32 @@ package es.core
          */
         public function variable(name,value)
         {
+            invalidate = false;
             return this.render.variable( name,value );
         };
 
         /**
-         * 安装皮肤
+         * 当修改数据或者属性后调用此方法来提交属性并刷新视图
          */
-        public function skinInstaller()
+        public function commitPropertyAndUpdateSkin()
         {
+            if( initialized===false )
+            {
+                initialized = true;
+                this.initializing();
+            }
             this.createChildren();
         }
+
+        /**
+         * @private
+         */
+        protected var initialized:Boolean=false;
+
+        /**
+         * @private
+         */
+        private var invalidate:Boolean=false;
 
         /**
          * 创建一组子级元素
@@ -258,52 +191,27 @@ package es.core
          */
         protected function createChildren()
         {
-            this.createChildFlag = true;
-            var children:Array = this.skinChildren;
-            var hash = this._hash;
-            var len = children.length;
-            var c = 0;
-            var child;
+            if( invalidate === true )return;
+            invalidate = true;
+            var element:Element = this.element;
             var render = this._render;
-            var parent = this.displayParent;
-            this.removeAllChild();
             if( render )
             {
-                child = render.fetch();
-                if( child )
-                {
-                    this.addChildAt( new Display( new Element( Element.createElement( child ) ) ) , -1 );
-                }
-            }
-
-            for (;c<len;c++)
+                var str:String = render.fetch();
+                if( str )element.html( str );
+            }else
             {
-                child = children[c];
-                if( System.isObject(child) )
+                var children:Array = this.children;
+                var len = children.length;
+                var c = 0;
+                var child:IDisplay;
+                for (; c < len; c++)
                 {
-                    child = Skin.parseSkinObject(child, hash);
-
-                }else if( child instanceof Render )
-                {
-                    var rd:Render = child as Render;
-                    child = rd.fetch();
-                }
-
-                if( child )
-                {
-                    if ( System.isString( child ) )
-                    {
-                        child = System.trim( child );
-                        var elem = new Element( Element.createElement( child , true ) );
-                        this.addChildAt( new Display( elem ) , -1);
-
-                    }else if( child instanceof Skin )
-                    {
-                        (child as Skin).createChildren();
-                        this.addChild( child as Display );
-                    }
+                    child = children[c] as IDisplay;
+                    element.addChild( child.element );
                 }
             }
+
             if( this.hasEventListener(SkinEvent.CREATE_CHILDREN_COMPLETED) )
             {
                 var e:SkinEvent = new SkinEvent( SkinEvent.CREATE_CHILDREN_COMPLETED );
@@ -379,33 +287,5 @@ package es.core
             }
         }
 
-        /**
-         * 将皮肤对象转成html的字符串形式
-         * @param skin
-         * @param hash
-         */
-        static protected function parseSkinObject( skin:Object={} , hash={} ):String
-        {
-            var tag = skin.name || 'div';
-            var children:Array = skin.children as Array;
-            var content:String='';
-            var len = children.length;
-            var i = 0;
-            for (;i<len;i++)
-            {
-                content += typeof children[i] ==="string" ? children[i] : Skin.parseSkinObject(children[i], hash);
-            }
-            if( tag==='text' )return content;
-            var str:String = '<' + tag;
-            var attr = (skin.attr || {}) as JSON;
-            for (var p in attr)
-            {
-                var v = attr[p];
-                v = p==='id' && hash.hasOwnProperty(v) ? hash[v] : v;
-                str += " " + p + '="' + v + '"';
-            }
-            str += '>' + content + '</' + tag + '>';
-            return str;
-        }
     }
 }

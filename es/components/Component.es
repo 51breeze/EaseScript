@@ -15,40 +15,26 @@ package es.components
         }
 
         /**
-         * @private
+         * 标记此组件是否完成初始过程
          */
-        private var _initialized=false;
-
-        /**
-         * 组件初始完成后调用
-         * 此方法无需手动调用
-         * @returns {boolean}
-         */
-        protected function initialized()
-        {
-            var val = this._initialized;
-            if( val===false )
-            {
-                this._initialized=true;
-                this.hasEventListener( ComponentEvent.INITIALIZED) && this.dispatchEvent(new ComponentEvent(ComponentEvent.INITIALIZED) );
-            }
-            return val;
-        }
+        protected var initialized:Boolean = false;
 
 
         /**
          * 组件初始化时调用
-         * 此方法无需手动调用
+         * 此方法由组件内部实现，无需手动调用
          * @returns {Boolean}
          */
         protected function initializing()
         {
-            var val = this._initialized===false;
-            if( val===true && this.hasEventListener( ComponentEvent.INITIALIZING) )
+            if( initialized===false )
             {
-                this.dispatchEvent(new ComponentEvent(ComponentEvent.INITIALIZING));
+                initialized = true;
+                if( this.hasEventListener( ComponentEvent.INITIALIZING ) )
+                {
+                    this.dispatchEvent(new ComponentEvent(ComponentEvent.INITIALIZING));
+                }
             }
-            return val;
         };
     }
 }
