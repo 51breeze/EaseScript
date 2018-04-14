@@ -11,9 +11,6 @@ package es.components
     import es.core.Skin;
     import es.interfaces.IContainer;
     import es.interfaces.IDisplay;
-    import es.core.es_internal;
-
-    use namespace es_internal;
     public class SkinComponent extends Component implements IDisplay
     {
         public function SkinComponent()

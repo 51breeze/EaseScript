@@ -5,25 +5,33 @@ module.exports={
         "name": "build",
         "child": {
             "js": {
-                "path": "./",
+                "path": "./webroot/",
                 "name": "js",
             },
             "img": {
-                "path": "./",
+                "path": "./webroot/",
                 "name": "img",
             },
             "css": {
-                "path": "./",
+                "path": "./webroot/",
                 "name": "css",
             },
             "font": {
-                "path": "./",
+                "path": "./webroot/",
                 "name": "fonts",
             },
             "view": {
-                "path": "./",
+                "path": "./app/",
                 "name": "views",
             },
+            "webroot":{
+                "path":"./",
+                "name":"webroot",
+            },
+            "application":{
+                "path":"./",
+                "name":"app",
+            }
         },
     },
     //工作的主目录结构配置

@@ -215,7 +215,7 @@ package es.core
             if( this.hasEventListener(SkinEvent.CREATE_CHILDREN_COMPLETED) )
             {
                 var e:SkinEvent = new SkinEvent( SkinEvent.CREATE_CHILDREN_COMPLETED );
-                e.parent = parent;
+                e.parent = this.parent;
                 e.child = this;
                 this.dispatchEvent( e );
             }

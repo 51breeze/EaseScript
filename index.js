@@ -138,7 +138,7 @@ function createDescription( syntax, stack , owner , moduleClass )
 
     if( moduleClass['id'] === 'interface')
     {
-       desc['isInterface'] =true;
+        desc['isInterface'] =true;
     }
 
     desc['origintype'] = desc['type'];
@@ -279,22 +279,22 @@ function parseMetaType( describe, currentStack, metaTypeStack , config, project,
     }
     metatype.metaTypeStack = metaTypeStack;
     defineMetaTypeList[ metatype.type ] = metatype;
-    
+
     switch ( metatype.type )
     {
         case "ArrayElementType" :
-                describe.arrayElementType = metatype.param.source;
+            describe.arrayElementType = metatype.param.source;
             break;
         case 'Skin' :
             var source = metatype.param.source;
             loadSkinModuleDescription( source , config , project, syntax);
             describe.value = ' System.getDefinitionByName("'+source+'")';
-        break;
+            break;
         case 'Embed' :
             var dest = parseMetaEmbed(metatype, config );
             dest= PATH.relative(config.build_path,dest ).replace(/\\/g,'/');
             describe.value = '"./'+dest+'"';
-        break;
+            break;
         case 'Bindable' :
             var name = currentStack.name();
             var item = describe;
@@ -346,10 +346,10 @@ function mergeImportClass(target, scope)
 {
     for (var i in scope)
     {
-       if( scope[i].id==="class" && scope[i]['import']===true )
-       {
-           target[i] = scope[i].fullclassname;
-       }
+        if( scope[i].id==="class" && scope[i]['import']===true )
+        {
+            target[i] = scope[i].fullclassname;
+        }
     }
 }
 
@@ -677,6 +677,12 @@ function loadSkinModuleDescription( skinClassName , config , project, syntax )
     //加载皮肤
     var modules = makeSkin( skinClassName , config , project, syntax, loadModuleDescription );
     var scriptConfig =  Utils.merge({}, config, {syntax: 'javascript'});
+
+    if( skinClassName=="es.skins.NavigateSkin" ){
+        console.log( "===", modules.length );
+    }
+
+
     for( var index in modules )
     {
         var _module = modules[ index ];
@@ -697,7 +703,8 @@ function loadSkinModuleDescription( skinClassName , config , project, syntax )
             loadFragmentModuleDescription("javascript", _module,scriptConfig, project);
         }
     }
-    return define(syntax, skinClassName);
+
+    return define("javascript", skinClassName);
 }
 
 /**
@@ -733,6 +740,7 @@ function loadModuleDescription( syntax , file , config , project , resource , su
             Utils.error(resource || sourcefile);
             throw new Error('Not found '+sourcefile+suffix);
         }
+
         //加载皮肤
         return loadSkinModuleDescription( fullclassname , config , project, syntax );
     }
@@ -819,12 +827,12 @@ function getRequirementsAllSkinModules( module )
     var contents= [];
     for(;i<len;i++)
     {
-         var skin = skinModuleContents[ datalist[i] ];
-         if( skin )
-         {
-             contents.push( skin );
-             contents = contents.concat( getRequirementsAllSkinModules( skin ) );
-         }
+        var skin = skinModuleContents[ datalist[i] ];
+        if( skin )
+        {
+            contents.push( skin );
+            contents = contents.concat( getRequirementsAllSkinModules( skin ) );
+        }
     }
     return contents;
 }
@@ -847,210 +855,123 @@ const syntax_supported={
 const builder={
 
     'javascript':function(config,project)
-     {
-         var jsSyntax = require('./lib/javascript.js');
+    {
+        var jsSyntax = require('./lib/javascript.js');
         // var script = jsSyntax(config, makeModules['javascript'], descriptions['javascript'], project );
-         
-         var less = require('less');
-         var themes = require('./style/themes.js');
-         var lessPath = PATH.resolve(config.root_path, './style/');
-         var options = {
-             paths: [lessPath],
-             globalVars: themes[config.themes] || themes.default,
-             compress: config.minify === 'enable',
-         };
-         var appLen = applicationModules.length;
-         var appIndex = 0;
-         for( ;appIndex<appLen;appIndex++ )
-         {
-             var mainModule = applicationModules[ appIndex ];
-             var viewModule = mainModule.defineMetaTypeList.View;
-             var script = jsSyntax(config, makeModules['javascript'], descriptions['javascript'], mainModule.fullclassname );
-             if( viewModule )
-             {
-                 viewModule = skinModuleContents[ viewModule.param.source ];
-                 var _styleContent = getSkinModuleStyles( getRequirementsAllSkinModules(viewModule) );
-                 var style = [];
-                 if (_styleContent.length > 0) {
-                     style = _styleContent.map(function (e, i) {
-                         var ownerModule = descriptions['javascript'][e.fullclassname];
-                         if (ownerModule.hasUsed !== true)return '';
-                         e = e.styleContent;
-                         e = e.replace(/@Embed\(.*?\)/g, function (a, b) {
-                             var metatype = Utils.executeMetaType(a.substr(1));
-                             var dest = parseMetaEmbed(metatype, config);
-                             return '"./' + PATH.relative(Utils.getBuildPath(config, 'build.css'), dest).replace(/\\/g, '/') + '"';
-                         });
 
-                         e.replace(/\B@(\w+)\s*:/gi, function (a, b, c) {
-                             e = e.replace(new RegExp('@' + b, "gi"), function (a) {
-                                 return '@' + b + i;
-                             });
-                         });
-                         return e;
-                     });
-                 }
+        var less = require('less');
+        var themes = require('./style/themes.js');
+        var lessPath = PATH.resolve(config.root_path, './style/');
+        var options = {
+            paths: [lessPath],
+            globalVars: themes[config.themes] || themes.default,
+            compress: config.minify === 'enable',
+        };
+        var appLen = applicationModules.length;
+        var appIndex = 0;
 
-                 if (config.font) {
-                     style.unshift("\n@import './less/glyphicons.less';\n");
-                 }
+        var makes =  Utils.merge(false, {}, makeModules['javascript'] ,  makeModules['php']);
+        var descrs =  Utils.merge(false, {}, descriptions['javascript'] ,  descriptions['php']);
 
-                 if (config.animate) {
-                     style.unshift("\n@import 'animate.less';\n");
-                 } else {
-                     style.unshift("\n@import 'animate-base.less';\n");
-                 }
+        for( ;appIndex<appLen;appIndex++ )
+        {
+            var mainModule = applicationModules[ appIndex ];
+            var viewModule = mainModule.defineMetaTypeList.View;
+            var script = jsSyntax(config,makes, descrs , mainModule.fullclassname );
+            if( viewModule )
+            {
+                viewModule = skinModuleContents[ viewModule.param.source ];
+                var _styleContent = getSkinModuleStyles( getRequirementsAllSkinModules(viewModule) );
+                var style = [];
+                if (_styleContent.length > 0) {
+                    style = _styleContent.map(function (e, i) {
+                        var ownerModule = descriptions['javascript'][e.fullclassname];
+                        if (ownerModule.hasUsed !== true)return '';
+                        e = e.styleContent;
+                        e = e.replace(/@Embed\(.*?\)/g, function (a, b) {
+                            var metatype = Utils.executeMetaType(a.substr(1));
+                            var dest = parseMetaEmbed(metatype, config);
+                            return '"./' + PATH.relative(Utils.getBuildPath(config, 'build.css'), dest).replace(/\\/g, '/') + '"';
+                        });
 
-                 style.unshift("\n@import 'mixins.less';\n");
-                 style.unshift("\n@import 'main.less';\n");
+                        e.replace(/\B@(\w+)\s*:/gi, function (a, b, c) {
+                            e = e.replace(new RegExp('@' + b, "gi"), function (a) {
+                                return '@' + b + i;
+                            });
+                        });
+                        return e;
+                    });
+                }
 
-                 (function (style, options, viewModule, config) {
-                     less.render(style.join("\n"), options, function (err, output) {
-                         if (err) {
-                             Utils.error(err.message);
-                             Utils.error(err.extract.join('\n'));
-                         } else {
-                             var filename = viewModule.fullclassname.toLowerCase();
-                             filename = PATH.resolve(Utils.getBuildPath(config, 'build.css'), filename + '.css');
-                             fs.writeFileSync(filename, output.css);
-                         }
-                     });
-                 })(style, options, viewModule, config);
+                if (config.font)
+                {
+                    style.unshift("\n@import './less/glyphicons.less';\n");
+                }
 
-                 var fontPath = Utils.getBuildPath(config, 'build.font');
-                 var fontfiles = Utils.getDirectoryFiles(lessPath + '/fonts');
-                 for (var i = 0; i < fontfiles.length; i++) {
-                     var source = fs.createReadStream(lessPath + '/fonts/' + fontfiles[i]);
-                     var tocopy = fs.createWriteStream(fontPath + "/" + fontfiles[i]);
-                     source.pipe(tocopy);
-                 }
+                if (config.animate) {
+                    style.unshift("\n@import 'animate.less';\n");
+                } else {
+                    style.unshift("\n@import 'animate-base.less';\n");
+                }
 
-                 if (script && config.minify === 'enable') {
-                     script = uglify.minify(script, {ie8: true});
-                     if (script.error)throw script.error;
-                     script = script.code;
-                 }
+                style.unshift("\n@import 'mixins.less';\n");
+                style.unshift("\n@import 'main.less';\n");
 
-                 var filename = viewModule.fullclassname.toLowerCase();
-                 filename = PATH.resolve(Utils.getBuildPath(config, 'build.js'), filename + '.js');
-                 Utils.mkdir(PATH.dirname(filename));
-                 fs.writeFileSync(filename, script);
+                (function (style, options, viewModule, config) {
+                    less.render(style.join("\n"), options, function (err, output) {
+                        if (err) {
+                            Utils.error(err.message);
+                            Utils.error(err.extract.join('\n'));
+                        } else {
+                            var filename = viewModule.fullclassname.toLowerCase();
+                            filename = PATH.resolve(Utils.getBuildPath(config, 'build.css'), filename + '.css');
+                            fs.writeFileSync(filename, output.css);
+                        }
+                    });
+                })(style, options, viewModule, config);
 
-               
+                var fontPath = Utils.getBuildPath(config, 'build.font');
+                var fontfiles = Utils.getDirectoryFiles(lessPath + '/fonts');
+                for (var i = 0; i < fontfiles.length; i++) {
+                    var source = fs.createReadStream(lessPath + '/fonts/' + fontfiles[i]);
+                    var tocopy = fs.createWriteStream(fontPath + "/" + fontfiles[i]);
+                    source.pipe(tocopy);
+                }
 
-             }
-         }
-     },
+                if (script && config.minify === 'enable') {
+                    script = uglify.minify(script, {ie8: true});
+                    if (script.error)throw script.error;
+                    script = script.code;
+                }
 
-     'php':function(config,project)
-     {
-
-         var jsSyntax = require('./lib/javascript.js');
-         // var script = jsSyntax(config, makeModules['javascript'], descriptions['javascript'], project );
-
-         var less = require('less');
-         var themes = require('./style/themes.js');
-         var lessPath = PATH.resolve(config.root_path, './style/');
-         var options = {
-             paths: [lessPath],
-             globalVars: themes[config.themes] || themes.default,
-             compress: config.minify === 'enable',
-         };
-         var appLen = applicationModules.length;
-         var appIndex = 0;
-         for( ;appIndex<appLen;appIndex++ )
-         {
-             var mainModule = applicationModules[ appIndex ];
-             var viewModule = mainModule.defineMetaTypeList.View;
-             var script = jsSyntax(config, makeModules['php'], descriptions['php'], mainModule.fullclassname );
+                var filename = viewModule.fullclassname.toLowerCase();
+                filename = PATH.resolve(Utils.getBuildPath(config, 'build.js'), filename + '.js');
+                Utils.mkdir(PATH.dirname(filename));
+                fs.writeFileSync(filename, script);
 
 
-             filename = PATH.resolve(Utils.getBuildPath(config, 'build.js'), 'index.php');
-             Utils.mkdir(PATH.dirname(filename));
-             fs.writeFileSync(filename, script );
-             process.exit();
 
-             if( viewModule )
-             {
-                 viewModule = skinModuleContents[ viewModule.param.source ];
-                 var _styleContent = getSkinModuleStyles( getRequirementsAllSkinModules(viewModule) );
-                 var style = [];
-                 if (_styleContent.length > 0) {
-                     style = _styleContent.map(function (e, i) {
-                         var ownerModule = descriptions['javascript'][e.fullclassname];
-                         if (ownerModule.hasUsed !== true)return '';
-                         e = e.styleContent;
-                         e = e.replace(/@Embed\(.*?\)/g, function (a, b) {
-                             var metatype = Utils.executeMetaType(a.substr(1));
-                             var dest = parseMetaEmbed(metatype, config);
-                             return '"./' + PATH.relative(Utils.getBuildPath(config, 'build.css'), dest).replace(/\\/g, '/') + '"';
-                         });
+            }
+        }
+    },
 
-                         e.replace(/\B@(\w+)\s*:/gi, function (a, b, c) {
-                             e = e.replace(new RegExp('@' + b, "gi"), function (a) {
-                                 return '@' + b + i;
-                             });
-                         });
-                         return e;
-                     });
-                 }
+    'php':function(config,project)
+    {
 
-                 if (config.font) {
-                     style.unshift("\n@import './less/glyphicons.less';\n");
-                 }
-
-                 if (config.animate) {
-                     style.unshift("\n@import 'animate.less';\n");
-                 } else {
-                     style.unshift("\n@import 'animate-base.less';\n");
-                 }
-
-                 style.unshift("\n@import 'mixins.less';\n");
-                 style.unshift("\n@import 'main.less';\n");
-
-                 (function (style, options, viewModule, config) {
-                     less.render(style.join("\n"), options, function (err, output) {
-                         if (err) {
-                             Utils.error(err.message);
-                             Utils.error(err.extract.join('\n'));
-                         } else {
-                             var filename = viewModule.fullclassname.toLowerCase();
-                             filename = PATH.resolve(Utils.getBuildPath(config, 'build.css'), filename + '.css');
-                             fs.writeFileSync(filename, output.css);
-                         }
-                     });
-                 })(style, options, viewModule, config);
-
-                 var fontPath = Utils.getBuildPath(config, 'build.font');
-                 var fontfiles = Utils.getDirectoryFiles(lessPath + '/fonts');
-                 for (var i = 0; i < fontfiles.length; i++) {
-                     var source = fs.createReadStream(lessPath + '/fonts/' + fontfiles[i]);
-                     var tocopy = fs.createWriteStream(fontPath + "/" + fontfiles[i]);
-                     source.pipe(tocopy);
-                 }
-
-                 if (script && config.minify === 'enable') {
-                     script = uglify.minify(script, {ie8: true});
-                     if (script.error)throw script.error;
-                     script = script.code;
-                 }
-
-                 var filename = viewModule.fullclassname.toLowerCase();
-                 filename = PATH.resolve(Utils.getBuildPath(config, 'build.js'), filename + '.js');
-                 Utils.mkdir(PATH.dirname(filename));
-                 fs.writeFileSync(filename, script);
-             }
-         }
-
-        /* var bootstrap = PATH.resolve(project.path, config.bootstrap );
-         var fullclassname = PATH.relative( config.project.path, bootstrap ).replace(/\\/g,'/').replace(/\//g,'.');
-         config.main = fullclassname;
-         var phpSyntax = require('./lib/javascript.js');
-         var script = phpSyntax(config, makeModules['php'], descriptions['php'], project );
-         var filename;
-         filename = PATH.resolve(Utils.getBuildPath(config, 'build.webroot'), config.bootstrap + '.php');
-         fs.writeFileSync(filename, script );*/
-     }
+        var jsSyntax = require('./lib/javascript.js');
+        var appLen = applicationModules.length;
+        var appIndex = 0;
+        for( ;appIndex<appLen;appIndex++ )
+        {
+            var mainModule = applicationModules[ appIndex ];
+            var viewModule = mainModule.defineMetaTypeList.View;
+            var script = jsSyntax(config, makeModules['php'], descriptions['php'], mainModule.fullclassname );
+            if( viewModule )
+            {
+                // viewModule = skinModuleContents[ viewModule.param.source ];
+            }
+        }
+    }
 };
 
 /**
@@ -1062,7 +983,7 @@ function buildProject(dir, base)
 {
     var dirpath = PATH.isAbsolute(dir.path) ? dir.path : PATH.resolve(base, dir.path, dir.name);
     if (!fs.existsSync(dirpath)) {
-        fs.mkdirSync(dirpath);
+        dirpath = Utils.mkdir( dirpath );
         if (typeof dir.bootstrap === "string" && dir.syntax) {
             //引用一个模板
             var file = PATH.resolve(config.root_path, dir.syntax, dir.bootstrap + dir.suffix);
@@ -1146,7 +1067,7 @@ function getConfigure(config)
     {
         //程序的路径
         config.root_path = root_path;
-        
+
         //合并默认配置文件
         Utils.merge(config, require( config.config_file ) );
 
@@ -1177,26 +1098,26 @@ function getConfigure(config)
         config = JSON.parse( Utils.getContents(makefile) );
     }
 
-  /*  var bootstrap_file = PATH.resolve( config.project.path , config.bootstrap.replace(/\./g,"/")+config.suffix );
-    Utils.mkdir( PATH.dirname( bootstrap_file ) );
-    if( !Utils.isFileExists(bootstrap_file) )
-    {
-        var defaultFile = [
-            'package\n{\n',
-            '\tpublic class '+config.bootstrap,
-            ' extends EventDispatcher\n\t{\n',
-            '\t\tpublic function '+config.bootstrap,
-            '()\n',
-            '\t\t{\n',
-            '\t\t\tsuper(document);\n',
-            '\t\t\t\tvar body = new Element("body");\n',
-            '\t\t\t\tbody.addChild( Element.createElement("<h1>Hello world!</h1>") );\n',
-            '\t\t}\n',
-            '\t}\n',
-            '}',
-        ];
-        Utils.setContents(bootstrap_file, defaultFile.join("") );
-    }*/
+    /*  var bootstrap_file = PATH.resolve( config.project.path , config.bootstrap.replace(/\./g,"/")+config.suffix );
+     Utils.mkdir( PATH.dirname( bootstrap_file ) );
+     if( !Utils.isFileExists(bootstrap_file) )
+     {
+     var defaultFile = [
+     'package\n{\n',
+     '\tpublic class '+config.bootstrap,
+     ' extends EventDispatcher\n\t{\n',
+     '\t\tpublic function '+config.bootstrap,
+     '()\n',
+     '\t\t{\n',
+     '\t\t\tsuper(document);\n',
+     '\t\t\t\tvar body = new Element("body");\n',
+     '\t\t\t\tbody.addChild( Element.createElement("<h1>Hello world!</h1>") );\n',
+     '\t\t}\n',
+     '\t}\n',
+     '}',
+     ];
+     Utils.setContents(bootstrap_file, defaultFile.join("") );
+     }*/
 
     //将上下文中引用的变量设为受保护的关键字
     for (var c in config.context )
@@ -1260,6 +1181,7 @@ function make( config, isGlobalConfig )
     config.$getDescriptionAndGlobals = getDescriptionAndGlobals;
     config.$loadSkinModuleDescription = loadSkinModuleDescription;
     config.$loadModuleDescription = loadModuleDescription;
+    config.$makeFragmentScript = makeFragmentScript;
 
     try
     {
@@ -1269,14 +1191,6 @@ function make( config, isGlobalConfig )
         if( syntax_supported[ project.config.syntax ] !== true )
         {
             Utils.error("Syntax "+project.config.syntax +" is not supported.");
-        }
-
-        //主要的类
-        for (var i in config.system_require_main_class )
-        {
-            var description = loadModuleDescription( project.config.syntax, config.system_require_main_class[i],  project.config, project);
-            description.isMainClass = true;
-            description.hasUsed = true;
         }
 
         var file = PATH.resolve( project.path,  project.config.bootstrap || "./" ).replace(/\\/g,'/');
@@ -1313,7 +1227,15 @@ function make( config, isGlobalConfig )
         for (var s in makeModules )
         {
             Utils.info('Making '+s+' starting ...');
-            builder[s](project.config, project);
+
+            //主要的类
+            for (var i in config.system_require_main_class )
+            {
+                var description = loadModuleDescription( s, config.system_require_main_class[i],  project.config, project);
+                description.isMainClass = true;
+                description.hasUsed = true;
+            }
+            builder[s]( Utils.merge({},project.config,{syntax:s}), project);
             Utils.info('Making '+s+' done ...');
         }
         Utils.info('\r\nCompleted !!!');
@@ -1324,6 +1246,45 @@ function make( config, isGlobalConfig )
         Utils.error(e.message);
         if( config.debug=='on')console.log( e );
     }
+}
+
+var jsSyntax = require('./lib/javascript.js');
+
+/**
+ * 编译一段零碎的脚本
+ * @param syntax
+ * @param content
+ * @param config
+ */
+function makeFragmentScript(syntax, content, config, project )
+{
+    //解析代码语法
+    var scope=null;
+    try{
+        scope = makeCodeDescription( content , config );
+    }catch (e)
+    {
+        throw new SyntaxError(  e.message +"\r\nfile: "+file );
+    }
+
+    scope.fullclassname = "";
+
+    //获取模块的描述
+    var description = getPropertyDescription( scope, config, project, syntax );
+    description.isFragmentModule = true;
+    description.filename = "";
+    scope.filename=description.filename;
+    scope.description=description;
+
+    //加载导入模块的描述
+    for (var i in description.import)
+    {
+        loadModuleDescription(syntax, description.import[i], config, project, scope.filename );
+    }
+
+    var makes =  Utils.merge(false, {}, makeModules['javascript'] ,  makeModules['php']);
+    var descrs =  Utils.merge(false, {}, descriptions['javascript'] ,  descriptions['php']);
+    return jsSyntax.buildFragmentScript( config, makes, descrs, scope );
 }
 
 /**
