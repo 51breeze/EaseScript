@@ -1,10 +1,12 @@
 const fs = require('fs');
 const PATH = require('path');
-const Ruler = require('./lib/ruler.js');
 const Utils = require('./lib/utils.js');
-const makeSkin = require('./lib/skin.js');
-const globals=require('./lib/globals.js');
 const uglify = require('uglify-js');
+const Compile = require('./lib/compile.js');
+const Maker = require('./lib/maker.js');
+
+globals = Maker.globalDescriptions;
+Utils.merge( Compile, Maker );
 
 //全局配置
 const defaultConfig = {
@@ -33,44 +35,13 @@ const defaultConfig = {
     'mode': 1, //1 标准模式（开发时使用） 2 性能模式（生产环境使用）
 };
 
-var  descriptions={};
-var  makeModules={};
-var  viewContents=[];
 var  requirements={};
-var  applicationModules = [];
-
-/**
- * 全局模块
- * @param classname
- * @returns {{}}
- */
-function define(syntax, classname, module)
-{
-    classname = classname.replace(/\s+/g,'');
-    var obj=descriptions.hasOwnProperty(syntax) ? descriptions[syntax] : descriptions[syntax]={};
-    if( typeof module === 'object' )
-    {
-        obj[ classname ] = module;
-        return module;
-    }
-    return obj.hasOwnProperty(classname) ? obj[classname] : null;
+var syntaxMap={
+    'js':'javascript',
+    'php':'php'
 }
-
-/**
- * 返回指定语法的类名描述信息包括全局类
- * @param syntax
- * @param classname
- * @returns {boolean}
- */
-function getDescriptionAndGlobals(syntax, classname)
-{
-    if( descriptions.hasOwnProperty(syntax) && descriptions[syntax].hasOwnProperty(classname) )
-    {
-        return descriptions[syntax][classname];
-    }
-    //全局类不分语法
-    return globals.hasOwnProperty( classname ) ? globals[classname] : null;
-}
+var globalConfig = defaultConfig;
+var systemMainClassModules = [];
 
 /**
  * 返回文件的路径
@@ -83,767 +54,220 @@ function filepath(file, base )
     return PATH.resolve( base, file.replace(/\./g,'/') ).replace(/\\/g,'/');
 }
 
-/**
- * 获取类型
- * @param type
- * @returns {string}
- */
-function getType( type )
+function getModuleWeight( modules )
 {
-    if(type==='*' || type==='void')return type;
-    return typeof type=== "string" ? type.replace(/^\(|\)$/g,'') : '';
+     var weight = {};
+     for(var m in modules )
+     {
+         var _module =  modules[m];
+         var proto = fetchAllParent( _module );
+        fetchAllImplements( _module, proto );
+         for( var i in proto )
+         {
+             fetchAllImplements(proto[i], proto);
+         }
+
+         for( var p in proto )
+         {
+             var _m = proto[p];
+             if (_m.nonglobal === true) 
+             {
+                 weight[_m.fullclassname] = (parseInt(weight[_m.fullclassname]) || 0) + 1;
+             }
+         }
+     }
+     return weight;
 }
 
-/**
- * 创建属性的描述
- * @param stack
- * @returns {string}
- */
-function createDescription( syntax, stack , owner , moduleClass )
+function fetchAllParent( module , results )
 {
-    var desc = {};
-    desc.__stack__ = stack;
-    desc['id'] =stack.keyword();
-    desc['type'] = getType( stack.type() );
-    desc['type'] = getImportType(syntax, moduleClass, getType( stack.type() ) );
-
-    if( desc['id']==='function' )
-    {
-        if( stack.returnType )
+    results = results || [];
+    if( !module.inherit )return results;
+    do {
+        var classname = module.inherit;
+        if( module.nonglobal===true && module.import[ classname ] )
         {
-            stack.returnType = getImportType(syntax, moduleClass, stack.returnType);
-            desc['type'] = stack.returnType;
+            classname = module.import[ classname ]
         }
-        desc.isReturn = stack.getScopeOf().isReturn;
-    }
-
-    var scope2 = stack.getScopeOf().define(  stack.name() )
-    if(  scope2 && scope2.value )
-    {
-        var content = scope2.value.content();
-        var reftype = "";
-        if( content[2] instanceof Ruler.STACK )
+        module = Maker.getLoaclAndGlobalModuleDescription( classname );
+        if( results.indexOf(module)<0 )
         {
-            reftype = content[2].type();
-            switch ( reftype )
-            {
-                case "(JSON)" : reftype = "JSON"; break;
-                case "(Array)" : reftype = "Array"; break;
-            }
-        }else{
-            reftype = Utils.getConstantType( content[2].value ) || Utils.getValueTypeof( content[2].type );
+            results.push(module);
         }
-        desc.referenceType = reftype;
-    }
-
-    if( moduleClass['id'] === 'interface')
-    {
-        desc['isInterface'] =true;
-    }
-
-    desc['origintype'] = desc['type'];
-    desc['privilege'] =stack.qualifier() || "internal";
-    desc['static'] = !!stack.static();
-    desc['nonglobal'] = true;
-    desc['isStatic'] = desc['static'];
-    desc['owner'] = owner;
-    if( stack.final() )
-    {
-        desc['final'] =stack.final();
-    }
-    if( stack.override() )
-    {
-        desc['override'] =stack.override();
-    }
-    if( stack.keyword() === 'function' )
-    {
-        desc['param'] = stack.param();
-        desc['paramType'] = [];
-        desc['type']=stack.returnType;
-
-        for(var i in desc['param'] )
-        {
-            if( desc['param'][i] ==='...')
-            {
-                desc['paramType'].push('*');
-            }else{
-                var obj = stack.define( desc['param'][i] );
-                obj.type = getImportType(syntax, moduleClass, getType(obj.type) );
-                desc['paramType'].push( obj.type );
-            }
-        }
-    }
-    return desc;
-}
-
-function getImportType(syntax, moduleClass,  type )
-{
-    if( !type )return '*';
-    if( type && type !=='*' && type !=='void' )
-    {
-        if( moduleClass.import.hasOwnProperty(type) )
-        {
-            return moduleClass.import[ type ];
-        }else if( moduleClass.classname===type )
-        {
-            return moduleClass.fullclassname;
-        }
-        return type;
-    }
-    return type || '*';
-}
-
-/**
- * 将元类型转字符串
- * @param stack
- * @param type
- * @returns {string}
- */
-function metaTypeToString( stack , type )
-{
-    var content  = stack.content();
-    if( stack.keyword()==='metatype'){
-        content = content[1].content();
-        if( Ruler.META_TYPE.indexOf( content[0].value ) < 0 )
-        {
-            throw new SyntaxError("Invaild metatype '"+content[0].value+"'");
-        }
-        type = content[0].value;
-    }
-
-    if( (type==='Embed') && stack.type()==='(expression)')
-    {
-        if( content[1].previous(0).value !=='source' )
-        {
-            //console.log( content[1].previous(0).value )
-            //throw new SyntaxError("Missing identifier source");
-        }
-    }
-
-    var len = content.length;
-    var str=[];
-    for(var i=0; i<len; i++)
-    {
-        if ( content[i] instanceof Ruler.STACK)
-        {
-            str.push( metaTypeToString( content[i], type ) );
-
-        } else if( content[i].value != null )
-        {
-            str.push( content[i].value  );
-        }else if( typeof content[i] === "string" )
-        {
-            str.push( content[i]  );
-        }
-    }
-    return str.join('');
-}
-
-function parseMetaEmbed(metatype, config )
-{
-    var source = metatype.param.source;
-    var filepath = PATH.resolve(config.project_path, source);
-    if( fs.existsSync(filepath) )
-    {
-        var rootImg  = Utils.getBuildPath(config, 'build.img');
-        var directory= PATH.relative(filepath, source );
-        var filename = PATH.basename( directory );
-        directory = PATH.dirname(directory).replace(/\\/g,'/').split('/');
-        directory = directory.filter(function (a) {
-            return a !== '..';
-        });
-        var dest =  PATH.resolve( rootImg, directory.join('/'), filename ).replace(/\\/g,'/');
-        fs.writeFileSync(dest, fs.readFileSync(filepath) );
-        return dest;
-
-    }else
-    {
-        throw new ReferenceError("file is not exists '"+source+"'");
-    }
-}
-
-/**
- * 解析元类型模块
- * @param stack
- * @param config
- * @returns {string}
- */
-function parseMetaType( describe, currentStack, metaTypeStack , config, project, syntax , list )
-{
-    var metatype = metaTypeToString( metaTypeStack );
-    metatype = Utils.executeMetaType(metatype);
-    var defineMetaTypeList = describe.defineMetaTypeList || (describe.defineMetaTypeList={});
-    if( defineMetaTypeList[ metatype.type ] )
-    {
-        error('Metatype binding has already exists in same object for "'+metatype.type+'"');
-    }
-    metatype.metaTypeStack = metaTypeStack;
-    defineMetaTypeList[ metatype.type ] = metatype;
-
-    switch ( metatype.type )
-    {
-        case "ArrayElementType" :
-            describe.arrayElementType = metatype.param.source;
-            break;
-        case 'Skin' :
-            var source = metatype.param.source;
-            loadSkinModuleDescription( source , config , project, syntax);
-            describe.value = ' System.getDefinitionByName("'+source+'")';
-            break;
-        case 'Embed' :
-            var dest = parseMetaEmbed(metatype, config );
-            dest= PATH.relative(config.build_path,dest ).replace(/\\/g,'/');
-            describe.value = '"./'+dest+'"';
-            break;
-        case 'Bindable' :
-            var name = currentStack.name();
-            var item = describe;
-            if( item.bindable===true )return;
-            var eventType = "PropertyEvent.CHANGE";
-            if( metatype.param.eventType )
-            {
-                if( metatype.param.eventType.lastIndexOf('.')>0 )
-                {
-                    eventType =  metatype.param.eventType;
-                }else{
-                    eventType = '"'+ metatype.param.eventType+'"';
-                }
-            }
-            if( item.id==='var' )
-            {
-                var private_var = name;
-                var privilege = item.privilege;
-                var type = item.type;
-                var setter = [
-                    'function(val){\n',
-                    '\tvar old = this['+config.context.private+'].'+private_var,';\n',
-                    '\tif(old!==val){\n',
-                    '\t\tthis['+config.context.private+'].'+private_var+'=val;\n',
-                    '\t\tvar event = new PropertyEvent('+eventType+');\n',
-                    '\t\tevent.property = "'+name+'";\n',
-                    '\t\tevent.oldValue = old;\n',
-                    '\t\tevent.newValue = val;\n',
-                    '\t\tthis.dispatchEvent(event);\n',
-                    '\t}',
-                    '\n}',
-                ];
-                var getter = [
-                    'function(val){\n',
-                    '\treturn this['+config.context.private+'].'+private_var,
-                    ';\n}',
-                ];
-                describe[ name ]={
-                    'id':'function', "privilege":privilege,"bindable":true,"type":type,'isAccessor':true,'varToBindable':true,
-                    "value":{"set":setter.join(""),"get":getter.join("")}
-                }
-            }
-            item.bindable = true;
-            break;
-    }
-}
-
-function mergeImportClass(target, scope)
-{
-    for (var i in scope)
-    {
-        if( scope[i].id==="class" && scope[i]['import']===true )
-        {
-            target[i] = scope[i].fullclassname;
-        }
-    }
-}
-
-function getDeclareClassDescription( stack , isInternal, config, project , syntax )
-{
-    var list = {'static':{},'proto':{},'import':{},'constructor':{},'attachContent':{} ,'use':{},'namespaces':{},
-        'isInternal': isInternal,"privilege":"internal",'requirements':{},'hasUsed':false};
-    var isstatic = stack.static();
-    var type = stack.fullclassname();
-    var data = stack.content();
-    var i = 0;
-    var len = data.length;
-    var item;
-    var metatypelist = [];
-
-    list['inherit'] = stack.extends() ? stack.extends() : null;
-    list['package'] = stack.parent().keyword()==="package" ? stack.parent().name() : "";
-    list['type'] = stack.fullclassname();
-    list['nonglobal'] = true;
-    list['fullclassname'] = stack.fullclassname();
-    list['classname'] = stack.name();
-
-    if (stack.keyword() === 'interface')
-    {
-        list['implements'] = [];
-        list['isDynamic'] = false;
-        list['isStatic'] = false;
-        list['isFinal'] = false;
-        list['id'] = 'interface';
-
-    } else
-    {
-        list['implements'] = stack.implements();
-        list['isDynamic'] = stack.dynamic();
-        list['isStatic'] = stack.static();
-        list['isFinal'] = stack.final();
-        list['isAbstract'] = stack.abstract();
-        list['id'] = 'class';
-    }
-
-    if( stack.qualifier() )
-    {
-        list.privilege = stack.qualifier();
-    }
-
-    mergeImportClass( list.import, stack.scope().define() );
-    if( list['inherit'] && !list.import.hasOwnProperty( list['inherit'] ) && !globals.hasOwnProperty( list['inherit'] ) )
-    {
-        list.import[ list['inherit'] ] = list['package']+"."+list['inherit'];
-    }
-
-    for (; i < len; i++)
-    {
-        item = data[i];
-        if (item instanceof Ruler.STACK)
-        {
-            var ref = item.static() || isstatic ? list.static : list.proto;
-            var ns = item.qualifier() || 'internal';
-            if( "private,protected,public,internal".indexOf(ns) > -1 )
-            {
-                ns='';
-            }
-            if( ns )
-            {
-                ref = ref[ ns ] || (ref[ ns ]={});
-                list.use[ ns ] = "namespace";
-            }
-
-            var isConstructor = false;
-            //构造函数
-            if (item.keyword() === 'function' && item.name() === stack.name() && !isstatic)
-            {
-                list.constructor = createDescription(syntax, item, null, list );
-                isConstructor = true;
-            }
-            //使用命名空间
-            else if ( item.keyword() === "use" )
-            {
-                list.use[ item.name() ] = "namespace";
-                continue;
-            }
-            //先保存声明的数据元
-            else if( item.keyword() === 'metatype' )
-            {
-                metatypelist.push( item );
-            }
-            //访问器
-            else if (item instanceof Ruler.SCOPE && item.accessor())
-            {
-                var refObj = ref[item.name()];
-                if (!refObj) {
-                    ref[item.name()] = refObj = createDescription(syntax,item, type, list );
-                    refObj.value = {};
-                }
-                refObj.value[item.accessor()] = createDescription(syntax,item, type, list);
-                refObj.isAccessor = true;
-                if (item.accessor() === 'get') {
-                    refObj.type = refObj.value[item.accessor()].type;
-                }
-                if (item.accessor() === 'set') {
-                    refObj.paramType = refObj.value[item.accessor()].paramType;
-                    refObj.param = refObj.paramType;
-                }
-            }
-            else
-            {
-                ref[item.name()] = createDescription(syntax,item, type, list);
-            }
-
-            //为当前的成员绑定数据元
-            if ( metatypelist.length > 0 && item.keyword() !== 'metatype')
-            {
-                var mLen = metatypelist.length;
-                var mI = 0;
-                var desc =  isConstructor ? list.constructor : ref[item.name()];
-                for(;mI<mLen;mI++)
-                {
-                    parseMetaType(desc, item, metatypelist[mI], config, project, syntax, list);
-                }
-                metatypelist = [];
-            }
-        }
-    }
-    return list;
+    }while( module.inherit );
+    return results;
 }
 
 
-function getNamespaceValue( stack, classModule )
+function fetchAllImplements( module, results )
 {
-    var express = stack.content();
-    express.shift();
-    express = express[0].content()[0].content();
-    express.splice(0, 2);
-    var scope = stack.getScopeOf();
-    var id = scope.keyword();
-    var ret;
-    if( id==="package" )
+    results = results || [];
+    if ( module.nonglobal !== true )
     {
-        ret = classModule.package+"/"+stack.qualifier()+":"+stack.name();
-
-    }else if( id==="class" )
-    {
-        ret = classModule.package+"."+classModule.classname+"/"+stack.qualifier()+":"+stack.name();
-
-    }else if( id==="function" )
-    {
-        ret = classModule.package+"."+classModule.classname+"/"+stack.qualifier()+":"+scope.name()+"/"+classModule.package+":"+stack.name();
+        return results;
     }
-    if (express.length === 1)
+
+    for(var i in module.implements )
     {
-        ret = express[0].value.replace(/[\"\']/g,'');
+        var classname = module.implements[i];
+        if ( module.nonglobal === true && module.import[classname] )
+        {
+            classname = module.import[classname];
+        }
+        module = Maker.getLoaclAndGlobalModuleDescription(classname);
+        if( results.indexOf(module) < 0 )
+        {
+            results.push(module);
+        }
+        fetchAllParent( module, results );
     }
-    return ret;
+    return results;
 }
 
-var root_block_declared=['class','interface','const','var','let','use','function','namespace'];
-
-/**
- * 获取类的成员信息
- */
-function getPropertyDescription( stack , config , project , syntax )
-{
-    var moduleClass = {'static':{},'proto':{},'import':{},'constructor':{},'attachContent':{},"rootContent":[],'defineMetaTypeList':{},
-        "namespaces":{}, "use":{},"declared":{},"nonglobal":true,"type":'' ,"privilege":"internal",'requirements':{},'hasUsed':false};
-    moduleClass.fullclassname = stack.fullclassname;
-    var fullclassname = stack.fullclassname.split('.');
-    moduleClass.classname = fullclassname.pop();
-    moduleClass.package = fullclassname.join(".");
-    moduleClass.rootStack=stack;
-
-    var has = false;
-    var data = stack.content();
-    var i = 0;
-    var item;
-    var len = data.length;
-    var count = 0;
-
-    var metatypelist = [];
-
-    for( ;i<len ;i++ )
-    {
-        item = data[i];
-        if( !(item instanceof Ruler.STACK) )
-        {
-            continue;
-        }
-
-        var id = item.keyword();
-        if( id ==="package" )
-        {
-            if( has )Utils.error("package cannot have more than one");
-            has = true;
-            var datalist = item.content();
-            var value;
-            for(var b=0; b< datalist.length; b++ )
-            {
-                value = datalist[b];
-                if( value instanceof Ruler.STACK )
-                {
-                    if (value.keyword() === "class" || value.keyword() === "interface")
-                    {
-                        Utils.merge(moduleClass, getDeclareClassDescription(value, false, config, project, syntax ) );
-
-                    } else if ( value.keyword() === "namespace" )
-                    {
-                        if( moduleClass.namespaces.hasOwnProperty( value.name() ) )
-                        {
-                            Utils.error('"'+value.name()+'" is already been declared');
-                        }
-                        mergeImportClass( moduleClass.import, item.scope().define() );
-                        moduleClass.namespaces[ value.name() ] = createDescription(syntax, value, null,  moduleClass);
-                        moduleClass.package = item.name();
-                        moduleClass.fullclassname =  moduleClass.package ? moduleClass.package+"."+value.name() : value.name();
-                        //moduleClass.namespaces[ value.name() ].value = getNamespaceValue( value, moduleClass);
-                        moduleClass.classname = value.name();
-                        moduleClass.id="namespace";
-                        moduleClass.type=value.name();
-                        count++;
-                    }
-                    else if ( value.keyword() === "use" )
-                    {
-                        moduleClass.use[ value.name() ] = "namespace";
-
-                    } else if ( value.keyword() === "metatype" )
-                    {
-                        var metatype = metaTypeToString( value );
-                        metatype = Utils.executeMetaType(metatype);
-                        metatype.metaTypeStack = value;
-                        var defineMetaTypeList = moduleClass.defineMetaTypeList;
-                        if( defineMetaTypeList[ metatype.type ] )
-                        {
-                            error('Metatype binding has already exists in same object for "'+metatype.type+'"');
-                        }
-                        defineMetaTypeList[ metatype.type ] = metatype;
-                        if( metatype.type ==="View" )
-                        {
-                            var viewModule = loadSkinModuleDescription(metatype.param.source, config , project, syntax );
-                            if( !moduleClass.import[ viewModule.classname ] ){
-                                moduleClass.import[ viewModule.classname ]=viewModule.fullclassname;
-                            }else
-                            {
-                                moduleClass.import[ viewModule.fullclassname ]=viewModule.fullclassname;
-                            }
-                        }
-                    }
-                }
-            }
-
-        }else if( root_block_declared.indexOf(id) >= 0 )
-        {
-            if ( id === "use" )
-            {
-                moduleClass.use[ item.name() ] = "namespace";
-
-            }else
-            {
-                if (moduleClass.declared.hasOwnProperty(item.name())) {
-                    Utils.error('"' + item.name() + '" is already been declared');
-                }
-
-                if (id === "namespace")
-                {
-                    if (moduleClass.namespaces.hasOwnProperty(item.name()))
-                    {
-                        Utils.error('"' + item.name() + '" is already been declared');
-                    }
-                    moduleClass.namespaces[item.name()] = createDescription(syntax,item,null,  moduleClass);
-                    //moduleClass.namespaces[item.name()].value = getNamespaceValue(item, moduleClass);
-
-                } else if (id === "class" || id === "interface")
-                {
-                    moduleClass.declared[item.name()] = getDeclareClassDescription(item, true, config, project, syntax );
-                    moduleClass.declared[item.name()].rootStack=item;
-                    moduleClass.declared[item.name()].namespaces = Utils.merge( moduleClass.declared[item.name()] ,moduleClass.namespaces);
-
-                } else if (item.name())
-                {
-                    moduleClass.declared[item.name()] = createDescription(syntax,item,null,  moduleClass);
-                }
-            }
-
-        }else
-        {
-            Utils.error('Unexpected expression');
-        }
-    }
-
-    if( moduleClass.id==="namespace" && count > 1 )
-    {
-        throw new Error('The content of the namespace is defined not greater than one');
-    }
-    //root block
-    mergeImportClass( moduleClass.import, stack.scope().define() );
-    return moduleClass;
-}
-
-//构建代码描述
-function makeCodeDescription( content ,config )
-{
-    //获取代码描述
-    var R= new Ruler( content, config );
-
-    //侦听块级域
-    if( config.blockScope==='enable' )
-    {
-        R.addListener("(statement)", function (e) {
-            if( e.desc.id !=='var' )e.desc.scope =this.scope().getScopeOf();
-        });
-    }
-
-    //解析代码语法
-    var scope = R.start();
-    return scope;
-}
-
-//所有皮肤模块内容
-var skinModuleContents = {};
-
-/**
- * 加载皮肤模块的描述信息
- * @returns
- */
-function loadSkinModuleDescription( skinClassName , config , project, syntax )
-{
-    //加载皮肤
-    var modules = makeSkin( skinClassName , config , project, syntax, loadModuleDescription );
-    var scriptConfig =  Utils.merge({}, config, {syntax: 'javascript'});
-
-    if( skinClassName=="es.skins.NavigateSkin" ){
-        console.log( "===", modules.length );
-    }
-
-
-    for( var index in modules )
-    {
-        var _module = modules[ index ];
-        if( _module.isMakeView )
-        {
-            viewContents.push(_module);
-        }
-        skinModuleContents[ _module.fullclassname ] = _module;
-
-        //运行在程序中的组件
-        if( _module.componentModule )
-        {
-            loadFragmentModuleDescription(syntax, _module.componentModule, config, project);
-        }
-        //运行在客户端的脚本
-        if( _module.script )
-        {
-            loadFragmentModuleDescription("javascript", _module,scriptConfig, project);
-        }
-    }
-
-    return define("javascript", skinClassName);
-}
-
-/**
- * 加载并解析模块的描述信息
- * @returns
- */
-function loadModuleDescription( syntax , file , config , project , resource , suffix , isComponent )
-{
-    suffix= suffix || config.suffix;
-
-    //获取源文件的路径
-    var sourcefile = filepath(file, config.project_path ).replace(/\\/g,'/');
-
-    //获取对应的包和类名
-    var fullclassname = PATH.relative( config.project_path, sourcefile ).replace(/\\/g,'/').replace(/\//g,'.');
-    fullclassname=fullclassname.replace(/^[\.]+/g,'');
-
-    //是否加载系统库中的文件
-    if( fullclassname.indexOf( config.system_lib_path_name+'.' )===0 )
-    {
-        sourcefile = filepath( fullclassname, config.system_lib_path ).replace(/\\/g,'/');
-    }
-
-    //如果已存在就返回
-    var description = getDescriptionAndGlobals(syntax, fullclassname);
-    if( description )return description;
-
-    if( !fs.existsSync(sourcefile+suffix) )
-    {
-        //是否为一个皮肤文件
-        if( isComponent===true || !fs.existsSync(sourcefile+config.skin_file_suffix) )
-        {
-            Utils.error(resource || sourcefile);
-            throw new Error('Not found '+sourcefile+suffix);
-        }
-
-        //加载皮肤
-        return loadSkinModuleDescription( fullclassname , config , project, syntax );
-    }
-    sourcefile+=suffix;
-
-    //先占个位
-    define(syntax, fullclassname, {} );
-
-    //检查源文件的状态
-    var stat = fs.statSync( sourcefile );
-
-    //源文件修改过的时间
-    var id = new Date(stat.mtime).getTime();
-
-    //编译源文件
-    Utils.info('Checking file '+sourcefile+'...');
-
-    //解析代码语法
-    var scope = null;
-    try{
-        scope = makeCodeDescription(fs.readFileSync( sourcefile , 'utf-8'), config );
-    }catch (e)
-    {
-        throw new SyntaxError(  e.message +"\r\nfile: "+sourcefile );
-    }
-
-    //需要编译的模块
-    var module = makeModules[syntax] || (makeModules[syntax]={});
-    module[fullclassname]=scope;
-
-    //获取模块的描述
-    scope.fullclassname = fullclassname;
-    description = getPropertyDescription( scope, config, project , syntax );
-    description.uid= id;
-    description.filename = sourcefile.replace(/\\/g,'/');
-    scope.filename = description.filename;
-    scope.description = description;
-
-    if( fullclassname !== description.fullclassname )
-    {
-        throw new SyntaxError( "Inconformity of file path. the '"+fullclassname+"' with the '"+ description.fullclassname+"' package" );
-    }
-
-    for( var p in description.declared )
-    {
-        if( description.declared[p].id==="class" )
-        {
-            var pkg = fullclassname.split('.').slice(0,-1);
-            description.declared[p].package = pkg.join('.');
-            pkg.push( description.declared[p].classname );
-            description.declared[p].fullclassname = pkg.join(".");
-            define(syntax, description.declared[p].fullclassname , description.declared[p] );
-        }
-    }
-
-    //加载导入模块的描述
-    for (var i in description.import)
-    {
-        var file =  description.import[i];
-        if( description.package && !globals.hasOwnProperty(file) && file.indexOf('.') < 0 )
-        {
-            if( !fs.existsSync(file+suffix) )
-            {
-                file = description.package +'.'+file;
-                description.import[i] = file;
-            }
-        }
-        loadModuleDescription(syntax, file, config, project, description.filename );
-    }
-    define(syntax, description.fullclassname, description );
-    return description;
-}
 
 /**
  * 获取所以依赖的皮肤模块
  * @param module
  * @returns {Array}
  */
-function getRequirementsAllSkinModules( module )
+function getRequirementsAllSkinModules( modules )
 {
-    var datalist = module.moduleContext.imports;
-    var i = 0;
-    var len = datalist.length;
-    var contents= [];
-    for(;i<len;i++)
+    return modules.filter(function (e) {
+        var m = Maker.getLoaclAndGlobalModuleDescription(e.fullclassname||e.type);
+        return m.nonglobal===true && m.ownerFragmentModule && m.ownerFragmentModule.isSkin;
+    });
+}
+
+function getRequirementsAllUsedModules( module , results, hash)
+{
+    results = results || [];
+    hash    = hash || {};
+    var name = module.fullclassname || module.type;
+    if ( hash[name] === true )
     {
-        var skin = skinModuleContents[ datalist[i] ];
-        if( skin )
-        {
-            contents.push( skin );
-            contents = contents.concat( getRequirementsAllSkinModules( skin ) );
-        }
+        return [];
     }
-    return contents;
+    hash[name] = true;
+    if( module.nonglobal===true )
+    {
+        var isNs = module.id==="namespace";
+        var hasUsed = isNs ? module.namespaces[ module.classname ].hasUsed : module.hasUsed;
+        if( hasUsed && results.indexOf(module)<0 )
+        {
+            results.push( module );
+        }
+        if( module.useExternalClassModules )
+        {
+            var datalist = module.useExternalClassModules;
+            var i = 0;
+            var len = datalist.length;
+            for (; i < len; i++)
+            {
+                var classname = datalist[i];
+                getRequirementsAllUsedModules( Maker.getLoaclAndGlobalModuleDescription( classname ), results , hash );
+            }
+        }
+
+    }else
+    {
+        results.push( module );
+    }
+    return results;
+}
+
+function getRequirementsAllGlobalClass( modules )
+{
+    modules = modules.filter(function (e) {
+         var m = Maker.getLoaclAndGlobalModuleDescription(e.fullclassname||e.type);
+         return !m.nonglobal;
+    });
+    return modules.map(function (e) {
+        return e.type;
+    });
+}
+
+function getModuleScriptContent( modules )
+{
+    modules = modules.filter(function (e) {
+        return e.nonglobal ===true && e.makeContent;
+    });
+    var weightMap = getModuleWeight( modules );
+    modules = modules.sort(function (a,b) {
+        var a1 = weightMap[ a.fullclassname ] || 0;
+        var b1 = weightMap[ b.fullclassname ] || 0;
+        if( a1==b1 )return 0;
+        return b1 < a1 ? -1 : 1;
+     });
+    modules = systemMainClassModules.concat( modules );
+    return modules.map(function (e) {
+         return e.makeContent;
+    });
 }
 
 function getSkinModuleStyles( modules )
 {
     return modules.filter(function(e){
-        return !!e.styleContent;
+        return e.ownerFragmentModule ? !!e.ownerFragmentModule.styleContent : false;
     });
 }
 
+function outputFiles( bulid_path, fileSuffix, classModules )
+{
+    for (var m in classModules)
+    {
+        var localModule = classModules[m];
+        var isUsed = localModule.hasUsed;
+        if ( isUsed === true && localModule.makeContent )
+        {
+            var file = Utils.getResolvePath( bulid_path , localModule.fullclassname );
+            Utils.mkdir( file.substr(0, file.lastIndexOf("/") ) );
+            Utils.setContents( file + fileSuffix, localModule.makeContent );
+        }
+    }
+}
+
+function createView( bootstrap, syntax, config )
+{
+    var requirements=[];
+    if( bootstrap.defineMetaTypeList && bootstrap.defineMetaTypeList.View )
+    {
+        var outputname = bootstrap.fullclassname.toLowerCase();
+        var viewModule = Maker.descriptionByName(  bootstrap.defineMetaTypeList.View.param.source );
+        if( viewModule.ownerFragmentModule )
+        {
+            var file = Utils.getResolvePath( Utils.getBuildPath(config, 'build.view'), outputname );
+            Utils.mkdir( file.substr(0, file.lastIndexOf("/") ) );
+            var suffix = syntax ==="php" ? ".php" : ".html";
+            Utils.setContents(file + suffix, viewModule.ownerFragmentModule.viewMaker(function (script)
+            {
+                var fragment = {};
+                fragment.fullclassname = viewModule.ownerFragmentModule.fullclassname+syntax;
+                fragment.script = script;
+                var stack = Maker.loadFragmentModuleDescription(syntax, fragment, config, true);
+                Compile(syntax, stack, stack.description, config);
+                if( stack.description.useExternalClassModules && stack.description.useExternalClassModules.length > 0 )
+                {
+                    requirements = stack.description.useExternalClassModules;
+                }
+                return stack.description.rootContent.join("");
+
+            }));
+        }
+    }
+    return requirements;
+}
+
+function mergeModules(targetModules, newModules )
+{
+    for (var r in newModules)
+    {
+        var m = Maker.getLoaclAndGlobalModuleDescription( newModules[r] );
+        if( targetModules.indexOf(m) < 0 )
+        {
+            targetModules.push( m );
+        }
+    }
+}
 
 //目前支持的语法
 const syntax_supported={
@@ -854,10 +278,14 @@ const syntax_supported={
 //构建器
 const builder={
 
-    'javascript':function(config,project)
+    'javascript':function(config, descriptions, client )
     {
-        var jsSyntax = require('./lib/javascript.js');
-        // var script = jsSyntax(config, makeModules['javascript'], descriptions['javascript'], project );
+        Utils.info("building javascript start...");
+
+        for( var s in systemMainClassModules )
+        {
+            Compile("javascript", Maker.makeModuleByName(systemMainClassModules[s].fullclassname), systemMainClassModules[s], config);
+        }
 
         var less = require('less');
         var themes = require('./style/themes.js');
@@ -867,110 +295,134 @@ const builder={
             globalVars: themes[config.themes] || themes.default,
             compress: config.minify === 'enable',
         };
-        var appLen = applicationModules.length;
-        var appIndex = 0;
-
-        var makes =  Utils.merge(false, {}, makeModules['javascript'] ,  makeModules['php']);
-        var descrs =  Utils.merge(false, {}, descriptions['javascript'] ,  descriptions['php']);
-
-        for( ;appIndex<appLen;appIndex++ )
+        var len = descriptions.length;
+        var index = 0;
+        for( ;index<len;index++ )
         {
-            var mainModule = applicationModules[ appIndex ];
-            var viewModule = mainModule.defineMetaTypeList.View;
-            var script = jsSyntax(config,makes, descrs , mainModule.fullclassname );
-            if( viewModule )
+            var bootstrap = descriptions[ index ];
+            var usedModules = [];
+            var outputname = bootstrap.fullclassname.toLowerCase();
+            var hashMap = Compile("javascript", Maker.makeModuleByName( bootstrap.fullclassname ) , bootstrap, config);
+            if( !client )
             {
-                viewModule = skinModuleContents[ viewModule.param.source ];
-                var _styleContent = getSkinModuleStyles( getRequirementsAllSkinModules(viewModule) );
-                var style = [];
-                if (_styleContent.length > 0) {
-                    style = _styleContent.map(function (e, i) {
-                        var ownerModule = descriptions['javascript'][e.fullclassname];
-                        if (ownerModule.hasUsed !== true)return '';
-                        e = e.styleContent;
-                        e = e.replace(/@Embed\(.*?\)/g, function (a, b) {
-                            var metatype = Utils.executeMetaType(a.substr(1));
-                            var dest = parseMetaEmbed(metatype, config);
-                            return '"./' + PATH.relative(Utils.getBuildPath(config, 'build.css'), dest).replace(/\\/g, '/') + '"';
-                        });
-
-                        e.replace(/\B@(\w+)\s*:/gi, function (a, b, c) {
-                            e = e.replace(new RegExp('@' + b, "gi"), function (a) {
-                                return '@' + b + i;
-                            });
-                        });
-                        return e;
-                    });
-                }
-
-                if (config.font)
-                {
-                    style.unshift("\n@import './less/glyphicons.less';\n");
-                }
-
-                if (config.animate) {
-                    style.unshift("\n@import 'animate.less';\n");
-                } else {
-                    style.unshift("\n@import 'animate-base.less';\n");
-                }
-
-                style.unshift("\n@import 'mixins.less';\n");
-                style.unshift("\n@import 'main.less';\n");
-
-                (function (style, options, viewModule, config) {
-                    less.render(style.join("\n"), options, function (err, output) {
-                        if (err) {
-                            Utils.error(err.message);
-                            Utils.error(err.extract.join('\n'));
-                        } else {
-                            var filename = viewModule.fullclassname.toLowerCase();
-                            filename = PATH.resolve(Utils.getBuildPath(config, 'build.css'), filename + '.css');
-                            fs.writeFileSync(filename, output.css);
-                        }
-                    });
-                })(style, options, viewModule, config);
-
-                var fontPath = Utils.getBuildPath(config, 'build.font');
-                var fontfiles = Utils.getDirectoryFiles(lessPath + '/fonts');
-                for (var i = 0; i < fontfiles.length; i++) {
-                    var source = fs.createReadStream(lessPath + '/fonts/' + fontfiles[i]);
-                    var tocopy = fs.createWriteStream(fontPath + "/" + fontfiles[i]);
-                    source.pipe(tocopy);
-                }
-
-                if (script && config.minify === 'enable') {
-                    script = uglify.minify(script, {ie8: true});
-                    if (script.error)throw script.error;
-                    script = script.code;
-                }
-
-                var filename = viewModule.fullclassname.toLowerCase();
-                filename = PATH.resolve(Utils.getBuildPath(config, 'build.js'), filename + '.js');
-                Utils.mkdir(PATH.dirname(filename));
-                fs.writeFileSync(filename, script);
-
-
-
+                var requirements = createView(bootstrap, "javascript", config );
+                mergeModules(usedModules, requirements);
             }
+
+            if( bootstrap.defineMetaTypeList && bootstrap.defineMetaTypeList.View )
+            {
+                outputname = bootstrap.defineMetaTypeList.View.param.source.toLowerCase();
+            }
+
+            var usedModules = getRequirementsAllUsedModules( bootstrap, usedModules );
+            var skinModules = getRequirementsAllSkinModules( usedModules );
+            var _styleContent = getSkinModuleStyles( skinModules );
+            var _scriptContent =  getModuleScriptContent( usedModules );
+            var requirements = getRequirementsAllGlobalClass( usedModules );
+
+            if( config.source_file ==="enable" )
+            {
+                outputFiles(  Utils.getBuildPath(config, 'build.js')+"/src", ".js", systemMainClassModules.concat( usedModules ) )
+            }
+
+            var builder = require( './javascript/builder.js');
+            _scriptContent = builder(bootstrap.fullclassname, config, _scriptContent.join(""), requirements, {namespace:function(content) {
+                return content.replace(/var\s+codeMap=\{\};/,"var codeMap="+JSON.stringify(hashMap)+";");
+            }});
+
+            var style = [];
+            if (_styleContent.length > 0)
+            {
+                style = _styleContent.map(function (e, i)
+                {
+                    var ownerModule = Maker.descriptionByName(e.fullclassname);
+                    if (ownerModule.hasUsed !== true)return '';
+                    e = e.ownerFragmentModule.styleContent;
+                    e = e.replace(/@Embed\(.*?\)/g, function (a, b) {
+                        var metatype = Utils.executeMetaType(a.substr(1));
+                        var dest = Utils.parseMetaEmbed(metatype, config);
+                        return '"./' + PATH.relative(Utils.getBuildPath(config, 'build.css'), dest).replace(/\\/g, '/') + '"';
+                    });
+
+                    e.replace(/\B@(\w+)\s*:/gi, function (a, b, c) {
+                        e = e.replace(new RegExp('@' + b, "gi"), function (a) {
+                            return '@' + b + i;
+                        });
+                    });
+                    return e;
+                });
+            }
+
+            if (config.font)
+            {
+                style.unshift("\n@import './less/glyphicons.less';\n");
+            }
+
+            if (config.animate) {
+                style.unshift("\n@import 'animate.less';\n");
+            } else {
+                style.unshift("\n@import 'animate-base.less';\n");
+            }
+
+            style.unshift("\n@import 'mixins.less';\n");
+            style.unshift("\n@import 'main.less';\n");
+
+            (function (style, options, outputname, config) {
+                less.render(style.join("\n"), options, function (err, output) {
+                    if (err) {
+                        Utils.error(err.message);
+                        Utils.error(err.extract.join('\n'));
+                    } else {
+                        var filename = filename = PATH.resolve(Utils.getBuildPath(config, 'build.css'), outputname + '.css');
+                        fs.writeFileSync(filename, output.css);
+                    }
+                });
+            })(style, options, outputname, config);
+
+            var fontPath = Utils.getBuildPath(config, 'build.font');
+            var fontfiles = Utils.getDirectoryFiles(lessPath + '/fonts');
+            for (var i = 0; i < fontfiles.length; i++) {
+                var source = fs.createReadStream(lessPath + '/fonts/' + fontfiles[i]);
+                var tocopy = fs.createWriteStream(fontPath + "/" + fontfiles[i]);
+                source.pipe(tocopy);
+            }
+
+            if (_scriptContent && config.minify === 'enable')
+            {
+                var script = uglify.minify(_scriptContent, {ie8: true});
+                if (script.error)throw script.error;
+                _scriptContent = script.code;
+            }
+
+            var filename = PATH.resolve(Utils.getBuildPath(config, 'build.js'), outputname + '.js');
+            Utils.mkdir(PATH.dirname(filename));
+            fs.writeFileSync(filename, _scriptContent );
+
         }
     },
 
-    'php':function(config,project)
+    'php':function(config, descriptions )
     {
-
-        var jsSyntax = require('./lib/javascript.js');
-        var appLen = applicationModules.length;
-        var appIndex = 0;
-        for( ;appIndex<appLen;appIndex++ )
+        Utils.info("building php start...")
+        var len = descriptions.length;
+        var index = 0;
+        var usedModules = systemMainClassModules.slice(0);
+        var hash = {};
+        for( var s in systemMainClassModules )
         {
-            var mainModule = applicationModules[ appIndex ];
-            var viewModule = mainModule.defineMetaTypeList.View;
-            var script = jsSyntax(config, makeModules['php'], descriptions['php'], mainModule.fullclassname );
-            if( viewModule )
-            {
-                // viewModule = skinModuleContents[ viewModule.param.source ];
-            }
+            Compile("php", Maker.makeModuleByName(systemMainClassModules[s].fullclassname), systemMainClassModules[s], config);
         }
+
+        for( ;index<len;index++ ) 
+        {
+            var bootstrap = descriptions[index];
+            Compile("php", Maker.makeModuleByName(bootstrap.fullclassname), bootstrap, config);
+            var requirements = createView( bootstrap, "php" , config );
+            mergeModules( usedModules, requirements );
+            getRequirementsAllUsedModules( bootstrap, usedModules , hash );
+        }
+        outputFiles(  Utils.getBuildPath(config, 'build.application'), ".php", usedModules );
+        builder.javascript(config, descriptions, true);
     }
 };
 
@@ -1147,13 +599,6 @@ function getConfigure(config)
     return config;
 }
 
-var syntaxMap={
-    'js':'javascript',
-    'php':'php'
-}
-
-var globalConfig = defaultConfig;
-
 /**
  * 开始生成代码片段
  */
@@ -1164,39 +609,31 @@ function make( config, isGlobalConfig )
     {
         globalConfig  = config;
     }
-    makeModules = {};
-    descriptions = {};
+
     requirements = config.requirements || (config.requirements = {});
     config.syntax = syntaxMap[ config.syntax ] || 'javascript';
-
+    
     //浏览器中的全局模块
     if( config.browser === 'enable' )
     {
         var browser = require('./lib/browser.js');
-        for(var b in browser){
-            globals[b]=browser[b];
-        }
+        Utils.merge(globals,browser);
     }
     config.globals=globals;
-    config.$getDescriptionAndGlobals = getDescriptionAndGlobals;
-    config.$loadSkinModuleDescription = loadSkinModuleDescription;
-    config.$loadModuleDescription = loadModuleDescription;
-    config.$makeFragmentScript = makeFragmentScript;
-
+    
     try
     {
-        var project = config.project;
-        project.config = Utils.merge({},config, project.config || {});
+        var project_path = config.project_path;
+        var makedir = project_path;
+        var makefiles = [];
+        var file = PATH.resolve( project_path ,  config.bootstrap || "./" ).replace(/\\/g,'/');
 
-        if( syntax_supported[ project.config.syntax ] !== true )
+        if( syntax_supported[ config.syntax ] !== true )
         {
-            Utils.error("Syntax "+project.config.syntax +" is not supported.");
+            Utils.error("Syntax "+config.syntax +" is not supported.");
         }
 
-        var file = PATH.resolve( project.path,  project.config.bootstrap || "./" ).replace(/\\/g,'/');
-        var makedir = project.path;
-        var makefiles = [];
-        if( !Utils.isFileExists(file+config.suffix ) )
+        if( !Utils.isFileExists( file+config.suffix ) )
         {
             if( Utils.isDir( file ) )
             {
@@ -1211,33 +648,28 @@ function make( config, isGlobalConfig )
             makefiles = [ file ];
         }
 
-        //自定义类
+        //主要的类
+        for (var i in config.system_require_main_class )
+        {
+            var desc = Maker.loadModuleDescription( config.syntax, config.system_require_main_class[i], config );
+            systemMainClassModules.push( desc );
+        }
+
         var i = 0;
         var len = makefiles.length;
+        var descriptions=[];
         for(;i<len;i++)
         {
             var classfile =PATH.basename( makefiles[i] , config.suffix );
-            var classname = PATH.relative(project.path, filepath(classfile, makedir ) ).replace(/\\/g,'/');
-            var mainDescription = loadModuleDescription(project.config.syntax, classname, project.config, project);
-            mainDescription.isMainClass = true;
-            mainDescription.hasUsed = true;
-            applicationModules.push( mainDescription );
+            var _filepath = filepath(classfile, makedir );
+            var classname = PATH.relative(project_path, _filepath ).replace(/\\/g,'/');
+            var desc = Maker.loadModuleDescription( config.syntax , classname, config, _filepath);
+            descriptions.push( desc );
         }
 
-        for (var s in makeModules )
-        {
-            Utils.info('Making '+s+' starting ...');
-
-            //主要的类
-            for (var i in config.system_require_main_class )
-            {
-                var description = loadModuleDescription( s, config.system_require_main_class[i],  project.config, project);
-                description.isMainClass = true;
-                description.hasUsed = true;
-            }
-            builder[s]( Utils.merge({},project.config,{syntax:s}), project);
-            Utils.info('Making '+s+' done ...');
-        }
+        Utils.info('Making starting ...');
+        builder[ config.syntax ]( config , descriptions );
+        Utils.info('Making done ...');
         Utils.info('\r\nCompleted !!!');
         Utils.info('Make path : '+config.build_path );
 
@@ -1248,89 +680,5 @@ function make( config, isGlobalConfig )
     }
 }
 
-var jsSyntax = require('./lib/javascript.js');
-
-/**
- * 编译一段零碎的脚本
- * @param syntax
- * @param content
- * @param config
- */
-function makeFragmentScript(syntax, content, config, project )
-{
-    //解析代码语法
-    var scope=null;
-    try{
-        scope = makeCodeDescription( content , config );
-    }catch (e)
-    {
-        throw new SyntaxError(  e.message +"\r\nfile: "+file );
-    }
-
-    scope.fullclassname = "";
-
-    //获取模块的描述
-    var description = getPropertyDescription( scope, config, project, syntax );
-    description.isFragmentModule = true;
-    description.filename = "";
-    scope.filename=description.filename;
-    scope.description=description;
-
-    //加载导入模块的描述
-    for (var i in description.import)
-    {
-        loadModuleDescription(syntax, description.import[i], config, project, scope.filename );
-    }
-
-    var makes =  Utils.merge(false, {}, makeModules['javascript'] ,  makeModules['php']);
-    var descrs =  Utils.merge(false, {}, descriptions['javascript'] ,  descriptions['php']);
-    return jsSyntax.buildFragmentScript( config, makes, descrs, scope );
-}
-
-/**
- * 加载并解析模块的描述信息
- * @returns
- */
-function loadFragmentModuleDescription( syntax, fragmentModule, config , project )
-{
-    //获取源文件的路径
-    var file = fragmentModule.filepath;
-
-    //解析代码语法
-    var scope=null;
-    try{
-        scope = makeCodeDescription( fragmentModule.script , config);
-    }catch (e)
-    {
-        throw new SyntaxError(  e.message +"\r\nfile: "+file );
-    }
-
-    //获取对应的包和类名
-    var fullclassname = fragmentModule.fullclassname;
-    scope.fullclassname = fullclassname;
-
-    //需要编译的模块
-    var module = makeModules[syntax] || (makeModules[syntax]={});
-    module[fullclassname] = scope;
-    scope.isFragmentModule = true;
-
-    //获取模块的描述
-    var description = getPropertyDescription( scope, config, project, syntax );
-    description.isFragmentModule = true;
-    description.uid= new Date().getTime();
-    description.filename = file;
-    description.isSkinModule = !!fragmentModule.isSkin;
-    scope.filename=description.filename;
-    scope.description=description;
-
-    //加载导入模块的描述
-    for (var i in description.import)
-    {
-        loadModuleDescription(syntax, description.import[i], config, project, scope.filename );
-    }
-
-    define(syntax, description.fullclassname, description );
-    return scope;
-}
 
 module.exports = make;

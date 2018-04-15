@@ -70,13 +70,6 @@ var config = {
     'bootstrap':program.bootstrap,
     'themes':program.themes,
     'source_file':program.sourceFile,
-    'context':{
-        "public":"_public",
-        "protected":"_protected",
-        "private":"_private",
-        "internal":"_internal",
-        "package":"Context"
-    },
     'mode': program.mode=='dev' ? 1 : program.mode=='test' ? 2 : 3, //1 标准模式（开发时使用） 2 测试  3 性能模式（生产环境使用）
 };
 config.clean = program.clean
