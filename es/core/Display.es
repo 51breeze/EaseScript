@@ -312,5 +312,14 @@ package es.core
         {
             return displayParent;
         };
+
+        /**
+         * 渲染显示皮肤对象。
+         * 调用此方法会重新创建子级对象，在非必要情况下请谨慎使用，可以节省资源。
+         */
+        public function display():Element
+        {
+            return this._element;
+        };
     }
 }

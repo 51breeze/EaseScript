@@ -138,7 +138,7 @@ function getRequirementsAllSkinModules( modules )
     });
 }
 
-function getRequirementsAllUsedModules( module , results, hash)
+function getRequirementsAllUsedModules( module , results, syntax, hash )
 {
     results = results || [];
     hash    = hash || {};
@@ -148,13 +148,14 @@ function getRequirementsAllUsedModules( module , results, hash)
         return [];
     }
     hash[name] = true;
+
     if( module.nonglobal===true )
     {
         var isNs = module.id==="namespace";
         var hasUsed = isNs ? module.namespaces[ module.classname ].hasUsed : module.hasUsed;
         if( hasUsed && results.indexOf(module)<0 )
         {
-            results.push( module );
+           results.push(module);
         }
         if( module.useExternalClassModules )
         {
@@ -164,11 +165,11 @@ function getRequirementsAllUsedModules( module , results, hash)
             for (; i < len; i++)
             {
                 var classname = datalist[i];
-                getRequirementsAllUsedModules( Maker.getLoaclAndGlobalModuleDescription( classname ), results , hash );
+                getRequirementsAllUsedModules( Maker.getLoaclAndGlobalModuleDescription( classname ), results ,syntax, hash );
             }
         }
 
-    }else
+    }else if( results.indexOf(module)<0  )
     {
         results.push( module );
     }
@@ -211,49 +212,63 @@ function getSkinModuleStyles( modules )
     });
 }
 
-function outputFiles( bulid_path, fileSuffix, classModules )
+function outputFiles( bulid_path, fileSuffix, classModules ,callback )
 {
     for (var m in classModules)
     {
         var localModule = classModules[m];
         var isUsed = localModule.hasUsed;
-        if ( isUsed === true && localModule.makeContent )
+        var content = localModule.makeContent
+        if( callback )
+        {
+            content = callback( localModule );
+        }
+        if ( isUsed === true && content )
         {
             var file = Utils.getResolvePath( bulid_path , localModule.fullclassname );
             Utils.mkdir( file.substr(0, file.lastIndexOf("/") ) );
-            Utils.setContents( file + fileSuffix, localModule.makeContent );
+            Utils.setContents(file + fileSuffix, content);
         }
     }
 }
 
-function createView( bootstrap, syntax, config )
+function compileFragmentScript(script, fullclassname, syntax, config, requirements )
+{
+    var fragment = {};
+    fragment.fullclassname = fullclassname;
+    fragment.script = script;
+    var stack = Maker.loadFragmentModuleDescription(syntax, fragment, config, true);
+    Compile(syntax, stack, stack.description, config);
+    if( stack.description.useExternalClassModules && stack.description.useExternalClassModules.length > 0 )
+    {
+        Utils.forEach( stack.description.useExternalClassModules, function ( classname )
+        {
+            if( requirements.indexOf( classname ) < 0 )
+            {
+                requirements.push(  classname );
+                var module = Maker.getLoaclAndGlobalModuleDescription( classname );
+                if (module.nonglobal === true)
+                {
+                    var stack = Maker.makeModuleByName( classname );
+                    Compile(syntax, stack, stack.description, config);
+                }
+            }
+        });
+    }
+    return stack.description.rootContent.join("");
+}
+
+function createServerView(rootpath, module, syntax, config )
 {
     var requirements=[];
-    if( bootstrap.defineMetaTypeList && bootstrap.defineMetaTypeList.View )
+    var file = Utils.getResolvePath( rootpath, module.fullclassname.replace(/\./g,"/") );
+    Utils.mkdir( file.substr(0, file.lastIndexOf("/") ) );
+    var suffix = syntax ==="php" ? ".php" : ".html";
+    var callback =  module.ownerFragmentModule.viewMaker || module.ownerFragmentModule.skinMaker;
+    Utils.setContents( (file + suffix).toLowerCase(), callback(function (script)
     {
-        var outputname = bootstrap.fullclassname.toLowerCase();
-        var viewModule = Maker.descriptionByName(  bootstrap.defineMetaTypeList.View.param.source );
-        if( viewModule.ownerFragmentModule )
-        {
-            var file = Utils.getResolvePath( Utils.getBuildPath(config, 'build.view'), outputname );
-            Utils.mkdir( file.substr(0, file.lastIndexOf("/") ) );
-            var suffix = syntax ==="php" ? ".php" : ".html";
-            Utils.setContents(file + suffix, viewModule.ownerFragmentModule.viewMaker(function (script)
-            {
-                var fragment = {};
-                fragment.fullclassname = viewModule.ownerFragmentModule.fullclassname+syntax;
-                fragment.script = script;
-                var stack = Maker.loadFragmentModuleDescription(syntax, fragment, config, true);
-                Compile(syntax, stack, stack.description, config);
-                if( stack.description.useExternalClassModules && stack.description.useExternalClassModules.length > 0 )
-                {
-                    requirements = stack.description.useExternalClassModules;
-                }
-                return stack.description.rootContent.join("");
-
-            }));
-        }
-    }
+        return compileFragmentScript(script,  module.ownerFragmentModule.fullclassname+syntax, syntax, config, requirements );
+    }));
     return requirements;
 }
 
@@ -297,24 +312,37 @@ const builder={
         };
         var len = descriptions.length;
         var index = 0;
+        var view_path = Utils.getBuildPath(config, 'build.view');
+
         for( ;index<len;index++ )
         {
             var bootstrap = descriptions[ index ];
             var usedModules = [];
             var outputname = bootstrap.fullclassname.toLowerCase();
             var hashMap = Compile("javascript", Maker.makeModuleByName( bootstrap.fullclassname ) , bootstrap, config);
-            if( !client )
-            {
-                var requirements = createView(bootstrap, "javascript", config );
-                mergeModules(usedModules, requirements);
-            }
 
             if( bootstrap.defineMetaTypeList && bootstrap.defineMetaTypeList.View )
             {
                 outputname = bootstrap.defineMetaTypeList.View.param.source.toLowerCase();
             }
 
-            var usedModules = getRequirementsAllUsedModules( bootstrap, usedModules );
+            var usedModules = getRequirementsAllUsedModules( bootstrap, usedModules, "javascript" );
+
+            if( !client )
+            {
+                usedModules.filter(function (e)
+                {
+                    var o = e.ownerFragmentModule || e;
+                    if( o.isMakeView===true /*|| o.isSkin === true*/  )
+                    {
+                        var requirements = createServerView(  view_path , e, ".html", config );
+                        mergeModules(usedModules, requirements);
+                    }
+                    return e.nonglobal === true;
+                });
+            }
+
+
             var skinModules = getRequirementsAllSkinModules( usedModules );
             var _styleContent = getSkinModuleStyles( skinModules );
             var _scriptContent =  getModuleScriptContent( usedModules );
@@ -403,25 +431,74 @@ const builder={
 
     'php':function(config, descriptions )
     {
-        Utils.info("building php start...")
-        var len = descriptions.length;
-        var index = 0;
+        Utils.info("building php start...");
+
         var usedModules = systemMainClassModules.slice(0);
         var hash = {};
-        for( var s in systemMainClassModules )
-        {
-            Compile("php", Maker.makeModuleByName(systemMainClassModules[s].fullclassname), systemMainClassModules[s], config);
-        }
+        var view_path = Utils.getBuildPath(config, 'build.view');
+        var app_path = Utils.getBuildPath(config, 'build.application');
 
-        for( ;index<len;index++ ) 
+        //编译系统模块
+        Utils.forEach(systemMainClassModules, function (module)
         {
-            var bootstrap = descriptions[index];
-            Compile("php", Maker.makeModuleByName(bootstrap.fullclassname), bootstrap, config);
-            var requirements = createView( bootstrap, "php" , config );
-            mergeModules( usedModules, requirements );
-            getRequirementsAllUsedModules( bootstrap, usedModules , hash );
-        }
-        outputFiles(  Utils.getBuildPath(config, 'build.application'), ".php", usedModules );
+            Compile("php", Maker.makeModuleByName( module.fullclassname ), module, config );
+        });
+
+        //编译普通模块
+        Utils.forEach(descriptions, function (module)
+        {
+            Compile("php", Maker.makeModuleByName(module.fullclassname), module, config);
+            getRequirementsAllUsedModules( module, usedModules , "php", hash );
+        });
+
+        //需要生成的本地模块
+        usedModules.filter(function (e)
+        {
+             var o = e.ownerFragmentModule || e;
+             if( o.isMakeView===true /*|| o.isSkin === true*/  )
+             {
+                 var requirements = createServerView( o.isMakeView ? view_path : app_path , e, "php", config );
+                 mergeModules(usedModules, requirements);
+             }
+             return e.nonglobal === true;
+        });
+
+        var localModules = usedModules.filter(function (e)
+        {
+            return e.nonglobal === true;
+        });
+
+        //输出模块文件
+        outputFiles( app_path, ".php", localModules , function (module) {
+
+            if( Maker.checkInstanceOf(module,"es.core.View") )
+            {
+                var code=["<?php\n"]
+                if( module.package ){
+                    code.push( "namespace "+module.package.replace(/\./g,'\\') +";\n" );
+                }
+                code.push( "use es\\core\\Application;\n" );
+                var rootpath =  PATH.relative( app_path, view_path ).replace(/\\/,'/');
+                var filepath =  rootpath+'/'+module.fullclassname.replace(/\./g,'/');
+                code.push( "class "+module.classname+"\n{\n" );
+                code.push( "\tprivate $_context;\n" );
+                code.push( "\tpublic function __construct(Application $context)\n\t{\n" );
+                code.push( "\t\t$this->_context = $context;\n" );
+                code.push( "\t}\n" );
+                code.push( "\tpublic function display()\n\t{\n" );
+                code.push( "\t\tob_start();\n" );
+                code.push( "\t\t$assignments = (array)$this->_context->getAssignments();\n" );
+                code.push( "\t\textract( $assignments , EXTR_IF_EXISTS );\n" );
+                code.push( "\t\tinclude '"+filepath+".php';\n" );
+                code.push( "\t\t$content = ob_get_contents();\n" );
+                code.push( "\t\tob_end_clean();\n" );
+                code.push( "\t\techo $content;\n" );
+                code.push( "\t}\n}" );
+                return code.join("");
+            }
+            return module.makeContent;
+        });
+
         builder.javascript(config, descriptions, true);
     }
 };

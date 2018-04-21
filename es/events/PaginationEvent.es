@@ -12,7 +12,7 @@ package es.events
         static public const REFRESH = 'paginationRefreshList';
         public  var newValue=null;
         public  var oldValue=null;
-        public function PaginationEvent(type, bubbles, cancelable)
+        public function PaginationEvent(type, bubbles=true, cancelable=true)
         {
             super(type, bubbles, cancelable);
         };

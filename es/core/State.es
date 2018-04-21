@@ -11,7 +11,7 @@ package es.core {
         private var _name:String = '';
         private var _stateGroup:Array = [];
 
-        public function State(name) {
+        public function State(name:String='') {
             this._name = name;
         }
 

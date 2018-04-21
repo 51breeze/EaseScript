@@ -86,7 +86,7 @@ package es.core
          * @param index
          * @returns {Display}
          */
-        public function addChildAt( child:IDisplay , index ):IDisplay
+        public function addChildAt( child:IDisplay , index:Number ):IDisplay
         {
             var parent = child.parent;
             if( parent )

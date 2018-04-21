@@ -45,13 +45,10 @@ package es.core
        {
            return assignments.title as String;
        }
-       
-       /**
-        * 执行此视图，并初始化相关属性
-        */
-       public function display( viewObject:View )
+
+       public function getAssignments():Object
        {
-           viewObject.display();
+           return assignments;
        }
    }
 }

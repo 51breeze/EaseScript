@@ -208,7 +208,7 @@ package es.core
                 for (; c < len; c++)
                 {
                     child = children[c] as IDisplay;
-                    element.addChild( child.element );
+                    element.addChild( child.display() );
                 }
             }
 

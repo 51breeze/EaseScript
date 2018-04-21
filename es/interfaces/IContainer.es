@@ -42,7 +42,7 @@ package es.interfaces
          * @param index
          * @returns {Display}
          */
-        public function addChildAt( child:IDisplay , index ):IDisplay;
+        public function addChildAt( child:IDisplay , index:Number ):IDisplay;
         /**
          * 移除指定的子级元素
          * @param child
