@@ -6,6 +6,7 @@
        import es.core.Display;
        import es.core.Skin;
 
+       [Syntax("javascript")]
        override protected function updateDisplayList()
        {
             super.updateDisplayList();
@@ -31,6 +32,17 @@
             body.variable( dataProfile, [] );
             head.variable( hostComponent.columnProfile(), hostComponent.columns );
             pagination.dataSource = dataSource;
+
+            var _wheelTarget = hostComponent.wheelTarget;
+            if( !_wheelTarget ){
+                 _wheelTarget = this.foot;
+            }
+
+            if( hostComponent.wheelEnable )
+            {
+               pagination.wheelTarget = _wheelTarget;
+            }
+
             dataSource.addEventListener(DataSourceEvent.SELECT, function (event:DataSourceEvent)
             {
                 if ( !event.waiting )
@@ -135,7 +147,7 @@
         <s:template>
               <tr>
                   <:foreach name="columns" value="name" >
-                      <th style="height:{headHeight}px;line-height:{headHeight}px;">{name}</th>
+                      <th style="height:{headHeight}px;line-height:{headHeight}px;">{name}<span></span></th>
                   </:foreach>
               </tr>
          </s:template>
@@ -165,7 +177,7 @@
     <tfoot id="@foot">
          <tr>
              <td colspan="3">
-                 <c:Pagination id="@pagination" wheelTarget="@foot" radius="3"  skinClass="es.skins.PaginationSkin">
+                 <c:Pagination id="@pagination"  radius="3"  skinClass="es.skins.PaginationSkin">
                  </c:Pagination>
              </td>
          </tr>

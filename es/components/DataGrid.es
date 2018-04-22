@@ -7,6 +7,8 @@
 package es.components
 {
     import es.components.SkinComponent;
+    import es.core.Display;
+
     public class DataGrid extends SkinComponent
     {
         public function DataGrid()
@@ -226,6 +228,52 @@ package es.components
         public function get footHeight():Number
         {
             return _footHeight;
+        }
+
+        /**
+         * @prvate
+         */
+        private var _wheelEnable:Boolean = true;
+
+        /**
+         * 是否启用滚动分页
+         * @param value
+         */
+        public function set wheelEnable( value:Boolean )
+        {
+            _wheelEnable = value;
+        }
+
+        /**
+         * 是否启用滚动分页
+         * @returns Boolean
+         */
+        public function get wheelEnable():Boolean
+        {
+            return _wheelEnable;
+        }
+
+        /**
+         * @prvate
+         */
+        private var _wheelTarget:Display = null;
+
+        /**
+         * 设置鼠标滚动的目标元素
+         * @param value
+         */
+        public function set wheelTarget( value:Display )
+        {
+            _wheelTarget = value;
+        }
+
+        /**
+         * 获取鼠标滚动的目标元素
+         * @returns Boolean
+         */
+        public function get wheelTarget():Display
+        {
+            return _wheelTarget;
         }
     }
 }

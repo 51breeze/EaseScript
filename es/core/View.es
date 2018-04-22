@@ -10,7 +10,9 @@ package es.core
     import es.events.SkinEvent;
     import es.core.Application;
     import es.components.Component;
-    public class View extends Component
+    import es.core.Skin;
+    import es.interfaces.IDisplay;
+    public class View extends Skin
     {
         /**
          * 字符集常量值
@@ -30,7 +32,7 @@ package es.core
          */
         public function View( context:Application )
         {
-            super( document );
+            super( new Element( document ) );
             _context = context;
         }
 
@@ -54,15 +56,38 @@ package es.core
         }
 
         /**
+         * 视图类中不能添加子级元素
+         * @param child
+         * @param index
+         * @return
+         */
+        override public function addChildAt( child:IDisplay , index:Number ):IDisplay
+        {
+             throw new Error("View is not addChildAt");
+             return null;
+        }
+
+        /**
+         * 视图类中不能移除子级元素
+         * @param child
+         * @return
+         */
+        override public function removeChild( child:IDisplay ):IDisplay
+        {
+            throw new Error("View is not removeChild");
+            return null;
+        }
+
+        /**
          * 执行此视图，并初始化相关属性
          */
-        public function display()
+       /* override public function display()
         {
             if( !initialized )
             {
                 this.initializing();
             }
-        }
+        }*/
     }
 }
 

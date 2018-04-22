@@ -20,19 +20,31 @@ package es.core
          * 皮肤类
          * @constructor
          */
-        function Skin( name:String="div", attr:Object=null)
+        function Skin( name:*, attr:Object=null)
         {
-            if( name.charAt(0) ==="#" )
+            if( name instanceof Element )
             {
-                super( new Element(name) );
+                super( name as Element );
+                
+            }else if( name instanceof String ) 
+            {
+                if ( name.charAt(0) === "#" || name.charAt(0) === "." ) 
+                {
+                    super( new Element(name) );
+
+                } else
+                {
+                    var strAttr = '';
+                    if (attr)
+                    {
+                        strAttr = System.serialize(attr, 'attr');
+                    }
+                    super( new Element('<' + name + " " + strAttr + '/>') );
+                }
 
             }else
             {
-                var strAttr = '';
-                if (attr) {
-                    strAttr = System.serialize(attr, 'attr');
-                }
-                super(new Element('<' + name + " " + strAttr + '/>'));
+                throw new Error( "Invalid parameter." );
             }
             this.addEventListener(ElementEvent.ADD,this.commitPropertyAndUpdateSkin);
         }
@@ -176,6 +188,19 @@ package es.core
         }
 
         /**
+         * 渲染显示皮肤对象。
+         * 调用此方法会重新创建子级对象，在非必要情况下请谨慎使用，可以节省资源。
+         */
+        override public function display():Element
+        {
+            if( initialized===false )
+            {
+                this.commitPropertyAndUpdateSkin();
+            }
+            return super.display();
+        };
+
+        /**
          * @private
          */
         protected var initialized:Boolean=false;
@@ -199,6 +224,7 @@ package es.core
             {
                 var str:String = render.fetch();
                 if( str )element.html( str );
+                
             }else
             {
                 var children:Array = this.children;

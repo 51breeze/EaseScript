@@ -455,7 +455,7 @@ const builder={
         usedModules.filter(function (e)
         {
              var o = e.ownerFragmentModule || e;
-             if( o.isMakeView===true /*|| o.isSkin === true*/  )
+             if( o.isMakeView===true /*|| o.isSkin === true*/ )
              {
                  var requirements = createServerView( o.isMakeView ? view_path : app_path , e, "php", config );
                  mergeModules(usedModules, requirements);
@@ -470,6 +470,26 @@ const builder={
 
         //输出模块文件
         outputFiles( app_path, ".php", localModules , function (module) {
+
+            var o = module.ownerFragmentModule || module;
+            if( o.skinMaker && o.isMakeView !==true && o.isSkin === true )
+            {
+                var callback = o.skinMaker;
+                var requirements = [];
+                var content = callback(function (script) {
+                    //console.log( script )
+                    return compileFragmentScript(script,  o.fullclassname+"php", "php", config, requirements );
+                });
+
+                var file = Utils.getResolvePath( app_path , o.fullclassname );
+                Utils.mkdir( file.substr(0, file.lastIndexOf("/") ) );
+                Utils.setContents(file+".php", content);
+
+                return "";
+
+                //console.log( content )
+                //process.exit();
+            }
 
             if( Maker.checkInstanceOf(module,"es.core.View") )
             {

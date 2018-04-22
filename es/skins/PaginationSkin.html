@@ -45,20 +45,14 @@
             }
         }
 
-
-        override public function commitPropertyAndUpdateSkin()
-        {
-
-            this.wheelTarget = this.hostComponent.wheelTarget;
-            super.commitPropertyAndUpdateSkin();
-        }
-
-
        override protected function initializing()
        {
-           
             var host = this.hostComponent;
             var profile = new RegExp( host.profile+'\\s*=\\s*(\\d+)');
+            var _wheelTarget = host.wheelTarget;
+            if( _wheelTarget ){
+              this.wheelTarget = _wheelTarget;
+            }
             this.addEventListener(MouseEvent.CLICK, function (e:MouseEvent)
             {
                 if (Element.getNodeName(e.target) === 'a')
