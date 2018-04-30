@@ -46,7 +46,6 @@ package es.core
             {
                 throw new Error( "Invalid parameter." );
             }
-            this.addEventListener(ElementEvent.ADD,this.commitPropertyAndUpdateSkin);
         }
 
         /**
@@ -224,7 +223,7 @@ package es.core
             {
                 var str:String = render.fetch();
                 if( str )element.html( str );
-                
+
             }else
             {
                 var children:Array = this.children;

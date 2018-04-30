@@ -1,23 +1,69 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <s:Skin xmlns:s="es.core" class="navigate">
 
+     <s:Metadata>[HostComponent("es.components.Navigate")]</s:Metadata>
+
+    <![CDATA[
+
+        override protected function initializing()
+        {
+            var hostComponent:Navigate = this.hostComponent;
+            var dataSource:DataSource =  hostComponent.dataSource;
+            var dataProfile:String =  hostComponent.dataProfile();
+            var container = this.container;
+            container.variable( dataProfile, [] );
+
+            var current = hostComponent.current;
+            if( typeof current !== "function" )
+            {
+                var key = current;
+                current = function(item,index){
+                    if(index==key)return true;
+                    if( item["link"] == key || item["label"] == key ) return true;
+                    return new RegExp( key ).test( item["link"] );
+                };
+            }
+
+            container.variable( "current",  current );
+            dataSource.addEventListener(DataSourceEvent.SELECT, function (event:DataSourceEvent)
+            {
+                if ( !event.waiting )
+                {
+                    container.variable( dataProfile , event.data );
+                    container.commitPropertyAndUpdateSkin();
+                }
+            });
+            dataSource.select(1);
+        }
+
+    ]]>
+
     <style>
         .navigate{
             width: 100%;
             height: 35px;
             line-height: 35px;
         }
-
-        .navigate > a{
-            margin: 5px;
-            font-size: 16px;
+        .navigate > .nav{
+            width: 1000px;
+            margin: 0px auto;
+        }
+        .navigate > .nav > li > a{
+            height: 35px;
+            padding:0px 10px;
         }
     </style>
 
-    <a href="./index.html">首页</a>
-    <a href="./person.html">个人</a>
-
-
-
+    <s:Skin id="@container" name="ul" class="nav nav-pills">
+        <s:template>
+            <:foreach name="datalist" value="item" key="link">
+                <:if condition="current(item,forIndex)">
+                   <li role="presentation" class="active"><a href="{item.link}">{item.label}</a></li>
+                <:else />
+                    <li role="presentation"><a href="{item.link}">{item.label}</a></li>
+                </:if>
+            </:foreach>
+        </s:template>
+    </s:Skin>
 
 </s:Skin>

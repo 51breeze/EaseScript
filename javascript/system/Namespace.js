@@ -24,7 +24,7 @@ Namespace.valueOf=function valueOf(){
 Namespace.toString=function toString(){
     return '[object Namespace]';
 };
-
+Namespace.prototype = Object.create( Object.prototype );
 Namespace.prototype.constructor=Namespace;
 Namespace.prototype.toString=function toString(){
     return '[object Namespace]';

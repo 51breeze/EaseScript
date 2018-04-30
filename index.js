@@ -148,11 +148,10 @@ function getRequirementsAllUsedModules( module , results, syntax, hash )
         return [];
     }
     hash[name] = true;
-
     if( module.nonglobal===true )
     {
         var isNs = module.id==="namespace";
-        var hasUsed = isNs ? module.namespaces[ module.classname ].hasUsed : module.hasUsed;
+        var hasUsed = isNs ? module.namespaces[ module.classname ].hasUsed || module.hasUsed : module.hasUsed;
         if( hasUsed && results.indexOf(module)<0 )
         {
            results.push(module);
@@ -201,7 +200,7 @@ function getModuleScriptContent( modules )
      });
     modules = systemMainClassModules.concat( modules );
     return modules.map(function (e) {
-         return e.makeContent;
+         return e.makeContent['javascript'];
     });
 }
 
@@ -212,13 +211,13 @@ function getSkinModuleStyles( modules )
     });
 }
 
-function outputFiles( bulid_path, fileSuffix, classModules ,callback )
+function outputFiles( bulid_path, fileSuffix, classModules ,callback , syntax )
 {
     for (var m in classModules)
     {
         var localModule = classModules[m];
         var isUsed = localModule.hasUsed;
-        var content = localModule.makeContent
+        var content = localModule.makeContent ? localModule.makeContent[ syntax ] : '';
         if( callback )
         {
             content = callback( localModule );
@@ -232,6 +231,28 @@ function outputFiles( bulid_path, fileSuffix, classModules ,callback )
     }
 }
 
+
+function doCompileFragmentScript( classItems , requirements , syntax , config )
+{
+    Utils.forEach( classItems , function ( classname )
+    {
+        if( requirements.indexOf( classname ) < 0 )
+        {
+            requirements.push( classname );
+            var module = Maker.getLoaclAndGlobalModuleDescription( classname );
+            if (module.nonglobal === true)
+            {
+                var stack = Maker.makeModuleByName( classname );
+                Compile(syntax, stack, stack.description, config);
+                if( stack.description.useExternalClassModules && stack.description.useExternalClassModules.length > 0 )
+                {
+                    doCompileFragmentScript( stack.description.useExternalClassModules, requirements ,  syntax , config);
+                }
+            }
+        }
+    });
+}
+
 function compileFragmentScript(script, fullclassname, syntax, config, requirements )
 {
     var fragment = {};
@@ -241,21 +262,9 @@ function compileFragmentScript(script, fullclassname, syntax, config, requiremen
     Compile(syntax, stack, stack.description, config);
     if( stack.description.useExternalClassModules && stack.description.useExternalClassModules.length > 0 )
     {
-        Utils.forEach( stack.description.useExternalClassModules, function ( classname )
-        {
-            if( requirements.indexOf( classname ) < 0 )
-            {
-                requirements.push(  classname );
-                var module = Maker.getLoaclAndGlobalModuleDescription( classname );
-                if (module.nonglobal === true)
-                {
-                    var stack = Maker.makeModuleByName( classname );
-                    Compile(syntax, stack, stack.description, config);
-                }
-            }
-        });
+        doCompileFragmentScript( stack.description.useExternalClassModules , requirements , syntax, config);
     }
-    return stack.description.rootContent.join("");
+    return stack.description.rootContent[syntax].join("");
 }
 
 function createServerView(rootpath, module, syntax, config )
@@ -297,11 +306,6 @@ const builder={
     {
         Utils.info("building javascript start...");
 
-        for( var s in systemMainClassModules )
-        {
-            Compile("javascript", Maker.makeModuleByName(systemMainClassModules[s].fullclassname), systemMainClassModules[s], config);
-        }
-
         var less = require('less');
         var themes = require('./style/themes.js');
         var lessPath = PATH.resolve(config.root_path, './style/');
@@ -320,12 +324,6 @@ const builder={
             var usedModules = [];
             var outputname = bootstrap.fullclassname.toLowerCase();
             var hashMap = Compile("javascript", Maker.makeModuleByName( bootstrap.fullclassname ) , bootstrap, config);
-
-            if( bootstrap.defineMetaTypeList && bootstrap.defineMetaTypeList.View )
-            {
-                outputname = bootstrap.defineMetaTypeList.View.param.source.toLowerCase();
-            }
-
             var usedModules = getRequirementsAllUsedModules( bootstrap, usedModules, "javascript" );
 
             if( !client )
@@ -333,10 +331,9 @@ const builder={
                 usedModules.filter(function (e)
                 {
                     var o = e.ownerFragmentModule || e;
-                    if( o.isMakeView===true /*|| o.isSkin === true*/  )
+                    if( o.isMakeView===true )
                     {
-                        var requirements = createServerView(  view_path , e, ".html", config );
-                        mergeModules(usedModules, requirements);
+                        mergeModules(usedModules, createServerView(  view_path , e, ".html", config ) );
                     }
                     return e.nonglobal === true;
                 });
@@ -350,7 +347,7 @@ const builder={
 
             if( config.source_file ==="enable" )
             {
-                outputFiles(  Utils.getBuildPath(config, 'build.js')+"/src", ".js", systemMainClassModules.concat( usedModules ) )
+                outputFiles(  Utils.getBuildPath(config, 'build.js')+"/src", ".js",  usedModules , null, "javascript");
             }
 
             var builder = require( './javascript/builder.js');
@@ -438,11 +435,6 @@ const builder={
         var view_path = Utils.getBuildPath(config, 'build.view');
         var app_path = Utils.getBuildPath(config, 'build.application');
 
-        //编译系统模块
-        Utils.forEach(systemMainClassModules, function (module)
-        {
-            Compile("php", Maker.makeModuleByName( module.fullclassname ), module, config );
-        });
 
         //编译普通模块
         Utils.forEach(descriptions, function (module)
@@ -463,6 +455,24 @@ const builder={
              return e.nonglobal === true;
         });
 
+        /*usedModules.filter(function (e)
+        {
+            var o = e.ownerFragmentModule || e;
+            if( o.skinMaker && o.isMakeView !==true && o.isSkin === true )
+            {
+                var callback = o.skinMaker;
+                var requirements = [];
+                var content = callback(function (script) {
+                    return compileFragmentScript(script,  o.fullclassname+"php", "php", config, requirements );
+                });
+                mergeModules(usedModules, requirements);
+                var file = Utils.getResolvePath( app_path , o.fullclassname );
+                Utils.mkdir( file.substr(0, file.lastIndexOf("/") ) );
+                Utils.setContents(file+".php", content);
+            }
+            return e.nonglobal === true;
+        });*/
+
         var localModules = usedModules.filter(function (e)
         {
             return e.nonglobal === true;
@@ -474,21 +484,7 @@ const builder={
             var o = module.ownerFragmentModule || module;
             if( o.skinMaker && o.isMakeView !==true && o.isSkin === true )
             {
-                var callback = o.skinMaker;
-                var requirements = [];
-                var content = callback(function (script) {
-                    //console.log( script )
-                    return compileFragmentScript(script,  o.fullclassname+"php", "php", config, requirements );
-                });
-
-                var file = Utils.getResolvePath( app_path , o.fullclassname );
-                Utils.mkdir( file.substr(0, file.lastIndexOf("/") ) );
-                Utils.setContents(file+".php", content);
-
-                return "";
-
-                //console.log( content )
-                //process.exit();
+                //return "";
             }
 
             if( Maker.checkInstanceOf(module,"es.core.View") )
@@ -516,7 +512,7 @@ const builder={
                 code.push( "\t}\n}" );
                 return code.join("");
             }
-            return module.makeContent;
+            return module.makeContent['php'];
         });
 
         builder.javascript(config, descriptions, true);
@@ -743,13 +739,6 @@ function make( config, isGlobalConfig )
         }else
         {
             makefiles = [ file ];
-        }
-
-        //主要的类
-        for (var i in config.system_require_main_class )
-        {
-            var desc = Maker.loadModuleDescription( config.syntax, config.system_require_main_class[i], config );
-            systemMainClassModules.push( desc );
         }
 
         var i = 0;

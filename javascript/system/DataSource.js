@@ -167,6 +167,11 @@ DataSource.prototype.source=function source( resource )
         storage(this,"items", resource.slice(0) );
         storage(this,"source", resource );
         storage(this,"isRemote", false );
+        if( storage(this,'selected')===true )
+        {
+            storage(this, "grep", null);
+            this.select();
+        }
     }
     //远程数据源
     else if( resource )

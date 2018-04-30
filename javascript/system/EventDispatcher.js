@@ -7,7 +7,7 @@
  * @require System,Object,Event,Internal,Reflect,Symbol
  */
 
-var storage=Internal.createSymbolStorage( Symbol('event') );
+var storage=Internal.createSymbolStorage( Symbol('EventDispatcher') );
 function EventDispatcher( target )
 {
     if( !(this instanceof EventDispatcher) )
@@ -123,7 +123,7 @@ EventDispatcher.prototype.removeEventListener=function removeEventListener(type,
  */
 EventDispatcher.prototype.dispatchEvent=function dispatchEvent( event )
 {
-    if( typeof event === "string" )event = new System.Event( event );
+    //if( typeof event === "string" )event = new System.Event( event );
     if( !System.is(event,Event) )throw new TypeError('Invalid event');
     var target = storage(this,'target') || this;
     if( target instanceof EventDispatcher && target !== this )

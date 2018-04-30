@@ -6,7 +6,7 @@
  * @author Jun Ye <664371281@qq.com>
  * @require Object,Symbol,TypeError,Reflect
  */
-var storage=Internal.createSymbolStorage( Symbol('iterator') );
+var storage=Internal.createSymbolStorage( Symbol('Iterator') );
 var has = $Object.prototype.hasOwnProperty;
 function Iterator( target )
 {

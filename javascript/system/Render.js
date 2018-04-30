@@ -6,7 +6,7 @@
  * @author Jun Ye <664371281@qq.com>
  */
 
-var syntax_regexp = /^\s*(if|foreach|for|else|do|switch|case|default|break|var|function|while|code|{|})(.*)?/,
+var syntax_regexp = /^\s*(if|foreach|for|else|do|switch|case|default|break|var|function|while|{|})(.*)?/,
 call_regexp = /^([\w\.]+)\s*\(/,
 foreach_regexp  = /(\w+)\s+as\s+(\w+)(\s+(\w+))?/i;
 
@@ -109,9 +109,18 @@ function make(template, variable)
                             begin_code = true;
                             break;
                         default :
-                            code += escape( matchSyntax[1] );
+                            //code += escape( matchSyntax[1] );
+                            code += match[1];
+                            if( code.slice(-1) ===")" ){
+                                code+=';';
+                            }
                             code+='\n';
                     }
+
+                }else
+                {
+                    code += match[1];
+                    code+='\n';
                 }
             }
         }
@@ -303,10 +312,13 @@ Variable.prototype.isObject=function(val)
  * @param index
  * @returns {*}
  */
-Variable.prototype.forEach=function(item, key, index)
+Variable.prototype.forEach=function (target,callback)
 {
-    return item[key];
-};
+    var forIndex = 0;
+    Object.forEach(target, function (item,name) {
+        callback.call(this,item,name,forIndex++);
+    }, this);
+}
 
 /**
  * 发生错误时的返回值

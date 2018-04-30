@@ -123,7 +123,12 @@ Object.merge=function merge()
 Object.forEach=function forEach(object,callback,thisObject)
 {
     if( object == null || object instanceof System.Class || typeof callback !== "function" )return;
-    var isIterator = System.is(object, System.getDefinitionByName( Internal.iteratorClass ) );
+    var isIterator = false;
+    if( System.hasClass( Internal.iteratorClass ) )
+    {
+        isIterator = System.is(object, System.getDefinitionByName( Internal.iteratorClass ) );
+    }
+
     if( isIterator )
     {
         var current;

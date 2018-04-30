@@ -36,7 +36,7 @@ package es.components
                     throw new TypeError("skinClass is not assign");
                 }
                 var skin = (Skin)new skinClass( this );
-                skin.addEventListener( ElementEvent.ADD, this.display, false, 0, this );
+                //skin.addEventListener( ElementEvent.ADD, this.display, false, 0, this );
                 this._skin = skin;
             }
             return this._skin;
@@ -80,7 +80,7 @@ package es.components
                         event.property = 'skinClass';
                         this.dispatchEvent(event);
                     }
-                    skin.addEventListener( ElementEvent.ADD, this.display, false, 0, this );
+                    //skin.addEventListener( ElementEvent.ADD, this.display, false, 0, this );
                 }
             }
         }

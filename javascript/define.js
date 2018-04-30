@@ -79,6 +79,13 @@ System.getDefinitionByName = function getDefinitionByName(name) {
     throw new TypeError('"' + name + '" is not define');
 };
 
+System.hasClass = function hasClass(name) {
+
+    var context = getContext(name);
+    name = getClassName(name);
+    return has.call(context,name);
+};
+
 var map=['System','Class','Interface','Namespace','Reflect','Object','JSON','Array','String','EventDispatcher','TypeError','Error','Symbol','Element'];
 
 /**
