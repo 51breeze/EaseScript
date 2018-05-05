@@ -148,9 +148,9 @@ final class System
 
     static function window()
     {
-        static $doc = null;
-        if( $doc===null ) $doc = new \Document();
-        return $doc;
+        static $win = null;
+        if( $win===null ) $win = new \Window();
+        return $win;
     }
 
     static function when()
