@@ -316,7 +316,7 @@ const builder={
         };
         var len = descriptions.length;
         var index = 0;
-        var view_path = Utils.getBuildPath(config, 'build.view');
+        var view_path = Utils.getBuildPath(config, 'build.html');
 
         for( ;index<len;index++ )
         {
@@ -434,12 +434,12 @@ const builder={
         var hash = {};
         var view_path = Utils.getBuildPath(config, 'build.view');
         var app_path = Utils.getBuildPath(config, 'build.application');
-
+        var hashMap=[];
 
         //编译普通模块
         Utils.forEach(descriptions, function (module)
         {
-            Compile("php", Maker.makeModuleByName(module.fullclassname), module, config);
+            hashMap = Compile("php", Maker.makeModuleByName(module.fullclassname), module, config);
             getRequirementsAllUsedModules( module, usedModules , "php", hash );
         });
 
@@ -449,29 +449,29 @@ const builder={
              var o = e.ownerFragmentModule || e;
              if( o.isMakeView===true /*|| o.isSkin === true*/ )
              {
-                 var requirements = createServerView( o.isMakeView ? view_path : app_path , e, "php", config );
-                 mergeModules(usedModules, requirements);
+                // var require = createServerView( o.isMakeView ? view_path : app_path , e, "php", config );
+                // mergeModules(usedModules, require);
              }
              return e.nonglobal === true;
         });
 
-        /*usedModules.filter(function (e)
+        usedModules.filter(function (e)
         {
             var o = e.ownerFragmentModule || e;
-            if( o.skinMaker && o.isMakeView !==true && o.isSkin === true )
+            if( o.skinMaker && o.isMakeView ===true && o.isSkin === true )
             {
                 var callback = o.skinMaker;
-                var requirements = [];
+                var require = [];
                 var content = callback(function (script) {
-                    return compileFragmentScript(script,  o.fullclassname+"php", "php", config, requirements );
+                    return compileFragmentScript(script,  o.fullclassname+"php", "php", config, require );
                 });
-                mergeModules(usedModules, requirements);
+                mergeModules(usedModules, require);
                 var file = Utils.getResolvePath( app_path , o.fullclassname );
                 Utils.mkdir( file.substr(0, file.lastIndexOf("/") ) );
                 Utils.setContents(file+".php", content);
             }
             return e.nonglobal === true;
-        });*/
+        });
 
         var localModules = usedModules.filter(function (e)
         {
@@ -482,9 +482,8 @@ const builder={
         outputFiles( app_path, ".php", localModules , function (module) {
 
             var o = module.ownerFragmentModule || module;
-            if( o.skinMaker && o.isMakeView !==true && o.isSkin === true )
-            {
-                //return "";
+            if( o.isMakeView ===true ){
+               // return "";
             }
 
             if( Maker.checkInstanceOf(module,"es.core.View") )
@@ -510,14 +509,38 @@ const builder={
                 code.push( "\t\tob_end_clean();\n" );
                 code.push( "\t\techo $content;\n" );
                 code.push( "\t}\n}" );
-                return code.join("");
+                //return code.join("");
             }
             return module.makeContent['php'];
         });
 
+        var phpBuilder = require( './php/builder.js');
+        var requirements = usedModules.filter(function (a) {
+             return !(a.nonglobal === true);
+        });
+        requirements= requirements.map(function (a) {
+              return a.type;
+        });
+        phpBuilder( config.build_path, config, [], requirements, hashMap);
         builder.javascript(config, descriptions, true);
     }
 };
+
+function getViewDisplay()
+{
+    var code = [];
+    code.push( "\tpublic function display($filename)\n\t{\n" );
+    code.push( "\t\tob_start();\n" );
+    code.push( "\t\t$assignments = (array)$this->getAssignments();\n" );
+    code.push( "\t\textract( $assignments , EXTR_IF_EXISTS );\n" );
+    code.push( "\t\tinclude $filename.'.php';\n" );
+    code.push( "\t\t$content = ob_get_contents();\n" );
+    code.push( "\t\tob_end_clean();\n" );
+    code.push( "\t\techo $content;\n" );
+    code.push( "\t}" );
+    return code.join("");
+}
+
 
 /**
  * 构建工程结构

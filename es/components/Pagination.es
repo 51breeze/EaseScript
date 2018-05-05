@@ -117,7 +117,7 @@ package es.components
          * @param callback
          * @returns {void}
          */
-        public function set url( value ):void
+        public function set url( value:* ):void
         {
            if( this._url !== value )
            {
@@ -133,7 +133,7 @@ package es.components
          * 获取一个返回url地址的回调函数
          * @returns {*}
          */
-        public function get url()
+        public function get url():*
         {
             return this._url;
         };
@@ -338,9 +338,9 @@ package es.components
             var current = this.current;
             var totalPage = this.totalPage;
             var pageSize = this.pageSize;
-            var link = this.link;
+            var link:Number = this.link;
             var url = this.url;
-            var offset = Math.max(current - Math.ceil(link / 2), 0);
+            var offset:Number = Math.max(current - Math.ceil(link / 2), 0);
             if( typeof url !== "function" )
             {
                 var linkUrl = url;

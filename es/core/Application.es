@@ -5,7 +5,7 @@ package es.core
    {
        public function Application()
        {
-           super(document);
+           super( document );
        }
 
        /**

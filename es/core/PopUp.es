@@ -378,9 +378,9 @@ package es.core
                 if( name in skin )
                 {
                     var btn:Skin = skin[name] as Skin;
-                    btn.addEventListener(MouseEvent.CLICK, (function (name) {
+                    btn.addEventListener(MouseEvent.CLICK, (function (actionName) {
                         return function (e:MouseEvent) {
-                            self.action(name);
+                            self.action(actionName);
                         };
                     })(name));
                 }
