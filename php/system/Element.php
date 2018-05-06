@@ -72,7 +72,6 @@ class Element extends EventDispatcher implements \ArrayAccess,\Countable
         return $element instanceof HTMLElement;
     }
 
-
     public $length = 0;
     private $items=array();
     public function __construct( $selector, $context=null )
@@ -231,6 +230,10 @@ class Element extends EventDispatcher implements \ArrayAccess,\Countable
     public function concat(){}
     public function indexOf(){}
 
+    public function toString()
+    {
+        return isset( $this->items[0] ) ? $this->items[0]->outerHTML : '';
+    }
 
     public function count()
     {

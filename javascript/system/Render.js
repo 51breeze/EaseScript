@@ -9,7 +9,6 @@
 var syntax_regexp = /^\s*(if|foreach|for|else|do|switch|case|default|break|var|function|while|{|})(.*)?/,
 call_regexp = /^([\w\.]+)\s*\(/,
 foreach_regexp  = /(\w+)\s+as\s+(\w+)(\s+(\w+))?/i;
-
 function escape( str )
 {
     return str.replace(/"/g, '\\"');

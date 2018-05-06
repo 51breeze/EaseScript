@@ -36,10 +36,13 @@ class Document extends HTMLElement
 
     public function __get($name)
     {
-         if( $name ==="outerHTML" ) {
+         if( $name ==="outerHTML" )
+         {
              return $this->documentElement->outerHTML;
          }
-         if( $name ==="innerHTML" ) {
+
+         if( $name ==="innerHTML" )
+         {
              return $this->documentElement->innerHTML;
          }
          if( isset($this->$name) )
@@ -47,6 +50,20 @@ class Document extends HTMLElement
              return $this->$name;
          }else{
              return null;
+         }
+    }
+
+    public function __set($name, $value )
+    {
+         if( $name ==="innerHTML" )
+         {
+             return $this->documentElement->innerHTML = $value;
+         }
+         if( isset($this->$name) )
+         {
+             return $this->$name = $value;
+
+         }else{
          }
     }
 

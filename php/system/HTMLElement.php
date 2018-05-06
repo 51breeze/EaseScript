@@ -22,42 +22,42 @@ class HTMLElement extends Node
 
     public function getElementByName( $name )
     {
-         if( !is_string($name) )return false;
-         $len = count( $this->children );
-         $i = 0;
-         $items = array();
-         for(;$i<$len;$i++)
-         {
-             $child = $this->children[$i];
-             if( strcasecmp($child->nodeName ,$name)===0 )
-             {
-                 array_push($items, $child);
-             }
-         }
-         return $items;
+        if( !is_string($name) )return false;
+        $len = count( $this->children );
+        $i = 0;
+        $items = array();
+        for(;$i<$len;$i++)
+        {
+            $child = $this->children[$i];
+            if( strcasecmp($child->nodeName ,$name)===0 )
+            {
+                array_push($items, $child);
+            }
+        }
+        return $items;
     }
-    
+
     public function getElementById( $name )
     {
-         if( !is_string($name) )return false;
-         $len = count( $this->children );
-         $i = 0;
-         for(;$i<$len;$i++)
-         {
-             $child = $this->children[$i];
-             if( strcasecmp($child->id ,$name)===0 )
-             {
+        if( !is_string($name) )return false;
+        $len = count( $this->children );
+        $i = 0;
+        for(;$i<$len;$i++)
+        {
+            $child = $this->children[$i];
+            if( strcasecmp($child->id ,$name)===0 )
+            {
                 return $child;
-             }
-         }
-         return null;
+            }
+        }
+        return null;
     }
 
     private $children=array();
 
     public function childNodes()
     {
-         return array_slice( $this->children, 0);
+        return array_slice( $this->children, 0);
     }
 
     public function addChild( Node $child )
@@ -128,12 +128,16 @@ class HTMLElement extends Node
         if( $this->parseHtml===true )
         {
             $this->parseHtml = false;
-            $html = '';
-            foreach ($this->children as $item)
+            $html = $this->innerHTML;
+            if( !$this->hasInnerHTML )
             {
-                $html .= $item->toString();
+                $html = '';
+                foreach ($this->children as $item)
+                {
+                    $html .= $item->toString();
+                }
+                $this->innerHTML = $html;
             }
-            $this->innerHTML = $html;
 
             $attr = '';
             $attrStr = System::serialize($this->attr, 'attr');
@@ -144,9 +148,16 @@ class HTMLElement extends Node
             if( $nodename === 'link' || $nodename === 'meta' || $nodename==="input" )
             {
                 $this->outerHTML = '<' . $this->nodeName . $attr . ' />';
+                $this->innerHTML = '';
 
             } else
             {
+                if( ($nodename ==="html" || $nodename==="head" || $nodename==="body" ) && preg_match('/<\/'.$nodename.'>$/', $html ) )
+                {
+                    $this->outerHTML = $html;
+                    return $html;
+                }
+
                 $left = '<' . $this->nodeName . $attr . '>';
                 $right = '</' . $this->nodeName . '>';
                 if (!$html) $html = $this->content;
@@ -156,7 +167,6 @@ class HTMLElement extends Node
                 }
                 $this->outerHTML = $html;
             }
-
         }
         return $this->outerHTML;
     }
@@ -172,7 +182,7 @@ class HTMLElement extends Node
                 $this->__toString();
                 return $this->outerHTML;
             case 'attr' :
-                 return $this->attr;
+                return $this->attr;
             case 'html' :
             case 'documentElement' :
                 return System::document()->__get('documentElement');
@@ -185,14 +195,19 @@ class HTMLElement extends Node
         return parent::__get($name);
     }
 
+    private $hasInnerHTML = false;
+
     public function __set($name, $value)
     {
         switch ($name)
         {
             case 'innerHTML' :
-                return $this->setInnerHTML( $value );
-            case 'outerHTML' :
-                return $this->setInnerHTML( $value ,  true );
+                $this->children=[];
+                $this->innerHTML = $value;
+                $this->parseHtml=true;
+                $this->hasInnerHTML = true;
+                return $value;
+             //  return $this->setInnerHTML( $value );
             case 'attr' :
                 if( is_object($value) )
                 {

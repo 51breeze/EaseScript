@@ -114,7 +114,18 @@ class Render extends Object
                             case 'for' :
                                 if( isset($matchSyntax[2]) && !empty( $matchSyntax[2] ) )
                                 {
-                                    $matchSyntax[2] = preg_replace('/([\(\,\;])\s*([a-zA-Z_]+[\w+]?)/i','\\1\$\\2', $matchSyntax[2] );
+                                    if( $syntax ==="for"  )
+                                    {
+                                        $matchSyntax[2] = preg_replace_callback('/\((.*?)\;(.*?)\;(.*?)\)/i', function ($a) {
+                                            $a[1] = preg_replace('/^var\s+/', '', trim($a[1]));
+                                            $a = preg_replace('/(\b[a-zA-Z_]+[\w+]?)/i', '\$\\1', array($a[1], $a[2], $a[3]));
+                                            return '(' . implode(";", $a) . ')';
+                                        }, $matchSyntax[2]);
+
+                                    }else
+                                    {
+                                        $matchSyntax[2] = preg_replace('/(^|[\(\,\;])\s*([a-zA-Z_]+\w+)/i','\\1\$\\2',$matchSyntax[2] );
+                                    }
                                 }
                                 $code .= $matchSyntax[1].( $matchSyntax[2] ? $matchSyntax[2] : '');
                                 $code.=PHP_EOL;
