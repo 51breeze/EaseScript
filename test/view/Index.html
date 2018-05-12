@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<s:View xmlns:s="es.core"  xmlns:c="es.components">
+<s:View name="html" xmlns:s="es.core"  xmlns:c="es.components" xmlns:b="@">
     <![CDATA[
         import es.core.PopUp;
         import es.skins.PopUpSkin;
+        import es.core.Display;
+        import BaseApplication;
+
+        [RunPlatform('client')]
         override protected function initializing()
         {
             PopUp.defaultOptions.skinClass =PopUpSkin;
@@ -13,15 +17,33 @@
                 });
             });
         }
+
     ]]>
 
+    <head>
+        <title>{title}</title>
+    </head>
 
     <body>
-        <c:Navigate skinClass="es.skins.NavigateSkin"></c:Navigate>
-        <button type="button" class="btn btn-success" style="width: 100px;">点 我</button>
+        <c:Navigate id="@navigate" skinClass="es.skins.NavigateSkin"  ></c:Navigate>
+
         <div>
-            <h1>这里是内容</h1>
-            <c:DataGrid source="http://working.com/json.php" skinClass="es.skins.DataGridSkin" width="500">
+            <button type="button" class="btn btn-success" style="width: 100px;">点 我</button>
+        </div>
+
+        <s:Skin>
+            <s:template>
+                <:for condition="var i=0; i lt 5; i++">
+                    <div>
+                        ssss ==============yejun {i}
+                    </div>
+                </:for>
+            </s:template>
+        </s:Skin>
+
+        <div>
+            <h1>这里是内容9999999999   {context.title} </h1>
+            <c:DataGrid source="http://working.com/json.php" skinClass="es.skins.DataGridSkin" width="500" >
                 <c:dataSource>
                     <c:dataType>@Http.TYPE_JSONP</c:dataType>
                 </c:dataSource>

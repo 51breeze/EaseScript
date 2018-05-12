@@ -549,23 +549,38 @@ function getViewDisplay()
  */
 function buildProject(dir, base)
 {
-    var dirpath = PATH.isAbsolute(dir.path) ? dir.path : PATH.resolve(base, dir.path, dir.name);
-    if (!fs.existsSync(dirpath)) {
-        dirpath = Utils.mkdir( dirpath );
-        if (typeof dir.bootstrap === "string" && dir.syntax) {
-            //引用一个模板
-            var file = PATH.resolve(config.root_path, dir.syntax, dir.bootstrap + dir.suffix);
-            if (Utils.isFileExists(file)) {
-                fs.linkSync(file, PATH.resolve(dirpath, dir.bootstrap + dir.suffix));
+    var dirpath = base;
+    if( dir.__build !== true )
+    {
+        var dirpath = PATH.isAbsolute(dir.path) ? PATH.resolve(dir.path, dir.name) : PATH.resolve(base, dir.path, dir.name);
+        if (!fs.existsSync(dirpath)) {
+            dirpath = Utils.mkdir(dirpath);
+            if (typeof dir.bootstrap === "string" && dir.syntax) {
+                //引用一个模板
+                var file = PATH.resolve(config.root_path, dir.syntax, dir.bootstrap + dir.suffix);
+                if (Utils.isFileExists(file)) {
+                    fs.linkSync(file, PATH.resolve(dirpath, dir.bootstrap + dir.suffix));
+                }
             }
         }
+        dir.path = dirpath.replace(/\\/g, '/');
+        dir.name = PATH.basename(dirpath);
+        dir.__build = true;
     }
 
-    dir.path = dirpath.replace(/\\/g,'/');
-    dir.name = PATH.basename(dirpath);
-
-    if (dir.child) {
-        for (var i in dir.child) {
+    if (dir.child)
+    {
+        for (var i in dir.child)
+        {
+            if( dir.child[i].path.charAt(0) === "@" )
+            {
+                var refName = dir.child[i].path.substr(1);
+                if( !dir.child.hasOwnProperty( refName ) ){
+                    throw new ReferenceError("Invalid reference path name for '"+refName+"'");
+                }
+                buildProject(dir.child[ refName ], dirpath);
+                dir.child[i].path = dir.child[ refName ].path;
+            }
             buildProject(dir.child[i], dirpath);
         }
     }
@@ -620,9 +635,8 @@ function getConfigure(config)
 
     config.debug = config.debug==='enable' ? 'on' : 'off';
 
-    //工作的目录
+    //工程目录
     var project_path = PATH.resolve( config.project_path );
-
     if( !fs.existsSync(project_path) )
     {
         fs.mkdirSync( project_path );
@@ -630,7 +644,6 @@ function getConfigure(config)
 
     //默认配置文件
     var makefile = PATH.resolve(project_path,'project.conf');
-
     if( !Utils.isFileExists( makefile ) || config.clean===true )
     {
         //程序的路径
@@ -645,18 +658,19 @@ function getConfigure(config)
         config.project.name = PATH.basename(project_path);
 
         //构建项目路径
-        config.build_path = PATH.resolve(config.build_path);
-        config.build.path = config.build_path;
-        config.build.name = PATH.basename(config.build_path);
-        if (!fs.existsSync(config.build_path)) {
-            fs.mkdirSync(config.build_path);
+        if( config.has_output_path )
+        {
+            config.build_path = PATH.resolve(config.build_path);
+            config.build.path = config.build_path;
+            config.build.name = '';
         }
 
         //构建输出目录
-        buildProject(config.build, config.build_path);
+        buildProject(config.build, config.project_path );
+        config.build_path = config.build.path;
 
         //构建工程目录
-        buildProject(config.project, config.project_path);
+        //buildProject(config.project, config.project_path);
 
         //生成一个默认的配置文件
         Utils.setContents(makefile, configToJson( config , 1 ) );

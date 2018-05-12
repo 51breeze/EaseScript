@@ -44,6 +44,8 @@ program
 
 program.parse(process.argv);
 
+var has_output_path = !!program.output;
+
 //输出路径
 if( !program.output )
 {
@@ -60,6 +62,7 @@ var config = {
     'animate': program.animate=="enable", //是否需要启用CSS3动画库
     'font': program.font=="enable", //是否需要启用CSS字体库
     'compat_version':program.compatVersion || {ie:9},      //要兼容的平台 {'ie':8,'chrome':32.5}
+    'has_output_path': has_output_path,
     'build_path': program.output,
     'project_path':program.path,
     'skin_file_suffix': '.'+program.skinFileSuffix,
