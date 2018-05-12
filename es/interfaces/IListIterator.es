@@ -1,6 +1,6 @@
 package es.interfaces
 {
-    public interface IIterator
+    public interface IListIterator
     {
         public function seek():Object
         public function next():Object

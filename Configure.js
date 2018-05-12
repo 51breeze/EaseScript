@@ -5,24 +5,28 @@ module.exports={
         "name": "build",
         "child": {
             "js": {
-                "path": "./webroot/",
+                "path": "@webroot",
                 "name": "js",
             },
             "img": {
-                "path": "./webroot/",
+                "path": "@webroot",
                 "name": "img",
             },
             "css": {
-                "path": "./webroot/",
+                "path": "@webroot",
                 "name": "css",
             },
             "font": {
-                "path": "./webroot/",
+                "path": "@webroot",
                 "name": "fonts",
             },
             "view": {
-                "path": "./app/",
-                "name": "views",
+                "path": "@application",
+                "name": "view",
+            },
+            "html":{
+                "path":"@webroot",
+                "name":"html",
             },
             "webroot":{
                 "path":"./",

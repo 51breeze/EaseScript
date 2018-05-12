@@ -718,7 +718,7 @@ function getConfigure(config)
     config.system_lib_path_name = 'es';
     config.system_lib_path = config.root_path;
     config.system_core_class={
-        "iteratorClass":"es.interfaces.IIterator",
+        "iteratorClass":"es.interfaces.IListIterator",
     };
 
     var system_main_class = [];
@@ -734,25 +734,25 @@ function getConfigure(config)
  */
 function make( config, isGlobalConfig )
 {
-    config = getConfigure( Utils.merge(globalConfig, config || {}) );
-    if( isGlobalConfig===true )
-    {
-        globalConfig  = config;
-    }
-
-    requirements = config.requirements || (config.requirements = {});
-    config.syntax = syntaxMap[ config.syntax ] || 'javascript';
-    
-    //浏览器中的全局模块
-    if( config.browser === 'enable' )
-    {
-        var browser = require('./lib/browser.js');
-        Utils.merge(globals,browser);
-    }
-    config.globals=globals;
-    
     try
     {
+        config = getConfigure( Utils.merge(globalConfig, config || {}) );
+        if( isGlobalConfig===true )
+        {
+            globalConfig  = config;
+        }
+
+        requirements = config.requirements || (config.requirements = {});
+        config.syntax = syntaxMap[ config.syntax ] || 'javascript';
+
+        //浏览器中的全局模块
+        if( config.browser === 'enable' )
+        {
+            var browser = require('./lib/browser.js');
+            Utils.merge(globals,browser);
+        }
+        config.globals=globals;
+
         var project_path = config.project_path;
         var makedir = project_path;
         var makefiles = [];
@@ -763,6 +763,7 @@ function make( config, isGlobalConfig )
             Utils.error("Syntax "+config.syntax +" is not supported.");
         }
 
+        //如果定要编译的目录下的文件
         if( !Utils.isFileExists( file+config.suffix ) )
         {
             if( Utils.isDir( file ) )
@@ -773,7 +774,9 @@ function make( config, isGlobalConfig )
                     return PATH.extname(a) === config.suffix;
                 });
             }
-        }else
+        }
+        //指定的编译文件
+        else
         {
             makefiles = [ file ];
         }
@@ -781,15 +784,29 @@ function make( config, isGlobalConfig )
         var i = 0;
         var len = makefiles.length;
         var descriptions=[];
+        var inheritClass=[];
         for(;i<len;i++)
         {
             var classfile =PATH.basename( makefiles[i] , config.suffix );
             var _filepath = filepath(classfile, makedir );
             var classname = PATH.relative(project_path, _filepath ).replace(/\\/g,'/');
-            var desc = Maker.loadModuleDescription( config.syntax , classname, config, _filepath);
-            descriptions.push( desc );
+            if( inheritClass.indexOf(classname) < 0 )
+            {
+                var desc = Maker.loadModuleDescription(config.syntax, classname, config, _filepath);
+                descriptions.push(desc);
+                if (desc.inherit)
+                {
+                    inheritClass.push(desc.import.hasOwnProperty(desc.inherit) ? desc.import[desc.inherit] : desc.inherit);
+                }
+            }
         }
 
+        //继承的类不属于入口文件
+        descriptions = descriptions.filter(function (a) {
+            return inheritClass.indexOf( a.fullclassname ) < 0;
+        })
+
+        //开始构建
         Utils.info('Making starting ...');
         builder[ config.syntax ]( config , descriptions );
         Utils.info('Making done ...');
@@ -802,6 +819,5 @@ function make( config, isGlobalConfig )
         if( config.debug=='on')console.log( e );
     }
 }
-
 
 module.exports = make;

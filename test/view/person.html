@@ -15,11 +15,16 @@
          }
 
     ]]>
+
+    <head>
+        <title>{title}</title>
+    </head>
+
     <body>
         <c:Navigate id="@navigate" skinClass="es.skins.NavigateSkin"></c:Navigate>
         <input value="{{this.title}}" />
          <div>
-             <h1>{{message}}</h1>
+             <h1>the is {message}</h1>
              <h1>这里是内容 Person</h1>
              <c:DataGrid source="http://working.com/json.php" skinClass="es.skins.DataGridSkin">
                  <c:dataSource>
