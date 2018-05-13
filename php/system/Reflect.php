@@ -226,6 +226,38 @@ final class Reflect
 
 final static public function type($value, $typeClass)
 {
+    if( is_string($typeClass) )
+    {
+        $original = $value;
+        $flag = false;
+        switch ( strtolower($typeClass) )
+        {
+            case "integer" :
+            case "int" :
+            case "number":
+            case "uint":
+                $value = intval($value);
+                $flag = true;
+                if ( strtolower($typeClass) !== "number")
+                {
+                    if( $typeClass === "uint" && $value < 0 )throw new RangeError($original ." convert failed. can only be an unsigned Integer");
+                    if( $value > 2147483647 || $value < -2147483648)throw new RangeError($original . " convert failed. the length of overflow Integer");
+                }
+                break;
+            case "double":
+            case "float":
+                $flag = true;
+                $value = floatval($value);
+                break;
+        }
+
+        if( $flag ===true )
+        {
+            if( System::isNaN($value) ) throw new TypeError($original + " can not be converted for " . $typeClass);
+            return $value;
+        }
+    }
+
     if( $value == null || $typeClass === "Object" )return $value;
     if ( $typeClass && !\System::is($value, $typeClass) )
     {

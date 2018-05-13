@@ -35,7 +35,7 @@ package es.components
                 if( skinClass===null ){
                     throw new TypeError("skinClass is not assign");
                 }
-                var skin = (Skin)new skinClass( this );
+                var skin:Skin = (Skin)new skinClass( this );
                 //skin.addEventListener( ElementEvent.ADD, this.display, false, 0, this );
                 this._skin = skin;
             }
@@ -61,20 +61,20 @@ package es.components
          */
         public function set skinClass(value:Class):void
         {
-            var old = this._skinClass;
+            var old:Class = this._skinClass;
             if( old !== value )
             {
                 this._skinClass = value;
                 if( this.initialized )
                 {
-                    var skin = (Skin)new value( this );
+                    var skin:Skin = (Skin)new value( this );
                     this._skin = skin;
                     if( !(skin instanceof Skin) ){
                         throw new TypeError("skinClass is not Skin");
                     }
                     if( this.hasEventListener(PropertyEvent.CHANGE) )
                     {
-                        var event = new PropertyEvent(PropertyEvent.CHANGE);
+                        var event:PropertyEvent = new PropertyEvent(PropertyEvent.CHANGE);
                         event.oldValue = old;
                         event.newValue = value;
                         event.property = 'skinClass';
@@ -309,8 +309,8 @@ package es.components
          */
         protected function commitPropertyAndUpdateSkin()
         {
-            var skin = this.skin;
-            Object.forEach(properties, function (value, name){
+            var skin:Skin = this.skin;
+            Object.forEach(properties, function (value:*, name:String){
                 skin[ name ] = value;
             });
             skin.commitPropertyAndUpdateSkin();

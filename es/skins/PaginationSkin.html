@@ -10,7 +10,7 @@
        /**
          * @private
          */
-        private var _wheelTarget;
+        private var _wheelTarget:Display;
 
 
         /**
@@ -28,17 +28,17 @@
          */
         public function set wheelTarget( value:Display )
         {
-            var old = this._wheelTarget;
+            var old:Display = this._wheelTarget;
             if( old !== value && value )
             {
                 this._wheelTarget = value;
                 if (old)old.removeEventListener(MouseEvent.MOUSE_WHEEL);
                 if( value )
                 {
-                    var host = this.hostComponent;
-                    value.addEventListener(MouseEvent.MOUSE_WHEEL, function (e) {
+                    var host:Pagination = this.hostComponent;
+                    value.addEventListener(MouseEvent.MOUSE_WHEEL, function (e:MouseEvent) {
                         e.preventDefault();
-                        var page = host.current;
+                        var page:int = host.current;
                         host.current = e.wheelDelta > 0 ? page + 1 : page - 1;
                     }, false, 0, this);
                 }
@@ -47,9 +47,9 @@
 
        override protected function initializing()
        {
-            var host = this.hostComponent;
-            var profile = new RegExp( host.profile+'\\s*=\\s*(\\d+)');
-            var _wheelTarget = host.wheelTarget;
+            var host:Pagination = this.hostComponent;
+            var profile:RegExp = new RegExp( host.profile+'\\s*=\\s*(\\d+)');
+            var _wheelTarget:Display = host.wheelTarget;
             if( _wheelTarget ){
               this.wheelTarget = _wheelTarget;
             }
@@ -74,7 +74,7 @@
         {
              super.updateDisplayList();
              var hostComponent:Pagination = this.hostComponent;
-             var _radius = hostComponent.radius;
+             var _radius:int = hostComponent.radius;
              if(_radius>0)
              {
                 Element('.link' , this.element ).style('borderRadius', _radius+'px' );

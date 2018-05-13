@@ -30,22 +30,22 @@ package es.core
         /**
          * @private
          */
-        private var options={};
+        private var options:Object={};
 
         /**
          * 遮罩层的显示层级
          */
-        static public const MASK_LEVEL = 99900;
+        static public const MASK_LEVEL:int = 99900;
 
         /**
          * 窗口容器的显示层级
          */
-        static public const WINDOW_LEVEL = 99910;
+        static public const WINDOW_LEVEL:int = 99910;
 
         /**
          * 系统弹窗的顶级层级
          */
-        static public const TOP_LEVEL = 99999;
+        static public const TOP_LEVEL:int = 99999;
 
         /**
          * 遮罩层实例对象
@@ -55,7 +55,7 @@ package es.core
         /**
          * 默认配置选项
          */
-        static public var defaultOptions={
+        static public var defaultOptions:Object={
             "profile":{"titleText":"提示"},
             "disableScroll":false,
             "callback":null,
@@ -124,14 +124,14 @@ package es.core
         /**
          * @pirvate
          */
-        static private var _disableScroll=false;
+        static private var _disableScroll:Boolean=false;
 
         /**
          * 禁用滚动条
          */
         static private function disableScroll()
         {
-            var root  = getRoot();
+            var root:Element  = getRoot();
             _disableScroll = true;
             root.style("overflowX", "hidden");
             root.style("overflowY", "hidden");
@@ -145,7 +145,7 @@ package es.core
             if( _disableScroll===true )
             {
                 _disableScroll = false;
-                var root  = getRoot();
+                var root:Element  = getRoot();
                 root.style("overflowX", "auto");
                 root.style("overflowY", "auto");
             }
@@ -175,13 +175,13 @@ package es.core
                     Element.createAnimationStyleSheet("maskFadeIn", {"from":{"opacity":0}, "to": {"opacity":style.opacity}});
                     style.animation="maskFadeIn "+style.fadeIn+"s forwards";
                 }
-                var win = getWindow();
-                var root  = getRoot();
+                var win:Element = getWindow();
+                var root:Element  = getRoot();
                 var elem:Element = new Element('<div />');
                 elem.style("cssText", System.serialize(style,"style") );
                 root.addChild(elem);
                 var resize:Function=function(){
-                    var height = win.height();
+                    var height:int = win.height();
                     elem.height( height + Math.max( win.scrollHeight()-height,0) );
                 };
                 win.addEventListener(Event.RESIZE, resize);
@@ -310,12 +310,12 @@ package es.core
             if( maskInstance )maskInstance.hide();
             if( timeoutId )clearTimeout(timeoutId);
             enableScroll();
-            var options = this.options;
-            var animation = options.animation;
-            var skin = this.skin;
+            var options:Object = this.options;
+            var animation:Object = options.animation;
+            var skin:Skin = this.skin;
             if( !flag && animation && animation.enabled )
             {
-                var anHidden = animation.hidden;
+                var anHidden:Object = animation.hidden;
                 skin.style("animation", anHidden.name+" "+anHidden.duration+"s "+anHidden.timing+" "+anHidden.delay+"s "+anHidden.fillMode);
                 setTimeout(function () {
                     skin.visible=false;
@@ -332,11 +332,11 @@ package es.core
          */
         protected function position()
         {
-            var opt = this.options;
-            var skin = this.skin;
-            var win = getWindow();
-            var offsetX = opt.offsetX || 0;
-            var offsetY = opt.offsetY || 0;
+            var opt:Object = this.options;
+            var skin:Skin = this.skin;
+            var win:Element = getWindow();
+            var offsetX:int =(int)opt.offsetX;
+            var offsetY:int =(int)opt.offsetY;
             switch ( opt.horizontal )
             {
                 case "left" :
@@ -370,22 +370,22 @@ package es.core
             super.initializing();
             var skin:Skin = this.skin;
             var bottons:Array = ["cancel","submit","close"];
-            var i=0;
-            var len = bottons.length;
-            var self = this;
+            var i:int=0;
+            var len:int = bottons.length;
+            var self:PopUp = this;
             for(;i<len;i++){
                 var name:String = bottons[i] as String;
                 if( name in skin )
                 {
                     var btn:Skin = skin[name] as Skin;
-                    btn.addEventListener(MouseEvent.CLICK, (function (actionName) {
+                    btn.addEventListener(MouseEvent.CLICK, (function (actionName:String) {
                         return function (e:MouseEvent) {
                             self.action(actionName);
                         };
                     })(name));
                 }
             }
-            var win = getWindow();
+            var win:Element = getWindow();
             win.addEventListener(Event.RESIZE,this.position,false,0,this);
             Element(document.body).addChild( skin.element );
         }
@@ -412,15 +412,15 @@ package es.core
             }
             this.callback = options.callback as Function;
             this.options = options;
-            var mask = options.mask;
-            var maskStyle = options.maskStyle||{};
-            var profile = options.profile as JSON;
+            var mask:Boolean = options.mask;
+            var maskStyle:Object = options.maskStyle||{};
+            var profile:Object = options.profile as JSON;
 
             //初始化皮肤对象
             this.display();
 
             //设置皮肤元素属性
-            Object.forEach(profile,function(value,prop)
+            Object.forEach(profile,function(value:*,prop:String)
             {
                 if( prop in skin )skin[ prop ] = value;
             });
@@ -452,11 +452,11 @@ package es.core
 
             //应用效果
             skin.visible=true;
-            var animation = options.animation;
-            var timeout = options.timeout * 1000;
+            var animation:Object = options.animation;
+            var timeout:int = options.timeout * 1000;
             if( animation.enabled )
             {
-                var anShow = animation.show;
+                var anShow:Boolean = animation.show;
                 skin.style("animation", anShow.name+" "+anShow.duration+"s "+anShow.timing+" "+anShow.delay+"s "+anShow.fillMode);
                 timeout = ( options.timeout+anShow.delay+anShow.duration )*1000;
             }
@@ -464,7 +464,7 @@ package es.core
             //定时关闭窗体
             if( options.timeout > 0 )
             {
-                var self = this;
+                var self:PopUp = this;
                 timeoutId = setTimeout(function () {
                     self.action("close");
                 }, timeout );

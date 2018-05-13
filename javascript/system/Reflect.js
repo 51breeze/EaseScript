@@ -260,6 +260,36 @@ Reflect.has=function has(scope, target, propertyKey)
 
 Reflect.type=function type(value, typeClass)
 {
+    if( typeof typeClass === "string" )
+    {
+        var original = value;
+        var flag = false;
+        switch (typeClass.toLowerCase())
+        {
+            case "integer" :
+            case "int" :
+            case "number":
+            case "uint":
+                flag = true;
+                value = parseInt(value);
+                if (typeClass.toLowerCase() !== "number") {
+                    if (typeClass === "uint" && value < 0)throw new System.RangeError(original + " convert failed. can only be an unsigned Integer");
+                    if (value > 2147483647 || value < -2147483648)throw new System.RangeError(original + " convert failed. the length of overflow Integer");
+                }
+                break;
+            case "double":
+            case "float":
+                flag = true;
+                value = parseFloat(value);
+                break;
+        }
+        if( flag )
+        {
+            if (isNaN(value))throw new System.TypeError(original + " can not be converted for " + typeClass);
+            return value;
+        }
+    }
+
     if( value == null || typeClass === System.Object )return value;
     if ( typeClass && !System.is(value, typeClass) )
     {

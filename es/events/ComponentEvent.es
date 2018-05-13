@@ -9,12 +9,12 @@ package es.events
     import es.components.Component;
     public class ComponentEvent extends Event
     {
-        static public const INITIALIZING = 'componentInitializing';
-        static public const INITIALIZED  = 'componentInitialized';
-        static public const INSTALLING   ='componentInstalling';
-        static public const UPDATE_DISPLAY_LIST ='componentUpdateDisplayList';
+        static public const INITIALIZING:String = 'componentInitializing';
+        static public const INITIALIZED:String  = 'componentInitialized';
+        static public const INSTALLING:String   ='componentInstalling';
+        static public const UPDATE_DISPLAY_LIST:String ='componentUpdateDisplayList';
         public var hostComponent:Component=null;
-        public function ComponentEvent(type, bubbles=true, cancelable=true)
+        public function ComponentEvent(type:String, bubbles:Boolean=true, cancelable:Boolean=true)
         {
             super(type, bubbles, cancelable);
         };

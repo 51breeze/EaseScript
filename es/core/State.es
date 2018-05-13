@@ -31,7 +31,8 @@ package es.core {
             return this._stateGroup;
         }
 
-        public function includeIn(value) {
+        public function includeIn(value:Object):Boolean
+        {
             return value === this._name || this._stateGroup.indexOf(value) >= 0;
         }
     }

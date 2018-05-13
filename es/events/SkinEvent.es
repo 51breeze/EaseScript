@@ -10,12 +10,12 @@ package es.events
     import es.core.State;
     public class SkinEvent extends Event
     {
-        static public const CREATE_CHILDREN_COMPLETED ='createChildrenCompleted';
-        static public const INTERNAL_UPDATE_STATE ='internalUpdateState';
+        static public const CREATE_CHILDREN_COMPLETED:String ='createChildrenCompleted';
+        static public const INTERNAL_UPDATE_STATE:String ='internalUpdateState';
         public var parent:IDisplay;
         public var child:IDisplay;
         public var state:State;
-        public function SkinEvent(type, bubbles=true, cancelable=true)
+        public function SkinEvent(type:String, bubbles:Boolean=true, cancelable:Boolean=true)
         {
             super(type, bubbles, cancelable);
         };

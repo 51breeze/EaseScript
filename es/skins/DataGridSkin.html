@@ -11,8 +11,8 @@
        {
             super.updateDisplayList();
             var hostComponent:DataGrid = this.hostComponent;
-            var radius= hostComponent.radius+'px';
-            var table =  this.element;
+            var radius:String= hostComponent.radius+'px';
+            var table:Element =  this.element;
             table.style('borderRadius', radius );
             Element('thead > tr:first-child >th:first-child' , table).style('borderTopLeftRadius',radius );
             Element('thead > tr:first-child >th:last-child' , table).style('borderTopRightRadius',radius );
@@ -33,7 +33,7 @@
             head.variable( hostComponent.columnProfile(), hostComponent.columns );
             pagination.dataSource = dataSource;
 
-            var _wheelTarget = hostComponent.wheelTarget;
+            var _wheelTarget:Display = hostComponent.wheelTarget;
             if( !_wheelTarget ){
                  _wheelTarget = this.foot;
             }

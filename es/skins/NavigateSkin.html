@@ -10,14 +10,14 @@
             var hostComponent:Navigate = this.hostComponent;
             var dataSource:DataSource =  hostComponent.dataSource;
             var dataProfile:String =  hostComponent.dataProfile();
-            var container = this.container;
+            var container:Skin = this.container;
             container.variable( dataProfile, [] );
 
-            var current = hostComponent.current;
+            var current:* = hostComponent.current;
             if( typeof current !== "function" )
             {
-                var key = current;
-                current = function(item,index){
+                var key:* = current;
+                current = function(item:Object,index:*){
                     if(index==key)return true;
                     if( item["link"] == key || item["label"] == key ) return true;
                     return new RegExp( key ).test( item["link"] );

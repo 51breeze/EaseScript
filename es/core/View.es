@@ -17,9 +17,9 @@ package es.core
         /**
          * 字符集常量值
          */
-        public static const CHARSET_GB2312 = 'GB2312';
-        public static const CHARSET_GBK    = 'GBK';
-        public static const CHARSET_UTF8   = 'UTF-8';
+        public static const CHARSET_GB2312:String = 'GB2312';
+        public static const CHARSET_GBK:String    = 'GBK';
+        public static const CHARSET_UTF8:String   = 'UTF-8';
 
         /**
          * @private
@@ -83,7 +83,7 @@ package es.core
          */
         override public function commitPropertyAndUpdateSkin()
         {
-            var init = initialized;
+            var init:Boolean = initialized;
             super.commitPropertyAndUpdateSkin();
             if( !init && this.hasEventListener("INTERNAL_BEFORE_CHILDREN") )
             {

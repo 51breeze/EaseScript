@@ -248,6 +248,14 @@ function builder(path , config , modules, requirements , namespaceMap )
         'Boolean':true,
         'Number':true,
         'Math':true,
+        'int':true,
+        'uint':true,
+        'Integer':true,
+        'Float':true,
+        'float':true,
+        'double':true,
+        'Double':true,
+        'arguments':true,
     };
 
     var requires = ['System','Namespace','document','window','HTMLElement','Node','Element'].concat( globals.slice(0), requirements );

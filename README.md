@@ -68,3 +68,6 @@ package
 
 ```
 
+node ./bin/es -p test -C -m test
+
+

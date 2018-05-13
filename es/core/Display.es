@@ -202,7 +202,7 @@ package es.core
          * @param boolean global 是否为全局坐标
          * @returns {left,top,right,bottom,width,height}
          */
-        public function getBoundingRect( global ):Object
+        public function getBoundingRect( global:Boolean=false ):Object
         {
             return _element.getBoundingRect( global );
         };

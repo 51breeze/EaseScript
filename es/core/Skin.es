@@ -34,7 +34,7 @@ package es.core
 
                 } else
                 {
-                    var strAttr = '';
+                    var strAttr:String = '';
                     if (attr)
                     {
                         strAttr = System.serialize(attr, 'attr');
@@ -51,7 +51,7 @@ package es.core
         /**
          * @private
          */
-        private var stateGroup={};
+        private var stateGroup:Object={};
 
         /**
          * 设置状态对象
@@ -61,13 +61,13 @@ package es.core
          */
         public function set states( value:Array ):void
         {
-            var len = value.length;
-            var i=0;
-            var stateGroup=this.stateGroup;
+            var len:int = value.length;
+            var i:int=0;
+            var stateGroup:Object=this.stateGroup;
             for(;i<len;i++)
             {
                 var stateObj:State = value[i] as State;
-                var name = stateObj.name;
+                var name:String = stateObj.name;
                 if( !name )throw new TypeError('name is not define in Skin.prototype.states');
                 if( stateGroup.hasOwnProperty(name) )
                 {
@@ -80,14 +80,14 @@ package es.core
         /**
          * @private
          */
-        private var _currentState=null;
+        private var _currentState:String=null;
 
         /**
          * 设置当前状态组名
          */
         public function set currentState( name:String ):void
         {
-            var current = this._currentState;
+            var current:String = this._currentState;
             if( current !== name )
             {
                 this._currentState=name;
@@ -134,7 +134,7 @@ package es.core
          */
         public function get render():Render
         {
-            var obj = _render;
+            var obj:Render = _render;
             if( !obj )
             {
                 obj = new Render();
@@ -167,7 +167,7 @@ package es.core
          * @param name
          * @param value
          */
-        public function variable(name,value)
+        public function variable(name:String,value:*):*
         {
             invalidate = false;
             return this.render.variable( name,value );
@@ -218,7 +218,7 @@ package es.core
             if( invalidate === true )return;
             invalidate = true;
             var element:Element = this.element;
-            var render = this._render;
+            var render:Render = this._render;
             if( render )
             {
                 var str:String = render.fetch();
@@ -227,8 +227,8 @@ package es.core
             }else
             {
                 var children:Array = this.children;
-                var len = children.length;
-                var c = 0;
+                var len:int = children.length;
+                var c:int = 0;
                 var child:IDisplay;
                 for (; c < len; c++)
                 {
@@ -260,14 +260,14 @@ package es.core
          */
         private function getCurrentState():State
         {
-            var currentState = this.currentState;
+            var currentState:String = this.currentState;
             if( !currentState )return null;
             if( this.currentStateObject ){
                 return this.currentStateObject;
             }
-            var stateGroup = this.stateGroup;
+            var stateGroup:Object = this.stateGroup;
             if( stateGroup.hasOwnProperty( currentState ) )return stateGroup[ currentState ] as State;
-            for( var p in stateGroup )
+            for( var p:String in stateGroup )
             {
                 var state:State = stateGroup[p] as State;
                 if( state.includeIn(currentState) )
@@ -287,13 +287,13 @@ package es.core
             var stateGroup:State = getCurrentState();
             if( stateGroup )
             {
-                var elems = new Element('[includeIn],[excludeFrom]', this.element );
+                var elems:Element = new Element('[includeIn],[excludeFrom]', this.element );
                 //隐藏或者显示当前已设置的状态
                 elems.forEach(function ()
                 {
-                    var includeIn   = elems.property('includeIn');
-                    var excludeFrom = elems.property('excludeFrom');
-                    var _include    = true;
+                    var includeIn:String = elems.property('includeIn');
+                    var excludeFrom:String = elems.property('excludeFrom');
+                    var _include:Boolean    = true;
                     if( includeIn ){
                         _include = stateGroup.includeIn(includeIn);
                     }

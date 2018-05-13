@@ -27,7 +27,7 @@ package es.components
          */
         public function get dataSource():DataSource
         {
-            var dataSource = this._dataSource;
+            var dataSource:DataSource = this._dataSource;
             if ( dataSource === null )
             {
                 dataSource = new DataSource();
@@ -99,13 +99,13 @@ package es.components
          * @type {string}
          * @private
          */
-        private var _columnProfile = 'columns';
+        private var _columnProfile:String = 'columns';
 
         /**
          * @param profile
          * @returns {*}
          */
-        public function columnProfile(profile=null)
+        public function columnProfile(profile:String=null)
         {
             if (typeof profile === "string")
             {
@@ -119,13 +119,13 @@ package es.components
          * @type {string}
          * @private
          */
-        private var _dataProfile = 'datalist';
+        private var _dataProfile:String = 'datalist';
 
         /**
          * @param profile
          * @returns {*}
          */
-        public function dataProfile(profile=null)
+        public function dataProfile(profile:String=null)
         {
             if (typeof profile === "string") {
                 this._dataProfile = profile;

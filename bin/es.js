@@ -27,6 +27,7 @@ program
 })
 .option('-m, --mode [dev|test|production]', '构建模式是用于生产环境还是测试环境','production')
 .option('-C, --clean', '清除编译配置文件,并重新生成')
+.option('--ST, --strict-type [enable|disabled]', '启用强类型模式,对于声明的变量、属性、函数的返回值必须指定类型', 'disabled')
 .option('--cv, --compat-version [ie:number,chrome:number,...]', '需要兼容的浏览器版本,默认为所有(*)',function (val) {
    val = val.split(',');
    var item={};
@@ -73,6 +74,7 @@ var config = {
     'bootstrap':program.bootstrap,
     'themes':program.themes,
     'source_file':program.sourceFile,
+    'strictType':program.strictType === 'enable',
     'mode': program.mode=='dev' ? 1 : program.mode=='test' ? 2 : 3, //1 标准模式（开发时使用） 2 测试  3 性能模式（生产环境使用）
 };
 config.clean = program.clean

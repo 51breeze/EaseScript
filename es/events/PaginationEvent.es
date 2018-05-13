@@ -8,11 +8,11 @@ package es.events
 {
     public class PaginationEvent extends Event
     {
-        static public const CHANGE = 'paginationChange';
-        static public const REFRESH = 'paginationRefreshList';
-        public  var newValue=null;
-        public  var oldValue=null;
-        public function PaginationEvent(type, bubbles=true, cancelable=true)
+        static public const CHANGE:String = 'paginationChange';
+        static public const REFRESH:String = 'paginationRefreshList';
+        public  var newValue:*=null;
+        public  var oldValue:*=null;
+        public function PaginationEvent(type:String, bubbles:Boolean=true, cancelable:Boolean=true)
         {
             super(type, bubbles, cancelable);
         };

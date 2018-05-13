@@ -275,6 +275,17 @@ function builder(main, config , code, requirements , replacements )
         if(is)utils.merge(libs, library[prop] );
     }
 
+    var exclude = {
+        'int':true,
+        'uint':true,
+        'Integer':true,
+        'float':true,
+        'Float':true,
+        'double':true,
+        'Double':true,
+        'arguments':true,
+    };
+
     /**
      * 引用全局对象模块
      */
@@ -286,13 +297,17 @@ function builder(main, config , code, requirements , replacements )
             var name = requirements[p];
             if( requires.indexOf( name ) < 0 && ( globals.hasOwnProperty( name ) || config.globals.hasOwnProperty(name) ) )
             {
-                if( p !== "arguments" )
+                if( exclude[p] !==true )
                 {
                     requires.push( name );
                 }
             }
         }
     }
+
+    requires = requires.filter(function (a) {
+        return exclude[a]!==true;
+    });
 
     for(var prop in requires)
     {

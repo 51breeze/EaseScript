@@ -44,7 +44,7 @@ package es.components
         /**
          * @private
          */
-        private var _dataSource=null;
+        private var _dataSource:DataSource=null;
 
         /**
          * 设置需要要页的数据源
@@ -52,12 +52,12 @@ package es.components
          */
         public function set dataSource( value:DataSource ):void
         {
-            var old = this._dataSource;
+            var old:DataSource = this._dataSource;
             if( old !== value )
             {
                 this._dataSource = value;
-                var self = this;
-                value.addEventListener( DataSourceEvent.SELECT,function (e)
+                var self:Pagination = this;
+                value.addEventListener( DataSourceEvent.SELECT,function (e:DataSourceEvent)
                 {
                     if( !e.waiting )self.commitPropertyAndUpdateSkin();
                 });
@@ -80,7 +80,7 @@ package es.components
         /**
          * @private
          */
-        private var _profile='page';
+        private var _profile:String='page';
 
         /**
          * 获取分页在地址中的属性名
@@ -110,7 +110,7 @@ package es.components
         /**
          * @private
          */
-        private var _url='';
+        private var _url:*='';
 
         /**
          * 设置返回一个回调函数,用来返回一个url地址
@@ -145,7 +145,7 @@ package es.components
          */
         public function get totalPage():Number
         {
-            var dataSource = this.dataSource;
+            var dataSource:DataSource = this.dataSource;
             if( dataSource )
             {
                 return dataSource.totalPage() || 1;
@@ -159,7 +159,7 @@ package es.components
          */
         public function get totalSize():Number
         {
-            var dataSource = this.dataSource;
+            var dataSource:DataSource = this.dataSource;
             if( dataSource )
             {
                 return dataSource.totalSize();
@@ -170,7 +170,7 @@ package es.components
         /**
          * @private
          */
-        private var _pageSize = NaN;
+        private var _pageSize:Number = NaN;
 
         /**
          * 获取每页显示多少行数据
@@ -178,7 +178,7 @@ package es.components
          */
         public function get pageSize():Number
         {
-            var dataSource = this.dataSource;
+            var dataSource:DataSource = this.dataSource;
             if( dataSource )
             {
                 return dataSource.pageSize();
@@ -191,7 +191,7 @@ package es.components
             if( this._pageSize !== num )
             {
                 this._pageSize = num;
-                var dataSource = this.dataSource;
+                var dataSource:DataSource = this.dataSource;
                 if( dataSource )
                 {
                     dataSource.pageSize( num );
@@ -214,7 +214,7 @@ package es.components
          */
         public function get current():Number
         {
-            var dataSource = this.dataSource;
+            var dataSource:DataSource = this.dataSource;
             if( dataSource && this.initialized )
             {
                 return this.dataSource.current();
@@ -229,15 +229,15 @@ package es.components
         public function set current(num:Number):void
         {
             num = isNaN( this.totalSize ) ? num :  Math.min( Math.max(1, num), this.totalPage );
-            var current = this._current;
+            var current:Number = this._current;
             if( num !== current )
             {
                 this._current = num;
-                var event = new PaginationEvent(PaginationEvent.CHANGE);
+                var event:PaginationEvent = new PaginationEvent(PaginationEvent.CHANGE);
                 event.oldValue = current;
                 event.newValue = num;
                 this.dispatchEvent(event);
-                var dataSource = this.dataSource;
+                var dataSource:DataSource = this.dataSource;
                 if( dataSource  )dataSource.select( num );
             }
         };
@@ -298,8 +298,8 @@ package es.components
             }
         }
 
-        private var _radius=0;
-        public function set radius( val:Number ):void
+        private var _radius:int=0;
+        public function set radius( val:int ):void
         {
             if( _radius !== val )
             {
@@ -311,7 +311,7 @@ package es.components
             }
         }
 
-        public function get radius():Number
+        public function get radius():int
         {
             return _radius;
         }
@@ -324,7 +324,7 @@ package es.components
             super.initializing();
             var dataSource:DataSource = _dataSource;
             if( !dataSource )throw new ReferenceError('dataSource is not defined');
-            var size = pageSize;
+            var size:Number = pageSize;
             if( !isNaN(size) )dataSource.pageSize(size);
             dataSource.select( this.current );
         }
@@ -334,19 +334,19 @@ package es.components
          */
         override protected function commitPropertyAndUpdateSkin()
         {
-            var skin = this.skin;
-            var current = this.current;
-            var totalPage = this.totalPage;
-            var pageSize = this.pageSize;
+            var skin:Skin = this.skin;
+            var current:Number = this.current;
+            var totalPage:Number = this.totalPage;
+            var pageSize:Number = this.pageSize;
             var link:Number = this.link;
-            var url = this.url;
+            var url:* = this.url;
             var offset:Number = Math.max(current - Math.ceil(link / 2), 0);
             if( typeof url !== "function" )
             {
-                var linkUrl = url;
-                url = linkUrl.length > 0 ? function(page, profile) {
+                var linkUrl:* = url;
+                url = linkUrl.length > 0 ? function(page:int, profile:String) {
                     return linkUrl.indexOf('?') >= 0 ? linkUrl + '&'+profile+'=' + page : linkUrl + '?'+profile+'=' + page;
-                }:function(page, profile) {
+                }:function(page:int, profile:String) {
                     return '?'+profile+'=' + page;
                 };
             }

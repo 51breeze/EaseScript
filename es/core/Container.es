@@ -88,13 +88,13 @@ package es.core
          */
         public function addChildAt( child:IDisplay , index:Number ):IDisplay
         {
-            var parent = child.parent;
+            var parent:IDisplay = child.parent;
             if( parent )
             {
                 (parent as Container).removeChild( child );
             }
             var children:Array = this._children;
-            var at = index < 0 ? index+children.length+1 : index;
+            var at:Number = index < 0 ? index+children.length+1 : index;
             children.splice(at, 0, child);
             if( child is SkinComponent )
             {
@@ -114,7 +114,7 @@ package es.core
             if( child )
             {
                 var children:Array = this._children;
-                var index = children.indexOf( child );
+                var index:Number = children.indexOf( child );
                 if( child is SkinComponent )
                 {
                     child = (child as SkinComponent).skin as IDisplay;
@@ -142,7 +142,7 @@ package es.core
         public function removeAllChild():void
         {
             var children:Array = this._children;
-            var len = children.length;
+            var len:int = children.length;
             while( len>0 )
             {
                 this.removeChild( children[ --len ] as IDisplay );
