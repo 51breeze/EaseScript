@@ -47,13 +47,13 @@ package es.core
         /**
          * @private
          */
-        private var _width:Number=NaN;
+        private var _width:uint=NaN;
 
         /**
          * 设置显示对象的宽度
          * @returns {Number}
          */
-        public function get width():Number
+        public function get width():uint
         {
             return isNaN(_width) ? _element.width() : _width;
         }
@@ -62,7 +62,7 @@ package es.core
          * 获取显示对象的宽度
          * @param value
          */
-        public function set width(value:Number):void
+        public function set width(value:uint):void
         {
             _width = value;
             _element.width(value);
@@ -71,13 +71,13 @@ package es.core
         /**
          * @private
          */
-        private var _height:Number=NaN;
+        private var _height:uint=NaN;
 
         /**
          * 设置显示对象的高度
          * @returns {Number}
          */
-        public function get height():Number
+        public function get height():uint
         {
             return isNaN(_height) ? _element.height() : _height;
         }
@@ -86,7 +86,7 @@ package es.core
          * 获取显示对象的高度
          * @param value
          */
-        public function set height(value:Number):void
+        public function set height(value:uint):void
         {
             _height = value;
             _element.height(value);
@@ -146,7 +146,7 @@ package es.core
          * 获取滚动条在上边的位置
          * @returns {Number}
          */
-        public function get scrollTop():Number
+        public function get scrollTop():int
         {
              return _element.scrollTop();
         }
@@ -155,7 +155,7 @@ package es.core
          * 设置滚动条在上边的位置
          * @param value
          */
-        public function set scrollTop(value:Number):void
+        public function set scrollTop(value:int):void
         {
              _element.scrollTop(value);
         }
@@ -164,7 +164,7 @@ package es.core
          * 获取滚动条在左边的位置
          * @returns {Number}
          */
-        public function get scrollLeft():Number
+        public function get scrollLeft():int
         {
              return _element.scrollTop();
         }
@@ -173,7 +173,7 @@ package es.core
          * 设置滚动条在左边的位置
          * @param value
          */
-        public function set scrollLeft(value:Number):void
+        public function set scrollLeft(value:int):void
         {
              _element.scrollTop(value);
         }
@@ -182,7 +182,7 @@ package es.core
          * 获取滚动条的宽度
          * @returns {Number}
          */
-        public function get scrollWidth():Number
+        public function get scrollWidth():int
         {
             return _element.scrollWidth();
         };
@@ -191,7 +191,7 @@ package es.core
          * 获取滚动条的高度
          * @returns {Number}
          */
-        public function get scrollHeight():Number
+        public function get scrollHeight():int
         {
             return  _element.scrollHeight();
         };
@@ -212,7 +212,7 @@ package es.core
          * 获取元素相对父元素的左边距
          * @returns {Number}
          */
-        public function get left():Number
+        public function get left():int
         {
             return _element.left();
         }
@@ -220,7 +220,7 @@ package es.core
          * 设置元素相对父元素的左边距
          * @returns {Number}
          */
-        public function set left( value:Number ):void
+        public function set left( value:int ):void
         {
             _element.left( value );
         }
@@ -229,7 +229,7 @@ package es.core
          * 获取元素相对父元素的上边距
          * @returns {Number}
          */
-        public function get top():Number
+        public function get top():int
         {
             return _element.top();
         }
@@ -237,7 +237,7 @@ package es.core
          * 设置元素相对父元素的上边距
          * @returns {Number}
          */
-        public function set top( value:Number ):void
+        public function set top( value:int ):void
         {
             _element.top( value );
         }
@@ -246,7 +246,7 @@ package es.core
          * 获取元素相对父元素的右边距
          * @returns {Number}
          */
-        public function get right():Number
+        public function get right():int
         {
             return _element.right();
         }
@@ -254,7 +254,7 @@ package es.core
          * 设置元素相对父元素的右边距
          * @returns {Number}
          */
-        public function set right( value:Number ):void
+        public function set right( value:int ):void
         {
             _element.right( value );
         }
@@ -263,7 +263,7 @@ package es.core
          * 获取元素相对父元素的下边距
          * @returns {Number}
          */
-        public function get bottom():Number
+        public function get bottom():int
         {
             return _element.bottom();
         }
@@ -271,7 +271,7 @@ package es.core
          * 设置元素相对父元素的下边距
          * @returns {Number}
          */
-        public function set bottom( value:Number ):void
+        public function set bottom( value:int ):void
         {
             _element.bottom( value );
         }
@@ -282,7 +282,7 @@ package es.core
          *  @param top
          *  @returns {object} left top
          */
-        public function localToGlobal(left:Number, top:Number):Object
+        public function localToGlobal(left:int, top:int):Object
         {
             return _element.localToGlobal(left, top);
         };
@@ -293,7 +293,7 @@ package es.core
          *  @param top
          *  @returns {object}  left top
          */
-        public function globalToLocal(left:Number, top:Number ):Object
+        public function globalToLocal(left:int, top:int ):Object
         {
             return _element.globalToLocal(left, top);
         };

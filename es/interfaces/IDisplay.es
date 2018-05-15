@@ -19,25 +19,25 @@ package es.interfaces
          * 设置显示对象的宽度
          * @returns {Number}
          */
-        public function get width():Number;
+        public function get width():uint;
 
         /**
          * 获取显示对象的宽度
          * @param value
          */
-        public function set width(value:Number):void;
+        public function set width(value:uint):void;
 
         /**
          * 设置显示对象的高度
          * @returns {Number}
          */
-        public function get height():Number;
+        public function get height():uint;
 
         /**
          * 获取显示对象的高度
          * @param value
          */
-        public function set height(value:Number):void;
+        public function set height(value:uint):void;
 
         /**
          * 标记此显示对象是否可见
@@ -55,49 +55,49 @@ package es.interfaces
          * 获取元素相对父元素的左边距
          * @returns {Number}
          */
-        public function get left():Number;
+        public function get left():int;
 
         /**
          * 设置元素相对父元素的左边距
          * @returns {Number}
          */
-        public function set left( value:Number ):void;
+        public function set left( value:int ):void;
 
         /**
          * 获取元素相对父元素的上边距
          * @returns {Number}
          */
-        public function get top():Number;
+        public function get top():int;
 
         /**
          * 设置元素相对父元素的上边距
          * @returns {Number}
          */
-        public function set top( value:Number ):void;
+        public function set top( value:int ):void;
 
         /**
          * 获取元素相对父元素的右边距
          * @returns {Number}
          */
-        public function get right():Number;
+        public function get right():int;
 
         /**
          * 设置元素相对父元素的右边距
          * @returns {Number}
          */
-        public function set right( value:Number ):void;
+        public function set right( value:int ):void;
 
         /**
          * 获取元素相对父元素的下边距
          * @returns {Number}
          */
-        public function get bottom():Number;
+        public function get bottom():int;
 
         /**
          * 设置元素相对父元素的下边距
          * @returns {Number}
          */
-        public function set bottom( value:Number ):void;
+        public function set bottom( value:int ):void;
 
         /**
          * 获取父级皮肤元素

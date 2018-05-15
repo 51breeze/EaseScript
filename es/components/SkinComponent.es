@@ -93,7 +93,7 @@ package es.components
         /**
          * 获取此对象的高度
          */
-        public function get height():Number
+        public function get height():uint
         {
             if( this.initialized )
             {
@@ -105,7 +105,7 @@ package es.components
         /**
          * 设置此对象的高度
          */
-        public function set height(value:Number):void
+        public function set height(value:uint):void
         {
             if( this.initialized )
             {
@@ -117,7 +117,7 @@ package es.components
         /**
          * 获取此对象的高度
          */
-        public function get width():Number
+        public function get width():uint
         {
             if( this.initialized )
             {
@@ -129,7 +129,7 @@ package es.components
         /**
          * 设置此对象的高度
          */
-        public function set width(value:Number):void
+        public function set width(value:uint):void
         {
             if( this.initialized ) {
                 this.skin.width = value;
@@ -178,7 +178,7 @@ package es.components
          * 获取元素相对父元素的左边距
          * @returns {Number}
          */
-        public function get left():Number
+        public function get left():int
         {
             if( this.initialized ) {
                 return this.skin.left;
@@ -190,7 +190,7 @@ package es.components
          * 设置元素相对父元素的左边距
          * @returns {Number}
          */
-        public function set left( value:Number ):void
+        public function set left( value:int ):void
         {
             if( this.initialized )
             {
@@ -203,7 +203,7 @@ package es.components
          * 获取元素相对父元素的上边距
          * @returns {Number}
          */
-        public function get top():Number
+        public function get top():int
         {
             if( this.initialized ) {
                 return this.skin.top;
@@ -215,7 +215,7 @@ package es.components
          * 设置元素相对父元素的上边距
          * @returns {Number}
          */
-        public function set top( value:Number ):void
+        public function set top( value:int ):void
         {
             if( this.initialized )
             {
@@ -228,7 +228,7 @@ package es.components
          * 获取元素相对父元素的右边距
          * @returns {Number}
          */
-        public function get right():Number
+        public function get right():int
         {
             if( this.initialized ) {
                 return this.skin.right;
@@ -240,7 +240,7 @@ package es.components
          * 设置元素相对父元素的右边距
          * @returns {Number}
          */
-        public function set right( value:Number ):void
+        public function set right( value:int ):void
         {
             if( this.initialized )
             {
@@ -253,7 +253,7 @@ package es.components
          * 获取元素相对父元素的下边距
          * @returns {Number}
          */
-        public function get bottom():Number
+        public function get bottom():int
         {
             if( this.initialized )
             {
@@ -266,7 +266,7 @@ package es.components
          * 设置元素相对父元素的下边距
          * @returns {Number}
          */
-        public function set bottom( value:Number ):void
+        public function set bottom( value:int ):void
         {
             if( this.initialized )
             {

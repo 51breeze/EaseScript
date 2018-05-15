@@ -20,7 +20,7 @@
                 current = function(item:Object,index:*){
                     if(index==key)return true;
                     if( item["link"] == key || item["label"] == key ) return true;
-                    return new RegExp( key ).test( item["link"] );
+                    return new RegExp( key ).test( (String)item["link"] );
                 };
             }
 

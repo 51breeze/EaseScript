@@ -285,7 +285,7 @@ Reflect.type=function type(value, typeClass)
         }
         if( flag )
         {
-            if (isNaN(value))throw new System.TypeError(original + " can not be converted for " + typeClass);
+            if (isNaN(value))throw new System.TypeError(original + " can not be convert for " + typeClass);
             return value;
         }
     }
@@ -293,7 +293,7 @@ Reflect.type=function type(value, typeClass)
     if( value == null || typeClass === System.Object )return value;
     if ( typeClass && !System.is(value, typeClass) )
     {
-        throw new System.TypeError( 'Specify the type of value do not match. must is "' + System.getQualifiedClassName(typeClass)+'"')
+        throw new System.TypeError( value+' can not be convert for ' + typeClass)
     }
     return value;
 };

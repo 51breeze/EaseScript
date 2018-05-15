@@ -412,7 +412,7 @@ package es.core
             }
             this.callback = options.callback as Function;
             this.options = options;
-            var mask:Boolean = options.mask;
+            var mask:Boolean = (Boolean)options.mask;
             var maskStyle:Object = options.maskStyle||{};
             var profile:Object = options.profile as JSON;
 
@@ -453,10 +453,10 @@ package es.core
             //应用效果
             skin.visible=true;
             var animation:Object = options.animation;
-            var timeout:int = options.timeout * 1000;
+            var timeout:Number = options.timeout * 1000;
             if( animation.enabled )
             {
-                var anShow:Boolean = animation.show;
+                var anShow:Object = animation.show;
                 skin.style("animation", anShow.name+" "+anShow.duration+"s "+anShow.timing+" "+anShow.delay+"s "+anShow.fillMode);
                 timeout = ( options.timeout+anShow.delay+anShow.duration )*1000;
             }

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<s:View name="html" xmlns:s="es.core"  xmlns:c="es.components" xmlns:b="@">
+<s:View xmlns:s="es.core"  xmlns:c="es.components" xmlns:b="@">
     <![CDATA[
         import es.core.PopUp;
         import es.skins.PopUpSkin;
@@ -9,10 +9,10 @@
         [RunPlatform('client')]
         override protected function initializing()
         {
-            PopUp.defaultOptions.skinClass =PopUpSkin;
+            PopUp.defaultOptions.skinClass = PopUpSkin;
             Element(".btn-success").addEventListener( MouseEvent.CLICK, function () {
                 console.log("click");
-                PopUp.confirm("您有3条信息未处理2", function (type) {
+                PopUp.confirm("您有3条信息未处理2", function (type:String) {
                     console.log( type );
                 });
             });
@@ -25,7 +25,7 @@
     </head>
 
     <body>
-        <c:Navigate id="@navigate" skinClass="es.skins.NavigateSkin"  ></c:Navigate>
+        <c:Navigate id="@navigate" skinClass="es.skins.NavigateSkin"></c:Navigate>
 
         <div>
             <button type="button" class="btn btn-success" style="width: 100px;">点 我</button>
