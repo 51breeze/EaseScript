@@ -46,7 +46,6 @@ program
 program.parse(process.argv);
 
 var has_output_path = !!program.output;
-
 //输出路径
 if( !program.output )
 {

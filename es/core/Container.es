@@ -114,7 +114,7 @@ package es.core
             if( child )
             {
                 var children:Array = this._children;
-                var index:Number = children.indexOf( child );
+                var index:int = children.indexOf( child );
                 if( child is SkinComponent )
                 {
                     child = (child as SkinComponent).skin as IDisplay;

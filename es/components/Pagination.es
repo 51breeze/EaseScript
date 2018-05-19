@@ -143,7 +143,7 @@ package es.components
          * @param number totalPage
          * @returns {Number}
          */
-        public function get totalPage():Number
+        public function get totalPage():int
         {
             var dataSource:DataSource = this.dataSource;
             if( dataSource )
@@ -157,7 +157,7 @@ package es.components
          * 获取总数据
          * @returns {Number}
          */
-        public function get totalSize():Number
+        public function get totalSize():int
         {
             var dataSource:DataSource = this.dataSource;
             if( dataSource )
@@ -170,13 +170,13 @@ package es.components
         /**
          * @private
          */
-        private var _pageSize:Number = NaN;
+        private var _pageSize:int = NaN;
 
         /**
          * 获取每页显示多少行数据
          * @returns {Number}
          */
-        public function get pageSize():Number
+        public function get pageSize():int
         {
             var dataSource:DataSource = this.dataSource;
             if( dataSource )
@@ -186,7 +186,7 @@ package es.components
             return this._pageSize;
         };
 
-        public function set pageSize(num:Number):void
+        public function set pageSize(num:int):void
         {
             if( this._pageSize !== num )
             {
@@ -206,13 +206,13 @@ package es.components
         /**
          * @private
          */
-        private var _current:Number = 1;
+        private var _current:int = 1;
 
         /**
          * 设置当前需要显示的分页
          * @returns {Number}
          */
-        public function get current():Number
+        public function get current():int
         {
             var dataSource:DataSource = this.dataSource;
             if( dataSource && this.initialized )
@@ -226,10 +226,10 @@ package es.components
          * 设置当前需要显示的分页
          * @param num
          */
-        public function set current(num:Number):void
+        public function set current(num:int):void
         {
             num = isNaN( this.totalSize ) ? num :  Math.min( Math.max(1, num), this.totalPage );
-            var current:Number = this._current;
+            var current:int = this._current;
             if( num !== current )
             {
                 this._current = num;
@@ -245,13 +245,13 @@ package es.components
         /**
          * @private
          */
-        private var _link:Number = 7;
+        private var _link:int = 7;
 
         /**
          * 获取分页的按扭数
          * @returns {Number}
          */
-        public function get link():Number
+        public function get link():int
         {
             return this._link;
         }
@@ -260,7 +260,7 @@ package es.components
          * 设置分页的按扭数
          * @returns {void}
          */
-        public function set link( num:Number ):void
+        public function set link( num:int ):void
         {
             if( this._link !== num )
             {
@@ -324,7 +324,7 @@ package es.components
             super.initializing();
             var dataSource:DataSource = _dataSource;
             if( !dataSource )throw new ReferenceError('dataSource is not defined');
-            var size:Number = pageSize;
+            var size:int = pageSize;
             if( !isNaN(size) )dataSource.pageSize(size);
             dataSource.select( this.current );
         }
@@ -335,10 +335,10 @@ package es.components
         override protected function commitPropertyAndUpdateSkin()
         {
             var skin:Skin = this.skin;
-            var current:Number = this.current;
-            var totalPage:Number = this.totalPage;
-            var pageSize:Number = this.pageSize;
-            var link:Number = this.link;
+            var current:int = this.current;
+            var totalPage:int = this.totalPage;
+            var pageSize:int = this.pageSize;
+            var link:int = this.link;
             var url:* = this.url;
             var offset:Number = Math.max(current - Math.ceil(link / 2), 0);
             if( typeof url !== "function" )

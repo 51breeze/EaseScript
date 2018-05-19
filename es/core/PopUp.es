@@ -14,6 +14,7 @@ package es.core
     import es.interfaces.IDisplay;
     import es.skins.PopUpSkin;
 
+    [RunPlatform("client")]
     public class PopUp extends SkinComponent
     {
         /**
@@ -181,7 +182,7 @@ package es.core
                 elem.style("cssText", System.serialize(style,"style") );
                 root.addChild(elem);
                 var resize:Function=function(){
-                    var height:int = win.height();
+                    var height:Number = win.height();
                     elem.height( height + Math.max( win.scrollHeight()-height,0) );
                 };
                 win.addEventListener(Event.RESIZE, resize);
@@ -340,7 +341,7 @@ package es.core
             switch ( opt.horizontal )
             {
                 case "left" :
-                    skin.left = offsetX+0;
+                    skin.left = offsetX;
                 break;
                 case "right" :
                     skin.left = offsetX+( win.width() - skin.width );
