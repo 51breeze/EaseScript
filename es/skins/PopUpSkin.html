@@ -55,6 +55,11 @@
             return body.element.html();
         }
 
+        override public function set height(val:uint):void
+        {
+             body.height = Math.max(val - 70,100);
+        }
+
     ]]>
 
     <style>
@@ -79,6 +84,7 @@
 
         .popup-head{
             height: 30px;
+            width: 100%;
             line-height: 30px;
             border-bottom: solid 1px #ccc;
             padding:0px 8px;
@@ -96,11 +102,13 @@
         .popup-body{
             height: auto;
             padding: 8px;
+            overflow: auto;
         }
 
         .popup-footer{
             border-top: solid 1px #ccc;
             height: 40px;
+            width: 100%;
             text-align: center;
         }
         .popup-footer button{

@@ -143,10 +143,7 @@ package es.components
          */
         public function get element():Element
         {
-            if( this.initialized ) {
-                return this.skin.element;
-            }
-            return null;
+            return this.skin.element;
         }
 
         /**

@@ -214,6 +214,13 @@ Event.create = function create( originalEvent )
     event.ctrlKey= !!originalEvent.ctrlKey;
     event.shiftKey= !!originalEvent.shiftKey;
     event.metaKey= !!originalEvent.metaKey;
+    if( originalEvent.animationName )
+    {
+        event.animationName = originalEvent.animationName;
+        event.elapsedTime   = originalEvent.elapsedTime;
+        event.eventPhase   = originalEvent.eventPhase;
+        event.isTrusted   = originalEvent.isTrusted;
+    }
     return event;
 };
 

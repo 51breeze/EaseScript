@@ -164,7 +164,10 @@ function getRequirementsAllUsedModules( module , results, syntax, hash )
             for (; i < len; i++)
             {
                 var classname = datalist[i];
-                getRequirementsAllUsedModules( Maker.getLoaclAndGlobalModuleDescription( classname ), results ,syntax, hash );
+                var classmodule = Maker.getLoaclAndGlobalModuleDescription( classname );
+                if( classmodule ) {
+                    getRequirementsAllUsedModules(classmodule, results, syntax, hash);
+                }
             }
         }
 
@@ -179,7 +182,7 @@ function getRequirementsAllGlobalClass( modules )
 {
     modules = modules.filter(function (e) {
          var m = Maker.getLoaclAndGlobalModuleDescription(e.fullclassname||e.type);
-         return !m.nonglobal;
+         return m && !m.nonglobal;
     });
     return modules.map(function (e) {
         return e.type;

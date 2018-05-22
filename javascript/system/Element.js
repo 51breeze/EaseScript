@@ -1112,8 +1112,41 @@ Element.prototype.animation=function animation(name, duration, timing, delay, co
     if(delay>0)cmd+=" "+delay+"s";
     if(count>1)cmd+=" "+count;
     if(direction)cmd+=" alternate";
-    if(fillMode)cmd+=" "+(fillMode||"forwards");
+    if(!fillMode)fillMode = "forwards";
+    cmd+=" "+fillMode;
     this.style("animation",cmd);
+    return this;
+}
+
+/**
+ * 淡入效果
+ * @param duration
+ * @param opacity
+ */
+Element.prototype.fadeIn=function(duration, opacity)
+{
+    var name = "fadeIn";
+    if( opacity>0 && opacity < 1)
+    {
+        name = Element.createAnimationStyleSheet("fadeIn_0_"+opacity,{from:{"opacity":0},to:{"opacity":opacity}});
+    }
+    this.animation(name,duration,"linear");
+    return this;
+}
+
+/**
+ * 淡出效果
+ * @param duration
+ * @param opacity
+ */
+Element.prototype.fadeOut=function(duration, opacity)
+{
+    var name = "fadeOut";
+    if( opacity>0 && opacity<1)
+    {
+        name = Element.createAnimationStyleSheet("fadeOut_"+opacity+"_0",{from:{"opacity":opacity},to:{"opacity":0}});
+    }
+    this.animation(name,duration,"linear");
     return this;
 }
 
@@ -1267,7 +1300,7 @@ accessor['position']={
     },
     set:function(prop,newValue,obj){
         var val = accessor.style.get.call(this,'position');
-        if( !position_hash[val] )
+        if( val && !position_hash[val] )
         {
             accessor.style.set.call(this,'position','relative');
         }
@@ -1709,6 +1742,15 @@ Element.prototype.contains=function contains( child )
 }
 
 /**
+ * 判断是否这空的集合
+ * @returns {boolean}
+ */
+Element.prototype.isEmpty=function isEmpty()
+{
+    return !(this.length > 0);
+}
+
+/**
  * 测试指定的元素（或者是一个选择器）是否为当前元素的子级
  * @param parent
  * @param child
@@ -1729,6 +1771,37 @@ Element.contains=function contains(parent,child)
     }
     return querySelector( child, parent ).length > 0;
 };
+
+/**
+ * 判断两个元素是否一致
+ * 如果指定的是一个元素对象（Element）， 那么会检查每一个元素都相等，只有所有的元素集都一致才会返回 true 反之 false。
+ * 如果指定的参数为同一个对象也会返回true。
+ * 此方法主要是比较集合元素，并非是元素对象(Element)
+ * @param a
+ * @param b
+ */
+Element.equal=function equal( a, b )
+{
+    if( a === b )return true;
+    if( !a || !b )return false;
+    var a1 = a instanceof Element ? a.slice(0) : [a];
+    var b1 = b instanceof Element ? b.slice(0) : [b];
+    if( a1.length != b1.length )return false;
+    var i=0;
+    var items = a1.concat(b1);
+    var len   = items.length;
+    for(;i<len;i++)
+    {
+        if( Element.isNodeElement( items[i] ) )
+        {
+            if( a1.indexOf(items[i]) < 0 || b1.indexOf(items[i]) < 0 )
+            {
+                return false;
+            }
+        }
+    }
+    return true;
+}
 
 /**
  * @private
@@ -2036,6 +2109,8 @@ Element.isAnimationSupport = function isAnimationSupport()
     return animationSupport;
 };
 
+var createdAnimationHash = {};
+
 /**
  * 生成css3样式动画
  * properties={
@@ -2046,21 +2121,32 @@ Element.isAnimationSupport = function isAnimationSupport()
 Element.createAnimationStyleSheet=function(stylename, properties)
 {
     if( !Element.isAnimationSupport() )return false;
+    stylename = stylename.replace(".","_");
     var css=["{"];
+    if( createdAnimationHash[stylename] ===true )
+    {
+        return stylename;
+    }
+    createdAnimationHash[stylename] = true;
     for( var i in properties )
     {
         css.push( i + ' {');
-        if( typeof properties[i] === "string" )
-        {
-            css.push( properties[i] );
-        }else if( System.isObject(properties[i]) )
+        if( System.isObject(properties[i]) )
         {
             css.push( System.serialize( properties[i], 'style' ) );
+        }else
+        {
+            css.push( properties[i] );
         }
         css.push( '}' );
     }
     css.push('}');
-    return Element.addStyleSheet( '@'+fix.cssPrefixName+'keyframes '+stylename, css.join("\r\n") );
+
+    if( Element.addStyleSheet( '@'+fix.cssPrefixName+'keyframes '+stylename, css.join("\r\n") ) )
+    {
+        return stylename;
+    }
+    return null;
 };
 
 /**

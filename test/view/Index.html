@@ -9,13 +9,31 @@
         [RunPlatform('client')]
         override protected function initializing()
         {
-            PopUp.defaultOptions.skinClass = PopUpSkin;
+            PopUp.skinClass = PopUpSkin;
             Element(".btn-success").addEventListener( MouseEvent.CLICK, function () {
                 console.log("click");
-                PopUp.confirm("您有3条信息未处理2", function (type:String) {
+
+                /*PopUp.confirm("您有3条信息未处理2", function (type:String) {
                     console.log( type );
+                }); */
+
+
+             console.log( Element(".uuuu").length );
+
+              var modal:PopUp =  PopUp.modality("修改信息",  Element(".uuuu").html( true ) , {callback:function (type:String) {
+                    console.log( type );
+                },profile:{width:700, height:500} }) as PopUp;
+
+                modal.skin.addEventListener(MouseEvent.CLICK, function(){
+
+                        PopUp.confirm("您有3条信息未处理2", function (type:String) {
+                        console.log( type );
+                        });
+
                 });
+
             });
+
         }
 
     ]]>
@@ -41,7 +59,7 @@
             </s:template>
         </s:Skin>
 
-        <div>
+        <div class="uuuu">
             <h1>这里是内容9999999999   {context.title} </h1>
             <c:DataGrid source="http://working.com/json.php" skinClass="es.skins.DataGridSkin" width="500" >
                 <c:dataSource>
