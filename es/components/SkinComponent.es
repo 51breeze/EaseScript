@@ -310,7 +310,7 @@ package es.components
             Object.forEach(properties, function (value:*, name:String){
                 skin[ name ] = value;
             });
-            skin.commitPropertyAndUpdateSkin();
+            skin.display();
         }
     }
 }

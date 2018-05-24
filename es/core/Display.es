@@ -95,7 +95,8 @@ package es.core
         /**
          * @private
          */
-        private var _visible:Boolean=null;
+        private var _visible:Boolean=false;
+        private var _visibleFlag:Boolean = false;
 
         /**
          * 标记此显示对象是否可见
@@ -104,6 +105,7 @@ package es.core
         public function set visible( flag:Boolean ):void
         {
             _visible= flag;
+            _visibleFlag = true;
            flag===false ? _element.hide() : _element.show();
         }
 
@@ -113,7 +115,7 @@ package es.core
          */
         public function get visible():Boolean
         {
-            if( _visible===null )
+            if( _visibleFlag===false )
             {
                 return !( _element.style("display") === "none");
             }

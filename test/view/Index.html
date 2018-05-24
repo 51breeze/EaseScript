@@ -3,6 +3,7 @@
     <![CDATA[
         import es.core.PopUp;
         import es.skins.PopUpSkin;
+        import es.skins.ModalitySkin;
         import es.core.Display;
         import BaseApplication;
 
@@ -22,7 +23,7 @@
 
               var modal:PopUp =  PopUp.modality("修改信息",  Element(".uuuu").html( true ) , {callback:function (type:String) {
                     console.log( type );
-                },profile:{width:700, height:500} }) as PopUp;
+                },skinClass:ModalitySkin,profile:{width:700, height:500} }) as PopUp;
 
                 modal.skin.addEventListener(MouseEvent.CLICK, function(){
 

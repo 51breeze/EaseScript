@@ -124,7 +124,7 @@ var storage=Internal.createSymbolStorage( Symbol('element') );
 /**
  * @private
  */
-function access(callback, name, newValue)
+function access(callback, name, newValue, isDisplay, isHidden)
 {
     var write= typeof newValue !== 'undefined';
     var getter = accessor[callback].get;
@@ -139,9 +139,24 @@ function access(callback, name, newValue)
         var elem = this.current();
         return elem ? getter.call(elem,name,this) : false;
     }
+
     return this.forEach(function(elem)
     {
         var oldValue= getter.call(elem,name,this);
+        if( isDisplay )
+        {
+            var _data = storage(elem, 'data') || storage(elem, 'data', {});
+            if( isHidden ){
+                _data['---display---'] = oldValue;
+            }else{
+                newValue = _data['---display---'];
+                if( !newValue || newValue.toLowerCase() === "none" )
+                {
+                    newValue=getDisplayValueByElem( elem );
+                }
+            }
+        }
+
         if( oldValue !== newValue )
         {
             var event = setter.call(elem,name,newValue,this);
@@ -162,6 +177,52 @@ function access(callback, name, newValue)
             }
         }
     });
+}
+
+function getDisplayValueByElem( elem )
+{
+    var nodename = elem.nodeName.toLowerCase();
+    switch ( nodename )
+    {
+        case "table" :
+            return 'table' ;
+        case "thead" :
+            return 'table-header-group' ;
+        case "tbody" :
+            return 'table-row-group';
+        case "tfoot" :
+            return 'table-footer-group';
+        case "tr" :
+            return 'table-row';
+        case "td" :
+            return 'table-cell';
+        case "col" :
+            return 'table-column';
+        case "caption" :
+            return 'table-caption';
+        case "colgroup" :
+            return 'table-column-group';
+        case "div" :
+        case "ul"  :
+        case "li"  :
+        case "p":
+        case "address":
+        case "dl":
+        case "dd":
+        case "dt":
+        case "ol":
+        case "fieldset":
+        case "form":
+        case "h1":
+        case "h2":
+        case "h3":
+        case "h4":
+        case "h5":
+        case "h6":
+            return 'block';
+        default :
+            return 'inline';
+    }
 }
 
 /**
@@ -954,7 +1015,8 @@ Element.prototype.style=function style(name, value)
  */
 Element.prototype.show=function show()
 {
-    return this.style('display','');
+    access.call(this,'style',"display",'',true,false);
+    return this;
 };
 
 /**
@@ -963,7 +1025,8 @@ Element.prototype.show=function show()
  */
 Element.prototype.hide=function hide()
 {
-    return this.style('display', 'none' );
+    access.call(this,'style',"display",'none',true,true);
+    return this;
 };
 
 /**

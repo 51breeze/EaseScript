@@ -107,8 +107,9 @@ package es.core
             if( !obj.visible )
             {
                 obj.fadeIn();
+                return obj;
             }
-            return obj;
+            return null;
         }
 
         //系统级弹框实例对象

@@ -81,14 +81,15 @@ package es.core
         /**
          * 执行此视图，并初始化相关属性
          */
-        override public function commitPropertyAndUpdateSkin()
+        override public function display():Element
         {
             var init:Boolean = initialized;
-            super.commitPropertyAndUpdateSkin();
+            var elem:Element = super.display();
             if( !init && this.hasEventListener("INTERNAL_BEFORE_CHILDREN") )
             {
                 this.dispatchEvent( new Event("INTERNAL_BEFORE_CHILDREN") );
             }
+            return elem;
         }
     }
 }

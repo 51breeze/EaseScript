@@ -61,10 +61,12 @@ package es.core
          */
         static private function getModalityInstance( skinClass:Class=null ):BasePopUp
         {
+            if( !skinClass )skinClass = PopUp.skinClass;
             if( !modalityInstance )
             {
                 modalityInstance=new PopUp();
-                modalityInstance.skinClass = PopUp.skinClass;
+                modalityInstance.skinClass = skinClass;
+               
             }
             //如果有指定一个新的皮肤类
             if( skinClass && modalityInstance.skinClass !== skinClass )
@@ -181,7 +183,7 @@ package es.core
                 "profile":{
                     "currentState":"confirm",
                     "titleText":title,
-                    "bodyContent":content
+                    "bodyContent":content,
                 }
             },options), true);
         }
@@ -194,13 +196,7 @@ package es.core
         override protected function show( options:Object={} , isModalWindow:Boolean=false ):BasePopUp
         {
             super.show( Object.merge(true,{},PopUpManage.defaultOptions,options), isModalWindow );
-
-            //加入到弹框管理器中
-            if( options.mask ) {
-                PopUpManage.show(this, isModalWindow);
-            }else{
-                PopUpManage.show(this, isModalWindow);
-            }
+            PopUpManage.show(this, isModalWindow);
             return this;
         }
 

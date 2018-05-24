@@ -22,7 +22,7 @@ package es.core
         /**
          * @private
          */
-        protected var timeoutId:Number=null;
+        protected var timeoutId:Number=NaN;
 
         /**
          * @private
@@ -59,10 +59,10 @@ package es.core
                 this.maskIntance = null;
             }
 
-            if( timeoutId )
+            if( !isNaN( timeoutId ) )
             {
                 clearTimeout(timeoutId);
-                timeoutId = null;
+                timeoutId = NaN;
             }
 
             if( options.disableScroll )
@@ -142,6 +142,7 @@ package es.core
                     btn.addEventListener(MouseEvent.CLICK, (function (actionName:String) {
                         return function (e:MouseEvent) {
                             self.action(actionName);
+                            e.stopPropagation();
                         };
                     })(name));
                 }
@@ -178,7 +179,6 @@ package es.core
             var elem:Element = super.display();
             var skin:Skin    = this.skin;
             var profile:Object = options.profile;
-
             if( System.env.platform('IE', 8) )
             {
                 skin.style('position','absolute');

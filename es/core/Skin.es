@@ -176,7 +176,7 @@ package es.core
         /**
          * 当修改数据或者属性后调用此方法来提交属性并刷新视图
          */
-        public function commitPropertyAndUpdateSkin()
+      /*  public function commitPropertyAndUpdateSkin()
         {
             if( initialized===false )
             {
@@ -184,7 +184,7 @@ package es.core
                 this.initializing();
             }
             this.createChildren();
-        }
+        }*/
 
         /**
          * 渲染显示皮肤对象。
@@ -194,8 +194,10 @@ package es.core
         {
             if( initialized===false )
             {
-                this.commitPropertyAndUpdateSkin();
+                initialized = true;
+                this.initializing();
             }
+            this.createChildren();
             return super.display();
         };
 
@@ -288,6 +290,7 @@ package es.core
             if( stateGroup )
             {
                 var elems:Element = new Element('[includeIn],[excludeFrom]', this.element );
+
                 //隐藏或者显示当前已设置的状态
                 elems.forEach(function ()
                 {

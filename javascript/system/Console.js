@@ -19,20 +19,20 @@ function toString(items)
     var str=[];
     for(var i=0; i<items.length; i++)
     {
-        if( items[i] != null && typeof items[i] === "object" ){
+        if( items[i] != null && items[i].constructor instanceof System.Class )
+        {
             var item  = items[i];
             var name = (items[i]._toString||items[i].toString).call(items[i]);
             if( !(System.isArray(item,Array) || System.isObject(item)) ){
                 item = Object.prototype.getEnumerableProperties.call(item,2);
             }
             str = item ? str.concat(name,item) : str.concat(name);
+
         }else
         {
             str.push( items[i] );
         }
-        str.push(",");
     }
-    str.pop();
     return str;
 }
 var $call = System.Function.prototype.call;
