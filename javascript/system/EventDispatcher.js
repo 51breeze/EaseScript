@@ -172,9 +172,18 @@ function $addEventListener(target, listener )
         }else {
             type = Event.type(type);
             try {
-                target.addEventListener ? target.addEventListener(type, $dispatchEvent, listener.useCapture) : target.attachEvent(type, function (e) {
-                    $dispatchEvent(e, target)
-                });
+                if( target.addEventListener )
+                {
+                    target.addEventListener(type, $dispatchEvent, listener.useCapture);
+                }else
+                {
+                    listener.proxyType=[type];
+                    listener.proxyTarget=target;
+                    listener.proxyHandle=function (e) {
+                        $dispatchEvent(e, target);
+                    }
+                    target.attachEvent(type, listener.proxyHandle);
+                }
             }catch (e) {}
         }
     }
@@ -216,26 +225,42 @@ function $removeEventListener(target, type, listener , dispatcher )
         //如果有指定侦听器则删除指定的侦听器
         if ( (!is || events[length].callback === listener) && events[length].dispatcher === dispatcher )
         {
-            events.splice(length, 1);
+            var result = events.splice(length, 1);
+            if( result[0] && result[0].proxyHandle && result[0].proxyType )
+            {
+                var types = result[0].proxyType;
+                var num = types.length;
+                while ( num > 0 )
+                {
+                    $removeListener(result[0].proxyTarget || target, types[ --num ], result[0].proxyHandle);
+                }
+            }
         }
     }
 
     //如果是元素并且没有侦听器就删除
     if( events.length < 1 && !(target instanceof EventDispatcher)  )
     {
-        var eventType= Event.type( type );
-        if( target.removeEventListener )
-        {
-            target.removeEventListener(eventType,$dispatchEvent,false);
-            target.removeEventListener(eventType,$dispatchEvent,true);
-
-        }else if( target.detachEvent )
-        {
-            target.detachEvent(eventType,$dispatchEvent);
-        }
+        $removeListener(target, type, $dispatchEvent);
     }
     return events.length !== ret;
 }
+
+function $removeListener(target, type , handle )
+{
+    var eventType= Event.type( type );
+    if( target.removeEventListener )
+    {
+        target.removeEventListener(eventType,handle,false);
+        target.removeEventListener(eventType,handle,true);
+
+    }else if( target.detachEvent )
+    {
+        target.detachEvent(eventType,handle);
+    }
+}
+
+
 /**
  * 调度指定侦听项
  * @param event
@@ -297,3 +322,6 @@ Listener.prototype.priority=0;
 Listener.prototype.callback=null;
 Listener.prototype.currentTarget=null;
 Listener.prototype.type=null;
+Listener.prototype.proxyHandle = null;
+Listener.prototype.proxyTarget = null;
+Listener.prototype.proxyType = null;

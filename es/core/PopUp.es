@@ -17,6 +17,7 @@ package es.core
     import es.core.SystemManage;
     import es.core.PopUpManage;
     import es.interfaces.IPopUp;
+    import es.skins.PopUpSkin;
 
     [RunPlatform("client")]
     public class PopUp extends BasePopUp  implements IPopUp
@@ -29,7 +30,7 @@ package es.core
         /**
          * 弹框的皮肤类
          */
-        static public var skinClass:Class = null;
+        static public var skinClass:Class = PopUpSkin;
 
         /**
          * @private
@@ -66,7 +67,6 @@ package es.core
             {
                 modalityInstance=new PopUp();
                 modalityInstance.skinClass = skinClass;
-               
             }
             //如果有指定一个新的皮肤类
             if( skinClass && modalityInstance.skinClass !== skinClass )
@@ -109,6 +109,7 @@ package es.core
         {
             return getInstance(options.skinClass).show(Object.merge(true,{
                 "timeout":2,
+                "vertical":"top",
                 "profile":{
                     "currentState":"tips",
                     "bodyContent":message
@@ -126,6 +127,7 @@ package es.core
         {
             return getInstance(options.skinClass).show(Object.merge(true,{
                 "timeout":2,
+                "vertical":"top",
                 "profile":{
                     "currentState":"title",
                     "bodyContent":message
@@ -143,6 +145,7 @@ package es.core
         {
             return getInstance(options.skinClass).show(Object.merge(true,{
                 "mask":true,
+                "vertical":"top",
                 "profile":{
                     "currentState":"alert",
                     "bodyContent":message
@@ -162,10 +165,11 @@ package es.core
             return getInstance(options.skinClass).show(Object.merge(true,{
                 "mask":true,
                 "callback":callback,
+                "vertical":"top",
                 "profile":{
                     "currentState":"confirm",
                     "bodyContent":message
-                }
+                },"offsetY":2
             },options));
         }
 
@@ -181,10 +185,17 @@ package es.core
             return getModalityInstance(options.skinClass).show(Object.merge(true,{
                 "mask":true,
                 "profile":{
-                    "currentState":"confirm",
+                    "currentState":"modality",
                     "titleText":title,
                     "bodyContent":content,
-                }
+                }, "animation":{
+                    "fadeIn": {
+                        "name":"fadeIn",
+                    },
+                    "fadeOut": {
+                        "name":"fadeOut",
+                    }
+                },
             },options), true);
         }
 
@@ -201,6 +212,15 @@ package es.core
         }
 
         /**
+         * 获取弹框的容器
+         * @return Skin
+         */
+        override protected function getContainer():Skin
+        {
+            return (this.skin as PopUpSkin).container;
+        }
+
+        /**
          * @override
          * @return Boolean
          */
@@ -209,21 +229,32 @@ package es.core
             var flag:Boolean = this.initialized;
             var elem:Element = super.display();
             var opt:Object = this.options;
+            var self:es.core.PopUp = this;
+            var skin:Skin = this.getContainer();
+
+            //如果是模态框添加鼠标在容器外点击时关闭窗口
+            skin.removeEventListener(MouseEvent.MOUSE_OUTSIDE);
+            skin.addEventListener(MouseEvent.MOUSE_OUTSIDE, function (e:MouseEvent)
+            {
+                if (opt.isModalWindow )
+                {
+                    if( opt.clickOutsideClose ===true )
+                    {
+                        self.close();
+                    }
+
+                }else
+                {
+                    skin.element.animation("shake", 0.2);
+                }
+            });
+
             if( !flag )
             {
-                //设置窗体位置
-                if (!isNaN(opt.x) || !isNaN(opt.y)) {
-                    elem.left(opt.x >> 0);
-                    elem.top(opt.y >> 0);
-
-                } else {
-                    var self:PopUp = this;
-                    SystemManage.getWindow().addEventListener(Event.RESIZE, function (e:Event) {
-                        self.position(opt.offsetX, opt.offsetY, opt.horizontal, opt.vertical);
-                    });
-                    this.position(opt.offsetX, opt.offsetY, opt.horizontal, opt.vertical);
-                }
+                 //使用排列位置
+                 SystemManage.getWindow().addEventListener( Event.RESIZE, this.position, false, 0, this);
             }
+            this.position();
             return elem;
         }
 
@@ -242,6 +273,20 @@ package es.core
         public function set title(value:String):void
         {
             (this.skin as PopUpSkin).titleText = value;
+        }
+
+        /**
+         * 点击按扭时或者关闭窗口时触发
+         * @param type
+         * @return
+         */
+        override public function action(type:String):Boolean
+        {
+            if( type === "close" )
+            {
+                PopUpManage.close( this );
+            }
+            return super.action( type );
         }
     }
 }

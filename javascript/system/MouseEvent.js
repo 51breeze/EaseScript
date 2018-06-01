@@ -31,9 +31,12 @@ MouseEvent.MOUSE_WHEEL='mousewheel';
 MouseEvent.CLICK='click';
 MouseEvent.DBLCLICK='dblclick';
 
+var lastOriginalEvent;
+
 //鼠标事件
 Event.registerEvent(function ( type , target, originalEvent ) {
 
+    lastOriginalEvent = originalEvent;
     if( type && /^mouse|click$/i.test(type) )
     {
         var event =new MouseEvent( type );
@@ -59,4 +62,29 @@ Event.registerEvent(function ( type , target, originalEvent ) {
 if( System.env.platform( System.env.BROWSER_FIREFOX ) )
 {
     Event.fix.map[ MouseEvent.MOUSE_WHEEL ] = 'DOMMouseScroll';
+}
+
+Event.fix.hooks[ MouseEvent.MOUSE_OUTSIDE ]=function(listener, dispatcher)
+{
+    var doc = window;
+    var target = this;
+    var elem = new System.Element( this );
+    var type = Event.fix.prefix+MouseEvent.CLICK;
+    listener.proxyTarget = doc;
+    listener.proxyType = [type];
+    listener.proxyHandle = function(event)
+    {
+        var e = Event.create(event);
+        var range = elem.getBoundingRect();
+        if (!(e.pageX >= range.left && e.pageX <= range.right && e.pageY >= range.top && e.pageY <= range.bottom))
+        {
+            e.type = MouseEvent.MOUSE_OUTSIDE;
+            e.currentTarget = target;
+            listener.dispatcher.dispatchEvent( e );
+        }
+    }
+    //防止当前鼠标点击事件向上冒泡后触发。
+    setTimeout(function () {
+        doc.addEventListener ? doc.addEventListener(type, listener.proxyHandle ) : doc.attachEvent(type, listener.proxyHandle );
+    },10);
 }

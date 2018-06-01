@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<s:Skin class="popup-skin fixed"  xmlns:c="es.components" xmlns:s="es.core">
+<s:Skin class="popup" tabindex="-1" xmlns:c="es.components" xmlns:s="es.core">
     <s:Metadata>[HostComponent("es.core.PopUp")]</s:Metadata>
     <![CDATA[
         private var _titleText:String="title";
@@ -57,7 +57,70 @@
 
         override public function set height(val:uint):void
         {
-             body.height = Math.max(val - 70,100);
+            var decrementY:int = 0;
+            if( footer.visible )
+            {
+                decrementY+=footer.height;
+            }
+            if( head.visible )
+            {
+                 decrementY+=head.height;
+            }
+            body.height = Math.max( val - decrementY, 100 );
+        }
+
+        override public function get height():uint
+        {
+            return container.height;
+        }
+
+        override public function set width(val:uint):void
+        {
+            container.width=val;
+        }
+        override public function get width():uint
+        {
+             return container.width;
+        }
+
+        override public function set left(val:int):void
+        {
+           container.left=val;
+        }
+
+        override public function get left():int
+        {
+           return container.left;
+        }
+
+        override public function set top(val:int):void
+        {
+            container.top=val;
+        }
+
+        override public function get top():int
+        {
+           return container.top;
+        }
+
+        override public function set right(val:int):void
+        {
+           container.right=val;
+        }
+
+        override public function get right():int
+        {
+           return container.right;
+        }
+
+        override public function set bottom(val:int):void
+        {
+            container.bottom=val;
+        }
+
+        override public function get bottom():int
+        {
+           return container.bottom;
         }
 
         public function set footerHeight(val:uint):void
@@ -65,7 +128,7 @@
             footer.height = val;
         }
 
-         public function get footerHeight():uint
+        public function get footerHeight():uint
         {
             return footer.height;
         } 
@@ -75,7 +138,7 @@
             head.height = val;
         }
 
-         public function get headHeight():uint
+        public function get headHeight():uint
         {
             return head.height;
         }
@@ -84,56 +147,71 @@
 
     <style>
 
-        @radius:6px;
-        @border_color:darken(@secondary, 3.5%);
+        @radius:5px;
+        @border_color:darken(@secondary,3.5%);
         @background_color:@secondary;
+        @import "animate/shake.less";
 
-        .popup-skin{
-            left:0px;
-            top:0px;
-            margin:0px;
+        .popup{
             z-index: 99999;
-            width:auto;
-            height:auto;
-            min-width: 220px;
+            left: 0px;
+            top:0px;
+            right: 0px;
+            bottom: 0px;
+            position:fixed;
+            outline: 0px;
+        }
+
+        .popup-container
+        {
+            width: 280px;
+            min-width: 280px;
+            margin: 0px auto;
             background-color: #ffffff;
             border:1px solid @border_color;
             .border-radius( @radius, @radius,  @radius,  @radius);
-            .box-shadow( 0px 1px 3px rgba(0,0,0,.3) );
+            .box-shadow( 3px 3px 10px rgba(0,0,0,.3) );
         }
 
         .popup-head{
-            height: 30px;
+            height: auto;
             width: 100%;
-            line-height: 30px;
-            border-bottom: solid 1px #ccc;
-            padding:0px 8px;
-        }
-        .popup-head .popup-title{
-            line-height: 30px;
-            float: left;
+            border-bottom: solid 1px  @border_color;
+            padding:8px 12px;
+           .border-radius( @radius, @radius, 0, 0);
         }
 
-        .popup-head button.close{
-            font-size: 19px;
-            padding:5px;
+        .popup-lg > .popup-head{
+            padding:12px;
+        }
+
+        .popup-lg > .popup-head > .popup-title{
+            font-size: 18px;
+            line-height: 1.42857143;
+            font-weight: 500;
         }
 
         .popup-body{
             height: auto;
-            padding: 8px;
+            padding: 12px;
             overflow: auto;
         }
 
         .popup-footer{
-            border-top: solid 1px #ccc;
-            height: 40px;
+            border-top: solid 1px  @border_color;
             width: 100%;
+            height: auto;
             text-align: center;
+            padding: 8px 12px;
+           .border-radius(0,0,@radius, @radius);
         }
-        .popup-footer button{
-            margin:6px;
-            padding: 3px 8px;
+        .popup-footer > button{
+            margin:0px 6px;
+        }
+
+        .popup-lg > .popup-footer
+        {
+            text-align: right;
         }
 
     </style>
@@ -142,16 +220,19 @@
         <s:State name="title" stateGroup="simple" />
         <s:State name="alert" stateGroup="normal" />
         <s:State name="confirm" stateGroup="normal" />
+        <s:State name="modality" stateGroup="normal" />
     </s:states>
     <s:currentState>alert</s:currentState>
-    <div class="popup-head" id="@head" excludeFrom="tips">
-        <span class="popup-title" id="@title">title</span>
-        <button type="button" class="close" id="@close" >×</button>
-    </div>
-    <div class="popup-body" id="@body">
-    </div>
-    <div class="popup-footer" id="@footer" excludeFrom="simple">
-        <button type="button" class="btn btn-sm btn-primary" id="@submit">确 定</button>
-        <button type="button" class="btn btn-sm btn-default" id="@cancel" excludeFrom="alert">取 消</button>
+    <div class="popup-container fixed" id="@container" addClass.modality="popup-lg">
+        <div class="popup-head" id="@head" excludeFrom="tips">
+            <span class="popup-title" id="@title">title</span>
+            <button type="button" class="close" id="@close" >×</button>
+        </div>
+        <div class="popup-body" id="@body">
+        </div>
+        <div class="popup-footer" id="@footer" excludeFrom="simple">
+            <button type="button" class="btn btn-sm btn-default" removeClass.modality="btn-sm" id="@cancel" excludeFrom="alert">取 消</button>
+            <button type="button" class="btn btn-sm btn-primary" removeClass.modality="btn-sm" id="@submit">确 定</button>
+        </div>
     </div>
 </s:Skin>

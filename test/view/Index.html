@@ -3,27 +3,27 @@
     <![CDATA[
         import es.core.PopUp;
         import es.skins.PopUpSkin;
-        import es.skins.ModalitySkin;
         import es.core.Display;
         import BaseApplication;
 
         [RunPlatform('client')]
         override protected function initializing()
         {
-            PopUp.skinClass = PopUpSkin;
-            Element(".btn-success").addEventListener( MouseEvent.CLICK, function () {
+
+            Element(".btn-success").addEventListener( MouseEvent.CLICK, function (e:MouseEvent) {
                 console.log("click");
 
                 /*PopUp.confirm("您有3条信息未处理2", function (type:String) {
                     console.log( type );
                 }); */
 
+                //e.stopPropagation();
 
-             console.log( Element(".uuuu").length );
+
 
               var modal:PopUp =  PopUp.modality("修改信息",  Element(".uuuu").html( true ) , {callback:function (type:String) {
                     console.log( type );
-                },skinClass:ModalitySkin,profile:{width:700, height:500} }) as PopUp;
+                },disableScroll:true,profile:{width:700, height:500}}) as PopUp;
 
                 modal.skin.addEventListener(MouseEvent.CLICK, function(){
 

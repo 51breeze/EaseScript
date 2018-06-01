@@ -756,6 +756,19 @@ function make( config, isGlobalConfig )
         }
         config.globals=globals;
 
+        if( config.library )
+        {
+            Utils.forEach(config.library, function (name)
+            {
+                config.globals[ name ] = {
+                    "id":"class",
+                    "type":name,
+                    "notCheckType":true,
+                    "notLoadFile":true
+                }
+            });
+        }
+
         var project_path = config.project_path;
         var makedir = project_path;
         var makefiles = [];

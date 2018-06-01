@@ -49,11 +49,13 @@ function getDistance(startX,endX,startY,endY)
 var dataKey='__$touchDragData__';
 function invoke(listener, dispatchHandle )
 {
+    var currentTarget = this;
     var handle = function( event )
     {
+        event = Event.create( event );
         var x=0;
         var y= 0;
-        var target = event.currentTarget;
+        var target = currentTarget; // event.currentTarget;
         var data=target[dataKey];
         var touches=event.targetTouches;
         var dragEvent;
@@ -111,8 +113,26 @@ function invoke(listener, dispatchHandle )
             dispatchHandle(dragEvent);
         }
     }
-    listener.dispatcher.addEventListener(TouchEvent.TOUCH_START,handle, false, -1000)
+
+   /* listener.dispatcher.addEventListener(TouchEvent.TOUCH_START,handle, false, -1000)
     .addEventListener(TouchEvent.TOUCH_MOVE,handle, false, -1000)
-    .addEventListener(TouchEvent.TOUCH_END,handle, false, -1000);
+    .addEventListener(TouchEvent.TOUCH_END,handle, false, -1000);*/
+
+    listener.proxyHandle = handle;
+    listener.proxyTarget = this;
+    listener.proxyType = [
+        Event.fix.prefix+TouchEvent.TOUCH_START,
+        Event.fix.prefix+TouchEvent.TOUCH_MOVE,
+        Event.fix.prefix+TouchEvent.TOUCH_END
+    ];
+    for(var i=0;i<3;i++){
+        addListener(this, listener.proxyType[i] , handle);
+    }
 }
+
+function addListener(target, type, handle)
+{
+    target.addEventListener ? target.addEventListener(type,  handle) : target.attachEvent(type, handle);
+}
+
 Event.fix.hooks[ TouchDragEvent.TOUCH_DRAG_START ] = Event.fix.hooks[ TouchDragEvent.TOUCH_DRAG_MOVE ] = Event.fix.hooks[ TouchDragEvent.TOUCH_DRAG_END ] = invoke;

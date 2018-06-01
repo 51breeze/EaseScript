@@ -69,13 +69,14 @@ package es.core
             {
                 SystemManage.enableScroll();
             }
-
+            
             var animation:Object = options.animation;
             var skin:Skin = this.skin;
             if( this.state && animation && animation.enabled )
             {
+                var container:Skin = this.getContainer();
                 var fadeOut:Object = animation.fadeOut;
-                skin.style("animation", fadeOut.name+" "+fadeOut.duration+"s "+fadeOut.timing+" "+fadeOut.delay+"s "+fadeOut.fillMode);
+                container.style("animation", fadeOut.name+" "+fadeOut.duration+"s "+fadeOut.timing+" "+fadeOut.delay+"s "+fadeOut.fillMode);
                 setTimeout(function () {
                     skin.visible=false;
                 }, (fadeOut.delay+fadeOut.duration)*1000);
@@ -88,34 +89,74 @@ package es.core
         }
 
         /**
+         * 获取弹框的容器
+         * @return Skin
+         */
+        protected function getContainer():Skin
+        {
+            return this.skin;
+        }
+
+        /**
          * 设置窗体的位置
          */
-        protected function position(offsetX:int, offsetY:int, horizontal:String="center", vertical:String="middle" )
+        protected function position()
         {
+            var opt:Object =  this.options;
+            var horizontal:String = opt.horizontal as String;
+            var vertical:String = opt.vertical as String;
+            var skin:Skin = this.getContainer();
+
+            //设置弹框水平位置
+            if( typeof opt.x ==="string" && opt.x.slice(-1) ==="%"  || !isNaN(opt.x) )
+            {
+                skin.style("left", opt.x );
+                horizontal = '';
+            }
+
+            //设置弹框垂直位置
+            if( typeof opt.y ==="string" && opt.y.slice(-1) ==="%" || !isNaN(opt.y) )
+            {
+                skin.style("top", opt.y );
+                vertical = '';
+            }
+
+            var offsetX:int = (int)opt.offsetX;
+            var offsetY:int = (int)opt.offsetY;
             var win:Element = SystemManage.getWindow();
-            var skin:Skin = this.skin;
+            var winX:int =  win.width();
+            var winY:int =  win.height();
             switch ( horizontal )
             {
                 case "left" :
-                    skin.left = offsetX;
+                    skin.left = Math.max(offsetX,0);
                     break;
                 case "right" :
-                    skin.left = offsetX+( win.width() - skin.width );
+                    skin.left = getMaxAndMin(offsetX+( winX - skin.width ),winX, skin.width);
                     break;
-                default :
-                    skin.left = offsetX+( win.width() - skin.width ) / 2;
+                case "center" :
+                    skin.left = getMaxAndMin( offsetX+( winX - skin.width ) / 2, winX, skin.width );
+                    break;
             }
+
             switch ( vertical )
             {
                 case "top" :
-                    skin.top = offsetY+0;
+                    skin.top = Math.max(offsetY,0);
                     break;
                 case "bottom" :
-                    skin.top = offsetY+( win.height() - skin.height );
+                    skin.top =  getMaxAndMin( offsetY+( winY - skin.height ) , winY, skin.height );
                     break;
-                default :
-                    skin.top = offsetY+( win.height() - skin.height ) / 2;
+                case "middle" :
+                    skin.top = getMaxAndMin( offsetY+( winY - skin.height ) / 2, winY,  skin.height );
+                    break;
             }
+        }
+
+        //返回给定窗口大小范围内的值
+        private function getMaxAndMin( val:int, winSize:int,  skinSize:int ):int
+        {
+            return Math.max( Math.max( val , 0 ),  Math.min(val, winSize-skinSize)  );
         }
 
         //引用窗体中皮肤按扭的属性名
@@ -156,19 +197,20 @@ package es.core
          */
         protected function show( options:Object={} , isModalWindow:Boolean=false):es.core.BasePopUp
         {
+            options.isModalWindow = isModalWindow;
             this.options  = options;
             this.state    = true;
-
-            //启用背景遮罩
-            if( options.mask === true )
-            {
-                maskIntance = PopUpManage.mask( null, options.maskStyle );
-            }
 
             //禁用滚动条
             if( options.disableScroll )
             {
                 SystemManage.disableScroll();
+            }
+
+            //启用背景遮罩
+            if( options.mask === true )
+            {
+                maskIntance = PopUpManage.mask( null, options.maskStyle );
             }
             return this;
         }
@@ -184,6 +226,9 @@ package es.core
                 skin.style('position','absolute');
             }
 
+            //应用效果
+            elem.show();
+
             //设置皮肤元素属性
             Object.forEach(profile,function(value:*,prop:String)
             {
@@ -192,14 +237,13 @@ package es.core
                 }
             });
 
-            //应用效果
-            elem.show();
+            var container:Skin = this.getContainer();
             var animation:Object = options.animation;
             var timeout:Number   = options.timeout * 1000;
             if( animation.enabled )
             {
                 var fadeIn:Object = animation.fadeIn;
-                elem.style("animation", fadeIn.name+" "+fadeIn.duration+"s "+fadeIn.timing+" "+fadeIn.delay+"s "+fadeIn.fillMode);
+                container.style("animation", fadeIn.name+" "+fadeIn.duration+"s "+fadeIn.timing+" "+fadeIn.delay+"s "+fadeIn.fillMode);
                 timeout = (options.timeout+fadeIn.delay+fadeIn.duration )*1000;
             }
 

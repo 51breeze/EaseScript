@@ -214,7 +214,7 @@ function isEmpty( obj ) {
  * 在特定的版本下需要加载的库文件
  */
 const library={
-    /*'ie-9':{'Element':'Sizzle.js'}*/
+    'ie-9':{'Element':'Sizzle.js'}
 };
 
 /**
@@ -306,7 +306,11 @@ function builder(main, config , code, requirements , replacements )
     }
 
     requires = requires.filter(function (a) {
-        return exclude[a]!==true;
+        if( config.globals.hasOwnProperty(a) && config.globals[a].notLoadFile===true)
+        {
+            return false;
+        }
+        return exclude[a] !== true;
     });
 
     for(var prop in requires)

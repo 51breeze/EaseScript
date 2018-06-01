@@ -40,19 +40,19 @@ package es.core
             "disableScroll":false,
             "callback":null,
             "timeout":0,
-            "skinStyle":null,
             "maskStyle":null,
+            "clickOutsideClose":false,
             "animation":{
                 "enabled":true,
                 "fadeIn": {
-                    "name":"fadeIn",
+                    "name":"fadeInDown",
                     "duration":0.2,
                     "timing":"linear",
                     "delay":0,
                     "fillMode":"forwards",
                 },
                 "fadeOut": {
-                    "name":"fadeOut",
+                    "name":"fadeOutUp",
                     "duration":0.2,
                     "timing":"linear",
                     "delay":0,
@@ -68,15 +68,24 @@ package es.core
         };
 
         /**
-         * 遮罩层实例对象
+         * 当前打开窗口的计数据器
          */
-        static private var maskHash:Dictionary = new Dictionary();
+        static private var count:int = 0;
+
+         //遮罩层实例对象
+        static private var maskInstance:MaskDisplay = null;
+
+        //系统级弹框实例对象
+        static private var systemPopUpInstance:IPopUp=null;
+
+        //模态窗口实例对象
+        static private var modalityInstances:Array=[];
 
         /**
          * 显示一个遮罩层
          * @param style
          */
-        static public function mask( target:Display=null, options:Object=null, viewport:Element=null ):Display
+        static public function mask( target:Display=null, options:Object=null ):Display
         {
             //有指定目标遮罩层就关闭
             if( target )
@@ -87,18 +96,12 @@ package es.core
                 }
                 return target;
             }
-
-            if( viewport == null )
-            {
-                viewport = SystemManage.getBody();
-            }
-
-            var obj:MaskDisplay = maskHash.get( viewport ) as MaskDisplay;
+            var obj:MaskDisplay = maskInstance;
             if( obj == null )
             {
-                obj = new MaskDisplay( viewport );
-                maskHash.set( viewport, obj );
+                obj = new MaskDisplay( SystemManage.getBody() );
                 obj.style("zIndex", MASK_LEVEL );
+                maskInstance = obj;
             }
             if( options )
             {
@@ -112,12 +115,6 @@ package es.core
             return null;
         }
 
-        //系统级弹框实例对象
-        static private var systemPopUpInstance:IPopUp=null;
-
-        //模态窗口实例对象
-        static private var modalityInstances:Array=[];
-
         /**
          * 显示系统级的弹框
          * @param instance
@@ -129,7 +126,7 @@ package es.core
             {
                 viewport = SystemManage.getBody();
             }
-
+            count++;
             var level:int = WINDOW_LEVEL;
             if( isModalWindow === true )
             {
@@ -202,6 +199,15 @@ package es.core
          */
         static public function close( target:IPopUp )
         {
+            if( count > 0 )
+            {
+                count--;
+                if(maskInstance.visible)
+                {
+                    maskInstance.fadeOut();
+                }
+            }
+
             var index:int = modalityInstances.indexOf(target);
             if( index >= 0 )
             {
@@ -226,9 +232,6 @@ import es.core.SystemManage;
 import es.core.Display;
 class MaskDisplay extends Display
 {
-    //已绑定事件的容器
-    static private var container:Element;
-
     /**
      * 遮罩层样式
      */
@@ -241,11 +244,11 @@ class MaskDisplay extends Display
         "style":{
             "backgroundColor":"#000000",
             "opacity":0.7,
-            "width":"100%",
-            "height":"100%",
-            "position":"absolute",
+            "position":"fixed",
             "left":"0px",
             "top":"0px",
+            "right":"0px",
+            "bottom":"0px",
         }
     };
 
@@ -257,45 +260,17 @@ class MaskDisplay extends Display
      */
     public function MaskDisplay( viewport:Element )
     {
-        super( new Element('<div />') );
+        super( new Element('<div tabIndex="-1" />') );
         this._options = defaultOptions;
         this.style( "cssText", System.serialize(defaultOptions.style,"style") );
         this.visible = false;
         viewport.addChild( this.element );
-        this.resize();
     }
 
     //设置遮罩层样式及动画
     public function options( option:Object )
     {
         this._options = Object.merge( true, {}, defaultOptions, option );
-    }
-
-    //调整遮罩层的高度
-    //这个方法必须在当前对象添加到容器后才能生效
-    private function resize()
-    {
-        var height:Number=0;
-        var viewport:Element = this.element.parent();
-        if( Element.equal( viewport,  SystemManage.getBody() ) )
-        {
-            viewport =SystemManage.getWindow();
-            height = viewport.scrollHeight();
-        }else{
-            height = viewport.height();
-        }
-
-        if( !Element.equal(MaskDisplay.container, viewport) )
-        {
-            if( MaskDisplay.container )
-            {
-                MaskDisplay.container.removeEventListener(Event.RESIZE, this.resize);
-            }
-            viewport.addEventListener(Event.RESIZE, this.resize, false, 0, this);
-            MaskDisplay.container = viewport;
-        }
-        var h:Number = this.height;
-        this.height = h + Math.max( height-h,0);
     }
 
     //淡入遮罩层

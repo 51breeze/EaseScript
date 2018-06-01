@@ -8,9 +8,6 @@ package es.core
 {
     import es.components.SkinComponent;
     import es.core.Container;
-    import es.core.Display;
-    import es.core.es_internal;
-    import es.components.Component;
     import es.events.SkinEvent;
     import es.core.State;
     import es.interfaces.IDisplay;
@@ -174,19 +171,6 @@ package es.core
         };
 
         /**
-         * 当修改数据或者属性后调用此方法来提交属性并刷新视图
-         */
-      /*  public function commitPropertyAndUpdateSkin()
-        {
-            if( initialized===false )
-            {
-                initialized = true;
-                this.initializing();
-            }
-            this.createChildren();
-        }*/
-
-        /**
          * 渲染显示皮肤对象。
          * 调用此方法会重新创建子级对象，在非必要情况下请谨慎使用，可以节省资源。
          */
@@ -264,7 +248,8 @@ package es.core
         {
             var currentState:String = this.currentState;
             if( !currentState )return null;
-            if( this.currentStateObject ){
+            if( this.currentStateObject )
+            {
                 return this.currentStateObject;
             }
             var stateGroup:Object = this.stateGroup;
@@ -283,6 +268,8 @@ package es.core
 
         /**
          * 更新显示列表
+         * 此方法主要用来显示和隐藏指定对应状态的元素
+         * 当调用 createChildren 方法后，系统会自动调用无需手动调用。
          */
         protected function updateDisplayList()
         {
@@ -314,6 +301,5 @@ package es.core
                 }
             }
         }
-
     }
 }

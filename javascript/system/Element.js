@@ -119,7 +119,7 @@ var fix={
  * @private
  */
 var accessor={};
-var storage=Internal.createSymbolStorage( Symbol('element') );
+var storage=Internal.createSymbolStorage( Symbol('Element') );
 
 /**
  * @private
@@ -179,6 +179,11 @@ function access(callback, name, newValue, isDisplay, isHidden)
     });
 }
 
+/**
+ * 获取元素的显示属性
+ * @param elem
+ * @returns {*}
+ */
 function getDisplayValueByElem( elem )
 {
     var nodename = elem.nodeName.toLowerCase();
@@ -1132,8 +1137,8 @@ Element.prototype.removeClass=function removeClass( className )
     return this.forEach(function(elem){
         if(!hasStyle(elem))return;
         var old = elem['className']||'';
-        var newValue = !all && old ? old.replace( new RegExp('(\\s|^)' + className + '(\\s|$)'), '') : '';
-        this.addClass(newValue,true);
+        var newValue = !all && old ? old.replace( new RegExp('(\\s|^)' + className + '(\\s|$)'), ' ') : '';
+        this.addClass(newValue, true);
     });
 };
 
@@ -1177,6 +1182,7 @@ Element.prototype.animation=function animation(name, duration, timing, delay, co
     if(direction)cmd+=" alternate";
     if(!fillMode)fillMode = "forwards";
     cmd+=" "+fillMode;
+    this.style("animation","unset");
     this.style("animation",cmd);
     return this;
 }
