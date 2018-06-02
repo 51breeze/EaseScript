@@ -296,6 +296,59 @@ function mergeModules(targetModules, newModules )
     }
 }
 
+function importCss( name , project_path, less_path )
+{
+    var file = name;
+    //如果不是指定的绝对路径
+    if( !PATH.isAbsolute( name ) )
+    {
+        file = PATH.resolve( project_path, name );
+    }
+    //如果文件不存在,则指向到默认目录
+    if( !Utils.isFileExists( file ) )
+    {
+        file = PATH.resolve(less_path, name);
+        if( !Utils.isFileExists( file ) )
+        {
+            throw new Error( "'"+file +"' is not exists." );
+        }
+    }
+    return Utils.getContents( file );
+}
+
+function importCssPath( name , project_path, less_path )
+{
+    var file = name;
+    //如果不是指定的绝对路径
+    if( !PATH.isAbsolute( name ) )
+    {
+        file = PATH.resolve( project_path, name );
+    }
+    //如果文件不存在,则指向到默认目录
+    if( !Utils.isFileExists( file ) )
+    {
+        file = PATH.resolve(less_path, name);
+        if( !Utils.isFileExists( file ) )
+        {
+            throw new Error( "'"+file +"' is not exists." );
+        }
+    }
+    return file;
+}
+
+//所有动画库
+const animate_name_all = [
+"bounce","flash","pulse","rubberBand","shake","headShake","swing","tada","wobble","jello","bounceIn","bounceInDown","bounceInLeft",
+"bounceInRight","bounceInUp","bounceOut","bounceOutDown","bounceOutLeft","bounceOutRight","bounceOutUp","fadeIn","fadeInDown","fadeInDownBig",
+"fadeInLeft","fadeInLeftBig","fadeInRight","fadeInRightBig","fadeInUp","fadeInUpBig","fadeOut","fadeOutDown","fadeOutDownBig","fadeOutLeft",
+"fadeOutLeftBig","fadeOutRight","fadeOutRightBig","fadeOutUp","fadeOutUpBig","flipInX","flipInY","flipOutX","flipOutY","lightSpeedIn","lightSpeedOut",
+"rotateIn","rotateInDownLeft","rotateInDownRight","rotateInUpLeft","rotateInUpRight","rotateOut","rotateOutDownLeft","rotateOutDownRight","rotateOutUpLeft",
+"rotateOutUpRight","hinge","jackInTheBox","rollIn","rollOut","zoomIn","zoomInDown","zoomInLeft","zoomInRight","zoomInUp","zoomOut","zoomOutDown","zoomOutLeft",
+"zoomOutRight","zoomOutUp","slideInDown","slideInLeft","slideInRight","slideInUp","slideOutDown","slideOutLeft","slideOutRight","slideOutUp"
+];
+
+
+
 //目前支持的语法
 const syntax_supported={
     'php':true,
@@ -359,19 +412,49 @@ const builder={
             }});
 
             var style = [];
+            var importStyle = ["main.less"];
+            const loadedStyle= {};
+
+            //需要处理样式表
             if (_styleContent.length > 0)
             {
+                //获取样式内容
                 style = _styleContent.map(function (e, i)
                 {
                     var ownerModule = Maker.descriptionByName(e.fullclassname);
                     if (ownerModule.hasUsed !== true)return '';
                     e = e.ownerFragmentModule.styleContent;
+
+                    //加载需要嵌入的文件
                     e = e.replace(/@Embed\(.*?\)/g, function (a, b) {
                         var metatype = Utils.executeMetaType(a.substr(1));
                         var dest = Utils.parseMetaEmbed(metatype, config);
                         return '"./' + PATH.relative(Utils.getBuildPath(config, 'build.css'), dest).replace(/\\/g, '/') + '"';
                     });
 
+                    //导入样式或者less
+                    e = e.replace(/\B@import\s+([\'\"])(.*?)\1[;\B]?/gi, function (a,b,c)
+                    {
+                        c = Utils.trim(c);
+
+                        //获取样式的绝对路径
+                        var file = importCssPath( c , config.project_path, lessPath );
+
+                        //如果没有加载过指定的文件
+                        if( loadedStyle[file] !== true )
+                        {
+                            loadedStyle[file] = true;
+                            if (c.slice(-4) === ".css")
+                            {
+                                return Utils.getContents( file );
+                            } else {
+                                importStyle.push(c);
+                            }
+                        }
+                        return '';
+                    });
+
+                    //把样式变量转换成唯一的
                     e.replace(/\B@(\w+)\s*:/gi, function (a, b, c) {
                         e = e.replace(new RegExp('@' + b, "gi"), function (a) {
                             return '@' + b + i;
@@ -381,20 +464,36 @@ const builder={
                 });
             }
 
+            //需要加载字体样式
             if (config.font)
             {
-                style.unshift("\n@import './less/glyphicons.less';\n");
+                importStyle.push('./less/glyphicons.less');
             }
 
-            if (config.animate) {
-                style.unshift("\n@import 'animate.less';\n");
-            } else {
-                style.unshift("\n@import 'animate-base.less';\n");
+            //需要加载的动画样式
+            var animatefiles = ["fadeIn.css","fadeOut.css"];
+            var animatepath = PATH.resolve(lessPath, "animate");
+
+            //需要加载所有的动画样式
+            if (config.animate)
+            {
+                animatefiles = Utils.getDirectoryFiles( animatepath );
             }
 
-            style.unshift("\n@import 'mixins.less';\n");
-            style.unshift("\n@import 'main.less';\n");
+            //加载动画样式
+            animatefiles.forEach(function (a) {
+                a = PATH.resolve(animatepath, a);
+                if( loadedStyle[a] !== true )
+                {
+                    loadedStyle[a] = true;
+                    style.unshift( Utils.getContents( a ) );
+                }
+            });
 
+            //合并导入的样式
+            style.unshift( "\n@import '"+ importStyle.join("';\n@import '") +"';\n" );
+
+            //使用less处理样式文件
             (function (style, options, outputname, config) {
                 less.render(style.join("\n"), options, function (err, output) {
                     if (err) {

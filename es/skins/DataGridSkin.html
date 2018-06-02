@@ -60,6 +60,8 @@
         @radius:5px;
         @border_color:darken(@secondary, 3.5%);
         @background_color:@secondary;
+        @import "less/buttons.less";
+        @import "less/tables.less";
 
         .data-grid-skin {
             border-collapse: separate;
@@ -178,7 +180,7 @@
     <tfoot id="@foot">
          <tr>
              <td colspan="3">
-                 <c:Pagination id="@pagination"  radius="3"  skinClass="es.skins.PaginationSkin">
+                 <c:Pagination id="@pagination"  radius="3">
                  </c:Pagination>
              </td>
          </tr>

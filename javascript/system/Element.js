@@ -1180,7 +1180,7 @@ Element.prototype.animation=function animation(name, duration, timing, delay, co
     if(delay>0)cmd+=" "+delay+"s";
     if(count>1)cmd+=" "+count;
     if(direction)cmd+=" alternate";
-    if(!fillMode)fillMode = "forwards";
+    if(!fillMode)fillMode = "both";
     cmd+=" "+fillMode;
     this.style("animation","unset");
     this.style("animation",cmd);

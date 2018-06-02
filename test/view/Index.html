@@ -23,7 +23,7 @@
 
               var modal:PopUp =  PopUp.modality("修改信息",  Element(".uuuu").html( true ) , {callback:function (type:String) {
                     console.log( type );
-                },disableScroll:true,profile:{width:700, height:500}}) as PopUp;
+                },profile:{width:700, height:500}}) as PopUp;
 
                 modal.skin.addEventListener(MouseEvent.CLICK, function(){
 
@@ -44,8 +44,7 @@
     </head>
 
     <body>
-        <c:Navigate id="@navigate" skinClass="es.skins.NavigateSkin"></c:Navigate>
-
+        <c:Navigate id="@navigate"></c:Navigate>
         <div>
             <button type="button" class="btn btn-success" style="width: 100px;">点 我</button>
         </div>
@@ -60,9 +59,9 @@
             </s:template>
         </s:Skin>
 
-        <div class="uuuu">
+        <div class="uuuu" style="margin: 10px;">
             <h1>这里是内容9999999999   {context.title} </h1>
-            <c:DataGrid source="http://working.com/json.php" skinClass="es.skins.DataGridSkin" width="500" >
+            <c:DataGrid source="http://working.com/json.php"  width="500" >
                 <c:dataSource>
                     <c:dataType>@Http.TYPE_JSONP</c:dataType>
                 </c:dataSource>

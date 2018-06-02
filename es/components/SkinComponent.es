@@ -32,11 +32,11 @@ package es.components
             if (this._skin === null)
             {
                 var skinClass:Class = this.skinClass;
-                if( skinClass===null ){
+                if( skinClass===null )
+                {
                     throw new TypeError("skinClass is not assign");
                 }
                 var skin:Skin = (Skin)new skinClass( this );
-                //skin.addEventListener( ElementEvent.ADD, this.display, false, 0, this );
                 this._skin = skin;
             }
             return this._skin;
@@ -69,9 +69,6 @@ package es.components
                 {
                     var skin:Skin = (Skin)new value( this );
                     this._skin = skin;
-                    if( !(skin instanceof Skin) ){
-                        throw new TypeError("skinClass is not Skin");
-                    }
                     if( this.hasEventListener(PropertyEvent.CHANGE) )
                     {
                         var event:PropertyEvent = new PropertyEvent(PropertyEvent.CHANGE);
@@ -80,7 +77,6 @@ package es.components
                         event.property = 'skinClass';
                         this.dispatchEvent(event);
                     }
-                    //skin.addEventListener( ElementEvent.ADD, this.display, false, 0, this );
                 }
             }
         }

@@ -39,6 +39,9 @@ package es.core
          */
         protected var maskIntance:Display = null;
 
+        //动画是否完成
+        protected var animationEnd:Boolean = true;
+
         /**
          * 是否关闭窗体。
          * 如果回调函数返回false则不关闭
@@ -76,15 +79,19 @@ package es.core
             {
                 var container:Skin = this.getContainer();
                 var fadeOut:Object = animation.fadeOut;
+                this.animationEnd = false;
                 container.style("animation", fadeOut.name+" "+fadeOut.duration+"s "+fadeOut.timing+" "+fadeOut.delay+"s "+fadeOut.fillMode);
-                setTimeout(function () {
+                setTimeout(function (obj:BasePopUp) {
                     skin.visible=false;
-                }, (fadeOut.delay+fadeOut.duration)*1000);
+                    obj.state = false;
+                    obj.animationEnd = true;
+                }, (fadeOut.delay+fadeOut.duration)*1000, this );
 
-            }else{
+            }else
+            {
+                this.state = false;
                 skin.visible=false;
             }
-            this.state = false;
             return true;
         }
 
@@ -215,10 +222,14 @@ package es.core
             return this;
         }
 
+        /**
+         * @inherit
+         * @return
+         */
         override public function display():Element
         {
-            var options:Object = this.options;
             var elem:Element = super.display();
+            var options:Object = this.options;
             var skin:Skin    = this.skin;
             var profile:Object = options.profile;
             if( System.env.platform('IE', 8) )
@@ -240,17 +251,21 @@ package es.core
             var container:Skin = this.getContainer();
             var animation:Object = options.animation;
             var timeout:Number   = options.timeout * 1000;
-            if( animation.enabled )
+            var self:es.core.BasePopUp = this;
+            if( animation.enabled && !animation.running )
             {
+                this.animationEnd = false;
                 var fadeIn:Object = animation.fadeIn;
                 container.style("animation", fadeIn.name+" "+fadeIn.duration+"s "+fadeIn.timing+" "+fadeIn.delay+"s "+fadeIn.fillMode);
                 timeout = (options.timeout+fadeIn.delay+fadeIn.duration )*1000;
+                setTimeout(function (obj:BasePopUp) {
+                   obj.animationEnd= true;
+                }, timeout , this );
             }
 
             //定时关闭窗体
             if( options.timeout > 0 )
             {
-                var self:es.core.BasePopUp = this;
                 timeoutId = setTimeout(function () {
                     self.action("close");
                 }, timeout );

@@ -206,8 +206,11 @@ package es.core
          */
         override protected function show( options:Object={} , isModalWindow:Boolean=false ):BasePopUp
         {
-            super.show( Object.merge(true,{},PopUpManage.defaultOptions,options), isModalWindow );
-            PopUpManage.show(this, isModalWindow);
+            if( !this.state )
+            {
+                super.show(Object.merge(true, {}, PopUpManage.defaultOptions, options), isModalWindow);
+                PopUpManage.show(this, isModalWindow);
+            }
             return this;
         }
 
@@ -236,16 +239,19 @@ package es.core
             skin.removeEventListener(MouseEvent.MOUSE_OUTSIDE);
             skin.addEventListener(MouseEvent.MOUSE_OUTSIDE, function (e:MouseEvent)
             {
-                if (opt.isModalWindow )
+                if( self.state )
                 {
-                    if( opt.clickOutsideClose ===true )
+                    if (opt.isModalWindow)
                     {
-                        self.close();
+                        if (opt.clickOutsideClose === true)self.close();
+                    } else if( self.animationEnd )
+                    {
+                        self.animationEnd = false;
+                        skin.element.animation("shake", 0.2);
+                        setTimeout(function () {
+                            self.animationEnd = true;
+                        },300);
                     }
-
-                }else
-                {
-                    skin.element.animation("shake", 0.2);
                 }
             });
 

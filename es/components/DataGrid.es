@@ -9,6 +9,7 @@ package es.components
     import es.components.SkinComponent;
     import es.core.Display;
 
+    [Skin("es.skins.DataGridSkin")]
     public class DataGrid extends SkinComponent
     {
         public function DataGrid()

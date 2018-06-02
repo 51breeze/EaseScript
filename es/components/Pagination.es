@@ -34,6 +34,7 @@ package es.components
     import es.events.PaginationEvent;
     import es.core.Display;
 
+    [Skin("es.skins.PaginationSkin")]
     public class Pagination extends SkinComponent
     {
         function Pagination()

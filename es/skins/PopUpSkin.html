@@ -150,7 +150,13 @@
         @radius:5px;
         @border_color:darken(@secondary,3.5%);
         @background_color:@secondary;
-        @import "animate/shake.less";
+
+        @import "animate/shake.css";
+        @import "animate/fadeInDown.css";
+        @import "animate/fadeOutUp.css";
+        @import "less/fixed.less";
+        @import "less/buttons.less";
+        @import "less/close.less";
 
         .popup{
             z-index: 99999;
@@ -170,7 +176,7 @@
             background-color: #ffffff;
             border:1px solid @border_color;
             .border-radius( @radius, @radius,  @radius,  @radius);
-            .box-shadow( 3px 3px 10px rgba(0,0,0,.3) );
+            .box-shadow( 0px 3px 5px rgba(0,0,0,.35) );
         }
 
         .popup-head{

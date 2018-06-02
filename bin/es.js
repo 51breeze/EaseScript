@@ -13,7 +13,7 @@ program
 .option('-p, --path [dir]', '项目路径', cmd===cwd || cwd===root_path ? './project' : cwd )
 .option('-c, --config [file]', '指定配置文件', PATH.resolve(root_path, 'configure.js') )
 .option('-M, --minify [enable|disabled]', '是否需要压缩代码', null )
-.option('-A, --animate [enable|disabled]', '是否需要启用CSS3动画库', 'disabled' )
+.option('-A, --animate [enable|disabled]', '是否需要加载所有的CSS3动画库', 'disabled' )
 .option('-F, --font [enable|disabled]', '是否需要启用CSS字体库', 'enable' )
 .option('-o, --output [dir]', '输出路径')
 .option('-s, --syntax [js|php]', '要构建的语法','js')

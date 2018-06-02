@@ -202,7 +202,7 @@ package es.core
             if( count > 0 )
             {
                 count--;
-                if(maskInstance.visible)
+                if( count < 1 && maskInstance.visible)
                 {
                     maskInstance.fadeOut();
                 }
