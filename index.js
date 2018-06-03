@@ -5,6 +5,8 @@ const uglify = require('uglify-js');
 const Compile = require('./lib/compile.js');
 const Maker = require('./lib/maker.js');
 
+const zlib = require('zlib');
+
 globals = Maker.globalDescriptions;
 Utils.merge( Compile, Maker );
 
@@ -836,6 +838,8 @@ function getConfigure(config)
  */
 function make( config, isGlobalConfig )
 {
+
+
     try
     {
         config = getConfigure( Utils.merge(globalConfig, config || {}) );

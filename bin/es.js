@@ -56,6 +56,7 @@ program
 .option('--bs, --block-scope [enable|disabled]', '是否需要启用块级域','disabled')
 .option('--bsc, --base-skin-class [value]', '指定皮肤文件的基础类','es.core.Skin')
 .option('--sfs, --skin-file-suffix [value]', '皮肤文件的后缀','html')
+//.option('--gh, --global-handle [variable name]', '全局引用EaseScript对象的变量名','EaseScript')
 .option('--src, --source-file [enable|disabled]', '是否需要生成源文件','enable');
 
 program.parse(process.argv);
@@ -88,6 +89,7 @@ var config = {
     'bootstrap':program.bootstrap,
     'themes':program.themes,
     'source_file':program.sourceFile,
+   //'global_handle':program.globalHandle,
     'library':program.library,
     'strictType':program.strictType === 'enable',
     'mode': program.mode=='dev' ? 1 : program.mode=='test' ? 2 : 3, //1 标准模式（开发时使用） 2 测试  3 性能模式（生产环境使用）

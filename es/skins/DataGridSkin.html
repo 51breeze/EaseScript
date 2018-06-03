@@ -1,59 +1,61 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <s:Skin name="table" class="table data-grid-skin"  xmlns:c="es.components" xmlns:s="es.core">
     <s:Metadata>[HostComponent("es.components.DataGrid")]</s:Metadata>
-    <![CDATA[
-       import es.events.PaginationEvent;
-       import es.core.Display;
-       import es.core.Skin;
+    <s:Script>
+        <![CDATA[
+           import es.events.PaginationEvent;
+           import es.core.Display;
+           import es.core.Skin;
 
-       [Syntax("javascript")]
-       override protected function updateDisplayList()
-       {
-            super.updateDisplayList();
-            var hostComponent:DataGrid = this.hostComponent;
-            var radius:String= hostComponent.radius+'px';
-            var table:Element =  this.element;
-            table.style('borderRadius', radius );
-            Element('thead > tr:first-child >th:first-child' , table).style('borderTopLeftRadius',radius );
-            Element('thead > tr:first-child >th:last-child' , table).style('borderTopRightRadius',radius );
-            Element('tfoot > tr:last-child >td:first-child' , table).style('borderBottomLeftRadius',radius );
-            Element('tfoot > tr:last-child >td:last-child' , table).style('borderBottomRightRadius',radius );
-            Element('td',  (this.foot as Display).element ).height( hostComponent.footHeight );
-        }
-
-        override protected function initializing()
-        {
-            var hostComponent:DataGrid = this.hostComponent;
-            var dataSource:DataSource =  hostComponent.dataSource;
-            var body:Skin = this.body;
-            var dataProfile:String =  hostComponent.dataProfile();
-            body.variable('rowHeight', hostComponent.rowHeight );
-            head.variable('headHeight', hostComponent.headHeight );
-            body.variable( dataProfile, [] );
-            head.variable( hostComponent.columnProfile(), hostComponent.columns );
-            pagination.dataSource = dataSource;
-
-            var _wheelTarget:Display = hostComponent.wheelTarget;
-            if( !_wheelTarget ){
-                 _wheelTarget = this.foot;
+           [Syntax("javascript")]
+           override protected function updateDisplayList()
+           {
+                super.updateDisplayList();
+                var hostComponent:DataGrid = this.hostComponent;
+                var radius:String= hostComponent.radius+'px';
+                var table:Element =  this.element;
+                table.style('borderRadius', radius );
+                Element('thead > tr:first-child >th:first-child' , table).style('borderTopLeftRadius',radius );
+                Element('thead > tr:first-child >th:last-child' , table).style('borderTopRightRadius',radius );
+                Element('tfoot > tr:last-child >td:first-child' , table).style('borderBottomLeftRadius',radius );
+                Element('tfoot > tr:last-child >td:last-child' , table).style('borderBottomRightRadius',radius );
+                Element('td',  (this.foot as Display).element ).height( hostComponent.footHeight );
             }
 
-            if( hostComponent.wheelEnable )
+            override protected function initializing()
             {
-               pagination.wheelTarget = _wheelTarget;
-            }
+                var hostComponent:DataGrid = this.hostComponent;
+                var dataSource:DataSource =  hostComponent.dataSource;
+                var body:Skin = this.body;
+                var dataProfile:String =  hostComponent.dataProfile();
+                body.variable('rowHeight', hostComponent.rowHeight );
+                head.variable('headHeight', hostComponent.headHeight );
+                body.variable( dataProfile, [] );
+                head.variable( hostComponent.columnProfile(), hostComponent.columns );
+                pagination.dataSource = dataSource;
 
-            dataSource.addEventListener(DataSourceEvent.SELECT, function (event:DataSourceEvent)
-            {
-                if ( !event.waiting )
-                {
-                    body.variable( dataProfile , event.data );
-                    body.display();
+                var _wheelTarget:Display = hostComponent.wheelTarget;
+                if( !_wheelTarget ){
+                     _wheelTarget = this.foot;
                 }
-            });
-            dataSource.select(1);
-        }
-    ]]>
+
+                if( hostComponent.wheelEnable )
+                {
+                   pagination.wheelTarget = _wheelTarget;
+                }
+
+                dataSource.addEventListener(DataSourceEvent.SELECT, function (event:DataSourceEvent)
+                {
+                    if ( !event.waiting )
+                    {
+                        body.variable( dataProfile , event.data );
+                        body.display();
+                    }
+                });
+                dataSource.select(1);
+            }
+        ]]>
+    </s:Script>
 
     <style>
 
