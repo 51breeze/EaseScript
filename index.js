@@ -212,7 +212,7 @@ function getModuleScriptContent( modules )
 function getSkinModuleStyles( modules )
 {
     return modules.filter(function(e){
-        return e.ownerFragmentModule ? !!e.ownerFragmentModule.styleContent : false;
+        return e.ownerFragmentModule ? !!e.ownerFragmentModule.moduleContext.style : false;
     });
 }
 
@@ -326,8 +326,9 @@ function importCssPath( name , project_path, less_path )
     {
         file = PATH.resolve( project_path, name );
     }
+
     //如果文件不存在,则指向到默认目录
-    if( !Utils.isFileExists( file ) )
+    if( less_path && !Utils.isFileExists( file ) )
     {
         file = PATH.resolve(less_path, name);
         if( !Utils.isFileExists( file ) )
@@ -338,18 +339,340 @@ function importCssPath( name , project_path, less_path )
     return file;
 }
 
-//所有动画库
-const animate_name_all = [
-"bounce","flash","pulse","rubberBand","shake","headShake","swing","tada","wobble","jello","bounceIn","bounceInDown","bounceInLeft",
-"bounceInRight","bounceInUp","bounceOut","bounceOutDown","bounceOutLeft","bounceOutRight","bounceOutUp","fadeIn","fadeInDown","fadeInDownBig",
-"fadeInLeft","fadeInLeftBig","fadeInRight","fadeInRightBig","fadeInUp","fadeInUpBig","fadeOut","fadeOutDown","fadeOutDownBig","fadeOutLeft",
-"fadeOutLeftBig","fadeOutRight","fadeOutRightBig","fadeOutUp","fadeOutUpBig","flipInX","flipInY","flipOutX","flipOutY","lightSpeedIn","lightSpeedOut",
-"rotateIn","rotateInDownLeft","rotateInDownRight","rotateInUpLeft","rotateInUpRight","rotateOut","rotateOutDownLeft","rotateOutDownRight","rotateOutUpLeft",
-"rotateOutUpRight","hinge","jackInTheBox","rollIn","rollOut","zoomIn","zoomInDown","zoomInLeft","zoomInRight","zoomInUp","zoomOut","zoomOutDown","zoomOutLeft",
-"zoomOutRight","zoomOutUp","slideInDown","slideInLeft","slideInRight","slideInUp","slideOutDown","slideOutLeft","slideOutRight","slideOutUp"
-];
 
+function toHex(v)
+{
+    return '#' + v.map(function (c) {
+            c = Math.round(c);
+            return (c < 16 ? '0' : '') + c.toString(16);
+    }).join('');
+}
 
+function superposition(baseColor, mixeColor)
+{
+    var Color = this.context.pluginManager.less.tree.Color;
+    baseColor = baseColor.rgb;
+    mixeColor = mixeColor.rgb;
+    var r = Math.round( baseColor[0] <= 128 ? mixeColor[0] * baseColor[0] / 128 : 255 - (255-mixeColor[0]) * (255-baseColor[0]) / 128 ) ;
+    var g = Math.round( baseColor[1] <= 128 ? mixeColor[1] * baseColor[1] / 128 : 255 - (255-mixeColor[1]) * (255-baseColor[1]) / 128  );
+    var b = Math.round( baseColor[2] <= 128 ? mixeColor[2] * baseColor[2] / 128 : 255 - (255-mixeColor[2]) * (255-baseColor[2]) / 128  );
+    var rgb = [r,g,b];
+    console.log( rgb , mixeColor, baseColor );
+    return new Color(rgb, 1 , toHex(rgb)  );
+}
+
+function themeColor(color , base , name)
+{
+    if( base )
+    {
+         return base;
+    }
+    return color;
+    console.log( name.value );
+    process.exit();
+}
+
+/**
+ * 查找指定主题名的样式对象
+ * @param styleObject
+ * @param name
+ * @returns {*}
+ */
+function findThemeStyleByName(styleObject, name )
+{
+    return styleObject.filter(function (a) {
+        var themeName = a.attr.theme || "default";
+        return themeName === name;
+    });
+}
+
+/**
+ * 合并样式对象
+ * @param styleObject
+ * @param styleObjectAll
+ * @returns {string}
+ */
+function combineThemeStyle( styleObject, styleObjectAll, importStyle, loadedStyle, included, config, lessPath )
+{
+    return styleObject.map(function (a) {
+        var content = a.content;
+        content = correction(a.file, content, importStyle, loadedStyle, included, config, lessPath);
+        if( a.attr.combine )
+        {
+           var results = findThemeStyleByName( styleObjectAll, a.attr.combine ).map(function (a) {
+               return combineThemeStyle( [a], styleObjectAll, importStyle, loadedStyle, included, config, lessPath );
+           });
+           return content +"\n"+ results.join("\n");
+        }else{
+            return content;
+        }
+    }).join("\n");
+}
+
+const itemRegExp = /@([\w\-]+)\s*:\s*([^;]+)\s*;/;
+
+/**
+ * 解析主题配置文件
+ * @param content
+ * @returns {{}}
+ */
+function parseConfigFile( content )
+{
+    var items = {};
+    var result;
+    while ( result = itemRegExp.exec(content) )
+    {
+        items[ result[1] ] = result[2];
+        content = content.substr( result.index + result[2].length );
+    }
+    return items;
+}
+
+//主题基本配置文件
+var theme_base_config = null;
+
+/**
+ * 合并主题配置文件
+ * @param lesspath
+ * @param file
+ * @param config
+ * @returns {*}
+ */
+function mergeThemeConfig( lesspath, theme_name, config )
+{
+    var base = theme_base_config;
+    if( base===null )
+    {
+        base = PATH.resolve(lesspath, './less/variables.less');
+        if( !Utils.isFileExists(base) )
+        {
+            throw new ReferenceError("Missing less theme file for '"+base+"'");
+        }
+        base = parseConfigFile( Utils.getContents( base ) );
+        theme_base_config = base;
+    }
+
+     var file = config.theme_file_path;
+     if (!PATH.isAbsolute(file))
+     {
+         file = PATH.resolve(config.project_path, file);
+     }
+     if( Utils.isFileExists(file) )
+     {
+         var stat = fs.statSync( file );
+         if( stat.isDirectory() )
+         {
+             //以文件名来区分
+             file = PATH.resolve( file, theme_name+".less");
+             base = Utils.merge(base, parseConfigFile( Utils.getContents( file ) ) );
+
+         }else{
+
+             //以对象键名来区分
+             var object = parseConfigFile( Utils.getContents( file ) );
+             Utils.merge(base,  object[ theme_name ] || object );
+         }
+
+     }else
+     {
+         Utils.warn( " Not found theme file for '"+ file +"'" );
+     }
+     return base;
+}
+
+/**
+ * 修正内容路径
+ * @param file
+ * @param content
+ * @param importStyle
+ * @param loadedStyle
+ * @param included
+ * @param config
+ * @param lessPath
+ * @returns {*}
+ */
+function correction( file, content, importStyle, loadedStyle, included, config, lessPath )
+{
+    var e = content;
+    var root = file ? PATH.dirname(file) : "";
+    if( root ){
+        root = root.replace(/\\/g, '/').replace(/\/$/,'')+"/";
+    }
+
+    //修正图片地址
+    e = e.replace(/url\s*\(\s*[^@](.*?)\)/ig, function (a, b) {
+        b = root+b.replace(/^["']|["']$/g,"");
+        if( b.substr(0,5) === "http:" || b.substr(0,6) === "https:" )return a;
+        var dest = Utils.copyfileToBuildDir( b, Utils.getBuildPath(config, 'build.img'), config );
+        var url = '"./' + PATH.relative(Utils.getBuildPath(config, 'build.css'), dest).replace(/\\/g, '/') + '"';
+        return "url("+url+")";
+    });
+
+    //加载需要嵌入的文件
+    e = e.replace(/@Embed\(.*?\)/ig, function (a, b) {
+        var metatype = Utils.executeMetaType(a.substr(1));
+        var dest = Utils.parseMetaEmbed(metatype, config, root);
+        return '"./' + PATH.relative(Utils.getBuildPath(config, 'build.css'), dest).replace(/\\/g, '/') + '"';
+    });
+
+    //导入样式或者less
+    e = e.replace(/\B@import\s+([\'\"])(.*?)\1[;\B]?/gi, function (a,b,c)
+    {
+        c = root+ Utils.trim(c);
+
+        //获取样式的绝对路径
+        var file = importCssPath( c , config.project_path, lessPath );
+
+        //如果没有加载过指定的文件
+        if( loadedStyle[file] !== true )
+        {
+            loadedStyle[file] = true;
+            if (c.slice(-4) === ".css")
+            {
+                return Utils.getContents( file );
+            } else {
+                importStyle.push( file );
+            }
+        }
+        return '';
+    });
+
+    //合并样式
+    e = e.replace(/\B@include\s+([\'\"])(.*?)\1[;\B]?/gi, function (a,b,c)
+    {
+        c = root+ Utils.trim(c);
+        if( included[c] !==true  )
+        {
+            included[c] = true;
+            //获取样式的绝对路径
+            var file = importCssPath(c, config.project_path );
+            return Utils.getContents( file );
+        }
+        return "";
+    });
+    return e;
+}
+
+/**
+ * 获取指定皮肤模块的所有样式内容
+ * @param skinModules
+ * @param importStyle
+ * @param loadedStyle
+ * @param lessPath
+ * @param config
+ * @returns {*|{type, id, param}|{}|Array}
+ */
+function getAllStyleContent(skinModules, importStyle, loadedStyle, lessPath, config)
+{
+    var style = skinModules.map(function (m, i)
+    {
+        var ownerModule = Maker.descriptionByName(m.fullclassname);
+        if(ownerModule.hasUsed !== true)return '';
+
+        //已经加载的样式
+        var included = {};
+        var e = "";
+
+        //是否有指定样式文件
+        if( config.skin_style_config && config.skin_style_config.hasOwnProperty(m.fullclassname) )
+        {
+            var stylefile = config.skin_style_config[ m.fullclassname ];
+            if( !PATH.isAbsolute(stylefile) )
+            {
+                stylefile = PATH.resolve( config.project_path, stylefile );
+            }
+            e = Utils.getContents(stylefile);
+            e = correction( stylefile, e, importStyle, loadedStyle, included, config, lessPath);
+        }
+        //模块中的样式内容
+        else
+        {
+            var styleObjectAll = m.ownerFragmentModule.moduleContext.style;
+            var defaultTheme = findThemeStyleByName(styleObjectAll, config.theme );
+            if( defaultTheme.length === 0  ){
+                defaultTheme = findThemeStyleByName(styleObjectAll, "default" );
+            }
+            e = combineThemeStyle( defaultTheme , styleObjectAll , importStyle, loadedStyle, included, config, lessPath );
+        }
+        if( !e )return "";
+        //设置每一个样式表的作用域
+        var scope = "#"+ownerModule.fullclassname.replace(/\./g,"_");
+        return [scope,"(){\n",e,"\n}\n",scope,";\n"].join("");
+    });
+    return style;
+}
+
+//处理样式
+const less = require('less');
+
+/**
+ * 构建样式
+ * @param skinModules
+ * @param lessPath
+ * @param config
+ */
+function buildStyle(skinModules, lessPath, options, outputname, config )
+{
+    //需要处理样内容
+    var importStyle = ["main.less"];
+    var loadedStyle = {};
+    var style = getAllStyleContent(skinModules, importStyle, loadedStyle,lessPath, config)
+
+    //需要加载字体样式
+    if (config.font)
+    {
+        importStyle.push('./less/glyphicons.less');
+    }
+
+    //需要加载的动画样式
+    var animatefiles = ["fadeIn.css","fadeOut.css"];
+    var animatepath = PATH.resolve(lessPath, "animate");
+
+    //需要加载所有的动画样式
+    if (config.animate)
+    {
+        animatefiles = Utils.getDirectoryFiles( animatepath );
+    }
+
+    //加载动画样式
+    animatefiles.forEach(function (a) {
+        a = PATH.resolve(animatepath, a);
+        if( loadedStyle[a] !== true )
+        {
+            loadedStyle[a] = true;
+            style.unshift( Utils.getContents( a ) );
+        }
+    });
+
+    //合并导入的样式
+    style.unshift( "\n@import '"+ importStyle.join("';\n@import '") +"';\n" );
+
+    //使用less处理样式文件
+    (function (style, options, outputname, config) {
+
+        less.render(style.join("\n"), options, function (err, output) {
+            if (err) {
+                Utils.error(err.message);
+                Utils.error(err.extract.join('\n'));
+            } else {
+                var filename = filename = PATH.resolve(Utils.getBuildPath(config, 'build.css'), outputname + '.css');
+                fs.writeFileSync(filename, output.css);
+            }
+        });
+
+    })(style, options, outputname, config);
+
+    if( !font_builded )
+    {
+        font_builded = true;
+        var fontPath = Utils.getBuildPath(config, 'build.font');
+        var fontfiles = Utils.getDirectoryFiles(lessPath + '/fonts');
+        for (var i = 0; i < fontfiles.length; i++) {
+            Utils.copyfile(lessPath + '/fonts/' + fontfiles[i], fontPath + "/" + fontfiles[i])
+        }
+    }
+}
+var font_builded = false;
 
 //目前支持的语法
 const syntax_supported={
@@ -364,18 +687,26 @@ const builder={
     {
         Utils.info("building javascript start...");
 
-        var less = require('less');
-        var themes = require('./style/themes.js');
         var lessPath = PATH.resolve(config.root_path, './style/');
+        var theme_name = config.theme || "default";
+        var globalVars =  mergeThemeConfig( lessPath , theme_name, config );
         var options = {
             paths: [lessPath],
-            globalVars: themes[config.themes] || themes.default,
+            globalVars: globalVars,
             compress: config.minify === 'enable',
         };
+        globalVars.theme = config.theme;
+
+       /* less.functions.functionRegistry.add("superposition", superposition);
+        less.functions.functionRegistry.add("themeColor", function (color) {
+            return themeColor(color, options.globalVars.themeColor , options.globalVars.themeName );
+        });*/
+
         var len = descriptions.length;
         var index = 0;
         var view_path = Utils.getBuildPath(config, 'build.html');
 
+        //处理每一个入口文件
         for( ;index<len;index++ )
         {
             var bootstrap = descriptions[ index ];
@@ -384,6 +715,7 @@ const builder={
             var hashMap = Compile("javascript", Maker.makeModuleByName( bootstrap.fullclassname ) , bootstrap, config);
             var usedModules = getRequirementsAllUsedModules( bootstrap, usedModules, "javascript" );
 
+            //需要生成视图
             if( !client )
             {
                 usedModules.filter(function (e)
@@ -397,136 +729,38 @@ const builder={
                 });
             }
 
-
+            //准备相应的文件
             var skinModules = getRequirementsAllSkinModules( usedModules );
-            var _styleContent = getSkinModuleStyles( skinModules );
-            var _scriptContent =  getModuleScriptContent( usedModules );
+            var scriptContent =  getModuleScriptContent( usedModules );
             var requirements = getRequirementsAllGlobalClass( usedModules );
 
+            //生成源文件
             if( config.source_file ==="enable" )
             {
                 outputFiles(  Utils.getBuildPath(config, 'build.js')+"/src", ".js",  usedModules , null, "javascript");
             }
 
+            //构建脚本内容
             var builder = require( './javascript/builder.js');
-            _scriptContent = builder(bootstrap.fullclassname, config, _scriptContent.join(""), requirements, {namespace:function(content) {
+            scriptContent = builder(bootstrap.fullclassname, config, scriptContent.join(""), requirements, {namespace:function(content) {
                 return content.replace(/var\s+codeMap=\{\};/,"var codeMap="+JSON.stringify(hashMap)+";");
             }});
 
-            var style = [];
-            var importStyle = ["main.less"];
-            const loadedStyle= {};
+            //需要处理样内容
+            buildStyle(skinModules, lessPath, options, outputname, config );
 
-            //需要处理样式表
-            if (_styleContent.length > 0)
+            //压缩脚本
+            if (scriptContent && config.minify === 'enable')
             {
-                //获取样式内容
-                style = _styleContent.map(function (e, i)
-                {
-                    var ownerModule = Maker.descriptionByName(e.fullclassname);
-                    if (ownerModule.hasUsed !== true)return '';
-                    e = e.ownerFragmentModule.styleContent;
-
-                    //加载需要嵌入的文件
-                    e = e.replace(/@Embed\(.*?\)/g, function (a, b) {
-                        var metatype = Utils.executeMetaType(a.substr(1));
-                        var dest = Utils.parseMetaEmbed(metatype, config);
-                        return '"./' + PATH.relative(Utils.getBuildPath(config, 'build.css'), dest).replace(/\\/g, '/') + '"';
-                    });
-
-                    //导入样式或者less
-                    e = e.replace(/\B@import\s+([\'\"])(.*?)\1[;\B]?/gi, function (a,b,c)
-                    {
-                        c = Utils.trim(c);
-
-                        //获取样式的绝对路径
-                        var file = importCssPath( c , config.project_path, lessPath );
-
-                        //如果没有加载过指定的文件
-                        if( loadedStyle[file] !== true )
-                        {
-                            loadedStyle[file] = true;
-                            if (c.slice(-4) === ".css")
-                            {
-                                return Utils.getContents( file );
-                            } else {
-                                importStyle.push(c);
-                            }
-                        }
-                        return '';
-                    });
-
-                    //把样式变量转换成唯一的
-                    e.replace(/\B@(\w+)\s*:/gi, function (a, b, c) {
-                        e = e.replace(new RegExp('@' + b, "gi"), function (a) {
-                            return '@' + b + i;
-                        });
-                    });
-                    return e;
-                });
-            }
-
-            //需要加载字体样式
-            if (config.font)
-            {
-                importStyle.push('./less/glyphicons.less');
-            }
-
-            //需要加载的动画样式
-            var animatefiles = ["fadeIn.css","fadeOut.css"];
-            var animatepath = PATH.resolve(lessPath, "animate");
-
-            //需要加载所有的动画样式
-            if (config.animate)
-            {
-                animatefiles = Utils.getDirectoryFiles( animatepath );
-            }
-
-            //加载动画样式
-            animatefiles.forEach(function (a) {
-                a = PATH.resolve(animatepath, a);
-                if( loadedStyle[a] !== true )
-                {
-                    loadedStyle[a] = true;
-                    style.unshift( Utils.getContents( a ) );
-                }
-            });
-
-            //合并导入的样式
-            style.unshift( "\n@import '"+ importStyle.join("';\n@import '") +"';\n" );
-
-            //使用less处理样式文件
-            (function (style, options, outputname, config) {
-                less.render(style.join("\n"), options, function (err, output) {
-                    if (err) {
-                        Utils.error(err.message);
-                        Utils.error(err.extract.join('\n'));
-                    } else {
-                        var filename = filename = PATH.resolve(Utils.getBuildPath(config, 'build.css'), outputname + '.css');
-                        fs.writeFileSync(filename, output.css);
-                    }
-                });
-            })(style, options, outputname, config);
-
-            var fontPath = Utils.getBuildPath(config, 'build.font');
-            var fontfiles = Utils.getDirectoryFiles(lessPath + '/fonts');
-            for (var i = 0; i < fontfiles.length; i++) {
-                var source = fs.createReadStream(lessPath + '/fonts/' + fontfiles[i]);
-                var tocopy = fs.createWriteStream(fontPath + "/" + fontfiles[i]);
-                source.pipe(tocopy);
-            }
-
-            if (_scriptContent && config.minify === 'enable')
-            {
-                var script = uglify.minify(_scriptContent, {ie8: true});
+                var script = uglify.minify(scriptContent, {ie8: true});
                 if (script.error)throw script.error;
-                _scriptContent = script.code;
+                scriptContent = script.code;
             }
 
+            //生成文件
             var filename = PATH.resolve(Utils.getBuildPath(config, 'build.js'), outputname + '.js');
             Utils.mkdir(PATH.dirname(filename));
-            fs.writeFileSync(filename, _scriptContent );
-
+            fs.writeFileSync(filename, scriptContent );
         }
     },
 
@@ -817,6 +1051,38 @@ function getConfigure(config)
     if( config.reserved.indexOf('Context')<0 )config.reserved.push('Context');
     if( config.reserved.indexOf('Reflect')<0 )config.reserved.push('Reflect');
 
+    //主题配置文件路径
+    if( !PATH.isAbsolute( config.theme_file_path ) )
+    {
+        config.theme_file_path = PATH.resolve( config.project_path, config.theme_file_path );
+    }
+
+    //指定组件皮肤样式配置文件
+    if( config.skin_style_config )
+    {
+        var dataitem={};
+        Utils.forEach(  config.skin_style_config, function (item,key) {
+            if( item.slice(-5)===".conf" )
+            {
+                 if( !PATH.isAbsolute( item ) )
+                 {
+                     item = PATH.resolve(config.project_path, item);
+                 }
+                 if( !Utils.isFileExists(item) )
+                 {
+                    throw new ReferenceError( item+" is not exists.");
+                 }
+                 var fileconfig = JSON.parse( Utils.getContents(item) );
+                 if( fileconfig ){
+                     dataitem = Utils.merge(true,dataitem,fileconfig);
+                 }
+            }else{
+                dataitem[key]=item;
+            }
+        });
+        config.skin_style_config = dataitem;
+    }
+
     //系统类库路径名
     //在加载类文件时发现是此路径名打头的都转到系统库路径中查找文件。
     config.system_lib_path_name = 'es';
@@ -838,8 +1104,6 @@ function getConfigure(config)
  */
 function make( config, isGlobalConfig )
 {
-
-
     try
     {
         config = getConfigure( Utils.merge(globalConfig, config || {}) );

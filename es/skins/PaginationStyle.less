@@ -1,0 +1,40 @@
+@radius:3px;
+@secondary:#DFDFDF;
+@border:darken(@secondary, 8.5%);
+
+.pagination{
+  width: 100%;
+  height: auto;
+}
+.pagination li
+{
+  list-style: none;
+  display: inline-block;
+  margin: 0px 3px;
+  width: auto;
+  float: left;
+}
+.pagination li.link{
+  background-color: #ffffff;
+  border: solid 1px @border;
+  .border-radius( @radius, @radius,  @radius,  @radius);
+}
+.pagination li.link a{
+  width: 22px;
+  height: 22px;
+  text-align:center;
+}
+.pagination li.current{
+  background-color: @secondary;
+}
+.pagination li.current a{
+  color: #46484c;
+}
+.pagination li a{
+  text-decoration: none;
+  cursor: pointer;
+  text-align:center;
+  display: inline-block;
+  line-height: 22px;
+  color: #46484c;
+}

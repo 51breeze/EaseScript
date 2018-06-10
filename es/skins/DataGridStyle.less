@@ -1,0 +1,99 @@
+@radius:5px;
+@background_color:@theme-color;
+@box_border_color:darken(@background_color, 3.5%);
+@import "../../style/less/buttons.less";
+@import "../../style/less/tables.less";
+
+.head-text-color(@color) when( lightness(@color) <= 50% ){
+  @text-color:#fff;
+  @shine-color:rgba(255,255,255,.3);
+  @border_color:lighten(@background_color, 30%);
+}.head-text-color(@color) when( default() ){
+  @text-color:#555;
+  @shine-color:rgba(255,255,255,.8);
+  @border_color:@box_border_color;
+}
+.head-text-color( @background_color );
+
+.data-grid-skin {
+  border-collapse: separate;
+  *border-collapse: collapse; /* IE7 and lower */
+  border-spacing: 0;
+  width: 100%;
+  border:1px solid @box_border_color;
+  margin:0px;
+  .border-radius( @radius, @radius,  @radius,  @radius);
+  .box-shadow( 0px 2px 8px rgba(0,0,0,.35) );
+  background-color: lighten(@body-bg,8%);
+}
+
+/*ie6*/
+.data-grid-skin tbody td,
+.data-grid-skin thead th{
+  border-left: 1px solid @border_color;
+  border-top: 1px solid @border_color;
+  text-align: left;
+  margin: 0px;
+  padding: 4px;
+}
+.data-grid-skin thead th{
+  background-color: @background_color;
+  color:@text-color;
+}
+
+.data-grid-skin > thead > tr > td,
+.data-grid-skin > thead > tr > th,
+.data-grid-skin > tbody > tr > td
+{
+  border-left: 1px solid @border_color;
+  border-top: 1px solid @border_color;
+  text-align: left;
+  margin: 0px;
+  padding: 4px;
+}
+
+.data-grid-skin > tbody > tr:hover {
+  background: #fbf8e9;
+  .transition(all 0.1s ease-in-out);
+}
+
+.data-grid-skin > thead > tr:first-child > th {
+  border-top: none;
+  line-height: 25px;
+  background-color: @background_color;
+  background-clip: padding-box;
+  position:relative;
+  .gradient-vertical( lighten(@background_color, 6.5%),  @background_color );
+  .box-shadow( 0px 1px 0px @shine-color inset );
+}
+
+.data-grid-skin > thead > tr:last-child > th {
+  border-bottom: none;
+}
+
+.data-grid-skin > tbody > tr:last-child > td {
+  border-bottom: 1px solid @border_color;
+}
+
+.data-grid-skin > tbody > tr > td:first-child,
+.data-grid-skin > thead > tr > th:first-child {
+  border-left: none;
+}
+
+.data-grid-skin > thead > tr:first-child > th:first-child {
+  border-top-left-radius:@radius;
+}
+
+.data-grid-skin > thead > tr:first-child > th:last-child
+{
+  border-top-right-radius:@radius;
+}
+
+.data-grid-skin > tfoot > tr:last-child > td:first-child {
+  border-bottom-left-radius:@radius;
+  border-top: none;
+}
+
+.data-grid-skin > tfoot > tr:last-child > td:last-child {
+  border-bottom-right-radius:@radius;
+}

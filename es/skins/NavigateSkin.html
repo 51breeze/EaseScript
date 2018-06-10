@@ -35,25 +35,7 @@
         }
     ]]>
     </s:Script>
-
-    <style>
-        @import "less/navbar.less";
-        @import "less/navs.less";
-        .navigate{
-            width: 100%;
-            height: 35px;
-            line-height: 35px;
-        }
-        .navigate > .nav{
-            width: 1000px;
-            margin: 0px auto;
-        }
-        .navigate > .nav > li > a{
-            height: 35px;
-            padding:0px 10px;
-        }
-    </style>
-
+    <style file="NavigateStyle.less" />
     <s:Skin id="@container" name="ul" class="nav nav-pills">
         <s:template>
             <:foreach name="datalist" value="item" key="link">
