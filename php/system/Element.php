@@ -133,7 +133,11 @@ class Element extends EventDispatcher implements \ArrayAccess,\Countable
     public function addChildAt($child, $index=-1 )
     {
         $child = $child instanceof Element ? $child->items[0] : $child;
+        if( !isset($this->items[0]) ){
+            throw new TypeError("Invalid element");
+        }
         return $this->items[0]->addChildAt($child, $index);
+
     }
 
     public function removeChild( $child )
@@ -212,7 +216,19 @@ class Element extends EventDispatcher implements \ArrayAccess,\Countable
         $item = @$this->items[0];
         if( $value != null )
         {
-            if( $item ) $item->style->$name=$value;
+            if( $item )
+            {
+                static $attrpx = array(
+                    "width"=>"px",
+                    "height"=>"px",
+                    "left"=>"px",
+                    "top"=>"px",
+                    "bottom"=>"px",
+                    "right"=>"px",
+                    "borderRadius"=>"px",
+                );
+                $item->style->$name=$value.( isset($attrpx[$name]) ? $attrpx[$name] : '' );
+            }
             return $this;
         }
         return $item ? $item->style->$name : null;

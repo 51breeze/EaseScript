@@ -1,5 +1,4 @@
 <?php
-
 /*
  * EaseScript
  * Copyright © 2017 EaseScript All rights reserved.
@@ -7,9 +6,7 @@
  * https://github.com/51breeze/EaseScript
  * @author Jun Ye <664371281@qq.com>
  */
-
 if( !defined('NaN') )define('NaN','NaN');
-
 final class System
 {
     public static function log()
@@ -17,6 +14,16 @@ final class System
         $param = func_get_args();
         array_unshift( $param, implode(' ',array_fill(0,func_num_args(),'%s') ) );
         echo call_user_func_array('sprintf',  $param );
+    }
+
+    public static function isIterator( $obj )
+    {
+        static $iteratorClass = "es\\interfaces\\IListIterator";
+        if( interface_exists($iteratorClass) )
+        {
+            return is_a($obj, $iteratorClass);
+        }
+        return false;
     }
 
     public static function isOf( $obj, $class )
@@ -40,8 +47,17 @@ final class System
                     return is_string($obj);
                 case 'Boolean' :
                     return is_bool($obj);
+                case "int" :
+                case "Int":
+                case 'Integer' :
                 case 'Number' :
                     return is_numeric($obj);
+                case 'Uint' :
+                case 'uint' :
+                    return $obj >= 0;
+                case "double" :
+                case "float" :
+                    return is_float($obj);
                 case 'Object' :
                     return $obj===null ? true : is_object($obj);
             }
@@ -50,15 +66,6 @@ final class System
         {
             return false;
         }
-    }
-
-    public static function type($obj, $typeClass)
-    {
-        if( !self::is($obj, $typeClass) )
-        {
-            throw new TypeError('type is error');
-        }
-        return $obj;
     }
 
     public static function typeOf( $obj )
@@ -82,12 +89,12 @@ final class System
 
     public static function isObject( $obj, $flag=false )
     {
-        if(  is_object($obj) )
+        if( is_object($obj) )
         {
             $type = get_class($obj);
             return $type === 'es\core\Object' || $type === "stdClass";
 
-        }else if(  $flag !== true && is_array( $obj ) )
+        }else if( $flag !== true && is_array( $obj ) )
         {
             return true;
         }
@@ -102,6 +109,11 @@ final class System
     public static function isString( $obj )
     {
         return is_string($obj);
+    }
+
+    public static function isNumber( $obj )
+    {
+        return is_numeric($obj);
     }
 
     public static function isNaN($value)

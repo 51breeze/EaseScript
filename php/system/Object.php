@@ -11,12 +11,25 @@ class Object extends \stdClass implements \Iterator, \ArrayAccess
 {
     static public function each($target, $callback, $thisArg=null)
     {
-        if( $thisArg && $thisArg !== null ) {
+        if( $thisArg && $thisArg !== null )
+        {
             $callback = System::bind($thisArg, $callback);
         }
-        foreach($target as $key=>$item)
+
+        if( System::isIterator($target) )
         {
-            $callback($item,$key);
+            $target->rewind();
+            for ( ;$target->next(); )
+            {
+                $callback( $target->current(), $target->key() );
+            }
+
+        }else
+        {
+            foreach ($target as $key=>$item)
+            {
+                $callback($item, $key);
+            }
         }
     }
 
@@ -92,8 +105,8 @@ class Object extends \stdClass implements \Iterator, \ArrayAccess
         return $target;
     }
 
-    private $_originValue= null;
-    private $_originType= null;
+    private $_originValue= array();
+    private $_originType= 'object';
     
     public function __construct( $object=null )
     {
@@ -115,11 +128,6 @@ class Object extends \stdClass implements \Iterator, \ArrayAccess
                  $this->_originType = System::typeOf( $object );
                  $this->_originValue = $object;
              }
-
-         }else
-         {
-             $this->_originValue = array();
-             $this->_originType = 'object';
          }
     }
 
@@ -151,17 +159,17 @@ class Object extends \stdClass implements \Iterator, \ArrayAccess
     {
     }
 
-    function hasOwnProperty( $name )
+    public function hasOwnProperty( $name )
     {
         return isset( $this->_originValue[$name] );
     }
 
-    function propertyIsEnumerable( $name )
+    public function propertyIsEnumerable( $name )
     {
         return isset( $this->_originValue[$name] );
     }
 
-    function keys()
+    public function keys()
     {
         return array_keys($this->_originValue);
     }
@@ -171,7 +179,7 @@ class Object extends \stdClass implements \Iterator, \ArrayAccess
         return array_values( $this->_originValue );
     }
 
-    function getEnumerableProperties( $state=null )
+    public function getEnumerableProperties( $state=null )
     {
         return array_slice($this->_originValue,0);
     }
@@ -198,7 +206,10 @@ class Object extends \stdClass implements \Iterator, \ArrayAccess
 
     public function offsetUnset($offset)
     {
-        unset( $this->_originValue[$offset] );
+        if( $this->_originValue )
+        {
+            unset($this->_originValue[$offset]);
+        }
     }
 
     public function current()

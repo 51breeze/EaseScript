@@ -207,7 +207,7 @@ package es.components
         /**
          * @private
          */
-        private var _current:int = 1;
+        private var _current:int = NaN;
 
         /**
          * 设置当前需要显示的分页
@@ -216,6 +216,11 @@ package es.components
         public function get current():int
         {
             var dataSource:DataSource = this.dataSource;
+            if( isNaN(_current) )
+            {
+                var curr:int = (int)Locator.query(_profile, 1);
+                this._current = isNaN( curr ) ? 1 : curr;
+            }
             if( dataSource && this.initialized )
             {
                 return this.dataSource.current();

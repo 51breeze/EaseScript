@@ -223,49 +223,47 @@ final class Reflect
         return $target->__get($name);
     }
 
-
-final static public function type($value, $typeClass)
-{
-    if( is_string($typeClass) )
+    final static public function type($value, $typeClass)
     {
-        $original = $value;
-        $flag = false;
-        switch ( strtolower($typeClass) )
+        if( is_string($typeClass) )
         {
-            case "integer" :
-            case "int" :
-            case "number":
-            case "uint":
-                $value = intval($value);
-                $flag = true;
-                if ( strtolower($typeClass) !== "number")
-                {
-                    if( $typeClass === "uint" && $value < 0 )throw new RangeError($original ." convert failed. can only be an unsigned Integer");
-                    if( $value > 2147483647 || $value < -2147483648)throw new RangeError($original . " convert failed. the length of overflow Integer");
-                }
-                break;
-            case "double":
-            case "float":
-                $flag = true;
-                $value = floatval($value);
-                break;
+            $original = $value;
+            $flag = false;
+            switch ( strtolower($typeClass) )
+            {
+                case "integer" :
+                case "int" :
+                case "number":
+                case "uint":
+                    $value = intval($value);
+                    $flag = true;
+                    if ( strtolower($typeClass) !== "number")
+                    {
+                        if( $typeClass === "uint" && $value < 0 )throw new RangeError($original ." convert failed. can only be an unsigned Integer");
+                        if( $value > 2147483647 || $value < -2147483648)throw new RangeError($original . " convert failed. the length of overflow Integer");
+                    }
+                    break;
+                case "double":
+                case "float":
+                    $flag = true;
+                    $value = floatval($value);
+                    break;
+            }
+
+            if( $flag ===true )
+            {
+                if( System::isNaN($value) ) throw new TypeError($original + " can not be converted for " . $typeClass);
+                return $value;
+            }
         }
 
-        if( $flag ===true )
+        if( $value == null || $typeClass === "Object" )return $value;
+        if ( $typeClass && !\System::is($value, $typeClass) )
         {
-            if( System::isNaN($value) ) throw new TypeError($original + " can not be converted for " . $typeClass);
-            return $value;
+            throw new TypeError( 'Specify the type of value do not match. must is "'.$typeClass.'"');
         }
+        return $value;
     }
-
-    if( $value == null || $typeClass === "Object" )return $value;
-    if ( $typeClass && !\System::is($value, $typeClass) )
-    {
-        throw new TypeError( 'Specify the type of value do not match. must is "'.$typeClass.'"');
-    }
-    return $value;
-}
-    
 
     final static public function set($scope,$target, $name, $value, $thisArg=null,$ns=null )
     {
@@ -313,18 +311,16 @@ final static public function type($value, $typeClass)
         return !!self::getReflectionMethodOrProperty($target, $name,'Get_', $scope,$ns);
     }
 
-    final static public function incre($scope,$target, $propertyKey, $flag , $ns)
+    final static public function incre($scope,$target, $propertyKey, $flag=true , $ns=null )
     {
-        $flag = $flag !== false;
         $val = \Reflect::get($scope,$target, $propertyKey, null, $ns );
         $ret = $val+1;
         \Reflect::set($scope,$target, $propertyKey, $ret , null, $ns );
         return $flag ? $val : $ret;
     }
 
-    final static public function decre($scope,$target, $propertyKey, $flag , $ns)
+    final static public function decre($scope,$target, $propertyKey, $flag=true , $ns=null )
     {
-        $flag = $flag !== false;
         $val = \Reflect::get($scope,$target, $propertyKey, null, $ns );
         $ret = $val-1;
         \Reflect::set($scope,$target, $propertyKey, $ret , null, $ns );

@@ -289,7 +289,7 @@ function builder(main, config , code, requirements , replacements )
     /**
      * 引用全局对象模块
      */
-    var requires = ['System','Class','Namespace','Interface','Iterator','EventDispatcher','Event'].concat( globals.slice(0) );
+    var requires = ['System','Class','Namespace','Interface','ListIterator','EventDispatcher','Event'].concat( globals.slice(0) );
     if( requirements )
     {
         for ( var p in requirements )

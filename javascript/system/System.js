@@ -554,6 +554,11 @@ Internal.createSymbolStorage=function(symbol)
         }
         if( typeof value !== "undefined" )
         {
+            if( typeof data[ name ] === "number" )
+            {
+                if (value === "increment")return data[name]++;
+                if (value === "decrement")return data[name]--;
+            }
             data[ name ]=value;
             return value;
         }

@@ -394,6 +394,8 @@ ScriptRequest.prototype.__target__ = null;
 ScriptRequest.prototype.__async__ = null;
 ScriptRequest.prototype.__sended__ = false;
 
+var headElement = null;
+
 /**
  * 开始请求数据
  * @param url
@@ -414,8 +416,19 @@ ScriptRequest.prototype.send = function send(url, data)
     var target = this.__target__;
     if( this.__async__ )target.setAttribute('async', 'async');
     target.setAttribute('src', url);
-    if (!target.parentNode) {
-        (document.head || document.getElementsByTagName("head")[0]).appendChild(target);
+    if( headElement === null )
+    {
+        headElement = document.head || document.getElementsByTagName("head")[0];
+    }
+
+    if( !headElement || !headElement.parentNode )
+    {
+        throw new ReferenceError("Head element is not exist.");
+    }
+
+    if (!target.parentNode)
+    {
+        headElement.appendChild(target);
     }
 };
 

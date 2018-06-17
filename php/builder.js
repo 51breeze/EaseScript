@@ -225,6 +225,7 @@ var classMap = {
     "Namespace":"Namespaces",
     "document":"Document",
     "window":"Window",
+    "console":"Console",
 }
 
 /**
@@ -269,39 +270,28 @@ function builder(path , config , modules, requirements , namespaceMap )
             continue;
         }
         loaded[ name ] = true;
-        if( ( config.globals.hasOwnProperty(name) || globals.indexOf(name)>=0 ) )
+        if( utils.isFileExists(config.root_path+'/php/system/'+name+'.php') )
         {
-            if( utils.isFileExists(config.root_path+'/php/system/'+name+'.php') )
+            var content = utils.getContents( config.root_path+'/php/system/'+name+'.php' );
+            if( name==="Namespaces" && namespaceMapValue.length>0 )
             {
-                var content = utils.getContents( config.root_path+'/php/system/'+name+'.php' );
-                if( name==="Namespaces" && namespaceMapValue.length>0 )
-                {
-                    content = content.replace(/private\s+static\s+\$map\s*=\s*array\(\.*\)\s*;/,function (a) {
-                        return 'private static $map = array('+namespaceMapValue.join(",\n")+');';
-                    });
-                }
-
-                var _require = describe(content,"");
-                _require = _require.requirements.filter(function (name) {
-                     return !exclude[ name ];
+                content = content.replace(/private\s+static\s+\$map\s*=\s*array\(\.*\)\s*;/,function (a) {
+                    return 'private static $map = array('+namespaceMapValue.join(",\n")+');';
                 });
-
-                _require.forEach(function (name) {
-                    if( !loaded[ name ] ){
-                        requires.push( name );
-                    }
-                });
-
-                content = utils.trim( content );
-
-                /*if( _require.length > 0) {
-                    content = content.replace(/^\<\?php/, '<?php\nnamespace system;\nuse system\\' + _require.join(";\nuse system\\") + ";\n");
-                }else{
-                    content = content.replace(/^\<\?php/, '<?php\nnamespace system;\n');
-                }*/
-
-                utils.setContents( dir+"/"+name+'.php', content );
             }
+
+            var _require = describe(content,"");
+            _require = _require.requirements.filter(function (name) {
+                 return !exclude[ name ];
+            });
+
+            _require.forEach(function (name) {
+                if( !loaded[ name ] ){
+                    requires.push( name );
+                }
+            });
+            content = utils.trim( content );
+            utils.setContents( dir+"/"+name+'.php', content );
         }
     }
 

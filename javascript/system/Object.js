@@ -128,14 +128,18 @@ Object.forEach=function forEach(object,callback,thisObject)
     {
         isIterator = System.is(object, System.getDefinitionByName( Internal.iteratorClass ) );
     }
-
+    thisObject = thisObject||object;
     if( isIterator )
     {
-        var current;
-        var fn = object[ object instanceof System.Iterator ? "seek" : "_seek" ];
-        while ( current = fn.call(object) )
+        var prefix = object instanceof System.ListIterator ? "" : "_";
+        var next = object[prefix+"next"];
+        var current = object[prefix+"current"];
+        var key = object[prefix+"key"];
+        var rewind = object[prefix+"rewind"];
+        rewind.call(object);
+        for ( ;next.call(object); )
         {
-            callback.call(thisObject||object, current.value, current.key);
+            callback.call(thisObject, current.call(object), key.call(object) );
         }
 
     }else
@@ -152,7 +156,7 @@ Object.forEach=function forEach(object,callback,thisObject)
             if (System.Symbol.isSymbolPropertyName && System.Symbol.isSymbolPropertyName(prop))continue;
             if (prop !== token && $propertyIsEnumerable.call(object, prop))
             {
-                callback.call(thisObject || object, object[prop], prop);
+                callback.call(thisObject, object[prop], prop);
             }
         }
     }

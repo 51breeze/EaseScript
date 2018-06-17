@@ -1146,6 +1146,9 @@ function make( config, isGlobalConfig )
             Utils.error("Syntax "+config.syntax +" is not supported.");
         }
 
+        //Maker
+        Compile.Maker = Maker;
+
         //如果定要编译的目录下的文件
         if( !Utils.isFileExists( file+config.suffix ) )
         {

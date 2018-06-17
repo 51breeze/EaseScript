@@ -43,23 +43,23 @@ class Http extends EventDispatcher
     const METHOD_PUT= 'PUT';
 
     private $option = array(
-        'method'=>self::METHOD_GET,
-        'type'=>self::TYPE_JSON,
-        'contentType'=>self::DATA_X_WWW_FORM_URLENCODED,
-        'accept'=>self::ACCEPT_HTML,
+        'method'=>Http::METHOD_GET,
+        'type'=>Http::TYPE_JSON,
+        'contentType'=>Http::DATA_X_WWW_FORM_URLENCODED,
+        'accept'=>Http::ACCEPT_HTML,
     );
 
     public function __construct( $option =array() )
     {
         parent::__construct();
-        $this->option = array_merge( $this->option,(array)$option );
+        $this->option = (object)array_merge( $this->option,(array)$option );
     }
 
     public function abort()
     {
     }
 
-    public function load($url, $data=null, $method=self::METHOD_GET )
+    public function load($url, $data=null, $method=Http::METHOD_GET )
     {
         $request = new Request( $url );
         $fp = fsockopen( $request->host() , $request->port() , $errno, $errstr,5);
@@ -68,9 +68,32 @@ class Http extends EventDispatcher
             throw new Error( $errstr );
         }
 
+        $param = "";
+        if( $data )
+        {
+            $data = (array)$data;
+            if( $method === Http::METHOD_GET )
+            {
+                $request->query($data);
+
+            }else{
+                switch ( $this->option->contentType )
+                {
+                    case Http::DATA_JSON :
+                        $param = json_encode( $data );
+                        break;
+                    default :
+                        $param = http_build_query( $data );
+                }
+            }
+        }
+
         $out = $method." ".$request->uri()." HTTP/1.1\r\n";
         $out .= "Host: ".$request->host()."\r\n";
+        $out .= "Content-Type: ".$this->option->contentType."\r\n";
+        $out .= "Content-Length: ".strlen($param)."\r\n";
         $out .= "Connection: Close\r\n\r\n";
+        $out .= $param;
 
         stream_set_blocking($fp, 1 );
         stream_set_timeout($fp, 5);
