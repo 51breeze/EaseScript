@@ -723,7 +723,7 @@ const builder={
                     var o = e.ownerFragmentModule || e;
                     if( o.isMakeView===true )
                     {
-                        mergeModules(usedModules, createServerView(  view_path , e, ".html", config ) );
+                        mergeModules(usedModules, createServerView(  view_path , e, "javascript", config ) );
                     }
                     return e.nonglobal === true;
                 });
@@ -731,7 +731,7 @@ const builder={
 
             //准备相应的文件
             var skinModules = getRequirementsAllSkinModules( usedModules );
-            var scriptContent =  getModuleScriptContent( usedModules );
+            var scriptContent = getModuleScriptContent( usedModules );
             var requirements = getRequirementsAllGlobalClass( usedModules );
 
             //生成源文件
@@ -768,13 +768,18 @@ const builder={
     {
         Utils.info("building php start...");
 
+        //已经使用的模块
         var usedModules = systemMainClassModules.slice(0);
+        //以加载文件的哈希对象
         var hash = {};
+        //生成视图的路径
         var view_path = Utils.getBuildPath(config, 'build.view');
+        //构建应该路径
         var app_path = Utils.getBuildPath(config, 'build.application');
+        //命名空间映射关系
         var hashMap=[];
 
-        //编译普通模块
+        //编译模块
         Utils.forEach(descriptions, function (module)
         {
             hashMap = Compile("php", Maker.makeModuleByName(module.fullclassname), module, config);
@@ -782,84 +787,33 @@ const builder={
         });
 
         //需要生成的本地模块
-        usedModules.filter(function (e)
-        {
-             var o = e.ownerFragmentModule || e;
-             if( o.isMakeView===true /*|| o.isSkin === true*/ )
-             {
-                // var require = createServerView( o.isMakeView ? view_path : app_path , e, "php", config );
-                // mergeModules(usedModules, require);
-             }
-             return e.nonglobal === true;
-        });
-
-        usedModules.filter(function (e)
-        {
-            var o = e.ownerFragmentModule || e;
-            if( o.skinMaker && o.isMakeView ===true && o.isSkin === true )
-            {
-                var callback = o.skinMaker;
-                var require = [];
-                var content = callback(function (script) {
-                    return compileFragmentScript(script,  o.fullclassname+"php", "php", config, require );
-                });
-                mergeModules(usedModules, require);
-                var file = Utils.getResolvePath( app_path , o.fullclassname );
-                Utils.mkdir( file.substr(0, file.lastIndexOf("/") ) );
-                Utils.setContents(file+".php", content);
-            }
-            return e.nonglobal === true;
-        });
-
         var localModules = usedModules.filter(function (e)
         {
             return e.nonglobal === true;
         });
 
-        //输出模块文件
+        //输出使用的模块文件
         outputFiles( app_path, ".php", localModules , function (module) {
-
-            var o = module.ownerFragmentModule || module;
-            if( o.isMakeView ===true ){
-               // return "";
-            }
-
-            if( Maker.checkInstanceOf(module,"es.core.View") )
-            {
-                var code=["<?php\n"]
-                if( module.package ){
-                    code.push( "namespace "+module.package.replace(/\./g,'\\') +";\n" );
-                }
-                code.push( "use es\\core\\Application;\n" );
-                var rootpath =  PATH.relative( app_path, view_path ).replace(/\\/,'/');
-                var filepath =  rootpath+'/'+module.fullclassname.replace(/\./g,'/');
-                code.push( "class "+module.classname+"\n{\n" );
-                code.push( "\tprivate $_context;\n" );
-                code.push( "\tpublic function __construct(Application $context)\n\t{\n" );
-                code.push( "\t\t$this->_context = $context;\n" );
-                code.push( "\t}\n" );
-                code.push( "\tpublic function display()\n\t{\n" );
-                code.push( "\t\tob_start();\n" );
-                code.push( "\t\t$assignments = (array)$this->_context->getAssignments();\n" );
-                code.push( "\t\textract( $assignments , EXTR_IF_EXISTS );\n" );
-                code.push( "\t\tinclude '"+filepath+".php';\n" );
-                code.push( "\t\t$content = ob_get_contents();\n" );
-                code.push( "\t\tob_end_clean();\n" );
-                code.push( "\t\techo $content;\n" );
-                code.push( "\t}\n}" );
-                //return code.join("");
-            }
             return module.makeContent['php'];
         });
 
+        //php构建器
         var phpBuilder = require( './php/builder.js');
+
+        //使用的全局类模块
         var requirements = usedModules.filter(function (a) {
              return !(a.nonglobal === true);
         });
+
+        //全局类模块名
         requirements= requirements.map(function (a) {
               return a.type;
         });
+
+        //生成php文件
         phpBuilder( config.build_path, config, [], requirements, hashMap);
+
+        //构建需要生成的js文件
         builder.javascript(config, descriptions, true);
     }
 };

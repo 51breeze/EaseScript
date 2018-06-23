@@ -34,7 +34,7 @@ class DataSource extends EventDispatcher
     private $_totalSize = NaN;
     private $_buffer = 1;
     private $_current = 1;
-    private $_pageSize = 10;
+    private $_pageSize = 20;
     private $_loadCompleted = false;
     private $_loading = false;
     private $_nowNotify = false;
