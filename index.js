@@ -154,7 +154,7 @@ function getRequirementsAllUsedModules( module , results, syntax, hash )
     {
         var isNs = module.id==="namespace";
         var hasUsed = isNs ? module.namespaces[ module.classname ].hasUsed || module.hasUsed : module.hasUsed;
-        if( hasUsed && results.indexOf(module)<0 )
+        if( hasUsed && results.indexOf(module)<0  && module["has_syntax_remove_"+syntax] !== true )
         {
            results.push(module);
         }
@@ -1065,6 +1065,8 @@ function make( config, isGlobalConfig )
         {
             globalConfig  = config;
         }
+
+        config.syntax_supported = syntax_supported;
 
         requirements = config.requirements || (config.requirements = {});
         config.syntax = syntaxMap[ config.syntax ] || 'javascript';
