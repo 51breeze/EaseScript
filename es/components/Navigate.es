@@ -141,6 +141,7 @@ package es.components
         public function set current(value:*):void
         {
             _current = value;
+            this.interaction("current",value);
         }
     }
 }

@@ -291,6 +291,20 @@ package es.components
             {
                 this.initializing();
                 this.commitPropertyAndUpdateSkin();
+                if( RunPlatform(server) )
+                {
+                    var classname:String = __CLASS__.replace(/\\/gi,'.');
+                    var skinClass:String = System.getQualifiedObjectName( this.skin ).replace(/\\/gi,'.');
+                    var content:Array = [];
+                    var id:String = 'id'+( new Date() ).getTime();
+                    content.push( "var "+id+"=new "+classname +"()");
+                    content.push( id+".Set__skinClass="+skinClass );
+                    Object.forEach(interactionProperties, function (val:*,name:String) {
+                        content.push( id+".Set__"+name+"="+val );
+                    });
+                    content.push( id+"._display();\n" );
+                    //console.log( "<script>"+ content.join(";\n") +"</script>" );
+                }
             }
             return this.skin.element;
         };
@@ -307,6 +321,15 @@ package es.components
                 skin[ name ] = value;
             });
             skin.display();
+        }
+
+        [RunPlatform(server)]
+        private var interactionProperties:Object={};
+
+        [RunPlatform(server)]
+        protected function interaction(name:String, value:*)
+        {
+             interactionProperties[ name ] = value;
         }
     }
 }

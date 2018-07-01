@@ -215,10 +215,9 @@ package es.core
                 var children:Array = this.children;
                 var len:int = children.length;
                 var c:int = 0;
-                var child:IDisplay;
                 for (; c < len; c++)
                 {
-                    child = children[c] as IDisplay;
+                    var child:IDisplay = children[c] as IDisplay;
                     element.addChild( child.display() );
                 }
             }
@@ -236,6 +235,7 @@ package es.core
         /**
          * @private
          */
+        [RunPlatform(client)]
         private var currentStateObject:State=null;
 
         /**
@@ -244,6 +244,7 @@ package es.core
          * @param currentState
          * @returns {*}
          */
+        [RunPlatform(client)]
         private function getCurrentState():State
         {
             var currentState:String = this.currentState;
@@ -271,6 +272,7 @@ package es.core
          * 此方法主要用来显示和隐藏指定对应状态的元素
          * 当调用 createChildren 方法后，系统会自动调用无需手动调用。
          */
+        [RunPlatform(client)]
         protected function updateDisplayList()
         {
             var stateGroup:State = getCurrentState();

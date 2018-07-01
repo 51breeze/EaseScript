@@ -264,4 +264,9 @@ final class System
         }
         return $object;
     }
+
+    static function getQualifiedObjectName( $object )
+    {
+        return get_class($object);
+    }
 }

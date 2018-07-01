@@ -1070,6 +1070,7 @@ function make( config, isGlobalConfig )
 
         requirements = config.requirements || (config.requirements = {});
         config.syntax = syntaxMap[ config.syntax ] || 'javascript';
+        config.originMakeSyntax = config.syntax;
 
         //浏览器中的全局模块
         if( config.browser === 'enable' )
