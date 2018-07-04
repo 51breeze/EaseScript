@@ -12,12 +12,24 @@ class HTMLElement extends Node
     public $value  = '';
     private $innerHTML = '';
     private $outerHTML = '';
+    static private $mid=1;
 
     public function __construct($name='div', $type = 1, $attr=array() )
     {
         $this->nodeName = $name;
         $this->nodeType = $type;
+        if( !isset($attr["id"]) && !($name == "text" || $name == "#documentFragment") ){
+            $attr["id"] = "S-I-D-".(self::$mid++);
+        }
         parent::__construct($name, $type, $attr);
+    }
+
+    public function attribute($name, $value=null )
+    {
+         if( $value === null ){
+             return $this->attr->$name;
+         }
+         return $this->attr->$name = $value;
     }
 
     public function getElementByName( $name )
@@ -51,6 +63,18 @@ class HTMLElement extends Node
             }
         }
         return null;
+    }
+
+    public function countDepth()
+    {
+        if( $this->parentNode )
+        {
+            $this->depth += $this->parentNode->depth + 1;
+        }
+        foreach( $this->children as $child )
+        {
+            $child->countDepth();
+        }
     }
 
     private $children=array();

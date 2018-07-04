@@ -266,6 +266,7 @@ package es.components
         public function set wheelTarget( value:Display )
         {
             _wheelTarget = value;
+            this.interaction("wheelTarget",value);
         }
 
         /**

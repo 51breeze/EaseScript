@@ -300,7 +300,11 @@ package es.components
                     content.push( "var "+id+"=new "+classname +"()");
                     content.push( id+".Set__skinClass="+skinClass );
                     Object.forEach(interactionProperties, function (val:*,name:String) {
-                        content.push( id+".Set__"+name+"="+val );
+                        if( val instanceof Skin ){
+                            var elem:Object = (val as Skin).element;
+                            val = "new Element('#"+elem[0].id+"')";
+                        }
+                        content.push( id+".Set__"+name+"("+val+")" );
                     });
                     content.push( id+"._display();\n" );
                     //console.log( "<script>"+ content.join(";\n") +"</script>" );

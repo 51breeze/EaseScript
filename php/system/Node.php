@@ -15,6 +15,7 @@ class Node extends EventDispatcher
     protected $parentNode = null;
     protected $attr = null;
     protected $style = null;
+    protected $depth = 0;
 
     public function __construct($nodeName='text', $nodeType=3, $attr=null )
     {
@@ -66,4 +67,5 @@ class Node extends EventDispatcher
         }
         unset( $this->attr->$name );
     }
+
 }
