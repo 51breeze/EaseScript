@@ -19,7 +19,11 @@ package es.core
          */
         function Skin( name:*, attr:Object=null)
         {
-            if( name instanceof Element )
+            if( Element.isHTMLContainer(name) )
+            {
+                super( new Element(name) );
+            }
+            else if( name instanceof Element )
             {
                 super( name as Element );
                 

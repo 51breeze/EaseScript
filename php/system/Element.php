@@ -42,6 +42,9 @@ class Element extends EventDispatcher implements \ArrayAccess,\Countable
             case 'body' :
                 return System::document()->body;
                 break;
+            case 'head' :
+                return System::document()->head;
+                break;
             case 'html' :
                 return System::document()->documentElement;
                 break;
@@ -209,6 +212,14 @@ class Element extends EventDispatcher implements \ArrayAccess,\Countable
         $item->$name = $value;
         return $this;
     }
+
+    public function setProperties( $object )
+    {
+        $item = $this->items[0];
+        $item->attr = $object;
+        return $this;
+    }
+
     public function hasProperty($prop){}
     public function data($name, $value ){}
     public function style($name, $value=null)

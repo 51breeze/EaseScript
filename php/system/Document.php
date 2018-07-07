@@ -12,6 +12,7 @@ class Document extends HTMLElement
 {
     private $body = null;
     private $head = null;
+    private $title = null;
     private $documentElement=null;
     static public $document = null;
     public function __construct()
@@ -20,17 +21,15 @@ class Document extends HTMLElement
         {
             throw new Error("Document is not constructor");
         }
-
         parent::__construct();
         $this->documentElement = new HTMLElement('html');
-        Document::$document = $this->documentElement;
-        $this->addChild( $this->documentElement );
-
         $this->head = new HTMLElement('head');
-        $this->documentElement->addChild( $this->head );
-
+        $this->title= new HTMLElement('title');
         $this->body = new HTMLElement('body');
+        $this->head->addChild( $this->title );
+        $this->documentElement->addChild( $this->head );
         $this->documentElement->addChild( $this->body );
+        Document::$document = $this->documentElement;
         $this->nodeName = 'document';
     }
 
@@ -45,6 +44,12 @@ class Document extends HTMLElement
          {
              return $this->documentElement->innerHTML;
          }
+
+         if( $name ==="title" )
+         {
+             return $this->title->innerHTML;
+         }
+
          if( isset($this->$name) )
          {
              return $this->$name;
@@ -59,6 +64,16 @@ class Document extends HTMLElement
          {
              return $this->documentElement->innerHTML = $value;
          }
+         if( $name ==="outerHTML" )
+         {
+             return $this->documentElement->outerHTML = $value;
+         }
+
+         if( $name ==="title" )
+         {
+            return $this->title->innerHTML = $value;
+         }
+
          if( isset($this->$name) )
          {
              return $this->$name = $value;
