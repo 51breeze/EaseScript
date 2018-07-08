@@ -48,11 +48,11 @@ package es.components
          * @param source
          * @returns {void}
          */
+        [Syntax(origin)]
         public function set source( data:* ):void
         {
             this.dataSource.source( data );
         };
-
 
         /**
          * 获取数据源
@@ -82,7 +82,6 @@ package es.components
             }
             return this._dataProfile;
         };
-
 
         /**
          * @private
