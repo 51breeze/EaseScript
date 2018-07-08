@@ -19,34 +19,32 @@ package es.core
          */
         function Skin( name:*, attr:Object=null)
         {
+            var ele:Element = null;
             if( Element.isHTMLContainer(name) )
             {
-                super( new Element(name) );
+                ele= new Element(name);
             }
             else if( name instanceof Element )
             {
-                super( name as Element );
-                
+                ele=name as Element;
             }else if( name instanceof String ) 
             {
-                if ( name.charAt(0) === "#" || name.charAt(0) === "." ) 
-                {
-                    super( new Element(name) );
-
-                } else
-                {
-                    var strAttr:String = '';
-                    if (attr)
-                    {
-                        strAttr = System.serialize(attr, 'attr');
-                    }
-                    super( new Element('<' + name + " " + strAttr + '/>') );
-                }
-
+                var id:String = name.charAt(0);
+                ele = id === "#" || id==="." || id==="<" ? new Element(name) : new Element('<' + name +'/>');
             }else
             {
                 throw new Error( "Invalid parameter." );
             }
+            if( attr )
+            {
+                if( attr.innerHtml )
+                {
+                    ele.html( attr.innerHtml );
+                    delete attr.innerHtml;
+                }
+                ele.setProperties( attr );
+            }
+            super( ele );
         }
 
         /**
