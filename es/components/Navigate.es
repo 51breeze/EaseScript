@@ -48,7 +48,7 @@ package es.components
          * @param source
          * @returns {void}
          */
-        [Syntax(origin)]
+        [Remove(origin,expect=false)]
         public function set source( data:* ):void
         {
             this.dataSource.source( data );
@@ -68,7 +68,6 @@ package es.components
          * @private
          */
         private var _dataProfile:String = 'datalist';
-
 
         /**
          * @param profile

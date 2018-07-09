@@ -1,16 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<s:View xmlns:s="es.core"  xmlns:c="es.components" xmlns:b="@">
+<s:View uu="sss" xmlns:s="es.core"  xmlns:c="es.components" xmlns:b="@">
+    <s:Metadata>[HostComponent("BaseApplication")]</s:Metadata>
+    <s:Script>
     <![CDATA[
         import es.core.PopUp;
         import es.skins.PopUpSkin;
         import es.core.Display;
         import BaseApplication;
+        import es.skins.DataGridSkin;
 
-        [RunPlatform('client')]
         override protected function initializing()
         {
+            var gridSkin:DataGridSkin = dataGrid.skin as DataGridSkin;
+            gridSkin.pagination.profile="mypage";
+        }
 
-            Element(".btn-success").addEventListener( MouseEvent.CLICK, function (e:MouseEvent) {
+        [RunPlatform('server')]
+        private function server(){
+
+        }
+
+        override protected function updateDisplayList()
+        {
+            super.updateDisplayList();
+            this.server();
+            this.client();
+        }
+
+        [RunPlatform('client')]
+        private function client(){
+
+            Locator.url();
+             button.addEventListener( MouseEvent.CLICK, function (e:MouseEvent) {
                 console.log("click");
 
                 /*PopUp.confirm("您有3条信息未处理2", function (type:String) {
@@ -18,8 +39,6 @@
                 }); */
 
                 //e.stopPropagation();
-
-
 
               var modal:PopUp =  PopUp.modality("修改信息",  Element(".uuuu").html( true ) , {callback:function (type:String) {
                     console.log( type );
@@ -30,23 +49,24 @@
                         PopUp.confirm("您有3条信息未处理2", function (type:String) {
                         console.log( type );
                         });
-
                 });
-
             });
-
         }
-
     ]]>
+    </s:Script>
 
     <head>
         <title>{title}</title>
+        <base target="_blank"/>
+        <meta charset="UTF-8" http-equiv="X-UA-Compatible" />
+        <meta name="keyword" http-equiv="es,easescript" />
+        <script src="jquery-1.11.2.js" ></script>
     </head>
 
-    <body>
+    <body id="@body">
         <c:Navigate id="@navigate"></c:Navigate>
         <div>
-            <button type="button" class="btn btn-success" style="width: 100px;">点 我</button>
+            <button id="@button" type='button' class="btn btn-success" style="width: 100px;">点 我</button>
         </div>
 
         <s:Skin>
@@ -60,17 +80,35 @@
         </s:Skin>
 
         <div class="uuuu" style="margin: 10px;">
-            <h1>这里是内容9999999999   {context.title} </h1>
-            <c:DataGrid source="http://working.com/json.php"  width="500" >
+            <h1>
+                这里是内容9999999999   {context.title}
+            </h1>
+            <c:DataGrid source="http://working.com/json.php"  width="500"  async="false">
                 <c:dataSource>
                     <c:dataType>@Http.TYPE_JSONP</c:dataType>
                 </c:dataSource>
                 <c:columns>
                     <id>ID</id>
-                    <name>名称</name>
+                    <name>名称ssss</name>
+                    <phone>电话ss</phone>
+                </c:columns>
+            </c:DataGrid>
+        </div>
+
+
+        <div style="margin: 10px;">
+           <c:DataGrid  id="@dataGrid" source="http://working.com/json.php"  async="false" >
+                <c:dataSource>
+                    <c:dataType>@Http.TYPE_JSONP</c:dataType>
+                </c:dataSource>
+                <c:columns>
+                    <id>ID</id>
+                    <name>名称ss</name>
                     <phone>电话</phone>
                 </c:columns>
             </c:DataGrid>
         </div>
+
+
     </body>
 </s:View>
