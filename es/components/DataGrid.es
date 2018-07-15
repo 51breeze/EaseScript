@@ -12,9 +12,9 @@ package es.components
     [Skin("es.skins.DataGridSkin")]
     public class DataGrid extends SkinComponent
     {
-        public function DataGrid()
+        public function DataGrid( uniqueId:*=null )
         {
-            super();
+            super(uniqueId);
         }
 
         /**
@@ -266,7 +266,6 @@ package es.components
         public function set wheelTarget( value:Display )
         {
             _wheelTarget = value;
-            this.interaction("wheelTarget",value);
         }
 
         /**

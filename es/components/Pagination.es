@@ -37,9 +37,9 @@ package es.components
     [Skin("es.skins.PaginationSkin")]
     public class Pagination extends SkinComponent
     {
-        function Pagination()
+        function Pagination(uniqueId:*=null)
         {
-            super();
+            super(uniqueId);
         }
 
         /**
@@ -325,6 +325,7 @@ package es.components
         /**
          * @inherit
          */
+        [Syntax(origin)]
         override protected function initializing()
         {
             super.initializing();

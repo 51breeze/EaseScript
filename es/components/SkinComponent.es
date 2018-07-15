@@ -13,9 +13,43 @@ package es.components
     import es.interfaces.IDisplay;
     public class SkinComponent extends Component implements IDisplay
     {
-        public function SkinComponent()
+        private var uniqueId:*=null;
+        public function SkinComponent(uniqueId:*=null)
         {
             super();
+            if( uniqueId ) {
+                this.uniqueId = uniqueId;
+            }
+        }
+
+        public function getUniqueId()
+        {
+            return this.uniqueId;
+        }
+
+        /**
+         * @private
+         */
+        private var _async:Boolean = false;
+
+        /**
+         * 标记组件是否异步执行
+         * 此标记只对编译在服务端的组件有用。
+         * @param flag
+         */
+        public function set async(flag:Boolean)
+        {
+            _async = flag;
+        }
+
+        /**
+         * 获取此组件是否异步执行
+         * 此标记只对编译在服务端的组件有用。
+         * @returns {Boolean}
+         */
+        public function get async():Boolean
+        {
+            return _async;
         }
 
         /**
@@ -291,24 +325,6 @@ package es.components
             {
                 this.initializing();
                 this.commitPropertyAndUpdateSkin();
-                if( RunPlatform(server) )
-                {
-                    var classname:String = __CLASS__.replace(/\\/gi,'.');
-                    var skinClass:String = System.getQualifiedObjectName( this.skin ).replace(/\\/gi,'.');
-                    var content:Array = [];
-                    var id:String = 'id'+( new Date() ).getTime();
-                    content.push( "var "+id+"=new "+classname +"()");
-                    content.push( id+".Set__skinClass="+skinClass );
-                    Object.forEach(interactionProperties, function (val:*,name:String) {
-                        if( val instanceof Skin ){
-                            var elem:Object = (val as Skin).element;
-                            val = "new Element('#"+elem[0].id+"')";
-                        }
-                        content.push( id+".Set__"+name+"("+val+")" );
-                    });
-                    content.push( id+"._display();\n" );
-                    //console.log( "<script>"+ content.join(";\n") +"</script>" );
-                }
             }
             return this.skin.element;
         };
@@ -325,15 +341,6 @@ package es.components
                 skin[ name ] = value;
             });
             skin.display();
-        }
-
-        [RunPlatform(server)]
-        private var interactionProperties:Object={};
-
-        [RunPlatform(server)]
-        protected function interaction(name:String, value:*)
-        {
-             interactionProperties[ name ] = value;
         }
     }
 }

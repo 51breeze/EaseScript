@@ -537,6 +537,11 @@ System.getGlobalEvent=function getGlobalEvent()
       return _globalEvent;
 }
 
+System.getContext=function getContext()
+{
+    return Internal.context;
+}
+
 Internal.createSymbolStorage=function(symbol)
 {
     return function(target, name, value )

@@ -12,9 +12,9 @@ package es.components
     [Skin("es.skins.NavigateSkin")]
     public class Navigate extends SkinComponent
     {
-        function Navigate()
+        function Navigate(uniqueId:*=null)
         {
-            super();
+            super(uniqueId);
         }
 
 
@@ -139,7 +139,6 @@ package es.components
         public function set current(value:*):void
         {
             _current = value;
-            this.interaction("current",value);
         }
     }
 }

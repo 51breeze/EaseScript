@@ -8,7 +8,8 @@ package es.core
 {
     import es.components.SkinComponent;
     import es.core.Container;
-    import es.events.SkinEvent;
+import es.core.Skin;
+import es.events.SkinEvent;
     import es.core.State;
     import es.interfaces.IDisplay;
     public class Skin extends Container

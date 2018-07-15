@@ -56,6 +56,7 @@ class Node extends EventDispatcher
                 return $this->content = $value;
         }
         $this->attr->$name = $value;
+        return $value;
     }
 
     public function __unset($name)

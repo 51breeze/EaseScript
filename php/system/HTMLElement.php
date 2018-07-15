@@ -12,15 +12,11 @@ class HTMLElement extends Node
     public $value  = '';
     private $innerHTML = '';
     private $outerHTML = '';
-    static private $mid=1;
 
     public function __construct($name='div', $type = 1, $attr=array() )
     {
         $this->nodeName = $name;
         $this->nodeType = $type;
-        if( !isset($attr["id"]) && !($name == "text" || $name == "#documentFragment") ){
-            $attr["id"] = "S-I-D-".(self::$mid++);
-        }
         parent::__construct($name, $type, $attr);
     }
 
