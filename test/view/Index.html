@@ -11,7 +11,7 @@
 
         override protected function initializing()
         {
-            var gridSkin:DataGridSkin = dataGrid.skin as DataGridSkin;
+            var gridSkin:MyDataGridSkin = dataGrid.skin as MyDataGridSkin;
             gridSkin.pagination.profile="mypage";
         }
 
@@ -68,6 +68,11 @@
             <button id="@button" type='button' class="btn btn-success" style="width: 100px;">点 我</button>
         </div>
 
+
+        <div>
+            dsfdsfdsfsdf
+        </div>
+
         <s:Skin>
             <s:template>
                 <:for condition="var i=0; i lt 5; i++">
@@ -92,11 +97,12 @@
                     <phone>电话ss</phone>
                 </c:columns>
             </c:DataGrid>
+
         </div>
 
 
         <div style="margin: 10px;">
-           <c:DataGrid  id="@dataGrid" source="http://working.com/json.php"  async="false" >
+           <c:DataGrid  id="@dataGrid" source="http://working.com/json.php" skinClass="MyDataGridSkin"  async="true" >
                 <c:dataSource>
                     <c:dataType>@Http.TYPE_JSONP</c:dataType>
                 </c:dataSource>

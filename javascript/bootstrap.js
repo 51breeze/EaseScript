@@ -2,8 +2,10 @@ System.getGlobalEvent().addEventListener(Event.READY,function (e) {
     try{
         var Event = System.Event;
         var main = System.getDefinitionByName("{config.main}");
-        var interactionClass = System.getDefinitionByName("es.core.Interaction");
-        Reflect.set(interactionClass,interactionClass,"properties", window.Interaction || {});
+        try{
+            var interactionClass = System.getDefinitionByName("es.core.Interaction");
+            Reflect.set(interactionClass, interactionClass, "properties", window.Interaction || {});
+        }catch (e){}
         Internal.context = Reflect.construct(null,main);
         if( this.hasEventListener(Event.INITIALIZE_COMPLETED) )
         {

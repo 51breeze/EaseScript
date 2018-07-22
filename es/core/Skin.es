@@ -8,8 +8,8 @@ package es.core
 {
     import es.components.SkinComponent;
     import es.core.Container;
-import es.core.Skin;
-import es.events.SkinEvent;
+    import es.core.Skin;
+    import es.events.SkinEvent;
     import es.core.State;
     import es.interfaces.IDisplay;
     public class Skin extends Container
@@ -46,6 +46,19 @@ import es.events.SkinEvent;
                 ele.setProperties( attr );
             }
             super( ele );
+        }
+
+        [RunPlatform(server)]
+        public function generateId():String
+        {
+            var ele:Element = this.element;
+            var id:String = ele.property("id") as String;
+            if( !id )
+            {
+                id = "s"+System.uid();
+                ele.property("id", id);
+            }
+            return id;
         }
 
         /**
@@ -221,7 +234,11 @@ import es.events.SkinEvent;
                 for (; c < len; c++)
                 {
                     var child:IDisplay = children[c] as IDisplay;
-                    element.addChild( child.display() );
+                    var ele:Element = child.display();
+                    if( !ele[0].parentNode )
+                    {
+                        element.addChild( ele );
+                    }
                 }
             }
 

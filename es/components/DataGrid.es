@@ -12,9 +12,9 @@ package es.components
     [Skin("es.skins.DataGridSkin")]
     public class DataGrid extends SkinComponent
     {
-        public function DataGrid( uniqueId:*=null )
+        public function DataGrid()
         {
-            super(uniqueId);
+            super();
         }
 
         /**

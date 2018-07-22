@@ -11,7 +11,7 @@
            override protected function updateDisplayList()
            {
                 super.updateDisplayList();
-                var hostComponent:DataGrid = this.hostComponent;
+                var hostComponent:* = this.hostComponent;
                 var radius:String= hostComponent.radius+'px';
                 var table:Element =  this.element;
                 table.style('borderRadius', radius );

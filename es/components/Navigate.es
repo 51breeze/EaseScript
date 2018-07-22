@@ -12,9 +12,9 @@ package es.components
     [Skin("es.skins.NavigateSkin")]
     public class Navigate extends SkinComponent
     {
-        function Navigate(uniqueId:*=null)
+        function Navigate()
         {
-            super(uniqueId);
+            super();
         }
 
 

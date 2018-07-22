@@ -16,6 +16,15 @@ final class System
         echo call_user_func_array('sprintf',  $param );
     }
 
+    /**
+     * 全局唯一值
+     * @returns {string}
+     */
+    public static function uid()
+    {
+        return md5( uniqid( md5( microtime(true) ),true) );
+    }
+
     public static function isIterator( $obj )
     {
         static $iteratorClass = "es\\interfaces\\IListIterator";

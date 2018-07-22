@@ -256,7 +256,7 @@ function Context( name )
  */
 function builder(main, config , code, requirements , replacements )
 {
-    loaded = {};
+    loaded = {'HTMLElement':true,'Node':true};
     var contents = [];
     var fix = polyfill( config );
     

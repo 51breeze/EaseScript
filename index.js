@@ -2,13 +2,9 @@ const fs = require('fs');
 const PATH = require('path');
 const Utils = require('./lib/utils.js');
 const uglify = require('uglify-js');
-const Compile = require('./lib/compile.js');
 const Maker = require('./lib/maker.js');
-
-const zlib = require('zlib');
-
-globals = Maker.globalDescriptions;
-Utils.merge( Compile, Maker );
+const Compile = Maker.Compile;
+var globals = Maker.globalDescriptions;
 
 //全局配置
 const defaultConfig = {

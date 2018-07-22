@@ -205,11 +205,12 @@ class Element extends EventDispatcher implements \ArrayAccess,\Countable
         {
             if( System::isObject($name) )
             {
-                $item->attr = $name;
+                $item->attr = \Object::merge($item->attr,$name);
+                return $this;
             }
             return $item->$name;
         }
-        $item->$name = $value;
+        $item->attr->$name = $value;
         return $this;
     }
 

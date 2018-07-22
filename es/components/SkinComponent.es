@@ -13,18 +13,9 @@ package es.components
     import es.interfaces.IDisplay;
     public class SkinComponent extends Component implements IDisplay
     {
-        private var uniqueId:*=null;
-        public function SkinComponent(uniqueId:*=null)
+        public function SkinComponent()
         {
             super();
-            if( uniqueId ) {
-                this.uniqueId = uniqueId;
-            }
-        }
-
-        public function getUniqueId()
-        {
-            return this.uniqueId;
         }
 
         /**
@@ -75,6 +66,29 @@ package es.components
             }
             return this._skin;
         };
+
+        /**
+         * 设置皮肤对象
+         * @param Skin skinObj
+         * @returns {Object}
+         */
+        public function set skin( skinObj:Skin ):void
+        {
+            var old:Skin = this._skin;
+            this._skin = skinObj;
+            if( this.initialized && old && skinObj !== old )
+            {
+                if( this.hasEventListener(PropertyEvent.CHANGE) )
+                {
+                    var event:PropertyEvent = new PropertyEvent(PropertyEvent.CHANGE);
+                    event.oldValue = old;
+                    event.newValue = skinObj;
+                    event.property = 'skin';
+                    this.dispatchEvent(event);
+                }
+                commitPropertyAndUpdateSkin();
+            }
+        }
 
         /**
          * @protected

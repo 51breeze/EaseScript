@@ -37,9 +37,9 @@ package es.components
     [Skin("es.skins.PaginationSkin")]
     public class Pagination extends SkinComponent
     {
-        function Pagination(uniqueId:*=null)
+        function Pagination()
         {
-            super(uniqueId);
+            super();
         }
 
         /**
@@ -103,7 +103,8 @@ package es.components
                 this._profile = value;
                 if( this.initialized )
                 {
-                    commitPropertyAndUpdateSkin();
+                    var curr:int = (int)Locator.query(value, 1);
+                    this.current = isNaN( curr ) ? 1 : curr;
                 }
             }
         }

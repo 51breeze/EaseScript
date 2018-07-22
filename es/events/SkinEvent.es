@@ -17,6 +17,7 @@ package es.events
         public var parent:IDisplay;
         public var child:IDisplay;
         public var state:State;
+        public var content:String = '';
         public function SkinEvent(type:String, bubbles:Boolean=true, cancelable:Boolean=true)
         {
             super(type, bubbles, cancelable);
