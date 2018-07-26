@@ -55,7 +55,7 @@ package es.core
             var id:String = ele.property("id") as String;
             if( !id )
             {
-                id = "s"+System.uid();
+                id = "S"+System.uid(8);
                 ele.property("id", id);
             }
             return id;

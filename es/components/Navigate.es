@@ -9,6 +9,7 @@ package es.components
 {
     import es.components.SkinComponent;
 
+    [RunPlatform(server)]
     [Skin("es.skins.NavigateSkin")]
     public class Navigate extends SkinComponent
     {
@@ -17,8 +18,7 @@ package es.components
             super();
         }
 
-
-          /**
+        /**
          * @private
          */
         private var _dataSource:DataSource = null;

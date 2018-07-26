@@ -21,11 +21,11 @@ package es.components
         /**
          * @private
          */
-        private var _async:Boolean = false;
+        private var _async:Boolean = Syntax(javascript);
 
         /**
-         * 标记组件是否异步执行
-         * 此标记只对编译在服务端的组件有用。
+         * 标记此组件的运行行为。是否异步(前端/后端)执行
+         * 此标记只对编译在服务端的组件有用。否则在编译为客户端(javascript)的时候始终返回true
          * @param flag
          */
         public function set async(flag:Boolean)
@@ -34,13 +34,17 @@ package es.components
         }
 
         /**
-         * 获取此组件是否异步执行
-         * 此标记只对编译在服务端的组件有用。
+         * 获取此组件的运行行为。是否异步(前端/后端)执行
+         * 此标记只对编译在服务端的组件有用。否则在编译为客户端(javascript)的时候始终返回true
          * @returns {Boolean}
          */
         public function get async():Boolean
         {
-            return _async;
+            when( Syntax(origin,javascript) ){
+               return true;
+            }then{
+               return _async;
+            }
         }
 
         /**

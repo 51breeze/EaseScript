@@ -20,9 +20,37 @@ final class System
      * 全局唯一值
      * @returns {string}
      */
-    public static function uid()
+    public static function uid( $len=null )
     {
-        return md5( uniqid( md5( microtime(true) ),true) );
+        if( $len ===null )
+        {
+            return md5( uniqid( md5( microtime(true) ),true) );
+        }
+        static $hash=array();
+        $code = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $rand = $code[rand(0,25)]
+            .strtoupper(dechex(date('m')))
+            .date('d')
+            .substr(time(),-5)
+            .substr(microtime(),2,5)
+            .sprintf('%02d',rand(0,99));
+        $len = min( max(6,$len), 12);
+        for(
+            $a = md5( $rand, true ),
+            $s = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+            $d = '',
+            $f = 0;
+            $f < $len;
+            $g = ord( $a[ $f ] ),
+            $d .= $s[ ( $g ^ ord( $a[ $f + 8 ] ) ) - $g & 0x1F ],
+            $f++
+        );
+        if( isset($hash[$d]) )
+        {
+            return System::uid( $len );
+        }
+        $hash[$d] = true;
+        return $d;
     }
 
     public static function isIterator( $obj )
