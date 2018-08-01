@@ -9,7 +9,7 @@ package es.components
 {
     import es.components.SkinComponent;
 
-    [RunPlatform(server)]
+    [Syntax(origin)]
     [Skin("es.skins.NavigateSkin")]
     public class Navigate extends SkinComponent
     {

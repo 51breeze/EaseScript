@@ -107,7 +107,7 @@ final class Reflect
                 $method->setAccessible( true );
                 $accessible = true;
 
-            }else if( $method->isProtected() && $scopeReflect->isSubclassOf( $method->class ) )
+            }else if( $method->isProtected() && ( $method->class === $scopeReflect->getName() || $scopeReflect->isSubclassOf( $method->class ) ) )
             {
                 $method->setAccessible( true );
                 $accessible=true;

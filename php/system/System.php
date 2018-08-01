@@ -129,7 +129,7 @@ final class System
         if( is_object($obj) )
         {
             $type = get_class($obj);
-            return $type === 'es\core\Object' || $type === "stdClass";
+            return $type === 'Object' || $type === "stdClass";
 
         }else if( $flag !== true && is_array( $obj ) )
         {

@@ -134,9 +134,45 @@ package es.components
         }
 
         /**
-         * @private
+         * 将此组件的属性集注入到前端
          */
-        private var properties:Object={};
+        //[Injection]
+
+        /**
+         * 此组件的属性集
+         * @protected
+         */
+        protected var properties:Object={};
+
+        [RunPlatform(server)]
+        public function valueToString( value:* ):String
+        {
+            if( value instanceof Skin )
+            {
+                return '"#'+(value as Skin).generateId()+'"';
+
+            }else if( value instanceof Object || value instanceof Array )
+            {
+                var map: Object = {};
+                Object.forEach(value, function (item: *, name: String) {
+                    if (item instanceof Skin) {
+                        map[name] = '#' + (item as Skin).generateId();
+                    } else {
+                        map[name] = item;
+                    }
+                });
+                return JSON.stringify(map);
+
+            }else if( System.isString(value) )
+            {
+                return '"'+value+'"';
+
+            }else if(  typeof value === "boolean" )
+            {
+                return value ? "true" : "false";
+            }
+            return value as String;
+        }
 
         /**
          * 获取此对象的高度
@@ -356,7 +392,9 @@ package es.components
         {
             var skin:Skin = this.skin;
             Object.forEach(properties, function (value:*, name:String){
-                skin[ name ] = value;
+                if( name in skin ) {
+                    skin[name] = value;
+                }
             });
             skin.display();
         }

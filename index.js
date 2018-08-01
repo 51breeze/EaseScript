@@ -136,7 +136,15 @@ function getRequirementsAllSkinModules( modules )
     });
 }
 
-function getRequirementsAllUsedModules( module , results, syntax, hash )
+/**
+ * 获取所有引用的模块
+ * @param module
+ * @param results
+ * @param syntax
+ * @param hash
+ * @returns {*}
+ */
+function getRequirementsAllModules( module , results, hash )
 {
     results = results || [];
     hash    = hash || {};
@@ -149,11 +157,16 @@ function getRequirementsAllUsedModules( module , results, syntax, hash )
     if( module.nonglobal===true )
     {
         var isNs = module.id==="namespace";
-        var hasUsed = isNs ? module.namespaces[ module.classname ].hasUsed || module.hasUsed : module.hasUsed;
-        if( hasUsed && results.indexOf(module)<0  && module["has_syntax_remove_"+syntax] !== true )
+        var hasUsed = Compile.hasUsedModuleOf( module );
+        if( isNs && !hasUsed ){
+            hasUsed = Compile.hasUsedModuleOf( module.namespaces[ module.classname ] );
+        }
+
+        if( hasUsed && results.indexOf(module)<0 )
         {
            results.push(module);
         }
+
         if( module.useExternalClassModules )
         {
             var datalist = module.useExternalClassModules;
@@ -164,7 +177,7 @@ function getRequirementsAllUsedModules( module , results, syntax, hash )
                 var classname = datalist[i];
                 var classmodule = Maker.getLoaclAndGlobalModuleDescription( classname );
                 if( classmodule ) {
-                    getRequirementsAllUsedModules(classmodule, results, syntax, hash);
+                    getRequirementsAllModules(classmodule, results,  hash);
                 }
             }
         }
@@ -174,6 +187,28 @@ function getRequirementsAllUsedModules( module , results, syntax, hash )
         results.push( module );
     }
     return results;
+}
+
+/**
+ * 获取所有使用的模块,根据当前的语法来区分
+ * @param modules
+ * @param syntax
+ */
+function getRequirementsAllUsedModules( modules,syntax )
+{
+    return modules.filter(function (module) {
+        if( module.nonglobal===true )
+        {
+            var isNs = module.id === "namespace";
+            var hasUsed = Compile.hasUsedModuleOf(module, syntax);
+            if (isNs && !hasUsed)
+            {
+                hasUsed = Compile.hasUsedModuleOf(module.namespaces[module.classname], syntax);
+            }
+            return hasUsed && module["has_syntax_remove_" + syntax] !== true;
+        }
+        return true;
+    });
 }
 
 function getRequirementsAllGlobalClass( modules )
@@ -205,19 +240,12 @@ function getModuleScriptContent( modules )
     });
 }
 
-function getSkinModuleStyles( modules )
-{
-    return modules.filter(function(e){
-        return e.ownerFragmentModule ? !!e.ownerFragmentModule.moduleContext.style : false;
-    });
-}
-
 function outputFiles( bulid_path, fileSuffix, classModules ,callback , syntax )
 {
     for (var m in classModules)
     {
         var localModule = classModules[m];
-        var isUsed = localModule.hasUsed;
+        var isUsed =  Compile.hasUsedModuleOf( localModule , syntax );
         var content = localModule.makeContent ? localModule.makeContent[ syntax ] : '';
         if( callback )
         {
@@ -292,26 +320,6 @@ function mergeModules(targetModules, newModules )
             targetModules.push( m );
         }
     }
-}
-
-function importCss( name , project_path, less_path )
-{
-    var file = name;
-    //如果不是指定的绝对路径
-    if( !PATH.isAbsolute( name ) )
-    {
-        file = PATH.resolve( project_path, name );
-    }
-    //如果文件不存在,则指向到默认目录
-    if( !Utils.isFileExists( file ) )
-    {
-        file = PATH.resolve(less_path, name);
-        if( !Utils.isFileExists( file ) )
-        {
-            throw new Error( "'"+file +"' is not exists." );
-        }
-    }
-    return Utils.getContents( file );
 }
 
 function importCssPath( name , project_path, less_path )
@@ -563,7 +571,7 @@ function getAllStyleContent(skinModules, importStyle, loadedStyle, lessPath, con
     var style = skinModules.map(function (m, i)
     {
         var ownerModule = Maker.descriptionByName(m.fullclassname);
-        if(ownerModule.hasUsed !== true)return '';
+        if( !Compile.hasUsedModuleOf( ownerModule ) )return '';
 
         //已经加载的样式
         var included = {};
@@ -706,10 +714,10 @@ const builder={
         for( ;index<len;index++ )
         {
             var bootstrap = descriptions[ index ];
-            var usedModules = [];
             var outputname = bootstrap.fullclassname.toLowerCase();
             var hashMap = Compile("javascript", Maker.makeModuleByName( bootstrap.fullclassname ) , bootstrap, config);
-            var usedModules = getRequirementsAllUsedModules( bootstrap, usedModules, "javascript" );
+            var allModules = getRequirementsAllModules( bootstrap , []);
+            var usedModules = getRequirementsAllUsedModules( allModules, "javascript" );
 
             //需要生成视图
             if( !client )
@@ -726,7 +734,7 @@ const builder={
             }
 
             //准备相应的文件
-            var skinModules = getRequirementsAllSkinModules( usedModules );
+            var skinModules = getRequirementsAllSkinModules( allModules );
             var scriptContent = getModuleScriptContent( usedModules );
             var requirements = getRequirementsAllGlobalClass( usedModules );
 
@@ -764,6 +772,8 @@ const builder={
     {
         Utils.info("building php start...");
 
+        //所有引用模块
+        var allModules = systemMainClassModules.slice(0);
         //已经使用的模块
         var usedModules = systemMainClassModules.slice(0);
         //以加载文件的哈希对象
@@ -779,8 +789,10 @@ const builder={
         Utils.forEach(descriptions, function (module)
         {
             hashMap = Compile("php", Maker.makeModuleByName(module.fullclassname), module, config);
-            getRequirementsAllUsedModules( module, usedModules , "php", hash );
+            getRequirementsAllModules( module,allModules, hash );
         });
+
+        usedModules = usedModules.concat( getRequirementsAllUsedModules( allModules, "php" ) );
 
         //需要生成的本地模块
         var localModules = usedModules.filter(function (e)

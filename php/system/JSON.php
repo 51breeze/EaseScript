@@ -10,6 +10,10 @@ class JSON
 {
     static public function stringify( $value )
     {
+        if( System::isObject($value) )
+        {
+            $value = $value->valueOf();
+        }
         return json_encode($value, JSON_UNESCAPED_UNICODE);
     }
     static public function parse( $str )

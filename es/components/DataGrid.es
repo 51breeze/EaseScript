@@ -236,6 +236,8 @@ package es.components
          */
         private var _wheelEnable:Boolean = true;
 
+        [Injection]
+
         /**
          * 是否启用滚动分页
          * @param value
@@ -254,10 +256,7 @@ package es.components
             return _wheelEnable;
         }
 
-        /**
-         * @prvate
-         */
-        private var _wheelTarget:Display = null;
+        [Injection("es.core.Skin")]
 
         /**
          * 设置鼠标滚动的目标元素
@@ -265,7 +264,7 @@ package es.components
          */
         public function set wheelTarget( value:Display )
         {
-            _wheelTarget = value;
+            this.properties.wheelTarget = value;
         }
 
         /**
@@ -274,7 +273,7 @@ package es.components
          */
         public function get wheelTarget():Display
         {
-            return _wheelTarget;
+            return this.properties.wheelTarget as Display;
         }
     }
 }
