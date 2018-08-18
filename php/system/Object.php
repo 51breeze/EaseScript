@@ -110,6 +110,7 @@ class Object extends \stdClass implements \Iterator, \ArrayAccess
     
     public function __construct( $object=null )
     {
+         //is an self object
          if( $object != null && !is_subclass_of($this,"Object") )
          {
              if( System::is($object,'Object') && !is_a($object,'ArrayAccess')  )
@@ -133,7 +134,18 @@ class Object extends \stdClass implements \Iterator, \ArrayAccess
 
     public function valueOf()
     {
-        return $this->_originValue;
+        $value = $this->_originValue;
+        if( System::isArray( $value ) )
+        {
+            foreach ( $value as &$item )
+            {
+                if( $item instanceof \Object )
+                {
+                    $item = $item->valueOf();
+                }
+            }
+        }
+        return $value;
     }
 
     public function toString()

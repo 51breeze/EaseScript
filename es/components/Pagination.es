@@ -37,9 +37,9 @@ package es.components
     [Skin("es.skins.PaginationSkin")]
     public class Pagination extends SkinComponent
     {
-        function Pagination()
+        function Pagination(componentId:String = UIDInstance())
         {
-            super();
+            super(componentId);
         }
 
         /**

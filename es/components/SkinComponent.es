@@ -13,9 +13,26 @@ package es.components
     import es.interfaces.IDisplay;
     public class SkinComponent extends Component implements IDisplay
     {
-        public function SkinComponent()
+        private static var componentIdHash:Object={};
+        private var _componentId:String;
+        public function SkinComponent( componentId:String )
         {
             super();
+            if( System.isDefined( componentIdHash[ componentId ] ) )
+            {
+                throw new TypeError("Component id already exists. for '"+componentId+"'");
+            }
+            componentIdHash[ componentId ] = true;
+            _componentId = componentId;
+        }
+
+        /**
+         * 获取此组件的唯一ID
+         * @returns {String}
+         */
+        public function getComponentId( prefix:String="" ):String
+        {
+            return prefix+_componentId;
         }
 
         /**
@@ -147,6 +164,18 @@ package es.components
         [RunPlatform(server)]
         public function valueToString( value:* ):String
         {
+            if( typeof value === "boolean" )
+            {
+                return value ? "true" : "false";
+            }
+            if( typeof value === "Number" )
+            {
+                return value;
+            }
+            if( value == null )
+            {
+                return "null";
+            }
             if( value instanceof Skin )
             {
                 return '"#'+(value as Skin).generateId()+'"';
@@ -167,9 +196,6 @@ package es.components
             {
                 return '"'+value+'"';
 
-            }else if(  typeof value === "boolean" )
-            {
-                return value ? "true" : "false";
             }
             return value as String;
         }

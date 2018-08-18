@@ -22,6 +22,11 @@ package es.core
     [RunPlatform("client")]
     public class PopUp extends BasePopUp  implements IPopUp
     {
+        public function PopUp(componentId:String = UIDInstance())
+        {
+            super(componentId);
+        }
+
         /**
          * @pirvate
          */

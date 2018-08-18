@@ -8,7 +8,6 @@ package es.core
 {
      import Element;
      import es.interfaces.IDisplay;
-
     public class Display extends EventDispatcher implements IDisplay
     {
         /**

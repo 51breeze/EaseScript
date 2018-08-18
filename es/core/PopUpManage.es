@@ -35,7 +35,7 @@ package es.core
         /**
          * 默认配置选项
          */
-        static public const defaultOptions:Object={
+        static public var defaultOptions:Object={
             "profile":{"titleText":"提示"},
             "disableScroll":false,
             "callback":null,

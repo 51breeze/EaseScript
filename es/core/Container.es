@@ -6,7 +6,6 @@
  */
 package es.core
 {
-
     import es.components.SkinComponent;
     import es.core.Display;
     import es.interfaces.IDisplay;

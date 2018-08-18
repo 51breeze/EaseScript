@@ -19,6 +19,11 @@ package es.core
         * @private
         */
        static private var properties:Object={};
+
+        /**
+         * 获取所有的交互属性
+         * @returns {Object}
+         */
        static public function getProperties():Object
        {
             return properties;
@@ -26,35 +31,25 @@ package es.core
 
        /**
         * 从服务端拉取已经推送的属性
-        * @param uniqueId 实例对象的唯一ID
-        * @param name
+        * @param String key 实例对象的唯一键名
         */
-       static public function pull(uniqueId:*, name:String=null):*
+       static public function pull(key:String):Object
        {
-           if( !uniqueId || !(System.isString(uniqueId) || System.isNumber(uniqueId)) )
-           {
-               throw new TypeError("'uniqueId' param type must is String or Number and is not empty.");
-           }
-           var target:Object = properties[ uniqueId ];
-           return name ? target[ name ] : target;
+           return System.isDefined( properties[ key ] ) ? properties[ key ] : null;
        }
 
        /**
         * 将指定的数据推送到客户端
-        * @param uniqueId 实例对象的唯一ID
-        * @param data 一组数据对象
+        * @param String key 实例对象的唯一键名
+        * @param Object data 一组数据对象
         */
-       static public function push( uniqueId:*, data:Object )
+       static public function push(key:String, data:Object)
        {
-           if( !uniqueId || !(System.isString(uniqueId) || System.isNumber(uniqueId)) )
+           if( System.isDefined( properties[ key ] ) )
            {
-               throw new TypeError("'uniqueId' param type must is String or Number and is not empty.");
-           }
-           if( properties[ uniqueId ] )
-           {
-               properties[ uniqueId ] = Object.merge( properties[ uniqueId ], data );
+               properties[ key ] = Object.merge( properties[ key ], data );
            }else {
-               properties[ uniqueId ] = data;
+               properties[ key ] = data;
            }
        }
    }

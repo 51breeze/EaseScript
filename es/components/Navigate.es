@@ -13,9 +13,9 @@ package es.components
     [Skin("es.skins.NavigateSkin")]
     public class Navigate extends SkinComponent
     {
-        function Navigate()
+        function Navigate( componentId:String = UIDInstance() )
         {
-            super();
+            super( componentId );
         }
 
         /**

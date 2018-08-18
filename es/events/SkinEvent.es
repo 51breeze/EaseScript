@@ -13,6 +13,7 @@ package es.events
         static public const CREATE_CHILDREN_COMPLETED:String ='createChildrenCompleted';
         static public const INTERNAL_UPDATE_STATE:String ='internalUpdateState';
         static public const INTERNAL_CREATE_CHILDREN:String ='internalCreateChildren';
+        static public const MAKE_CLIENT_SKIN_FACTORY:String ='makeClientSkinFactory';
         public var skinChildren:Object={};
         public var parent:IDisplay;
         public var child:IDisplay;
