@@ -254,7 +254,7 @@ function Context( name )
  * @param config
  * @returns {string}
  */
-function builder(main, config , code, requirements , replacements )
+function builder(main, config , code, requirements , replacements)
 {
     loaded = {'HTMLElement':true,'Node':true};
     var contents = [];
@@ -365,7 +365,6 @@ function builder(main, config , code, requirements , replacements )
 
     //系统引导器
     var bootstrap = utils.getContents( rootPath+'/bootstrap.js' );
-
 
     //开发业务代码
     var business = ['(function(define,'+requires.join(',')+'){',

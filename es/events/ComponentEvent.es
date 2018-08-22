@@ -11,8 +11,6 @@ package es.events
     {
         static public const INITIALIZING:String = 'componentInitializing';
         static public const INITIALIZED:String  = 'componentInitialized';
-        static public const INSTALLING:String   ='componentInstalling';
-        static public const UPDATE_DISPLAY_LIST:String ='componentUpdateDisplayList';
         public var hostComponent:Component=null;
         public function ComponentEvent(type:String, bubbles:Boolean=true, cancelable:Boolean=true)
         {

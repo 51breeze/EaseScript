@@ -306,4 +306,10 @@ final class System
     {
         return get_class($object);
     }
+
+    static $context = null;
+    static function getContext()
+    {
+        return System::$context;
+    }
 }

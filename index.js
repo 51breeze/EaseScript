@@ -746,9 +746,11 @@ const builder={
 
             //构建脚本内容
             var builder = require( './javascript/builder.js');
-            scriptContent = builder(bootstrap.fullclassname, config, scriptContent.join(""), requirements, {namespace:function(content) {
-                return content.replace(/var\s+codeMap=\{\};/,"var codeMap="+JSON.stringify(hashMap)+";");
-            }});
+            scriptContent = builder(bootstrap.fullclassname, config, scriptContent.join(""), requirements, {
+                namespace:function(content) {
+                     return content.replace(/var\s+codeMap=\{\};/,"var codeMap="+JSON.stringify(hashMap)+";");
+                }
+            });
 
             //需要处理样内容
             buildStyle(skinModules, lessPath, options, outputname, config );

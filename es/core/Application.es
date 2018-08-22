@@ -1,6 +1,7 @@
 package es.core
 {
    import es.core.View;
+   import es.core.Interaction;
    public class Application extends EventDispatcher
    {
        public function Application()
@@ -9,9 +10,18 @@ package es.core
        }
 
        /**
+        * 获取所有交互数据转成JSON字符串
+        * @returns {String}
+        */
+       protected function propertiesToJson():String
+       {
+           return JSON.stringify( Interaction.getProperties().valueOf() );
+       }
+
+       /**
         * @private
         */
-       private var assignments:Object={};
+       private var _assignments:Object={};
 
        /**
         * 获取或者指定数据
@@ -22,9 +32,9 @@ package es.core
        public function assign(name:String, value:*=null)
        {
            if( value==null ){
-               return assignments[ name ];
+               return _assignments[ name ];
            }
-           return assignments[ name ] = value;
+           return _assignments[ name ] = value;
        }
 
        /**
@@ -33,7 +43,7 @@ package es.core
         */
        public function set title( value:String ):void
        {
-           assignments.title = value;
+           _assignments.title = value;
        }
 
        /**
@@ -43,12 +53,30 @@ package es.core
         */
        public function get title():String
        {
-           return assignments.title as String;
+           return _assignments.title as String;
        }
 
+       /**
+        * 获取所有已分配的数据
+        * @returns {Object}
+        */
        public function getAssignments():Object
        {
-           return assignments;
+           return _assignments;
+       }
+
+       /**
+        * 渲染并且显示一个视图
+        */
+       public function render( view:View ):void
+       {
+           view.display();
+           when( RunPlatform(server) )
+           {
+               var script:Node = new HTMLElement('script') as Node;
+               script.content='window["'+Interaction.key+'"]='+ propertiesToJson();
+               document.head.addChild( script );
+           }
        }
    }
 }

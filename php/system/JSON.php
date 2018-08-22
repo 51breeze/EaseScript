@@ -10,7 +10,7 @@ class JSON
 {
     static public function stringify( $value )
     {
-        if( System::isObject($value) )
+        if( System::isObject($value,true) )
         {
             $value = $value->valueOf();
         }

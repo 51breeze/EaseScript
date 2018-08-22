@@ -14,6 +14,11 @@ package es.core
      */
     static public class Interaction
     {
+        /**
+         * 交互时所使用的KEY
+         */
+        static public var key:String="FJH9-HGEW35-8WI0-YT2D";
+
        /**
         * 交互数据属性
         * @private
@@ -29,12 +34,27 @@ package es.core
             return properties;
        }
 
+        /**
+         * 是否有初始属性
+         */
+       static private var initialized:Boolean = false;
+
        /**
         * 从服务端拉取已经推送的属性
         * @param String key 实例对象的唯一键名
         */
        static public function pull(key:String):Object
        {
+           when( RunPlatform(client) )
+           {
+               if( initialized=== false )
+               {
+                   initialized = true;
+                   if( System.isObject(window[Interaction.key]) ){
+                       properties = window[Interaction.key];
+                   }
+               }
+           }
            return System.isDefined( properties[ key ] ) ? properties[ key ] : null;
        }
 
