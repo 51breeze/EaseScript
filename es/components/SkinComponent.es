@@ -403,6 +403,10 @@ package es.components
         {
             if( !this.initialized )
             {
+                when(RunPlatform(client))
+                {
+
+                }
                 this.initializing();
                 this.commitPropertyAndUpdateSkin();
             }

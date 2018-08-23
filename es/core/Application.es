@@ -7,6 +7,7 @@ package es.core
        public function Application()
        {
            super( document );
+           Reflect.set(System, System, "context", this);
        }
 
        /**

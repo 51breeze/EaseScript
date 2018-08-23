@@ -307,7 +307,17 @@ final class System
         return get_class($object);
     }
 
-    static $context = null;
+    static private $globalEvent=null;
+    static function getGlobalEvent()
+    {
+        if( System::$globalEvent===null )
+        {
+            System::$globalEvent = new EventDispatcher( System::window() );
+        }
+        return System::$globalEvent;
+    }
+
+    static private $context = null;
     static function getContext()
     {
         return System::$context;
