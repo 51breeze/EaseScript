@@ -280,28 +280,36 @@ package es.components
         }
 
         /**
-         * @private
-         */
-        private var _wheelTarget:Display=null;
-
-        /**
-         * 获取侦听鼠标滚轮事件的目标对象
-         * @returns {Element};
+         * 获取侦听鼠标滚轮事件的目标对象,用于实现异步加载分页
+         * 此方法只对异步执行的组件起作用
+         * @returns {Display};
          */
         public function get wheelTarget():Display
         {
-            return this._wheelTarget;
+            return pull("wheelTarget") as Display;
         }
 
         /**
-         * 设置侦听鼠标滚轮事件的目标对象
+         * 设置鼠标滚轮事件的目标对象,用于实现异步加载分页
+         * 此方法只对异步执行的组件起作用
+         * @param Display value
          */
         public function set wheelTarget( value:Display )
         {
-            this._wheelTarget = value;
-            if( initialized )
+            var old:Display = pull("wheelTarget") as Display;
+            if( old !== value && value )
             {
-               commitPropertyAndUpdateSkin();
+                push("wheelTarget",value);
+                if (old)old.removeEventListener( MouseEvent.MOUSE_WHEEL );
+                if( value )
+                {
+                    var self:Pagination = this;
+                    value.addEventListener(MouseEvent.MOUSE_WHEEL, function (e:MouseEvent) {
+                        e.preventDefault();
+                        var page:int = self.current;
+                        this.current = e.wheelDelta > 0 ? page + 1 : page - 1;
+                    }, false, 0, this);
+                }
             }
         }
 
@@ -322,7 +330,6 @@ package es.components
         {
             return _radius;
         }
-
         /**
          * @inherit
          */

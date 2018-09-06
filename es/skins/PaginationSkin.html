@@ -6,52 +6,10 @@
 
         import es.core.Display;
 
-       /**
-         * @private
-         */
-        private var _wheelTarget:Display;
-
-
-        /**
-         * 获取侦听鼠标滚轮事件的目标对象
-         * @returns {Element};
-         */
-        public function get wheelTarget():Display
-        {
-            return this._wheelTarget;
-        }
-
-
-        /**
-         * 设置侦听鼠标滚轮事件的目标对象
-         */
-        public function set wheelTarget( value:Display )
-        {
-            var old:Display = this._wheelTarget;
-            if( old !== value && value )
-            {
-                this._wheelTarget = value;
-                if (old)old.removeEventListener(MouseEvent.MOUSE_WHEEL);
-                if( value )
-                {
-                    var host:Pagination = this.hostComponent;
-                    value.addEventListener(MouseEvent.MOUSE_WHEEL, function (e:MouseEvent) {
-                        e.preventDefault();
-                        var page:int = host.current;
-                        host.current = e.wheelDelta > 0 ? page + 1 : page - 1;
-                    }, false, 0, this);
-                }
-            }
-        }
-
        override protected function initializing()
        {
             var host:Pagination = this.hostComponent;
             var profile:RegExp = new RegExp( host.profile+'\\s*=\\s*(\\d+)');
-            var _wheelTarget:Display = host.wheelTarget;
-            if( _wheelTarget ){
-              this.wheelTarget = _wheelTarget;
-            }
             this.addEventListener(MouseEvent.CLICK, function (e:MouseEvent)
             {
                 if ( host.async && Element.getNodeName(e.target) === 'a')

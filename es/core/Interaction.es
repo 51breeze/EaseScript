@@ -17,7 +17,7 @@ package es.core
         /**
          * 交互时所使用的KEY
          */
-        static public var key:String="FJH9-HGEW35-8WI0-YT2D";
+        static public var key:String="FJH9-H3EW-8WI0-YT2D";
 
        /**
         * 交互数据属性
@@ -51,7 +51,7 @@ package es.core
                {
                    initialized = true;
                    if( System.isObject(window[Interaction.key]) ){
-                       properties = window[Interaction.key];
+                       properties = window[Interaction.key] as Object;
                    }
                }
            }

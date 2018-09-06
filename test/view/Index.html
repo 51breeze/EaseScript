@@ -11,8 +11,10 @@
 
         override protected function initializing()
         {
-            var gridSkin:MyDataGridSkin = dataGrid.skin as MyDataGridSkin;
+            /*var gridSkin:MyDataGridSkin = dataGrid.skin as MyDataGridSkin;
             gridSkin.pagination.profile="mypage";
+            gridSkin.pagination.wheelTarget =  gridSkin['foot'] as Display;*/
+            super.initializing();
         }
 
         [RunPlatform('server')]
@@ -87,8 +89,7 @@
             <h1>
                 这里是内容9999999999   {context.title}
             </h1>
-            <c:DataGrid source="http://working.com/json.php"  width="500"  async="false">
-                <c:wheelTarget>@body</c:wheelTarget>
+            <!--<c:DataGrid source="http://working.com/json.php"  width="500"  async="false">
                 <c:dataSource>
                     <c:dataType>@Http.TYPE_JSONP</c:dataType>
                 </c:dataSource>
@@ -97,13 +98,13 @@
                     <name>名称ssss</name>
                     <phone>电话ss</phone>
                 </c:columns>
-            </c:DataGrid>
+            </c:DataGrid>-->
 
         </div>
 
 
         <div style="margin: 10px;">
-           <c:DataGrid  id="@dataGrid" source="http://working.com/json.php" skinClass="MyDataGridSkin"  async="true" >
+          <!-- <c:DataGrid  id="@dataGrid" source="http://working.com/json.php" skinClass="MyDataGridSkin"  async="true" >
                 <c:dataSource>
                     <c:dataType>@Http.TYPE_JSONP</c:dataType>
                 </c:dataSource>
@@ -112,7 +113,7 @@
                     <name>名称ss</name>
                     <phone>电话</phone>
                 </c:columns>
-            </c:DataGrid>
+            </c:DataGrid>-->
         </div>
 
     <div>===============================</div>

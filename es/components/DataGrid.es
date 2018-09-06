@@ -8,6 +8,8 @@ package es.components
 {
     import es.components.SkinComponent;
     import es.core.Display;
+    import es.core.Skin;
+    import es.core.Interaction;
 
     [Skin("es.skins.DataGridSkin")]
     public class DataGrid extends SkinComponent
@@ -106,14 +108,13 @@ package es.components
          * @param profile
          * @returns {*}
          */
-        public function columnProfile(profile:String=null)
+        public function get columnProfile():String
         {
-            if (typeof profile === "string")
-            {
-                this._columnProfile = profile;
-                return this;
-            }
             return this._columnProfile;
+        };
+        public function set columnProfile(value:String):void
+        {
+            this._columnProfile = value;
         };
 
         /**
@@ -126,12 +127,17 @@ package es.components
          * @param profile
          * @returns {*}
          */
-        public function dataProfile(profile:String=null)
+        public function set dataProfile(profile:String):void
         {
-            if (typeof profile === "string") {
-                this._dataProfile = profile;
-                return this;
-            }
+            this._dataProfile = profile;
+        };
+
+        /**
+         * @param profile
+         * @returns {*}
+         */
+        public function get dataProfile():String
+        {
             return this._dataProfile;
         };
 
@@ -229,51 +235,6 @@ package es.components
         public function get footHeight():Number
         {
             return _footHeight;
-        }
-
-        /**
-         * @prvate
-         */
-        private var _wheelEnable:Boolean = true;
-
-        [Injection]
-
-        /**
-         * 是否启用滚动分页
-         * @param value
-         */
-        public function set wheelEnable( value:Boolean )
-        {
-            _wheelEnable = value;
-        }
-
-        /**
-         * 是否启用滚动分页
-         * @returns Boolean
-         */
-        public function get wheelEnable():Boolean
-        {
-            return _wheelEnable;
-        }
-
-        [Injection("es.core.Skin")]
-
-        /**
-         * 设置鼠标滚动的目标元素
-         * @param value
-         */
-        public function set wheelTarget( value:Display )
-        {
-            this.properties.wheelTarget = value;
-        }
-
-        /**
-         * 获取鼠标滚动的目标元素
-         * @returns Boolean
-         */
-        public function get wheelTarget():Display
-        {
-            return this.properties.wheelTarget as Display;
         }
     }
 }

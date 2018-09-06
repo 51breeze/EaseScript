@@ -276,7 +276,7 @@ class MaskDisplay extends Display
     //淡入遮罩层
     public function fadeIn()
     {
-        var animation:Object = defaultOptions.animation;
+        var animation:Object = defaultOptions.animation as Object;
         if ( animation.fadeIn > 0 )
         {
             this.element.fadeIn( animation.fadeIn, this._options.style.opacity as float );
@@ -287,7 +287,7 @@ class MaskDisplay extends Display
     //淡出遮罩层
     public function fadeOut()
     {
-        var animation:Object = defaultOptions.animation;
+        var animation:Object = defaultOptions.animation as Object;
         var fadeOut:float = animation.fadeOut as float;
         if( animation.fadeOut > 0 )
         {

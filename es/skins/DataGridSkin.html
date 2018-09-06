@@ -27,22 +27,12 @@
                 var hostComponent:DataGrid = this.hostComponent;
                 var dataSource:DataSource =  hostComponent.dataSource;
                 var body:Skin = this.body;
-                var dataProfile:String =  hostComponent.dataProfile();
+                var dataProfile:String =  hostComponent.dataProfile;
                 body.variable('rowHeight', hostComponent.rowHeight );
                 head.variable('headHeight', hostComponent.headHeight );
                 body.variable( dataProfile, [] );
-                head.variable( hostComponent.columnProfile(), hostComponent.columns );
+                head.variable( hostComponent.columnProfile, hostComponent.columns );
                 pagination.dataSource = dataSource;
-
-                var _wheelTarget:Display = hostComponent.wheelTarget;
-                if( !_wheelTarget ){
-                     _wheelTarget = this.foot;
-                }
-
-                if( hostComponent.wheelEnable )
-                {
-                   pagination.wheelTarget = _wheelTarget;
-                }
 
                 dataSource.addEventListener(DataSourceEvent.SELECT, function (event:DataSourceEvent)
                 {

@@ -7,10 +7,13 @@
 package es.components
 {
     import es.components.Component;
-    import es.events.ComponentEvent;
+import es.components.SkinComponent;
+import es.events.ComponentEvent;
     import es.core.Skin;
     import es.interfaces.IContainer;
     import es.interfaces.IDisplay;
+    import es.core.Interaction;
+
     public class SkinComponent extends Component implements IDisplay
     {
         private static var componentIdHash:Object={};
@@ -32,7 +35,7 @@ package es.components
          */
         public function getComponentId( prefix:String="" ):String
         {
-            return prefix+_componentId;
+            return prefix ? prefix+'-'+_componentId : _componentId;
         }
 
         /**
@@ -151,22 +154,17 @@ package es.components
         }
 
         /**
-         * 将此组件的属性集注入到前端
-         */
-        //[Injection]
-
-        /**
          * 此组件的属性集
          * @protected
          */
         protected var properties:Object={};
 
         [RunPlatform(server)]
-        public function valueToString( value:* ):String
+        public function valueToString( value:* ):*
         {
             if( typeof value === "boolean" )
             {
-                return value ? "true" : "false";
+                return value;
             }
             if( typeof value === "Number" )
             {
@@ -174,11 +172,11 @@ package es.components
             }
             if( value == null )
             {
-                return "null";
+                return null;
             }
             if( value instanceof Skin )
             {
-                return '"#'+(value as Skin).generateId()+'"';
+                return '#'+(value as Skin).generateId();
 
             }else if( value instanceof Object || value instanceof Array )
             {
@@ -191,13 +189,8 @@ package es.components
                     }
                 });
                 return JSON.stringify(map);
-
-            }else if( System.isString(value) )
-            {
-                return '"'+value+'"';
-
             }
-            return value as String;
+            return value;
         }
 
         /**
@@ -403,10 +396,6 @@ package es.components
         {
             if( !this.initialized )
             {
-                when(RunPlatform(client))
-                {
-
-                }
                 this.initializing();
                 this.commitPropertyAndUpdateSkin();
             }
@@ -426,7 +415,68 @@ package es.components
                     skin[name] = value;
                 }
             });
-            skin.display();
+            when( RunPlatform(server) )
+            {
+                if( this.async === false ){
+                    skin.display();
+                }
+            }then
+            {
+                skin.display();
+            }
+        }
+
+        /**
+         * @inherit
+         */
+        override protected function initializing()
+        {
+            super.initializing();
+            when( RunPlatform(client) )
+            {
+                var object:Object = Interaction.pull( this.getComponentId() );
+                var target:Object = properties;
+                if (object) {
+                    Object.forEach(object,function (value:*, name:String) {
+                        if( typeof value ==="string" && (value as String).charAt(0)==="#" )
+                        {
+                            console.log( value );
+                            value = new Skin( value );
+                        }
+                        if( Reflect.has(SkinComponent,this,name) ) {
+                            Reflect.set(SkinComponent, this, name, value);
+                        }
+                        target[name]=value;
+                    });
+                }
+            }
+        }
+
+        /**
+         * 将属性推送到共享池(前后端互相访问)
+         * @param name
+         * @param value
+         * @returns {*}
+         */
+        protected function push(name:String, value:*):void
+        {
+            when( RunPlatform(server) )
+            {
+                var obj:Object = {};
+                obj[name] = valueToString(value);
+                Interaction.push( this.getComponentId(), obj );
+            }
+            properties[name] = value;
+        }
+
+        /**
+         * 从共享池中拉取指定的属性值(前后端互相访问)
+         * @param name
+         * @returns {*}
+         */
+        protected function pull(name:String):*
+        {
+            return properties[name];
         }
     }
 }

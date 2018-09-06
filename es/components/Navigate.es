@@ -73,13 +73,14 @@ package es.components
          * @param profile
          * @returns {*}
          */
-        public function dataProfile(profile:String=null)
+        public function set dataProfile(profile:String):void
         {
-            if (typeof profile === "string") {
-                this._dataProfile = profile;
-                return this;
-            }
-            return this._dataProfile;
+            this._dataProfile = profile;
+        };
+
+        public function get dataProfile():String
+        {
+           return this._dataProfile;
         };
 
         /**

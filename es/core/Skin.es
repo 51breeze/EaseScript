@@ -30,7 +30,7 @@ package es.core
                 ele=name as Element;
             }else if( name instanceof String ) 
             {
-                var id:String = name.charAt(0);
+                var id:String = (name as String).charAt(0);
                 ele = id === "#" || id==="." || id==="<" ? new Element(name) : new Element('<' + name +'/>');
             }else
             {

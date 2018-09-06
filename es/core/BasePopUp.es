@@ -73,12 +73,12 @@ package es.core
                 SystemManage.enableScroll();
             }
             
-            var animation:Object = options.animation;
+            var animation:Object = options.animation as Object;
             var skin:Skin = this.skin;
             if( this.state && animation && animation.enabled )
             {
                 var container:Skin = this.getContainer();
-                var fadeOut:Object = animation.fadeOut;
+                var fadeOut:Object = animation.fadeOut as Object;
                 this.animationEnd = false;
                 container.style("animation", fadeOut.name+" "+fadeOut.duration+"s "+fadeOut.timing+" "+fadeOut.delay+"s "+fadeOut.fillMode);
                 setTimeout(function (obj:BasePopUp) {
@@ -231,7 +231,7 @@ package es.core
             var elem:Element = super.display();
             var options:Object = this.options;
             var skin:Skin    = this.skin;
-            var profile:Object = options.profile;
+            var profile:Object = options.profile as Object;
             if( System.env.platform('IE', 8) )
             {
                 skin.style('position','absolute');
@@ -249,13 +249,13 @@ package es.core
             });
 
             var container:Skin = this.getContainer();
-            var animation:Object = options.animation;
+            var animation:Object = options.animation as Object;
             var timeout:Number   = options.timeout * 1000;
             var self:es.core.BasePopUp = this;
             if( animation.enabled && !animation.running )
             {
                 this.animationEnd = false;
-                var fadeIn:Object = animation.fadeIn;
+                var fadeIn:Object = animation.fadeIn as Object;
                 container.style("animation", fadeIn.name+" "+fadeIn.duration+"s "+fadeIn.timing+" "+fadeIn.delay+"s "+fadeIn.fillMode);
                 timeout = (options.timeout+fadeIn.delay+fadeIn.duration )*1000;
                 setTimeout(function (obj:BasePopUp) {
