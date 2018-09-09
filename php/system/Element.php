@@ -201,7 +201,7 @@ class Element extends EventDispatcher implements \ArrayAccess,\Countable
     public function property($name, $value=null)
     {
         $item = $this->items[0];
-        if( $value==null )
+        if( $value===null )
         {
             if( System::isObject($name) )
             {
@@ -258,6 +258,15 @@ class Element extends EventDispatcher implements \ArrayAccess,\Countable
     public function concat(){}
     public function indexOf(){}
 
+    public function isNodeInDocumentChain()
+    {
+        if( isset($this->items[0]) )
+        {
+            return $this->items[0]->isNodeInDocumentChain();
+        }
+        return false;
+    }
+
     public function toString()
     {
         return isset( $this->items[0] ) ? $this->items[0]->outerHTML : '';
@@ -278,6 +287,15 @@ class Element extends EventDispatcher implements \ArrayAccess,\Countable
     {
         if( $offset==='length' )return $this->length;
         return isset( $this->items[$offset] ) ? $this->items[$offset] : null;
+    }
+
+    public function __get( $name )
+    {
+        if( $this->items[$name] )
+        {
+            return $this->items[$name];
+        }
+        return parent::__get($name);
     }
 
     public function offsetSet($offset, $value)

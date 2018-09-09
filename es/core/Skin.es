@@ -235,6 +235,13 @@ package es.core
                 {
                     var child:IDisplay = children[c] as IDisplay;
                     var ele:Element = child.display();
+                    when(RunPlatform(server))
+                    {
+                        if (child is SkinComponent && (child as SkinComponent).async === true)
+                        {
+                            continue;
+                        }
+                    }
                     if( !ele[0].parentNode )
                     {
                         element.addChild( ele );

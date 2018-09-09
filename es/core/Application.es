@@ -1,6 +1,7 @@
 package es.core
 {
    import es.core.View;
+   import es.core.Skin;
    import es.core.Interaction;
    public class Application extends EventDispatcher
    {
@@ -14,9 +15,63 @@ package es.core
         * 获取所有交互数据转成JSON字符串
         * @returns {String}
         */
+       [RunPlatform(server)]
        protected function propertiesToJson():String
        {
-           return JSON.stringify( Interaction.getProperties().valueOf() );
+           var object:Object = Interaction.getProperties().valueOf();
+           var data:Object={};
+           var self:Application = this;
+           Object.forEach(object,function (value:*,name:*) {
+               value = self.valueToString(value);
+               if( value !== null ) {
+                   data[name] =value;
+               }
+           });
+           return JSON.stringify( data );
+       }
+
+       [RunPlatform(server)]
+       protected function valueToString( value:* ):*
+       {
+           if( typeof value === "boolean" )
+           {
+               return value;
+           }else if( typeof value === "Number" )
+           {
+               return value;
+           }else if( value == null )
+           {
+               return null;
+           }
+           if( value instanceof Skin )
+           {
+               var elem:Element = (value as Skin).element;
+               if(  elem.isNodeInDocumentChain() ) {
+                   return '#' + (value as Skin).generateId();
+               }else{
+                   return null;
+               }
+
+           }else if( value instanceof Object || value instanceof Array )
+           {
+               var map:Object = {};
+               var self:Application = this;
+               var has:Boolean = false;
+               Object.forEach(value, function (item: *, name: String) {
+                   item = self.valueToString( item );
+                   if( item !== null )
+                   {
+                       map[name] = item;
+                       has = true;
+                   }
+               });
+               if( has ) {
+                   return map;
+               }else{
+                   return null;
+               }
+           }
+           return value;
        }
 
        /**

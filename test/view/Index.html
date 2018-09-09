@@ -65,7 +65,9 @@
     </head>
 
     <body id="@body">
-        <c:Navigate id="@navigate"></c:Navigate>
+        <c:Navigate id="@navigate">
+            <c:source>@(context as BaseApplication).menus</c:source>
+        </c:Navigate>
         <div>
             <button id="@button" type='button' class="btn btn-success" style="width: 100px;">点 我</button>
         </div>
@@ -85,11 +87,11 @@
             </s:template>
         </s:Skin>
 
-        <div class="uuuu" style="margin: 10px;">
+        <div class="uuuu " style="margin: 10px;">
             <h1>
                 这里是内容9999999999   {context.title}
             </h1>
-            <!--<c:DataGrid source="http://working.com/json.php"  width="500"  async="false">
+            <c:DataGrid source="http://working.com/json.php"  width="500"  async="false" >
                 <c:dataSource>
                     <c:dataType>@Http.TYPE_JSONP</c:dataType>
                 </c:dataSource>
@@ -98,13 +100,12 @@
                     <name>名称ssss</name>
                     <phone>电话ss</phone>
                 </c:columns>
-            </c:DataGrid>-->
-
+                <c:rows>5</c:rows>
+            </c:DataGrid>
         </div>
 
-
         <div style="margin: 10px;">
-          <!-- <c:DataGrid  id="@dataGrid" source="http://working.com/json.php" skinClass="MyDataGridSkin"  async="true" >
+          <c:DataGrid  id="@dataGrid" source="http://working.com/json.php" skinClass="MyDataGridSkin"  async="true" >
                 <c:dataSource>
                     <c:dataType>@Http.TYPE_JSONP</c:dataType>
                 </c:dataSource>
@@ -113,7 +114,7 @@
                     <name>名称ss</name>
                     <phone>电话</phone>
                 </c:columns>
-            </c:DataGrid>-->
+            </c:DataGrid>
         </div>
 
     <div>===============================</div>

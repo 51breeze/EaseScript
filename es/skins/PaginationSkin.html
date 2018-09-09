@@ -47,7 +47,7 @@
           <a href="{url(prev,profile)}" class='{current===1?"disabled":""}'>上一页</a>
       </li>
       <:foreach name="link" value="val">
-          <li class="link {val===current?'current':''}">
+          <li class="link {val==current?'current':''}">
               <a href="{url(val,profile)}">{val}</a>
           </li>
       </:foreach>

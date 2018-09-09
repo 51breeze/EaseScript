@@ -15,6 +15,7 @@ class Document extends HTMLElement
     private $title = null;
     private $documentElement=null;
     static public $document = null;
+    protected $visible = true;
     public function __construct()
     {
         if( Document::$document !== null )
@@ -23,6 +24,7 @@ class Document extends HTMLElement
         }
         parent::__construct();
         $this->documentElement = new HTMLElement('html');
+        $this->documentElement->visible=true;
         $this->head = new HTMLElement('head');
         $this->title= new HTMLElement('title');
         $this->body = new HTMLElement('body');

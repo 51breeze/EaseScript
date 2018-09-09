@@ -48,7 +48,7 @@ package es.components
         private var _dataSource:DataSource=null;
 
         /**
-         * 设置需要要页的数据源
+         * 设置需要分页的数据源
          * @param value
          */
         public function set dataSource( value:DataSource ):void
@@ -236,16 +236,31 @@ package es.components
         public function set current(num:int):void
         {
             num = isNaN( this.totalSize ) ? num :  Math.min( Math.max(1, num), this.totalPage );
-            var current:int = this._current;
+            var current:int = this.current;
             if( num !== current )
             {
                 this._current = num;
                 var event:PaginationEvent = new PaginationEvent(PaginationEvent.CHANGE);
                 event.oldValue = current;
                 event.newValue = num;
-                this.dispatchEvent(event);
-                var dataSource:DataSource = this.dataSource;
-                if( dataSource  )dataSource.select( num );
+                var profile:String = this.profile;
+                var createUrl:* = this.url;
+                if( typeof createUrl !== "function" )
+                {
+                    var linkUrl:* = this.url;
+                    event.url = ( linkUrl.length > 0 ? ( linkUrl.indexOf('?') >= 0 ? linkUrl + '&'+profile+'=' + num : linkUrl + '?'+profile+'=' + num )
+                        : ('?'+this.profile+'=' + num) ) as String;
+                }else{
+                    event.url=createUrl(num,profile) as String;
+                }
+                if( this.dispatchEvent(event) )
+                {
+                    if( this.async )
+                    {
+                        var dataSource: DataSource = this.dataSource;
+                        if (dataSource) dataSource.select(num);
+                    }
+                }
             }
         };
 
@@ -300,14 +315,19 @@ package es.components
             if( old !== value && value )
             {
                 push("wheelTarget",value);
-                if (old)old.removeEventListener( MouseEvent.MOUSE_WHEEL );
-                if( value )
+                when(RunPlatform(client))
                 {
-                    var self:Pagination = this;
-                    value.addEventListener(MouseEvent.MOUSE_WHEEL, function (e:MouseEvent) {
+                    if (old) {
+                        old.removeEventListener(MouseEvent.MOUSE_WHEEL);
+                    }
+                    var self: Pagination = this;
+                    value.addEventListener(MouseEvent.MOUSE_WHEEL, function (e: MouseEvent) {
                         e.preventDefault();
-                        var page:int = self.current;
-                        this.current = e.wheelDelta > 0 ? page + 1 : page - 1;
+                        if( self.async ) {
+                            var page: int = self.current;
+                            page = e.wheelDelta > 0 ? page + 1 : page - 1;
+                            self.current = page;
+                        }
                     }, false, 0, this);
                 }
             }
@@ -365,6 +385,7 @@ package es.components
                     return '?'+profile+'=' + page;
                 };
             }
+
             offset = (offset + link) > totalPage ? offset - ( offset + link - totalPage ) : offset;
             skin.variable('totalPage', totalPage);
             skin.variable('pageSize', pageSize );

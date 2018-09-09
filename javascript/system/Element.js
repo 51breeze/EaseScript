@@ -1820,6 +1820,24 @@ Element.prototype.isEmpty=function isEmpty()
 }
 
 /**
+ * 判断当前元素节点是否在文档链中
+ * @returns {boolean}
+ */
+Element.prototype.isNodeInDocumentChain=function isNodeInDocumentChain()
+{
+    var node = this.current();
+    while (node)
+    {
+        if ( node===document.body || node === document.ownerDocument )
+        {
+            return true;
+        }
+        node = node.parentNode;
+    }
+    return false;
+}
+
+/**
  * 测试指定的元素（或者是一个选择器）是否为当前元素的子级
  * @param parent
  * @param child

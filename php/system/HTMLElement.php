@@ -9,10 +9,72 @@
  */
 class HTMLElement extends Node
 {
+    /**
+     * 元素的值属性(一般用于input元素)
+     * @var string
+     */
     public $value  = '';
+
+    /**
+     * 不包括元素本身的html字符串
+     * @var string
+     */
     private $innerHTML = '';
+
+    /**
+     * 包括元素本身的html字符串
+     * @var string
+     */
     private $outerHTML = '';
 
+    /**
+     * @var array
+     */
+    private $children=array();
+
+    /**
+     * 是否需要重新解析对象为html字符串
+     * @var bool
+     */
+    private $parseHtml = true;
+
+    /**
+     * 一个标志是否需要解析内部元素
+     * @var bool
+     */
+    private $hasInnerHTML = false;
+
+    /**
+     * 节点类型
+     * @var array
+     */
+    static private $typeMap = array(
+        'text'=>3,
+        'document'=>9,
+    );
+
+    /**
+     * 为子级设置相对根文档是可见的
+     * @param Node $child
+     */
+    static private function setVisibleForChild(Node $child)
+    {
+        $child->visible = true;
+        if( $child instanceof HTMLElement  )
+        {
+            foreach( $child->children as $item )
+            {
+                self::setVisibleForChild( $item );
+            }
+        }
+    }
+
+    /**
+     * HTMLElement constructor.
+     * @param string $name
+     * @param int $type
+     * @param array $attr
+     */
     public function __construct($name='div', $type = 1, $attr=array() )
     {
         $this->nodeName = $name;
@@ -20,6 +82,12 @@ class HTMLElement extends Node
         parent::__construct($name, $type, $attr);
     }
 
+    /**
+     * 设置获取元素的属性
+     * @param $name
+     * @param null $value
+     * @return mixed|null
+     */
     public function attribute($name, $value=null )
     {
          if( $value === null ){
@@ -28,6 +96,11 @@ class HTMLElement extends Node
          return $this->attr->$name = $value;
     }
 
+    /**
+     * 根据指定的名称获取元素
+     * @param $name
+     * @return array|bool
+     */
     public function getElementByName( $name )
     {
         if( !is_string($name) )return false;
@@ -45,6 +118,11 @@ class HTMLElement extends Node
         return $items;
     }
 
+    /**
+     * 根据指定的ID来获取元素
+     * @param $name
+     * @return Node|null
+     */
     public function getElementById( $name )
     {
         if( !is_string($name) )return false;
@@ -61,6 +139,9 @@ class HTMLElement extends Node
         return null;
     }
 
+    /**
+     * 获取当前元素的深度
+     */
     public function countDepth()
     {
         if( $this->parentNode )
@@ -73,23 +154,34 @@ class HTMLElement extends Node
         }
     }
 
-    private $children=array();
-
+    /**
+     * 获取元素的所有节点元素
+     * @return array
+     */
     public function childNodes()
     {
         return array_slice( $this->children, 0);
     }
 
+    /**
+     * 添加一个子级元素
+     * @param Node $child
+     * @return Node
+     * @throws ReferenceError
+     */
     public function addChild( Node $child )
     {
         return $this->addChildAt($child, -1 );
     }
 
+
     /**
-     * 是否需要重新解析对象为html字符串
-     * @var bool
+     * 添加一个子级元素到指定的索引位置
+     * @param Node $child
+     * @param $index
+     * @return Node
+     * @throws ReferenceError
      */
-    private $parseHtml = true;
 
     public function addChildAt(Node $child , $index )
     {
@@ -106,9 +198,19 @@ class HTMLElement extends Node
         array_splice( $this->children,$index,0, array($child) );
         $child->parentNode = $this;
         $this->parseHtml = true;
+        if( $this->visible )
+        {
+            self::setVisibleForChild( $child );
+        }
         return $child;
     }
 
+    /**
+     * 移除一个子级元素
+     * @param Node $child
+     * @return array
+     * @throws ReferenceError
+     */
     public function removeChild(Node $child)
     {
         $index = array_search($child, $this->children, true);
@@ -119,6 +221,12 @@ class HTMLElement extends Node
         throw new ReferenceError( 'child is not exists', __FILE__, __LINE__);
     }
 
+    /**
+     * 移除指定索引位置的元素
+     * @param $index
+     * @return array
+     * @throws ReferenceError
+     */
     public function removeChildAt( $index )
     {
         $index = $index<0 ? count($this->children)+$index : $index;
@@ -133,16 +241,29 @@ class HTMLElement extends Node
         throw new ReferenceError( 'index is out range', __FILE__, __LINE__);
     }
 
+    /**
+     * 获取子级的索引位置
+     * @param Node $child
+     * @return false|int|string
+     */
     public function getChildIndex(Node $child)
     {
         return array_search($child, $this->children, true );
     }
 
+    /**
+     * 是否有子级元素
+     * @return bool
+     */
     public function hasChildren()
     {
         return count( $this->children )>0;
     }
 
+    /**
+     * 将元素对象转成html的字符串
+     * @return array|null|string
+     */
     public function __toString()
     {
         if( $this->parseHtml===true )
@@ -191,6 +312,11 @@ class HTMLElement extends Node
         return $this->outerHTML;
     }
 
+    /**
+     * 当前指定的属性名不存在时调用
+     * @param $name
+     * @return mixed|null|object|stdClass|string
+     */
     public function __get($name)
     {
         switch ($name)
@@ -215,8 +341,12 @@ class HTMLElement extends Node
         return parent::__get($name);
     }
 
-    private $hasInnerHTML = false;
-
+    /**
+     * 当指定的属性名不存在时调用
+     * @param $name
+     * @param $value
+     * @return mixed|null|stdClass|void
+     */
     public function __set($name, $value)
     {
         switch ($name)
@@ -250,6 +380,10 @@ class HTMLElement extends Node
         return parent::__set($name, $value);
     }
 
+    /**
+     * 销毁指定名称的属性
+     * @param $name
+     */
     public function __unset($name)
     {
         switch ($name)
@@ -261,11 +395,15 @@ class HTMLElement extends Node
         return parent::__unset($name);
     }
 
-    static private $typeMap = array(
-        'text'=>3,
-        'document'=>9,
-    );
 
+    /**
+     * 解析内容元素为一个字符串(废弃)
+     * @param $html
+     * @param bool $outer
+     * @throws ReferenceError
+     * @throws SyntaxError
+     * @deprecated
+     */
     private function setInnerHTML( $html , $outer = false )
     {
         $index = count( $this->children );
@@ -386,7 +524,7 @@ class HTMLElement extends Node
                 $element = $this;
                 $element->nodeName = $name;
                 $element->nodeType = $type;
-                $element->attr     = $attrs;
+                $element->attr = $attrs;
 
             }else
             {

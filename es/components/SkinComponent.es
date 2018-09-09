@@ -41,14 +41,14 @@ import es.events.ComponentEvent;
         /**
          * @private
          */
-        private var _async:Boolean = Syntax(javascript);
+        private var _async:Boolean = Syntax(origin,javascript);
 
         /**
          * 标记此组件的运行行为。是否异步(前端/后端)执行
          * 此标记只对编译在服务端的组件有用。否则在编译为客户端(javascript)的时候始终返回true
          * @param flag
          */
-        public function set async(flag:Boolean)
+        public function set async(flag:Boolean):void
         {
             _async = flag;
         }
@@ -64,6 +64,24 @@ import es.events.ComponentEvent;
                return true;
             }then{
                return _async;
+            }
+        }
+
+        /**
+         * 判断此组件是否需要渲染皮肤
+         * 对于指定为javascript的语法或者指定为异步的方式来运行组件是需要渲染皮肤的。
+         * 此属性适应于组件开发人员，来指定在异步和同步方式的情况下如何来渲染皮肤或者加载数据等。
+         * 皮肤的渲染有两种方式：
+         * 1、直接通过服务端渲染
+         * 2、由客户端根据组件指定的数据实时渲染
+         * @returns {Boolean}
+         */
+        public function isNeedCreateSkin()
+        {
+            when( Syntax(origin,javascript) ){
+                return true;
+            }then{
+                return !this.async;
             }
         }
 
@@ -158,40 +176,6 @@ import es.events.ComponentEvent;
          * @protected
          */
         protected var properties:Object={};
-
-        [RunPlatform(server)]
-        public function valueToString( value:* ):*
-        {
-            if( typeof value === "boolean" )
-            {
-                return value;
-            }
-            if( typeof value === "Number" )
-            {
-                return value;
-            }
-            if( value == null )
-            {
-                return null;
-            }
-            if( value instanceof Skin )
-            {
-                return '#'+(value as Skin).generateId();
-
-            }else if( value instanceof Object || value instanceof Array )
-            {
-                var map: Object = {};
-                Object.forEach(value, function (item: *, name: String) {
-                    if (item instanceof Skin) {
-                        map[name] = '#' + (item as Skin).generateId();
-                    } else {
-                        map[name] = item;
-                    }
-                });
-                return JSON.stringify(map);
-            }
-            return value;
-        }
 
         /**
          * 获取此对象的高度
@@ -432,7 +416,7 @@ import es.events.ComponentEvent;
         override protected function initializing()
         {
             super.initializing();
-            when( RunPlatform(client) )
+            /*when( RunPlatform(client) )
             {
                 var object:Object = Interaction.pull( this.getComponentId() );
                 var target:Object = properties;
@@ -440,16 +424,23 @@ import es.events.ComponentEvent;
                     Object.forEach(object,function (value:*, name:String) {
                         if( typeof value ==="string" && (value as String).charAt(0)==="#" )
                         {
-                            console.log( value );
-                            value = new Skin( value );
+                            var ele:Element = new Element( value );
+                            if( ele.length > 0 ) {
+                                value = new Skin(ele);
+                            }else{
+                                value = null;
+                            }
                         }
-                        if( Reflect.has(SkinComponent,this,name) ) {
-                            Reflect.set(SkinComponent, this, name, value);
+                        if( value !== null )
+                        {
+                            if (Reflect.has(SkinComponent, this, name)) {
+                                Reflect.set(SkinComponent, this, name, value);
+                            }
+                            target[name] = value;
                         }
-                        target[name]=value;
                     });
                 }
-            }
+            }*/
         }
 
         /**
@@ -460,12 +451,12 @@ import es.events.ComponentEvent;
          */
         protected function push(name:String, value:*):void
         {
-            when( RunPlatform(server) )
+            /*when( RunPlatform(server) )
             {
                 var obj:Object = {};
-                obj[name] = valueToString(value);
-                Interaction.push( this.getComponentId(), obj );
-            }
+                obj[name] =value;
+                Interaction.push( this.getComponentId(), obj);
+            }*/
             properties[name] = value;
         }
 

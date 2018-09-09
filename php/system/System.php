@@ -243,12 +243,19 @@ final class System
         
         foreach ($object as $key=>$val)
         {
-            if( $type === 'attr' && $val==null )continue;
             if( System::isObject($val) )
             {
                 $key = $prefix ? $prefix . '[' . $key . ']' : $key;
                 $val = System::serialize($val, $type, $group ? $key : false);
             }else{
+                if( $type === 'attr' )
+                {
+                    if (is_bool($val)) {
+                        $val = $val ? "true" : "false";
+                    } else if ($val === null) {
+                        $val = "null";
+                    }
+                }
                 $val = $type === 'attr' ? '"' . $val . '"' : $val;
             }
             array_splice( $str, 0, 0, array( $key . $separate . $val ) );

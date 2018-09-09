@@ -16,6 +16,7 @@ class Node extends EventDispatcher
     protected $attr = null;
     protected $style = null;
     protected $depth = 0;
+    protected $visible = false;
 
     public function __construct($nodeName='text', $nodeType=3, $attr=null )
     {
@@ -24,6 +25,16 @@ class Node extends EventDispatcher
         $this->attr = $attr==null ? new \stdClass() : (object)$attr;
         $this->style = new \stdClass();
         parent::__construct();
+    }
+
+    /**
+     * 获取当前节点在文档中是否可见
+     * 此属性来判断父级（包括祖辈直到根节点）是否有添加到文档中显示，如果有则为true反之false
+     * @return bool
+     */
+    public function isNodeInDocumentChain()
+    {
+        return $this->visible;
     }
 
     public function __toString()

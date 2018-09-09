@@ -139,7 +139,7 @@ class Object extends \stdClass implements \Iterator, \ArrayAccess
         {
             foreach ( $value as &$item )
             {
-                if( $item instanceof \Object )
+                if( System::isObject($item) )
                 {
                     $item = $item->valueOf();
                 }
