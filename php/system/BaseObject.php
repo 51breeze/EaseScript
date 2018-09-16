@@ -7,7 +7,7 @@
  * @author Jun Ye <664371281@qq.com>
  * @require System
  */
-class Object extends \stdClass implements \Iterator, \ArrayAccess
+class BaseObject extends \stdClass implements \Iterator, \ArrayAccess
 {
     static public function each($target, $callback, $thisArg=null)
     {
@@ -83,10 +83,10 @@ class Object extends \stdClass implements \Iterator, \ArrayAccess
                         }
                         if( $type==='array' )
                         {
-                            $target[ $key ]=Object::merge( $deep, $cloneObj, $copy );
+                            $target[ $key ]=BaseObject::merge( $deep, $cloneObj, $copy );
                         }else
                         {
-                            $target->$key=Object::merge( $deep, $cloneObj, $copy );
+                            $target->$key=BaseObject::merge( $deep, $cloneObj, $copy );
                         }
 
                     } else if ( !empty($copy) )
@@ -111,9 +111,9 @@ class Object extends \stdClass implements \Iterator, \ArrayAccess
     public function __construct( $object=null )
     {
          //is an self object
-         if( $object != null && !is_subclass_of($this,"Object") )
+         if( $object != null && !is_subclass_of($this,"BaseObject") )
          {
-             if( System::is($object,'Object') && !is_a($object,'ArrayAccess')  )
+             if( System::is($object,'BaseObject') && !is_a($object,'ArrayAccess')  )
              {
                  $this->_originValue = $object->_originValue;
                  $this->_originType =  $object->_originType;
@@ -274,7 +274,7 @@ class Object extends \stdClass implements \Iterator, \ArrayAccess
         {
             throw new ReferenceError($name . ' is not exists.', __FILE__, __LINE__);
         }
-        if( $this->_originType && $this->_originType !== "object" && is_subclass_of($this,"Object") )
+        if( $this->_originType && $this->_originType !== "object" && is_subclass_of($this,"BaseObject") )
         {
             throw new ReferenceError($name . ' is not writable. The value type is an '.$this->_originType);
         }

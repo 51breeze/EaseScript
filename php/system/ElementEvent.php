@@ -5,7 +5,7 @@
  * Released under the MIT license
  * https://github.com/51breeze/EaseScript
  * @author Jun Ye <664371281@qq.com>
- * @require System,Event,Object
+ * @require System,Event
  */
 class ElementEvent extends Event
 {

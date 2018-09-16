@@ -5,7 +5,7 @@
  * Released under the MIT license
  * https://github.com/51breeze/EaseScript
  * @author Jun Ye <664371281@qq.com>
- * @require System,Symbol,Array,DataArray,Object,EventDispatcher,Http,HttpEvent,PropertyEvent,DataSourceEvent,DataGrep
+ * @require System,Symbol,Array,DataArray,BaseObject,EventDispatcher,Http,HttpEvent,PropertyEvent,DataSourceEvent,DataGrep
  */
 class DataSource extends EventDispatcher
 {

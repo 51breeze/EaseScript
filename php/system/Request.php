@@ -5,7 +5,7 @@
  * Released under the MIT license
  * https://github.com/51breeze/EaseScript
  * @author Jun Ye <664371281@qq.com>
- * @require Object,TypeError
+ * @require BaseObject,TypeError
  */
 
 /**
@@ -178,7 +178,7 @@ if (!function_exists('http_build_url'))
 }
 
 
-final class Request extends Object
+final class Request extends BaseObject
 {
     static public function isAjax()
     {

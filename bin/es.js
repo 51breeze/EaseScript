@@ -73,7 +73,8 @@ program
 .option('--bsc, --base-skin-class [value]', '指定皮肤文件的基础类','es.core.Skin')
 .option('--sfs, --skin-file-suffix [value]', '皮肤文件的后缀','html')
 //.option('--gh, --global-handle [variable name]', '全局引用EaseScript对象的变量名','EaseScript')
-.option('--src, --source-file [enable|disabled]', '是否需要生成源文件','enable');
+.option('--src, --source-file [enable|disabled]', '是否需要生成源文件','enable')
+.option('--sps, --service-provider-syntax [php]', '服务提供者的语法');
 
 program.parse(process.argv);
 
@@ -110,11 +111,22 @@ var config = {
     'strictType':program.strictType === 'enable',
     'theme_file_path':program.themeFilePath,
     'skin_style_config':program.skinStyleConfig,
+    'service_provider_syntax':program.serviceProviderSyntax,
     'mode': program.mode=='dev' ? 1 : program.mode=='test' ? 2 : 3, //1 标准模式（开发时使用） 2 测试  3 性能模式（生产环境使用）
 };
 config.clean = program.clean
 config.root_path = root_path;
 config.syntax = program.syntax;
+
+if( config.syntax )
+{
+    config.syntax = config.syntax.toLowerCase();
+}
+
+if( !config.service_provider_syntax )
+{
+    config.service_provider_syntax = config.syntax && config.syntax !== "javascript" ? config.syntax : 'php';
+}
 
 //开始
 require('../index.js')(config, true);

@@ -128,8 +128,8 @@ final class System
     {
         if( is_object($obj) )
         {
-            $type = get_class($obj);
-            return $type === 'Object' || $type === "stdClass";
+            $type = strtolower(get_class($obj));
+            return $type === 'baseobject' || $type === "stdclass" || $type === "object";
 
         }else if( $flag !== true && is_array( $obj ) )
         {

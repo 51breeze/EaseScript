@@ -5,7 +5,7 @@
  * Released under the MIT license
  * https://github.com/51breeze/EaseScript
  * @author Jun Ye <664371281@qq.com>
- * @require Object,EventDispatcher,ReferenceError
+ * @require BaseObject,EventDispatcher,ReferenceError
  */
 class Node extends EventDispatcher
 {
@@ -59,7 +59,7 @@ class Node extends EventDispatcher
         switch ($name)
         {
             case 'style' :
-                $this->style = Object::merge( $this->style, (object)$value);
+                $this->style = BaseObject::merge( $this->style, (object)$value);
                 return $this->style;
             case 'parentNode' :
                 throw new ReferenceError('parentNode is not writable.');

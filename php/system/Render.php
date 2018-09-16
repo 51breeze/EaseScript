@@ -5,9 +5,10 @@
  * Released under the MIT license
  * https://github.com/51breeze/EaseScript
  * @author Jun Ye <664371281@qq.com>
+ * @require BaseObject,System
  */
 
-class Render extends Object
+class Render extends BaseObject
 {
     const syntax_regexp = "/^\\s*(if|foreach|for|else|do|switch|case|default|break|var|function|while|code|{|})(.*)?/";
     const call_regexp = "/^([\\w\\.]+)\\s*\\(/";
@@ -250,7 +251,7 @@ class Variable
     public function __construct( Render $render )
     {
         $this->render = $render;
-        $this->data = new Object();
+        $this->data = new BaseObject();
     }
 
     /**
@@ -312,7 +313,7 @@ class Variable
      */
     public function isObject($val)
     {
-        return is_object($val) || is_array($val);
+        return System::isObject($val,true);
     }
 
     /**

@@ -5,9 +5,9 @@
  * Released under the MIT license
  * https://github.com/51breeze/EaseScript
  * @author Jun Ye <664371281@qq.com>
- * @require Object
+ * @require BaseObject
  */
-class RegExp extends Object
+class RegExp extends BaseObject
 {
     private $_pattern = '';
     private $_flag = '';

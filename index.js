@@ -684,8 +684,8 @@ const syntax_supported={
     'javascript':true
 };
 
-//构建器
-const builder={
+//语法构建器
+const SyntaxBuilder={
 
     'javascript':function(config, descriptions, client )
     {
@@ -768,12 +768,17 @@ const builder={
             Utils.mkdir(PATH.dirname(filename));
             fs.writeFileSync(filename, scriptContent );
         }
+
+        //编译服务
+        if( client !== true )
+        {
+            SyntaxBuilder[config.service_provider_syntax](config,[],true);
+        }
     },
 
-    'php':function(config, descriptions )
+    'php':function(config, descriptions, onlyServer )
     {
         Utils.info("building php start...");
-
         //所有引用模块
         var allModules = systemMainClassModules.slice(0);
         //已经使用的模块
@@ -786,47 +791,131 @@ const builder={
         var app_path = Utils.getBuildPath(config, 'build.application');
         //命名空间映射关系
         var hashMap=[];
-
         //编译模块
-        Utils.forEach(descriptions, function (module)
-        {
+        Utils.forEach(descriptions, function (module) {
             hashMap = Compile("php", Maker.makeModuleByName(module.fullclassname), module, config);
-            getRequirementsAllModules( module,allModules, hash );
+            getRequirementsAllModules(module, allModules, hash);
         });
+        //编译服务提供者
+        var serviceProvider = makeServiceProvider(config, allModules, hash, "php");
+        hashMap = serviceProvider.hash;
 
+        //获取所有使用的模块
         usedModules = usedModules.concat( getRequirementsAllUsedModules( allModules, "php" ) );
-
         //需要生成的本地模块
         var localModules = usedModules.filter(function (e)
         {
             return e.nonglobal === true;
         });
-
-        //输出使用的模块文件
-        outputFiles( app_path, ".php", localModules , function (module) {
-            return module.makeContent['php'];
-        });
-
         //php构建器
         var phpBuilder = require( './php/builder.js');
-
         //使用的全局类模块
         var requirements = usedModules.filter(function (a) {
              return !(a.nonglobal === true);
         });
-
         //全局类模块名
         requirements= requirements.map(function (a) {
               return a.type;
         });
-
         //生成php文件
-        phpBuilder( config.build_path, config, [], requirements, hashMap);
-
+        phpBuilder( config.build_path, config, localModules, requirements, hashMap, {
+            "service.bind":serviceProvider.service
+        });
         //构建需要生成的js文件
-        builder.javascript(config, descriptions, true);
+        if( onlyServer !==true ) {
+            SyntaxBuilder.javascript(config, descriptions, true);
+        }
     }
 };
+
+/**
+ * 生成服务提供者语法
+ * @param config
+ * @returns {Array}
+ */
+function makeServiceProvider(config, allModules, hash, syntax )
+{
+    var providerList = {};
+    var mapping = {};
+    Utils.forEach(config.ServiceProviderList,function (item)
+    {
+        var key =  item.provider;
+        var provider = providerList[ key ] || (providerList[ key ]={});
+        var param = item.name.match(/\{(.*?)\}/g);
+        if( !provider[ item.action ] ) {
+            provider[item.action]={param:param,method:item.method};
+        }else if( param && ( !provider[item.action].param || provider[item.action].param.length < param.length) ){
+            provider[item.action].param = param;
+        }
+        mapping[ item.method+':'+item.bind ] = {method:item.method,bind:item.bind,provider:item.provider+"@"+item.action}
+    });
+
+    createServiceProvider(config, providerList );
+
+    var hashMap;
+    Utils.forEach(providerList,function (item,fullclassname)
+    {
+        var module = Maker.loadModuleDescription(syntax, fullclassname, config, null, null,true);
+        hashMap = Compile( syntax , Maker.makeModuleByName(module.fullclassname), module, config);
+        getRequirementsAllModules( module,allModules, hash );
+    });
+
+    return {
+        "service":mapping,
+        "hash":hashMap
+    }
+}
+
+/**
+ * 生成服务提供者
+ * @param config
+ * @param provider
+ */
+function createServiceProvider(config, provider )
+{
+    Utils.forEach(provider,function (item,name)
+    {
+        if( Maker.isClassFileExists(name,config) )
+        {
+            return;
+        }
+
+        var package = name.split(".");
+        var className = package.pop();
+        package = package.join(".");
+        var code = ["package ", package, "{\n"];
+        code.push( "\timport es.core.Service;\n" );
+        code.push( "\tpublic class ", className, " extends Service{\n");
+        for(var p in item)
+        {
+            var param = item[p].param;
+            if( param )
+            {
+                param = param.map(function (val) {
+                    val = val.replace(/^\{|\}$/g,'');
+                    if( val.indexOf(":") < 0 ){
+                        val = val+":*";
+                    }
+                    return val;
+                });
+            }else{
+                param = [];
+            }
+            code.push("\t\tpublic function ", p, "(",param.join(","),"){\n");
+            if( item[p].method ==="get" ){
+                code.push("\t\t\treturn [];\n");
+            }else{
+                code.push("\t\t\treturn true;\n");
+            }
+            code.push("\t\t}\n");
+        }
+        code.push( "\t}\n");
+        code.push( "}");
+
+        var filepath = PATH.resolve( config.project_path, package, className + '.es');
+        Utils.setContents(filepath, code.join(""));
+    });
+}
 
 function getViewDisplay()
 {
@@ -1161,7 +1250,7 @@ function make( config, isGlobalConfig )
 
         //开始构建
         Utils.info('Making starting ...');
-        builder[ config.syntax ]( config , descriptions );
+        SyntaxBuilder[ config.syntax ]( config , descriptions );
         Utils.info('Making done ...');
         Utils.info('\r\nCompleted !!!');
         Utils.info('Make path : '+config.build_path );

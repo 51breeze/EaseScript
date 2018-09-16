@@ -226,6 +226,7 @@ var classMap = {
     "document":"Document",
     "window":"Window",
     "console":"Console",
+    "Object":"BaseObject",
 }
 
 /**
@@ -233,9 +234,10 @@ var classMap = {
  * @param config
  * @returns {string}
  */
-function builder(path , config , modules, requirements , namespaceMap )
+function builder(path , config , localModules, requirements , namespaceMap, replaces )
 {
-    var dir = utils.mkdir( path+"/system" );
+    var app_path = utils.getBuildPath(config,"build.application");
+    var dir = utils.mkdir( utils.getResolvePath( utils.getResolvePath(path, app_path), "system" ) );
     var o;
     var namespaceMapValue=[];
     for ( var n in namespaceMap )
@@ -295,11 +297,41 @@ function builder(path , config , modules, requirements , namespaceMap )
         }
     }
 
-    for (var n in modules )
+    //生成本地模块
+    for (var n in localModules )
     {
-        o = modules[n];
-        dir = utils.mkdir( path+"/"+o.package );
-        utils.setContents( dir+"/"+o.classname+'.php', "<?php\n"+o.buildCode );
+        o = localModules[n];
+        var file = utils.getResolvePath( app_path , o.fullclassname );
+        utils.mkdir( file.substr(0, file.lastIndexOf("/") ) );
+        utils.setContents( file+'.php', o.makeContent['php'] );
     }
+
+    //生成引导文件
+    dir = utils.mkdir( utils.getResolvePath(app_path,"bootstrap") );
+    var content = utils.getContents( config.root_path+"/php/bootstrap.php");
+    if( replaces )
+    {
+        content = content.replace(/([\s\t]+)?\[CODE\[(.*?)\]\];/ig, function (a, b, c) {
+              switch (c.toLowerCase())
+              {
+                  case "service.bind" :
+                      return serviceRegister( replaces["service.bind"]||{} , b );
+                  break;
+              }
+              return "";
+        });
+    }
+    utils.setContents( dir+"/index.php",  content );
 }
+
+function serviceRegister( serviceProvider, tab )
+{
+    var items = [];
+    utils.forEach(serviceProvider,function (item) {
+        items.push( '\\es\\core\\Service::bind("'+item.bind+'","'+item.provider+'","'+item.method+'");' );
+    });
+    return tab+items.join("\n"+tab.replace(/\r\n/g,"") );
+}
+
+
 module.exports = builder;

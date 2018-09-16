@@ -5,9 +5,9 @@
  * Released under the MIT license
  * https://github.com/51breeze/EaseScript
  * @author Jun Ye <664371281@qq.com>
- * @require Object,TypeError
+ * @require BaseObject,TypeError
  */
-class Event extends Object
+class Event extends BaseObject
 {
     const CLICK = 'click';
     const READY = 'ready';

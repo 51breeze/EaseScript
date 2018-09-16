@@ -5,9 +5,9 @@
  * Released under the MIT license
  * https://github.com/51breeze/EaseScript
  * @author Jun Ye <664371281@qq.com>
- * @require ArrayList
+ * @require ArrayList,BaseObject
  */
-class DataGrep extends Object
+class DataGrep extends BaseObject
 {
     const LIKE_LEFT = 'left';
     const LIKE_RIGHT = 'right';
@@ -23,7 +23,6 @@ class DataGrep extends Object
     /**
      * @returns {DataGrep}
      * @constructor
-     * @require Object,Math,DataArray,Array,Function,Error
      */
     public function __construct($dataItems)
     {

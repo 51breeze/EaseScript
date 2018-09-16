@@ -5,9 +5,9 @@
  * Released under the MIT license
  * https://github.com/51breeze/EaseScript
  * @author Jun Ye <664371281@qq.com>
- * @require System,Object,TypeError,ReferenceError
+ * @require System,BaseObject,TypeError,ReferenceError
  */
-class State extends Object
+class State extends BaseObject
 {
     private $_name = null;
     private $_stateGroup = null;

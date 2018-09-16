@@ -4,9 +4,9 @@
  * Released under the MIT license
  * https://github.com/51breeze/EaseScript
  * @author Jun Ye <664371281@qq.com>
- * @require System,Object,ReferenceError,TypeError
+ * @require System,BaseObject,ReferenceError,TypeError
  */
-class ArrayList extends Object implements \Countable
+class ArrayList extends BaseObject implements \Countable
 {
     private $dataItems=array();
     public function __construct()

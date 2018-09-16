@@ -5,7 +5,7 @@
  * Released under the MIT license
  * https://github.com/51breeze/EaseScript
  * @author Jun Ye <664371281@qq.com>
- * @require System,Object,Node,SyntaxError,ReferenceError
+ * @require System,BaseObject,Node,SyntaxError,ReferenceError
  */
 class HTMLElement extends Node
 {
@@ -359,14 +359,14 @@ class HTMLElement extends Node
                 return $value;
              //  return $this->setInnerHTML( $value );
             case 'attr' :
-                if( is_object($value) )
+                if( System::isObject($value) )
                 {
                     if( isset($value->style) )
                     {
-                        $this->style = Object::merge( $this->style, System::unserialize($value->style) );
+                        $this->style = BaseObject::merge( $this->style, System::unserialize($value->style) );
                         unset( $value->style );
                     }
-                    $this->attr = Object::merge( $this->attr, $value);
+                    $this->attr = BaseObject::merge( $this->attr, $value);
                     return $this->attr;
                 }
             case 'documentElement' :
