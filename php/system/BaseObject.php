@@ -111,9 +111,9 @@ class BaseObject extends \stdClass implements \Iterator, \ArrayAccess
     public function __construct( $object=null )
     {
          //is an self object
-         if( $object != null && !is_subclass_of($this,"BaseObject") )
+         if( $object != null && !is_subclass_of($this,BaseObject::class) )
          {
-             if( System::is($object,'BaseObject') && !is_a($object,'ArrayAccess')  )
+             if( System::is($object,BaseObject::class,false) && !is_a($object,'ArrayAccess')  )
              {
                  $this->_originValue = $object->_originValue;
                  $this->_originType =  $object->_originType;
@@ -135,11 +135,11 @@ class BaseObject extends \stdClass implements \Iterator, \ArrayAccess
     public function valueOf()
     {
         $value = $this->_originValue;
-        if( System::isArray( $value ) )
+        if( System::isObject( $value ) )
         {
             foreach ( $value as &$item )
             {
-                if( System::isObject($item) )
+                if( $item instanceof BaseObject )
                 {
                     $item = $item->valueOf();
                 }

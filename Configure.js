@@ -34,7 +34,7 @@ module.exports={
             },
             "application":{
                 "path":"./",
-                "name":"app",
+                "name":"easescript",
             }
         },
     },

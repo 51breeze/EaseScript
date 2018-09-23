@@ -154,7 +154,9 @@ class Render extends BaseObject
         $code .= '$___code___.="'.self::escape( substr( $template, $cursor ) ) .'";'.PHP_EOL;
         $code .= 'return $___code___;';
         try{
-            $reflect = new \ReflectionFunction(create_function('', $code));
+            $reflect = new \ReflectionFunction( function_exists("eval") ? function ()use($code){
+                return eval( $code );
+            } : @create_function('', $code) );
             $fun = \Closure::bind($reflect->getClosure(), $variable);
             return $fun();
         }catch ( \Exception $e )

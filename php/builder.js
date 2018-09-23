@@ -237,7 +237,7 @@ var classMap = {
 function builder(path , config , localModules, requirements , namespaceMap, replaces )
 {
     var app_path = utils.getBuildPath(config,"build.application");
-    var dir = utils.mkdir( utils.getResolvePath( utils.getResolvePath(path, app_path), "system" ) );
+    var dir = utils.mkdir( utils.getResolvePath( utils.getResolvePath(path, app_path), config.build_system_path ) );
     var o;
     var namespaceMapValue=[];
     for ( var n in namespaceMap )
@@ -282,17 +282,49 @@ function builder(path , config , localModules, requirements , namespaceMap, repl
                 });
             }
 
+            //替换系统类的动态常量
+            if( name === "System" )
+            {
+                var regexp = new RegExp("\\{@("+[
+                    "ES_BUILD_APPLICATION_NAME",
+                    "ES_BUILD_LIBARAY_NAME",
+                    "ES_BUILD_SYSTEM_PATH",
+                ].join("|")+")\\}","g");
+                content = content.replace(regexp,function (a,b) {
+                    switch ( b )
+                    {
+                        case "ES_BUILD_APPLICATION_NAME" :
+                            return config.build_application_name;
+                            break;
+                        case "ES_BUILD_LIBARAY_NAME" :
+                            return config.build_libaray_name;
+                            break;
+                        case "ES_BUILD_SYSTEM_PATH" :
+                            return config.build_system_path.replace(/\./g,"\\");
+                        break;
+                    }
+                    return "";
+                });
+            }
+
+            //需要加载的类名
             var _require = describe(content,"");
             _require = _require.requirements.filter(function (name) {
                  return !exclude[ name ];
             });
 
+            var namespace = config.build_system_path.replace(/\./g,"\\");
+            //定义系统类的命名空间
+            var usename = [ "namespace "+namespace+";" ];
             _require.forEach(function (name) {
+                usename.push("use "+namespace+"\\"+name+";" );
                 if( !loaded[ name ] ){
                     requires.push( name );
                 }
             });
+
             content = utils.trim( content );
+            content = content.replace(/^([\r\n\s]+)?<\?php/i, "<?php\n"+usename.join("\n") )
             utils.setContents( dir+"/"+name+'.php', content );
         }
     }
@@ -311,27 +343,32 @@ function builder(path , config , localModules, requirements , namespaceMap, repl
     var content = utils.getContents( config.root_path+"/php/bootstrap.php");
     if( replaces )
     {
-        content = content.replace(/([\s\t]+)?\[CODE\[(.*?)\]\];/ig, function (a, b, c) {
-              switch (c.toLowerCase())
+        content = content.replace(/\[CODE\[(.*?)\]\]/ig, function (a, b) {
+              switch ( b )
               {
-                  case "service.bind" :
-                      return serviceRegister( replaces["service.bind"]||{} , b );
+                  case "ServiceRouteList" :
+                      return makeServiceRouteList( replaces["ServiceRouteList"]||{});
                   break;
               }
-              return "";
+              return "null";
         });
     }
-    utils.setContents( dir+"/index.php",  content );
+    utils.setContents( dir+"/easescript.php",  content );
 }
 
-function serviceRegister( serviceProvider, tab )
+function makeServiceRouteList( serviceRouteList )
 {
-    var items = [];
-    utils.forEach(serviceProvider,function (item) {
-        items.push( '\\es\\core\\Service::bind("'+item.bind+'","'+item.provider+'","'+item.method+'");' );
+    var items = {};
+    utils.forEach(serviceRouteList,function (item) {
+        var obj = items[ item.method ] || (items[ item.method ] = []);
+        obj.push("\t\t'"+item.alias+"'=>'"+item.provider.replace(/\./g,"\\")+"'");
     });
-    return tab+items.join("\n"+tab.replace(/\r\n/g,"") );
-}
 
+    var bind=[];
+    utils.forEach(items,function (item,method) {
+        bind.push( "\n\t'"+method+"'=>array(\n"+item.join(",\n")+'\n\t)' );
+    });
+    return 'array(' + bind.join(",") +'\n)';
+}
 
 module.exports = builder;

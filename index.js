@@ -687,7 +687,7 @@ const syntax_supported={
 //语法构建器
 const SyntaxBuilder={
 
-    'javascript':function(config, descriptions, client )
+    'javascript':function(config, descriptions, client , serverRouteList )
     {
         Utils.info("building javascript start...");
 
@@ -749,7 +749,8 @@ const SyntaxBuilder={
             scriptContent = builder(bootstrap.fullclassname, config, scriptContent.join(""), requirements, {
                 namespace:function(content) {
                      return content.replace(/var\s+codeMap=\{\};/,"var codeMap="+JSON.stringify(hashMap)+";");
-                }
+                },
+                serverRouteList:serverRouteList
             });
 
             //需要处理样内容
@@ -790,15 +791,24 @@ const SyntaxBuilder={
         //构建应该路径
         var app_path = Utils.getBuildPath(config, 'build.application');
         //命名空间映射关系
-        var hashMap=[];
+        var hashMap={};
         //编译模块
         Utils.forEach(descriptions, function (module) {
             hashMap = Compile("php", Maker.makeModuleByName(module.fullclassname), module, config);
             getRequirementsAllModules(module, allModules, hash);
         });
+
         //编译服务提供者
-        var serviceProvider = makeServiceProvider(config, allModules, hash, "php");
-        hashMap = serviceProvider.hash;
+        var serverRouteList = makeServiceProvider(config, allModules, hash, "php", hashMap);
+        //路由控制列表
+        Utils.forEach(allModules.filter(function (e)
+        {
+            return !!e.controllerRouteList;
+        }),function (item) {
+            Utils.forEach(item.controllerRouteList,function (item,key) {
+                serverRouteList[key]=item;
+            });
+        });
 
         //获取所有使用的模块
         usedModules = usedModules.concat( getRequirementsAllUsedModules( allModules, "php" ) );
@@ -807,6 +817,7 @@ const SyntaxBuilder={
         {
             return e.nonglobal === true;
         });
+
         //php构建器
         var phpBuilder = require( './php/builder.js');
         //使用的全局类模块
@@ -817,13 +828,15 @@ const SyntaxBuilder={
         requirements= requirements.map(function (a) {
               return a.type;
         });
+
         //生成php文件
         phpBuilder( config.build_path, config, localModules, requirements, hashMap, {
-            "service.bind":serviceProvider.service
+            "ServiceRouteList": serverRouteList,
         });
+
         //构建需要生成的js文件
         if( onlyServer !==true ) {
-            SyntaxBuilder.javascript(config, descriptions, true);
+            SyntaxBuilder.javascript(config, descriptions, true, serverRouteList );
         }
     }
 };
@@ -833,37 +846,47 @@ const SyntaxBuilder={
  * @param config
  * @returns {Array}
  */
-function makeServiceProvider(config, allModules, hash, syntax )
+function makeServiceProvider(config, allModules, hash, syntax, hashMap )
 {
     var providerList = {};
     var mapping = {};
-    Utils.forEach(config.ServiceProviderList,function (item)
-    {
-        var key =  item.provider;
-        var provider = providerList[ key ] || (providerList[ key ]={});
-        var param = item.name.match(/\{(.*?)\}/g);
-        if( !provider[ item.action ] ) {
-            provider[item.action]={param:param,method:item.method};
-        }else if( param && ( !provider[item.action].param || provider[item.action].param.length < param.length) ){
-            provider[item.action].param = param;
-        }
-        mapping[ item.method+':'+item.bind ] = {method:item.method,bind:item.bind,provider:item.provider+"@"+item.action}
+    var serviceProviderList = allModules.filter(function (e) {
+        return !!e.serviceProviderList;
+    }).map(function (e) {
+        return e.serviceProviderList;
     });
 
-    createServiceProvider(config, providerList );
+    Utils.forEach(serviceProviderList,function (provider)
+    {
+        Utils.forEach(provider,function (item)
+        {
+            var key =  item.provider;
+            var provider = providerList[ key ] || (providerList[ key ]={});
+            var param = item.name.match(/\{(.*?)\}/g);
+            if( !provider[ item.action ] ) {
+                provider[item.action]={param:param,method:item.method};
+            }else if( param && ( !provider[item.action].param || provider[item.action].param.length < param.length) ){
+                provider[item.action].param = param;
+            }
+            mapping[ item.method+':'+item.bind ] = {method:item.method,alias:item.bind,provider:item.provider+"@"+item.action};
+        });
+    });
 
-    var hashMap;
+    //如果服务不存在则生成
+    createServiceProvider(config, providerList);
+
+    var _hashMap;
     Utils.forEach(providerList,function (item,fullclassname)
     {
         var module = Maker.loadModuleDescription(syntax, fullclassname, config, null, null,true);
-        hashMap = Compile( syntax , Maker.makeModuleByName(module.fullclassname), module, config);
+        _hashMap = Compile( syntax , Maker.makeModuleByName(module.fullclassname), module, config);
         getRequirementsAllModules( module,allModules, hash );
     });
 
-    return {
-        "service":mapping,
-        "hash":hashMap
+    if( hashMap ) {
+        Utils.merge(hashMap, _hashMap);
     }
+    return mapping;
 }
 
 /**
@@ -1165,12 +1188,21 @@ function make( config, isGlobalConfig )
             globalConfig  = config;
         }
 
+        //构建应用的目录名
+        config.build_application_name = Utils.getBuildPath(config,"build.application","name");
+        //主库目录名
+        config.build_libaray_name = "es";
+        //生成系统类目录
+        config.build_system_path = "es.system";
+        //当前支持构建的语法
         config.syntax_supported = syntax_supported;
-
+        //需要引用的全局类
         requirements = config.requirements || (config.requirements = {});
+        //默认构建的语法
         config.syntax = syntaxMap[ config.syntax ] || 'javascript';
         config.originMakeSyntax = config.syntax;
-
+        //服务提供者
+        config.ServiceProviderList = {};
         //浏览器中的全局模块
         if( config.browser === 'enable' )
         {

@@ -5,7 +5,7 @@
  * Released under the MIT license
  * https://github.com/51breeze/EaseScript
  * @author Jun Ye <664371281@qq.com>
- * @require System,HTMLElement,Node,EventDispatcher
+ * @require System,HTMLElement,Document,Node,EventDispatcher
  */
 class Element extends EventDispatcher implements \ArrayAccess,\Countable
 {
@@ -97,7 +97,7 @@ class Element extends EventDispatcher implements \ArrayAccess,\Countable
                 $selector = [ self::createElement( $selector ) ];
             }else
             {
-                $selector = \Document::querySelectorAll( $selector, $context );
+                $selector = Document::querySelectorAll( $selector, $context );
             }
 
         }else if( $selector instanceof Node )

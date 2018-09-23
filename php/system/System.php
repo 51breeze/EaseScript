@@ -5,8 +5,14 @@
  * Released under the MIT license
  * https://github.com/51breeze/EaseScript
  * @author Jun Ye <664371281@qq.com>
+ * @require EventDispatcher,Document,Window,TypeError
  */
-if( !defined('NaN') )define('NaN','NaN');
+
+define('NaN','NaN');
+define('ES_BUILD_APPLICATION_NAME','{@ES_BUILD_APPLICATION_NAME}');
+define('ES_BUILD_LIBARAY_NAME','{@ES_BUILD_LIBARAY_NAME}');
+define('ES_BUILD_SYSTEM_PATH','{@ES_BUILD_SYSTEM_PATH}');
+
 final class System
 {
     public static function log()
@@ -47,7 +53,7 @@ final class System
         );
         if( isset($hash[$d]) )
         {
-            return System::uid( $len );
+            return static::uid( $len );
         }
         $hash[$d] = true;
         return $d;
@@ -55,7 +61,7 @@ final class System
 
     public static function isIterator( $obj )
     {
-        static $iteratorClass = "es\\interfaces\\IListIterator";
+        static $iteratorClass = 'es\interfaces\IListIterator';
         if( interface_exists($iteratorClass) )
         {
             return is_a($obj, $iteratorClass);
@@ -63,62 +69,63 @@ final class System
         return false;
     }
 
-    public static function isOf( $obj, $class )
-    {
-        try {
-            if(interface_exists($class))return false;
-        }catch (\Exception $e){}
-        return self::is($obj, $class);
-    }
-
-    public static function is( $obj, $class )
+    /**
+     * 判断对象是否为指定的类型
+     * @param $obj 检查的目标对象
+     * @param $class 指定的对象类型
+     * @param bool $flag 是否查检接口类型。可选值true检查接口类型false不检查接口,默认true。
+     * @return bool
+     */
+    public static function is( $obj, $class, $flag=true )
     {
         try{
-            switch ( $class )
+            switch ( strtolower($class) )
             {
-                case 'Class' :
+                case 'class' :
                     return is_string($obj) ? class_exists($obj, true) : false;
-                case 'Array' :
-                    return self::isArray( $obj );
-                case 'String' :
+                case 'array' :
+                    return static::isArray( $obj );
+                case 'string' :
                     return is_string($obj);
-                case 'Boolean' :
+                case 'boolean' :
                     return is_bool($obj);
                 case "int" :
-                case "Int":
-                case 'Integer' :
-                case 'Number' :
+                case 'integer' :
+                case 'number' :
                     return is_numeric($obj);
-                case 'Uint' :
                 case 'uint' :
-                    return $obj >= 0;
+                    return is_numeric($obj) && $obj >= 0;
                 case "double" :
                 case "float" :
                     return is_float($obj);
-                case 'Object' :
+                case 'object' :
                     return $obj===null ? true : is_object($obj);
             }
-            return is_string($obj) ? false : is_a($obj, $class);
+            return is_string($obj) ? false : ( $flag === true ?  is_a($obj, $class) : $obj instanceof $class );
         }catch (\Exception $e)
         {
             return false;
         }
     }
 
+    public function isScalar( $obj )
+    {
+        return false;
+    }
+
     public static function typeOf( $obj )
     {
-        if( self::isArray( $obj ) )
-        {
-            return is_callable($obj) ? 'function' : 'array';
-        }else if( function_exists( $obj ) ){
+        if( is_callable( $obj ) ){
             return 'function';
+        }else if( static::isArray( $obj ) ) {
+            return 'array';
         }else if( is_bool($obj) ){
             return 'boolean';
         }else if( is_numeric($obj) ){
             return 'number';
         }else if( is_string($obj) ){
             return 'string';
-        }else if( self::is($obj,'RegExp') ){
+        }else if( static::is($obj, ES_BUILD_SYSTEM_PATH.'\RegExp',false) ){
             return 'regexp';
         }
         return 'object';
@@ -129,7 +136,7 @@ final class System
         if( is_object($obj) )
         {
             $type = strtolower(get_class($obj));
-            return $type === 'baseobject' || $type === "stdclass" || $type === "object";
+            return $type === trim(ES_BUILD_SYSTEM_PATH.'\baseobject','\\') || $type === "stdclass" || $type === "object";
 
         }else if( $flag !== true && is_array( $obj ) )
         {
@@ -140,7 +147,8 @@ final class System
 
     public static function isArray( $obj )
     {
-        return is_array($obj) || is_a($obj,'es\core\ArrayList', false);
+        static $arrayListClass = 'es\system\ArrayList';
+        return is_array($obj) || is_a($obj,$arrayListClass,false);
     }
 
     public static function isString( $obj )
@@ -191,14 +199,14 @@ final class System
     static function document()
     {
         static $doc = null;
-        if( $doc===null ) $doc = new \Document();
+        if( $doc===null ) $doc = new Document();
         return $doc;
     }
 
     static function window()
     {
         static $win = null;
-        if( $win===null ) $win = new \Window();
+        if( $win===null ) $win = new Window();
         return $win;
     }
 
@@ -243,10 +251,10 @@ final class System
         
         foreach ($object as $key=>$val)
         {
-            if( System::isObject($val) )
+            if( static::isObject($val) )
             {
                 $key = $prefix ? $prefix . '[' . $key . ']' : $key;
-                $val = System::serialize($val, $type, $group ? $key : false);
+                $val = static::serialize($val, $type, $group ? $key : false);
             }else{
                 if( $type === 'attr' )
                 {
@@ -317,16 +325,16 @@ final class System
     static private $globalEvent=null;
     static function getGlobalEvent()
     {
-        if( System::$globalEvent===null )
+        if( static::$globalEvent===null )
         {
-            System::$globalEvent = new EventDispatcher( System::window() );
+            static::$globalEvent = new EventDispatcher( static::window() );
         }
-        return System::$globalEvent;
+        return static::$globalEvent;
     }
 
     static private $context = null;
     static function getContext()
     {
-        return System::$context;
+        return static::$context;
     }
 }

@@ -14,7 +14,7 @@ class EventDispatcher extends BaseObject
     private $target = null;
     function __construct( $target=null )
     {
-        if( $target != null && !System::isOf($target, 'EventDispatcher') )
+        if( $target != null && !System::is($target, 'es\system\EventDispatcher') )
         {
             throw new TypeError('target is not EventDispatcher');
         }

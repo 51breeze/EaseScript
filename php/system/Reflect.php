@@ -258,7 +258,7 @@ final class Reflect
         }
 
         if( $value == null || $typeClass === "Object" )return $value;
-        if ( $typeClass && !\System::is($value, $typeClass) )
+        if ( $typeClass && !System::is($value, $typeClass) )
         {
             throw new TypeError( 'Specify the type of value do not match. must is "'.$typeClass.'"');
         }

@@ -42,10 +42,10 @@
 
                 //e.stopPropagation();
 
-              PopUp.title("修改信息 sfdfdsf");
+              //PopUp.title("修改信息 sfdfdsf");
 
 
-           /*
+
               var modal:PopUp =  PopUp.modality("修改信息",  Element(".uuuu").html( true ) , {callback:function (type:String) {
                     console.log( type );
                 },profile:{width:700, height:500}}) as PopUp;
@@ -55,7 +55,7 @@
                         PopUp.confirm("您有3条信息未处理2", function (type:String) {
                         console.log( type );
                         });
-                });*/
+                });
             });
         }
     ]]>
@@ -95,7 +95,7 @@
             <h1>
                 这里是内容9999999999   {context.title}
             </h1>
-            <c:DataGrid source="http://working.com/json.php"  width="500"  async="false" >
+            <c:DataGrid source="http://local.working.com/json.php"  width="500"  async="false" >
                 <c:dataSource>
                     <c:dataType>@Http.TYPE_JSONP</c:dataType>
                 </c:dataSource>
@@ -109,7 +109,7 @@
         </div>
 
         <div style="margin: 10px;">
-          <c:DataGrid  id="@dataGrid" source="http://working.com/json.php" skinClass="MyDataGridSkin"  async="true" >
+          <c:DataGrid  id="@dataGrid" source="http://local.working.com/json.php" skinClass="MyDataGridSkin"  async="true" >
                 <c:dataSource>
                     <c:dataType>@Http.TYPE_JSONP</c:dataType>
                 </c:dataSource>

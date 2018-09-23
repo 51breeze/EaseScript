@@ -78,8 +78,7 @@ var fix={
             return Math.max(
                 this['inner'+prop] || 0,
                 this['offset'+prop] || 0,
-                this['client'+prop] || 0,
-                this.document.documentElement['client'+prop] || 0
+                this['client'+prop] || 0
             );
 
         } else if ( Element.isDocument(this) )

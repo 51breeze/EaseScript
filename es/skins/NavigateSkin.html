@@ -3,7 +3,7 @@
     <s:Metadata>[HostComponent("es.components.Navigate")]</s:Metadata>
     <s:Script>
     <![CDATA[
-        [Syntax(origin)]
+
         override protected function initializing()
         {
             var hostComponent:Navigate = this.hostComponent;
@@ -11,7 +11,6 @@
             var dataProfile:String =  hostComponent.dataProfile;
             var container:Skin = this.container;
             container.variable( dataProfile, [] );
-
             var current:* = hostComponent.current;
             if( typeof current !== "function" )
             {
@@ -19,7 +18,7 @@
                 current = function(item:Object,index:*){
                     if(index==key)return true;
                     if( item["link"] == key || item["label"] == key ) return true;
-                    return new RegExp( key ).test( (String)item["link"] );
+                    return new RegExp( key ).test( (String)item.link );
                 };
             }
 

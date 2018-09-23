@@ -27,7 +27,7 @@ class DataGrep extends BaseObject
     public function __construct($dataItems)
     {
         parent::__construct();
-        if (!System::isOf($dataItems, "Array")) throw new Error('error', 'Invalid data list');
+        if (!System::is($dataItems, "Array", false)) throw new Error('error', 'Invalid data list');
         $this->_dataItems = $dataItems;
     }
 
