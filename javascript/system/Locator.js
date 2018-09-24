@@ -160,4 +160,10 @@ Locator.query = function query(name, defaultValue)
     }
     return Object.merge({}, map.query);
 }
+
+Locator.real = function real(name)
+{
+     return Locator.staticHtmlFileMap[ name ]||name;
+}
+Locator.staticHtmlFileMap={};
 System.Locator = Locator;

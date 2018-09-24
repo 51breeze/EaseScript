@@ -1,11 +1,14 @@
 System.getGlobalEvent().addEventListener(Event.READY,function (e) {
-    var router = [CODE[ServiceRouteList]];
+    var router = [CODE[SERVICE_ROUTE_LIST]];
     try{
         var locator = System.Locator;
         var Event = System.Event;
         router = router.get || {};
         var path = locator.path().join("/");
         path = '/'+path.replace(/^\//,'');
+
+        console.log( locator.query("mod") );
+
         if( router[ path ] )
         {
             var controller = router[ path ].split("@");

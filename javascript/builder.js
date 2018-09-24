@@ -365,15 +365,7 @@ function builder(main, config , code, requirements , replacements)
 
     //系统引导器
     var bootstrap = utils.getContents( rootPath+'/bootstrap.js' );
-    bootstrap = bootstrap.replace(/\[CODE\[(.*?)\]\]/ig, function (a, b) {
-        switch ( b )
-        {
-            case "ServiceRouteList" :
-                return makeServiceRouteList( replacements.serverRouteList );
-                break;
-        }
-        return "null";
-    });
+    bootstrap = replaceContent(bootstrap, replacements, config);
 
     //开发业务代码
     var business = ['(function(define,'+requires.join(',')+'){',
@@ -401,6 +393,20 @@ function builder(main, config , code, requirements , replacements)
     return framework.join('\n');
 }
 
+function replaceContent(content, data, config)
+{
+    data = data||{};
+    content = content.replace(/\[CODE\[(.*?)\]\]/ig, function (a, b) {
+        switch ( b )
+        {
+            case "SERVICE_ROUTE_LIST" :
+                return makeServiceRouteList( data["SERVICE_ROUTE_LIST"]||{});
+            break;
+        }
+        return data[b]||"";
+    });
+    return content;
+}
 
 function makeServiceRouteList( serviceRouteList )
 {

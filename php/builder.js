@@ -234,16 +234,15 @@ var classMap = {
  * @param config
  * @returns {string}
  */
-function builder(path , config , localModules, requirements , namespaceMap, replaces )
+function builder(path , config , localModules, requirements , replacements )
 {
     var app_path = utils.getBuildPath(config,"build.application");
     var dir = utils.mkdir( utils.getResolvePath( utils.getResolvePath(path, app_path), config.build_system_path ) );
     var o;
     var namespaceMapValue=[];
-    for ( var n in namespaceMap )
-    {
-        namespaceMapValue.push( "'"+n+"'=>'"+namespaceMap[n]+"'" );
-    }
+    utils.forEach(replacements.NAMESPACE_HASH_MAP,function (value,name) {
+        namespaceMapValue.push( "'"+name+"'=>'"+value+"'" );
+    });
 
     var exclude = {
         'Function':true,
@@ -338,22 +337,33 @@ function builder(path , config , localModules, requirements , namespaceMap, repl
         utils.setContents( file+'.php', o.makeContent['php'] );
     }
 
+    var bootstrap_dir = utils.getBuildPath(config,"build.bootstrap");
+    var webroot_dir = utils.getBuildPath(config,"build.webroot");
+
     //生成引导文件
-    dir = utils.mkdir( utils.getResolvePath(app_path,"bootstrap") );
     var content = utils.getContents( config.root_path+"/php/bootstrap.php");
-    if( replaces )
-    {
-        content = content.replace(/\[CODE\[(.*?)\]\]/ig, function (a, b) {
-              switch ( b )
-              {
-                  case "ServiceRouteList" :
-                      return makeServiceRouteList( replaces["ServiceRouteList"]||{});
-                  break;
-              }
-              return "null";
-        });
-    }
-    utils.setContents( dir+"/easescript.php",  content );
+    content = replaceContent(content, replacements,config);
+    utils.setContents( bootstrap_dir+'/'+replacements["BOOTSTRAP_CLASS_FILE_NAME"],  content );
+
+    //生成入口文件
+    content = utils.getContents( config.root_path+"/php/index.php");
+    content = replaceContent(content, replacements, config);
+    utils.setContents( webroot_dir+"/index.php",  content );
+}
+
+function replaceContent(content, data, config)
+{
+    data = data||{};
+    content = content.replace(/\[CODE\[(.*?)\]\]/ig, function (a, b) {
+        switch ( b )
+        {
+            case "SERVICE_ROUTE_LIST" :
+                return makeServiceRouteList( data["SERVICE_ROUTE_LIST"]||{});
+            break;
+        }
+        return data[ b ]||"";
+    });
+    return content;
 }
 
 function makeServiceRouteList( serviceRouteList )

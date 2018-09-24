@@ -32,6 +32,10 @@ module.exports={
                 "path":"./",
                 "name":"webroot",
             },
+            "bootstrap":{
+                "path":"@application",
+                "name":"bootstrap",
+            },
             "application":{
                 "path":"./",
                 "name":"easescript",
