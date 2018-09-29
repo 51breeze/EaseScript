@@ -338,25 +338,23 @@ function builder(main, config , code, requirements , replacements)
          return val;
     });
 
-   /* var index = requires.indexOf('console');
-    if( index > 0 )requires.splice(index,1);*/
-
     var index = requires.indexOf('Symbol');
     if( index > 0 )requires.splice(index,1);
 
-    var internal = [];
+    var internal = [
+        'Internal.environment='+config.mode+';',
+        'Internal.ORIGIN_SYNTAX = "[CODE[ORIGIN_SYNTAX]]";',
+        'Internal.URL_PATH_NAME = "[CODE[STATIC_URL_PATH_NAME]]";',
+    ];
     for (var scc in  config.system_core_class )
     {
-        internal.push("Internal."+scc+"='"+config.system_core_class[scc]+"';" );
+        internal.push("Internal."+scc+'="'+config.system_core_class[scc]+'";' );
     }
     if( config.mode==1  )
     {
         internal.push( utils.getContents( rootPath+'/internal.js' ) );
     }
-    if( internal.length > 0 )
-    {
-        internal='(function(System,Internal,environment){\n'+ internal.join('\n') + '\n}(System,Internal,'+config.mode+'));'
-    }
+    internal = replaceContent(internal.join("\n"), replacements, config);
 
     var run='';
     if( config.mode==1 ){
@@ -381,9 +379,9 @@ function builder(main, config , code, requirements , replacements)
     var framework = [
         '(function(System,Internal,undefined){',
             '"use strict";',
+            internal,
             //系统全局模块域
             '(function(System,$'+globals.join(',$')+'){',
-                internal,
                 contents,
                 run,
             '}(System,' + g.join(',') + '));',

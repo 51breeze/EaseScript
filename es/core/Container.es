@@ -95,6 +95,12 @@ package es.core
             var children:Array = this._children;
             var at:Number = index < 0 ? index+children.length+1 : index;
             children.splice(at, 0, child);
+
+            if( this.isChain() )
+            {
+                element.addChildAt( child.display(), at);
+            }
+
             if( child is SkinComponent )
             {
                 child = (child as SkinComponent).skin as IDisplay;

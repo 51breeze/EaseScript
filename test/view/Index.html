@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<s:View uu="sss" xmlns:s="es.core"  xmlns:c="es.components" xmlns:b="@">
+<s:View uu="sss" xmlns:s="es.core"  xmlns:c="es.components" xmlns:b="@" xmlns:p="view.page">
     <s:Metadata>[HostComponent("BaseApplication")]</s:Metadata>
     <s:Script>
     <![CDATA[
@@ -8,6 +8,7 @@
         import es.core.Display;
         import BaseApplication;
         import es.skins.DataGridSkin;
+        import view.page.IndexSkin;
 
         override protected function initializing()
         {
@@ -69,13 +70,17 @@
     </head>
 
     <body id="@body">
-        <c:Navigate id="@navigate">
+
+        <c:Navigate id="@navigate" viewport="@content">
             <c:source>@context.menus</c:source>
         </c:Navigate>
+
+        <div id="@content">
+        </div>
+
         <div>
             <button id="@button" type='button' class="btn btn-success" style="width: 100px;">点 我</button>
         </div>
-
 
         <div>
             dsfdsfdsfsdf

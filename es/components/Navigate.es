@@ -8,6 +8,7 @@
 package es.components
 {
     import es.components.SkinComponent;
+    import es.interfaces.IContainer;
 
     [Syntax(origin)]
     [Skin("es.skins.NavigateSkin")]
@@ -139,7 +140,31 @@ package es.components
 
         public function set current(value:*):void
         {
-            _current = value;
+            if(  _current != value  )
+            {
+                _current = value;
+                if( this.initialized )
+                {
+                    commitPropertyAndUpdateSkin();
+                }
+            }
+        }
+
+
+        override protected function commitPropertyAndUpdateSkin()
+        {
+            super.commitPropertyAndUpdateSkin();
+        }
+
+        private var _viewport:IContainer=null;
+        public function set viewport( value:IContainer ):void
+        {
+            _viewport = value;
+        }
+
+        public function get viewport():IContainer
+        {
+            return _viewport;
         }
     }
 }

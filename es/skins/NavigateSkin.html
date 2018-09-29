@@ -4,13 +4,23 @@
     <s:Script>
     <![CDATA[
 
+        import es.interfaces.IContainer;
+
         override protected function initializing()
         {
             var hostComponent:Navigate = this.hostComponent;
             var dataSource:DataSource =  hostComponent.dataSource;
             var dataProfile:String =  hostComponent.dataProfile;
             var container:Skin = this.container;
-            container.variable( dataProfile, [] );
+            container.variable( dataProfile, hostComponent );
+            var viewport:IContainer = hostComponent.viewport;
+            container.variable( "loadContent", function(item:Object){
+
+                 if( viewport && item.content instanceof Class ){
+                     var obj:Skin = Reflect.construct(null, item.content, [hostComponent] ) as Skin;
+                     viewport.addChild( obj );
+                 }
+            });
             var current:* = hostComponent.current;
             if( typeof current !== "function" )
             {
@@ -41,6 +51,7 @@
             <:foreach name="datalist" value="item" key="link">
                 <:if condition="current(item,forIndex)">
                    <li role="presentation" class="active"><a href="{item.link}">{item.label}</a></li>
+                   <:code>loadContent(item)</:code>
                 <:else />
                     <li role="presentation"><a href="{item.link}">{item.label}</a></li>
                 </:if>

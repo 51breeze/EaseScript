@@ -1,5 +1,4 @@
 var _stack = [];
-Internal.environment = environment;
 Internal.addStack =function (filename, info){
     if( !info )return;
     _stack.push(info.replace(/(\:\d+\:\d+)$/, function (a,b) {

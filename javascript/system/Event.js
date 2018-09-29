@@ -224,4 +224,44 @@ Event.create = function create( originalEvent )
     return event;
 };
 
+Event.fix.hooks[ Event.READY ]=function (listener, dispatcher)
+{
+    var target=this;
+    var doc = this.contentWindow ?  this.contentWindow.document : this.ownerDocument || this.document || this;
+    var win=  doc && doc.nodeType===9 ? doc.defaultView || doc.parentWindow : window;
+    if( !(win || doc) )return;
+    var id = null;
+    var has = false;
+    var handle=function(event)
+    {
+        if( !event )
+        {
+            switch ( doc.readyState )
+            {
+                case 'loaded'   :
+                case 'complete' :
+                case '4'        :
+                    event= new Event( Event.READY );
+                    break;
+            }
+        }
+        if( event && has===false)
+        {
+            has = true;
+            if(id){
+                window.clearInterval(id);
+                id = null;
+            }
+            event = event instanceof Event ? event : Event.create( event );
+            event.currentTarget = target;
+            event.target = target;
+            dispatcher( event );
+        }
+    }
+    var type = Event.type(Event.READY);
+    doc.addEventListener ? doc.addEventListener( type, handle) : doc.attachEvent(type, handle);
+    id = window.setInterval(handle,50);
+    return true;
+}
+
 

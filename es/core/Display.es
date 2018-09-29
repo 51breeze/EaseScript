@@ -315,6 +315,15 @@ package es.core
         };
 
         /**
+         * 判断当前元素是否已经添加到文档链中
+         * @returns {*}
+         */
+        public function isChain()
+        {
+            return !!this._element[0].parentNode;
+        }
+
+        /**
          * 渲染显示皮肤对象。
          * 调用此方法会重新创建子级对象，在非必要情况下请谨慎使用，可以节省资源。
          */

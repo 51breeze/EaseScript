@@ -296,17 +296,17 @@ function compileFragmentScript(script, fullclassname, syntax, config, requiremen
     return stack.description.rootContent[syntax].join("");
 }
 
-function createServerView(rootpath, module, syntax, config )
+function createServerView(rootpath, module, syntax, config , bootstrap )
 {
     var requirements=[];
     var file = Utils.getResolvePath( rootpath, module.fullclassname.replace(/\./g,"/") );
     Utils.mkdir( file.substr(0, file.lastIndexOf("/") ) );
     var suffix = syntax ==="php" ? ".php" : ".html";
-    var callback =  module.ownerFragmentModule.viewMaker || module.ownerFragmentModule.skinMaker;
+    var callback =  module.viewMaker || module.skinMaker;
     Utils.setContents( (file + suffix).toLowerCase(), callback(function (script)
     {
-        return compileFragmentScript(script,  module.ownerFragmentModule.fullclassname+syntax, syntax, config, requirements );
-    }));
+        return compileFragmentScript(script,  module.fullclassname+syntax, syntax, config, requirements );
+    },bootstrap));
     return requirements;
 }
 
@@ -717,7 +717,7 @@ const SyntaxBuilder={
         for( ;index<len;index++ )
         {
             var bootstrap = descriptions[ index ];
-            var outputname = bootstrap.fullclassname.toLowerCase();
+            var outputname = bootstrap.fullclassname
             var hashMap = Compile("javascript", Maker.makeModuleByName( bootstrap.fullclassname ) , bootstrap, config);
             var loadHash = {};
             var allModules = getRequirementsAllModules( bootstrap , [],  loadHash );
@@ -726,7 +726,6 @@ const SyntaxBuilder={
             //需要生成视图
             if( !onlyClient )
             {
-                var view_files = {}
                 usedModules.filter(function (e)
                 {
                     var o = e.ownerFragmentModule || e;
@@ -736,7 +735,7 @@ const SyntaxBuilder={
                             Utils.getResolvePath( Utils.getBuildPath(config,"build.html"), o.fullclassname.replace(/\./g,"/") ) );
                         view_files[ view_path.toLowerCase() ] = bootstrap.fullclassname;*/
 
-                        mergeModules(usedModules, createServerView(  view_path , e, "javascript", config ) );
+                        mergeModules(usedModules, createServerView( view_path , o, "javascript", config , bootstrap ) );
                     }
                     return e.nonglobal === true;
                 });
@@ -746,7 +745,7 @@ const SyntaxBuilder={
             }
 
             //获取路由配置
-            var serverRouteList = getServiceRoutes(config, allModules );
+            var serverRoutes = getServiceRoutes(config, allModules );
 
             //准备相应的文件
             var skinModules = getRequirementsAllSkinModules( allModules );
@@ -766,8 +765,11 @@ const SyntaxBuilder={
                      return content.replace(/var\s+codeMap=\{\};/,"var codeMap="+JSON.stringify(hashMap)+";");
                 },
                 "NAMESPACE_HASH_MAP":hashMap,
-                "SERVICE_ROUTE_LIST":serverRouteList,
+                "SERVICE_ROUTE_LIST":serverRoutes,
                 "BOOTSTRAP_CLASS_FILE_NAME":"",
+                "ORIGIN_SYNTAX":config.originMakeSyntax,
+                "STATIC_URL_PATH_NAME":config.static_url_path_name,
+                "DEFAULT_BOOTSTRAP_ROUTER_PROVIDER":bootstrap.fullclassname+"@"+bootstrap.defineMetaTypeList.Router.param.default,
                 "BOOTSTRAP_CLASS_PATH":Utils.getRelativePath(
                     Utils.getBuildPath(config,"build.webroot"),
                     Utils.getBuildPath(config,"build.bootstrap")
@@ -790,6 +792,9 @@ const SyntaxBuilder={
             Utils.mkdir(PATH.dirname(filename));
             fs.writeFileSync(filename, scriptContent );
         }
+
+        //入口视图
+
 
         //需要构建服务类
         if( onlyClient !== true )
@@ -867,6 +872,9 @@ const SyntaxBuilder={
             "NAMESPACE_HASH_MAP":hashMap,
             "SERVICE_ROUTE_LIST": routeMapping,
             "BOOTSTRAP_CLASS_FILE_NAME":"Bootstrap.php",
+            "ORIGIN_SYNTAX":config.originMakeSyntax,
+            "STATIC_URL_PATH_NAME":config.static_url_path_name,
+            "DEFAULT_BOOTSTRAP_ROUTER_PROVIDER":config.default_bootstrap_router_provider,
             "BOOTSTRAP_CLASS_PATH":Utils.getRelativePath(
                 Utils.getBuildPath(config,"build.webroot"),
                 Utils.getBuildPath(config,"build.bootstrap")
@@ -890,7 +898,7 @@ const SyntaxBuilder={
  * @param config
  * @returns {Array}
  */
-function getServiceRoutes(config, allModules, view_files )
+function getServiceRoutes(config, allModules )
 {
     var routes = {};
     //路由控制列表
@@ -1289,7 +1297,8 @@ function make( config, isGlobalConfig )
         config.ServiceProviderList = {};
         //指定构建后应用的入口根目录,默认为webroot下面
         config.build_bootstrap_root_path = Utils.getBuildPath(config,"build.webroot");
-
+        //静态页面需要模拟path信息的接收名
+        config.static_url_path_name = "PATH";
         //浏览器中的全局模块
         if( config.browser === 'enable' )
         {
@@ -1362,6 +1371,9 @@ function make( config, isGlobalConfig )
             }
         }
 
+        //默认入口类优先级 ==> 手动指定，类文件名为index, 第一个类
+        var bootstrap_class=[null,null,null];
+
         //继承 es.core.Application 的属于入口文件
         descriptions = descriptions.filter(function (a) {
             //如果这个类被子类继承过证明也不是入口文件
@@ -1369,8 +1381,47 @@ function make( config, isGlobalConfig )
             {
                 return false;
             }
-            return Maker.checkInstanceOf(a,"es.core.Application");
+            var flag = Maker.checkInstanceOf(a,"es.core.Application");
+            if( flag )
+            {
+                //默认指定第一个为入口类
+                if( bootstrap_class[2] === null )
+                {
+                    bootstrap_class[2] = a.fullclassname;
+                }
+
+                //默认index为入口类
+                if( a.classname.toLowerCase() ==="index" )
+                {
+                    bootstrap_class[1] = a.fullclassname;
+                }
+
+                //否则为指定的入口类
+                if( a.fullclassname === config.default_bootstrap_class )
+                {
+                    bootstrap_class[0] = a.fullclassname;
+                }
+            }
+            return flag;
         });
+
+        //是否有找到指定的入口类
+        if( config.default_bootstrap_class && !bootstrap_class[0] )
+        {
+            throw new ReferenceError("Not found assign bootstrap class. for '"+config.default_bootstrap_class+"'");
+        }
+
+        //默认入口类
+        config.default_bootstrap_class = bootstrap_class.filter(function (a) {
+            return !!a;
+        })[0];
+
+        var bootstrapClassModule = Maker.localDescriptions[  config.default_bootstrap_class ];
+        if( !bootstrapClassModule.defineMetaTypeList.Router || !bootstrapClassModule.defineMetaTypeList.Router.param.default )
+        {
+            throw new ReferenceError("Default bootstrap router method is not define '"+ config.default_bootstrap_class+"'");
+        }
+        config.default_bootstrap_router_provider=config.default_bootstrap_class+"@"+bootstrapClassModule.defineMetaTypeList.Router.param.default;
 
         //开始构建
         Utils.info('Making starting ...');

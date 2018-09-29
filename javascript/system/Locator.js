@@ -40,13 +40,12 @@ var path = location.pathname.replace(/^\//,"");
 if( path )
 {
     path = path.split("/");
-    var file = path.shift();
-    if( file.indexOf(".") < 0 )
+    if( path[0].indexOf(".") > 0 )
     {
-        path.unshift( file );
-        file = "";
+        map.filename = path.shift();
+    }else if( path[ path.length-1 ].indexOf(".") > 0 ){
+        map.filename = path.pop();
     }
-    map.filename = file;
     map.path = path;
 }
 

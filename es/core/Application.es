@@ -122,6 +122,44 @@ package es.core
        }
 
        /**
+        * @private
+        */
+       private var _async:Boolean = Syntax(origin,javascript);
+
+       /**
+        * 标记此组件的运行行为。是否异步(前端/后端)执行
+        * 此标记只对编译在服务端的组件有用。否则在编译为客户端(javascript)的时候始终返回true
+        * @param flag
+        */
+       public function set async(flag:Boolean):void
+       {
+           _async = flag;
+       }
+
+       /**
+        * 获取此组件的运行行为。是否异步(前端/后端)执行
+        * 此标记只对编译在服务端的组件有用。否则在编译为客户端(javascript)的时候始终返回true
+        * @returns {Boolean}
+        */
+       public function get async():Boolean
+       {
+           when( Syntax(origin,javascript) ){
+           return true;
+           }then{
+               return _async;
+           }
+       }
+
+       /**
+        * 获取此组件的唯一ID
+        * @returns {String}
+        */
+       public function getComponentId( prefix:String="" ):String
+       {
+           return "";
+       }
+
+       /**
         * 渲染并且显示一个视图
         */
        public function render( view:View ):void
