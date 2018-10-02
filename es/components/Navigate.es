@@ -150,6 +150,11 @@ package es.components
             }
         }
 
+        override protected function initializing()
+        {
+            super.initializing();
+        }
+
 
         override protected function commitPropertyAndUpdateSkin()
         {

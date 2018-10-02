@@ -18,7 +18,7 @@ function polyfill( config )
     {
         var is=true;
         var path = rootPath + '/fix/' + files[i];
-        var info = utils.getFilenameByPath(path).split('-', 2);
+        var info = utils.getFilenameByPath(path).split('-', 3);
         if( config.compat_version && typeof config.compat_version === 'object' && config.compat_version.hasOwnProperty( info[1] ) )
         {
             is = parseFloat( info[2] ) >= parseFloat( config.compat_version[ info[1] ] );
@@ -259,7 +259,7 @@ function builder(main, config , code, requirements , replacements)
     loaded = {'HTMLElement':true,'Node':true};
     var contents = [];
     var fix = polyfill( config );
-    
+
     /**
      * 需要支持的第三方库文件
      */
@@ -267,7 +267,7 @@ function builder(main, config , code, requirements , replacements)
     for(var prop in library)
     {
         var is=config.compat_version==='*' || prop==='*';
-        var info = prop.split('-', 1);
+        var info = prop.split('-', 2);
         if( !is && config.compat_version && typeof config.compat_version === 'object' && config.compat_version.hasOwnProperty( info[0] ) )
         {
             is = parseFloat( info[1] ) > parseFloat( config.compat_version[ info[0] ] );
@@ -390,6 +390,40 @@ function builder(main, config , code, requirements , replacements)
     ];
     return framework.join('\n');
 }
+
+/**
+ * 组合单个应用文件
+ * @param content
+ * @param requirements
+ * @return {*|string}
+ */
+function segment( content, requirements, handle, classname )
+{
+    return [
+        'window["'+handle+'"]["Load"]["'+classname+'"]=function(Internal,System,undefined){',
+        '(function(define,'+requirements.join(',')+'){',
+        '"use strict";',
+            content,
+        '})(Internal.define,'+requirements.map(function (a){
+            a = mapname[a] || a;
+            if(a==='System')return a;
+            return 'System.'+a;
+        }).join(',')+');}',
+     ].join('\n');
+}
+builder.segment = segment;
+
+/**
+ * 生成入口视图
+ * @param content
+ * @param requirements
+ * @return {*|string}
+ */
+function getBootstrapView( config, replacements )
+{
+    return replaceContent( utils.getContents( rootPath+'/index.html' ), replacements, config);
+}
+builder.getBootstrapView = getBootstrapView;
 
 function replaceContent(content, data, config)
 {

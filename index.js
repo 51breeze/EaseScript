@@ -122,6 +122,38 @@ function fetchAllImplements( module, results )
     return results;
 }
 
+/**
+ * 获取不同策略的模块
+ * @param modules
+ * @param mode  global core local
+ * @return array
+ */
+const MODULE_POLICY_GLOBAL = 1;
+const MODULE_POLICY_CORE = 2;
+const MODULE_POLICY_LOCAL = 4;
+const MODULE_POLICY_ALL = 7;
+function getModulesWithPolicy( modules, mode )
+{
+    if( (mode & MODULE_POLICY_ALL) === MODULE_POLICY_ALL )
+    {
+        return modules;
+    }
+    return modules.filter(function (e)
+    {
+        for(var i = 0, n = 0; i <= mode; n++)
+        {
+            i = 1 * Math.pow(2, n);
+            var v = i & mode;
+            if ( v === MODULE_POLICY_GLOBAL && e.nonglobal !== true) {
+                return true
+            } else if ( v === MODULE_POLICY_CORE && e.nonglobal === true && e.fullclassname.indexOf("es.") === 0) {
+                return true
+            } else if ( v === MODULE_POLICY_LOCAL && e.nonglobal === true && e.fullclassname.indexOf("es.") !== 0) {
+                return true
+            }
+        }
+    });
+}
 
 /**
  * 获取所以依赖的皮肤模块
@@ -207,11 +239,11 @@ function getRequirementsAllUsedModules( modules,syntax )
             }
             return hasUsed && module["has_syntax_remove_" + syntax] !== true;
         }
-        return true;
+        return Compile.hasUsedModuleOf(module);
     });
 }
 
-function getRequirementsAllGlobalClass( modules )
+function getRequirementsAllGlobalClass( modules)
 {
     modules = modules.filter(function (e) {
          var m = Maker.getLoaclAndGlobalModuleDescription(e.fullclassname||e.type);
@@ -222,7 +254,7 @@ function getRequirementsAllGlobalClass( modules )
     });
 }
 
-function getModuleScriptContent( modules )
+function getModuleScriptContent( modules)
 {
     modules = modules.filter(function (e) {
         return e.nonglobal ===true && e.makeContent;
@@ -234,7 +266,6 @@ function getModuleScriptContent( modules )
         if( a1==b1 )return 0;
         return b1 < a1 ? -1 : 1;
      });
-    modules = systemMainClassModules.concat( modules );
     return modules.map(function (e) {
          return e.makeContent['javascript'];
     });
@@ -306,7 +337,7 @@ function createServerView(rootpath, module, syntax, config , bootstrap )
     Utils.setContents( (file + suffix).toLowerCase(), callback(function (script)
     {
         return compileFragmentScript(script,  module.fullclassname+syntax, syntax, config, requirements );
-    },bootstrap));
+    }));
     return requirements;
 }
 
@@ -659,12 +690,13 @@ function buildStyle(skinModules, lessPath, options, outputname, config )
                 Utils.error(err.message);
                 Utils.error(err.extract.join('\n'));
             } else {
-                var filename = filename = PATH.resolve(Utils.getBuildPath(config, 'build.css'), outputname + '.css');
+                var filename = PATH.resolve(Utils.getBuildPath(config, 'build.css'), outputname + '.css');
                 fs.writeFileSync(filename, output.css);
             }
         });
 
     })(style, options, outputname, config);
+
 
     if( !font_builded )
     {
@@ -677,6 +709,17 @@ function buildStyle(skinModules, lessPath, options, outputname, config )
     }
 }
 var font_builded = false;
+
+/**
+ * 获取指定文件相对于webroot的目录
+ * @param config
+ * @param file
+ * @return {string}
+ */
+function getRelativeWebrootPath(config, file )
+{
+    return PATH.relative( Utils.getBuildPath(config, 'build.webroot') , file ).replace(/\\/g,"/").replace(/^[\/\.]+/g,'');
+}
 
 //目前支持的语法
 const syntax_supported={
@@ -709,9 +752,45 @@ const SyntaxBuilder={
         var len = descriptions.length;
         var index = 0;
         var view_path = Utils.getBuildPath(config, 'build.html');
-
+        var allHashMap = {};
+        var allServerRoutes = {};
+        var loadRequiremnets = {};
+        //基础模块(es or system)
+        var baseModule = systemMainClassModules;
         //服务提供者
         var serviceProviders ={};
+        //基础文件与开发文件是否需要分开
+        var doPart= config.script_part_load;
+        var handle = Utils.MD5( (new Date()).getTime().toString() , 16 );
+        //加载js文件的路径
+        var js_load_path = PATH.relative( Utils.getBuildPath(config, 'build.webroot') , Utils.getBuildPath(config, 'build.js') ).replace(/\\/g,"/").replace(/^[\/\.]+/g,'');
+       //加载css文件的路径
+        var css_load_path = PATH.relative( Utils.getBuildPath(config, 'build.webroot') , Utils.getBuildPath(config, 'build.css') ).replace(/\\/g,"/").replace(/^[\/\.]+/g,'');
+        //构建脚本内容
+        var builder = require( './javascript/builder.js');
+        var buildBaseScript = function (config, scriptContent, requirements, hashMap , serverRoutes, bootstrap,loadRequirements )
+        {
+            return builder(config.build_path, config, scriptContent, requirements, {
+                "namespace": function (content) {
+                    return content.replace(/var\s+codeMap=\{\};/, "var codeMap=" + JSON.stringify(hashMap) + ";");
+                },
+                "HANDLE":handle,
+                "JS_LOAD_PATH":js_load_path,
+                "CSS_LOAD_PATH":css_load_path,
+                "NAMESPACE_HASH_MAP": hashMap,
+                "SERVICE_ROUTE_LIST": serverRoutes,
+                "BOOTSTRAP_CLASS_FILE_NAME": "",
+                "VERSION":(new Date).getTime(),
+                "LOAD_REQUIREMENTS":loadRequirements||"{}",
+                "ORIGIN_SYNTAX": config.originMakeSyntax,
+                "STATIC_URL_PATH_NAME": config.static_url_path_name,
+                "DEFAULT_BOOTSTRAP_ROUTER_PROVIDER": bootstrap.fullclassname + "@" + bootstrap.defineMetaTypeList.Router.param.default,
+                "BOOTSTRAP_CLASS_PATH": Utils.getRelativePath(
+                    Utils.getBuildPath(config, "build.webroot"),
+                    Utils.getBuildPath(config, "build.bootstrap")
+                )
+            });
+        }
 
         //处理每一个入口文件
         for( ;index<len;index++ )
@@ -722,35 +801,65 @@ const SyntaxBuilder={
             var loadHash = {};
             var allModules = getRequirementsAllModules( bootstrap , [],  loadHash );
             var usedModules = getRequirementsAllUsedModules( allModules, "javascript" );
+            Utils.merge(allHashMap,hashMap);
 
-            //需要生成视图
+            //获取服务提供者
             if( !onlyClient )
             {
-                usedModules.filter(function (e)
-                {
-                    var o = e.ownerFragmentModule || e;
-                    if( o.isMakeView===true )
-                    {
-                        /*var view_path =  Utils.getRelativePath(config.build_bootstrap_root_path,
-                            Utils.getResolvePath( Utils.getBuildPath(config,"build.html"), o.fullclassname.replace(/\./g,"/") ) );
-                        view_files[ view_path.toLowerCase() ] = bootstrap.fullclassname;*/
-
-                        mergeModules(usedModules, createServerView( view_path , o, "javascript", config , bootstrap ) );
-                    }
-                    return e.nonglobal === true;
-                });
-
-                //获取服务提供者
                 Utils.merge(serviceProviders, getServiceProvider(config,usedModules).providers );
             }
 
+            //获取依赖文件
+            var external_requires = [];
+            usedModules.filter(function (e)
+            {
+                var o = e.ownerFragmentModule || e;
+                if( o.isMakeView===true )
+                {
+                    //需要生成视图
+                    if( !onlyClient )
+                    {
+                        mergeModules(usedModules, createServerView(view_path, o, "javascript", config, bootstrap));
+                    }
+                    if( o.moduleContext.external_requires.length > 0 )
+                    {
+                        external_requires = external_requires.concat(o.moduleContext.external_requires);
+                    }
+                }
+            });
+
             //获取路由配置
             var serverRoutes = getServiceRoutes(config, allModules );
+            Utils.merge(allServerRoutes,serverRoutes);
 
             //准备相应的文件
             var skinModules = getRequirementsAllSkinModules( allModules );
-            var scriptContent = getModuleScriptContent( usedModules );
-            var requirements = getRequirementsAllGlobalClass( usedModules );
+            var scriptContent = "";
+            var requirements = [];
+
+            //拆分系统类与本地类
+            if( doPart )
+            {
+                scriptContent = getModuleScriptContent( getModulesWithPolicy(usedModules, MODULE_POLICY_LOCAL) );
+                getModulesWithPolicy(usedModules, MODULE_POLICY_GLOBAL | MODULE_POLICY_CORE ).forEach(function (item) {
+                    if( !item.nonglobal  )
+                    {
+                        requirements.push( item.type );
+                    }
+                    if( baseModule.indexOf( item ) < 0 )
+                    {
+                        baseModule.push( item );
+                    }
+                });
+
+            }else
+            {
+                scriptContent = getModuleScriptContent( usedModules );
+                requirements = getRequirementsAllGlobalClass( usedModules );
+                scriptContent = scriptContent.concat(systemMainClassModules.map(function (e) {
+                    return e.makeContent['javascript'];
+                }));
+            }
 
             //生成源文件
             if( config.source_file ==="enable" )
@@ -758,26 +867,34 @@ const SyntaxBuilder={
                 outputFiles(  Utils.getBuildPath(config, 'build.js')+"/src", ".js",  usedModules , null, "javascript");
             }
 
-            //构建脚本内容
-            var builder = require( './javascript/builder.js');
-            scriptContent = builder(config.build_path, config, scriptContent.join(""), requirements, {
-                "namespace":function(content) {
-                     return content.replace(/var\s+codeMap=\{\};/,"var codeMap="+JSON.stringify(hashMap)+";");
-                },
-                "NAMESPACE_HASH_MAP":hashMap,
-                "SERVICE_ROUTE_LIST":serverRoutes,
-                "BOOTSTRAP_CLASS_FILE_NAME":"",
-                "ORIGIN_SYNTAX":config.originMakeSyntax,
-                "STATIC_URL_PATH_NAME":config.static_url_path_name,
-                "DEFAULT_BOOTSTRAP_ROUTER_PROVIDER":bootstrap.fullclassname+"@"+bootstrap.defineMetaTypeList.Router.param.default,
-                "BOOTSTRAP_CLASS_PATH":Utils.getRelativePath(
-                    Utils.getBuildPath(config,"build.webroot"),
-                    Utils.getBuildPath(config,"build.bootstrap")
-                )
-            });
+            //应用模块需要的依赖文件
+            loadRequiremnets[ bootstrap.fullclassname ] = {
+                script:getRelativeWebrootPath(config,PATH.resolve(Utils.getBuildPath(config, 'build.js'), outputname + '.js')),
+                css:getRelativeWebrootPath(config, PATH.resolve( Utils.getBuildPath(config, 'build.css'), outputname + '.css')  ),
+                require:external_requires.map(function (file) {
+                    return getRelativeWebrootPath(config, file)
+                })
+            };
+
+            //如果需要把基础类与本地类分开加载
+            if( doPart === true )
+            {
+                scriptContent = builder.segment( scriptContent.join("") , requirements, handle,  bootstrap.fullclassname );
+            }else{
+                loadRequire.push( scriptFile );
+                scriptContent =  buildBaseScript(
+                    config,
+                    scriptContent.join(""),
+                    requirements,
+                    hashMap ,
+                    serverRoutes,
+                    bootstrap,
+                    JSON.stringify(({})[ bootstrap.fullclassname ]=loadRequiremnets[ bootstrap.fullclassname ])
+                );
+            }
 
             //需要处理样内容
-            buildStyle(skinModules, lessPath, options, outputname, config );
+            buildStyle(skinModules, lessPath, options, outputname, config);
 
             //压缩脚本
             if (scriptContent && config.minify === 'enable')
@@ -788,13 +905,71 @@ const SyntaxBuilder={
             }
 
             //生成文件
-            var filename = PATH.resolve(Utils.getBuildPath(config, 'build.js'), outputname + '.js');
-            Utils.mkdir(PATH.dirname(filename));
-            fs.writeFileSync(filename, scriptContent );
+            Utils.setContents(
+                PATH.resolve(Utils.getBuildPath(config, 'build.js'), outputname + '.js'),
+                scriptContent
+            );
         }
 
-        //入口视图
+        //需要生成系统脚本
+        if( doPart === true )
+        {
+            //构建脚本内容
+            scriptContent = buildBaseScript(
+                config,
+                getModuleScriptContent( baseModule ).join(""),
+                getRequirementsAllGlobalClass( baseModule ),
+                allHashMap ,
+                allServerRoutes,
+                Maker.localDescriptions[  config.default_bootstrap_class ],
+                JSON.stringify(loadRequiremnets)
+            );
 
+            //压缩脚本
+            if (scriptContent && config.minify === 'enable')
+            {
+                var script = uglify.minify(scriptContent, {ie8: true});
+                if (script.error)throw script.error;
+                scriptContent = script.code;
+            }
+
+            //生成文件
+            var baseScriptFile =  PATH.resolve( Utils.getBuildPath(config, 'build.js'),'easescript.js' );
+            Utils.setContents(
+                baseScriptFile,
+                scriptContent
+            );
+
+            var default_bootstrap = Maker.localDescriptions[  config.default_bootstrap_class ].fullclassname;
+
+            //生成入口视图
+            Utils.setContents(
+                PATH.resolve(Utils.getBuildPath(config, 'build.webroot'),'index.html'),
+                builder.getBootstrapView(config, {
+                    META_CHARSET:"UTF-8",
+                    META_HTTP_EQUIV:"X-UA-Compatible",
+                    META_CONTENT:"IE=edge",
+                    META_KEYWORD_HTTP_EQUIV:"es,easescript",
+                    BASE_STYLE_FILE:"",
+                    APP_STYLE_FILE: getRelativeWebrootPath(
+                        config,
+                        PATH.resolve(
+                            Utils.getBuildPath(config, 'build.css'),
+                            default_bootstrap+".css"
+                        )
+                    ),
+                    BASE_SCRIPT_FILE:getRelativeWebrootPath( config, baseScriptFile ),
+                    APP_SCRIPT_FILE:getRelativeWebrootPath(
+                        config,
+                        PATH.resolve(
+                            Utils.getBuildPath(config, 'build.js'),
+                            default_bootstrap+".js"
+                        )
+                    ),
+                    VIEW_TITLE:"Welcome to the EaseScript world!",
+                })
+            );
+        }
 
         //需要构建服务类
         if( onlyClient !== true )
@@ -1279,7 +1454,8 @@ function make( config, isGlobalConfig )
         {
             globalConfig  = config;
         }
-
+        //脚本文件分开加载
+        config.script_part_load = true;
         //构建应用的目录名
         config.build_application_name = Utils.getBuildPath(config,"build.application","name");
         //主库目录名
@@ -1296,7 +1472,7 @@ function make( config, isGlobalConfig )
         //服务提供者
         config.ServiceProviderList = {};
         //指定构建后应用的入口根目录,默认为webroot下面
-        config.build_bootstrap_root_path = Utils.getBuildPath(config,"build.webroot");
+        config.build_bootstrap_root_path = Utils.getBuildPath(config,"build");
         //静态页面需要模拟path信息的接收名
         config.static_url_path_name = "PATH";
         //浏览器中的全局模块
@@ -1355,6 +1531,8 @@ function make( config, isGlobalConfig )
         var len = makefiles.length;
         var descriptions=[];
         var inheritClass=[];
+        //入口文件列表
+        var bootstrapClassList = config.bootstrap_class_list = [];
         for(;i<len;i++)
         {
             var classfile =PATH.basename( makefiles[i] , config.suffix );
@@ -1362,6 +1540,7 @@ function make( config, isGlobalConfig )
             var classname = PATH.relative(project_path, _filepath ).replace(/\\/g,'/');
             if( inheritClass.indexOf(classname) < 0 )
             {
+                bootstrapClassList.push( classname );
                 var desc = Maker.loadModuleDescription(config.syntax, classname, config, _filepath);
                 descriptions.push(desc);
                 if (desc.inherit)
@@ -1370,6 +1549,7 @@ function make( config, isGlobalConfig )
                 }
             }
         }
+
 
         //默认入口类优先级 ==> 手动指定，类文件名为index, 第一个类
         var bootstrap_class=[null,null,null];
@@ -1433,7 +1613,8 @@ function make( config, isGlobalConfig )
     }catch (e)
     {
         Utils.error(e.message);
-        if( config.debug=='on')console.log( e );
+       // if( config.debug=='on')
+            console.log( e );
     }
 }
 

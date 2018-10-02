@@ -116,6 +116,34 @@ final class Reflect
         return $accessible ? array($type, $method, $reflect) : null;
     }
 
+    /**
+     * Reflect.construct() 方法的行为有点像 new 操作符 构造函数 ， 相当于运行 new target(...args).
+     * @param target
+     * @param argumentsList
+     * @returns {*}
+     */
+    final static public function construct($scope, $target , $args=null )
+    {
+        if( class_exists($target) )
+        {
+            $reflect = new \ReflectionClass( $target );
+            if( $reflect->isAbstract() )
+            {
+                throw new TypeError('Abstract class cannot be instantiated');
+            }
+
+            if ($args && System::isArray($args)) {
+                return $reflect->newInstanceArgs($args);
+            } else {
+                return $reflect->newInstance($args);
+            }
+
+        }else
+        {
+            throw new TypeError('Not found the "'.$target.'" class.');
+        }
+    }
+
     final static public function apply( $target, $thisArgument=null, $argumentsList=null )
     {
         if( !is_callable($target) )

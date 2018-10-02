@@ -478,7 +478,7 @@ function createElement(html , flag )
             }
 
             var div = document.createElement("div");
-            var result = html.match(/^\<(tr|th|td|tbody|thead|tfoot)/);
+            var result = html.match(/^\<(tr|th|td|tbody|thead|tfoot)(?:[\s\>]+)/i);
             if( result )
             {
                 var level = 1;
@@ -500,6 +500,7 @@ function createElement(html , flag )
                         html ='<table>'+html+'</table>';
                         level = 1;
                 }
+
                 div.innerHTML = html;
                 for (var i = 0; i < level; i++)div = div.childNodes.item(0);
                 if( !div )
@@ -523,6 +524,7 @@ function createElement(html , flag )
                 }
                 return fragment;
             }
+
             div=div.childNodes.item(0);
             return div.parentNode.removeChild( div );
         }
@@ -1604,6 +1606,9 @@ Element.prototype.html=function html( htmlObject )
         {
             htmlObject = htmlObject.current();
             is = true;
+        }else if( Element.isNodeElement(htmlObject) )
+        {
+            is = true;
         }
     }
     return this.forEach(function(elem)
@@ -1633,32 +1638,66 @@ Element.prototype.html=function html( htmlObject )
         {
             this.removeChild( elem.childNodes.item(0) );
         }
-        if( htmlObject )
+
+        //如果是一个节点对象
+        if(is)
         {
-            if(is)return this.addChild.call(htmlObject);
-            try
-            {
-                elem.innerHTML = htmlObject;
-            } catch (e)
+            return this.addChild.call( htmlObject );
+        }
+        try
+        {
+            if( System.env.platform(System.env.BROWSER_IE,9) )
             {
                 var nodename = Element.getNodeName(elem);
-                if ( !( new RegExp("^<" + nodename).exec(htmlObject) ) )
-                {
-                    htmlObject ="<"+nodename+">"+htmlObject+"</"+nodename+">";
+                switch ( nodename ){
+                    case "thead" :
+                    case "tbody":
+                    case "tfoot":
+                        this[ this.indexOf( elem ) ] = replaceHtmlElement(elem, htmlObject);
+                    break;
+                    default :
+                        elem.innerHTML = htmlObject;
                 }
-                var child = createElement(htmlObject);
-                var deep = nodename === 'tr' ? 2 : 1, d = 0;
-                while (d < deep && child.firstChild)
-                {
-                    d++;
-                    child = child.firstChild;
-                }
-                mergeAttributes(child, elem);
-                elem.parentNode.replaceChild(child, elem);
+
+            }else
+            {
+                elem.innerHTML = htmlObject;
             }
+
+        } catch (e)
+        {
+            this[ this.indexOf( elem ) ] = replaceHtmlElement(elem, htmlObject);
         }
+
     });
 };
+
+/**
+ * 替换一个html元素
+ * @param elem
+ * @param htmlObject
+ * @return {Node}
+ */
+function replaceHtmlElement(elem, htmlObject )
+{
+    var nodename = Element.getNodeName(elem);
+    if ( !( new RegExp("^<" + nodename,'i').exec(htmlObject) ) )
+    {
+        htmlObject ="<"+nodename+">"+htmlObject+"</"+nodename+">";
+    }
+    var child = createElement(htmlObject);
+    mergeAttributes(child, elem);
+    var parent = elem.parentNode;
+    if( !parent ){
+        parent = document.createElement("div");
+        parent.appendChild( elem );
+        parent.replaceChild(child, elem);
+        parent.removeChild(child);
+    }else {
+        parent.replaceChild(child, elem);
+    }
+    return child;
+}
 
 /**
  * 添加子级元素（所有已匹配的元素）

@@ -410,38 +410,6 @@ import es.events.ComponentEvent;
             }
         }
 
-        /**
-         * @inherit
-         */
-        override protected function initializing()
-        {
-            super.initializing();
-            /*when( RunPlatform(client) )
-            {
-                var object:Object = Interaction.pull( this.getComponentId() );
-                var target:Object = properties;
-                if (object) {
-                    Object.forEach(object,function (value:*, name:String) {
-                        if( typeof value ==="string" && (value as String).charAt(0)==="#" )
-                        {
-                            var ele:Element = new Element( value );
-                            if( ele.length > 0 ) {
-                                value = new Skin(ele);
-                            }else{
-                                value = null;
-                            }
-                        }
-                        if( value !== null )
-                        {
-                            if (Reflect.has(SkinComponent, this, name)) {
-                                Reflect.set(SkinComponent, this, name, value);
-                            }
-                            target[name] = value;
-                        }
-                    });
-                }
-            }*/
-        }
 
         /**
          * 将属性推送到共享池(前后端互相访问)
@@ -451,12 +419,6 @@ import es.events.ComponentEvent;
          */
         protected function push(name:String, value:*):void
         {
-            /*when( RunPlatform(server) )
-            {
-                var obj:Object = {};
-                obj[name] =value;
-                Interaction.push( this.getComponentId(), obj);
-            }*/
             properties[name] = value;
         }
 
