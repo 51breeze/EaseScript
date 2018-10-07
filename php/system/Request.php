@@ -195,15 +195,6 @@ final class Request extends BaseObject
     }
 
     /**
-     * 获取当前请求的方法
-     * @return string
-     */
-    static public function method()
-    {
-        return isset( $_SERVER['REQUEST_METHOD'] ) ? $_SERVER['REQUEST_METHOD'] : null;
-    }
-
-    /**
      * 返回一个URL组装的所有属性
      * @return mixed|null
      */
@@ -249,6 +240,24 @@ final class Request extends BaseObject
     public function uri()
     {
         return http_build_url( $this->baseurl , (array)$this->body, HTTP_URL_REPLACE | HTTP_URL_JOIN_PATH | HTTP_URL_JOIN_QUERY | HTTP_URL_STRIP_HOST );
+    }
+
+    private $_method = null;
+
+    /**
+     * 获取当前请求的方法
+     * @return string
+     */
+    public function method($value=null)
+    {
+        if( $value != null ){
+            return $this->_method = $value;
+        }
+        if( $this->_method === null )
+        {
+            return isset($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : null;
+        }
+        return $this->_method;
     }
 
     public function host( $value=null )
@@ -297,7 +306,11 @@ final class Request extends BaseObject
             {
                 $value = http_build_query( (array)$value );
             }
-            $this->body->query = $value;
+            if( $this->body->query ){
+                $this->body->query .='&'.$value;
+            }else{
+                $this->body->query =$value;
+            }
             return $this;
         }
         return $this->body->query;

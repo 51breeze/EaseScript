@@ -14,8 +14,26 @@ class Document extends HTMLElement
     private $head = null;
     private $title = null;
     private $documentElement=null;
-    static public $document = null;
+    static private $document = null;
     protected $visible = true;
+
+    /**
+     * 获取Document的实例对象
+     * @return Document|null
+     * @throws Error
+     */
+    public static function __callStatic($name,$args)
+    {
+        if( $name==="document")
+        {
+            if (Document::$document === null)
+            {
+                return new Document();
+            }
+            return Document::$document;
+        }
+    }
+
     public function __construct()
     {
         if( Document::$document !== null )
@@ -31,7 +49,7 @@ class Document extends HTMLElement
         $this->head->addChild( $this->title );
         $this->documentElement->addChild( $this->head );
         $this->documentElement->addChild( $this->body );
-        Document::$document = $this->documentElement;
+        Document::$document = $this;
         $this->nodeName = 'document';
     }
 
@@ -40,6 +58,11 @@ class Document extends HTMLElement
          if( $name ==="outerHTML" )
          {
              return $this->documentElement->outerHTML;
+         }
+
+         if( $name==="document" )
+         {
+             return Document::document();
          }
 
          if( $name ==="innerHTML" )

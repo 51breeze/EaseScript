@@ -99,7 +99,7 @@ final class System
                 case "float" :
                     return is_float($obj);
                 case 'object' :
-                    return $obj===null ? true : is_object($obj);
+                    return $obj===null ? true : System::isObject($obj);
             }
             return is_string($obj) ? false : ( $flag === true ?  is_a($obj, $class) : $obj instanceof $class );
         }catch (\Exception $e)
@@ -194,20 +194,6 @@ final class System
             return \Closure::bind( $reflect->getClosure() , $thisArg);
         }
         throw new TypeError('callback is not callable');
-    }
-
-    static function document()
-    {
-        static $doc = null;
-        if( $doc===null ) $doc = new Document();
-        return $doc;
-    }
-
-    static function window()
-    {
-        static $win = null;
-        if( $win===null ) $win = new Window();
-        return $win;
     }
 
     static function when()

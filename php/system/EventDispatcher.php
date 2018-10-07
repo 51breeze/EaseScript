@@ -14,7 +14,7 @@ class EventDispatcher extends BaseObject
     private $target = null;
     function __construct( $target=null )
     {
-        if( $target != null && !System::is($target, 'es\system\EventDispatcher') )
+        if( $target != null && !System::is($target, EventDispatcher::class) )
         {
             throw new TypeError('target is not EventDispatcher');
         }
@@ -113,7 +113,11 @@ class EventDispatcher extends BaseObject
             $i=0;
             while($i<$len)
             {
-                $list[$i][1]($event);
+                $value = $list[$i][1]($event);
+                if( $value !==null )
+                {
+                    return $value;
+                }
                 if( $event->propagationStopped === true )
                 {
                     return false;

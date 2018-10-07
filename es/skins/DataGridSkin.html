@@ -24,25 +24,30 @@
 
             override protected function initializing()
             {
+                super.initializing();
                 var hostComponent:DataGrid = this.hostComponent;
-                var dataSource:DataSource =  hostComponent.dataSource;
-                var body:Skin = this.body;
-                var dataProfile:String =  hostComponent.dataProfile;
-                body.variable('rowHeight', hostComponent.rowHeight );
-                head.variable('headHeight', hostComponent.headHeight );
-                body.variable( dataProfile, [] );
-                head.variable( hostComponent.columnProfile, hostComponent.columns );
-                pagination.dataSource = dataSource;
-
-                dataSource.addEventListener(DataSourceEvent.SELECT, function (event:DataSourceEvent)
+                if( hostComponent.isNeedCreateSkin() )
                 {
-                    if ( !event.waiting )
+                    var dataSource:DataSource =  hostComponent.dataSource;
+                    var body:Skin = this.body;
+                    var dataProfile:String =  hostComponent.dataProfile;
+                    body.variable('rowHeight', hostComponent.rowHeight );
+                    head.variable('headHeight', hostComponent.headHeight );
+                    body.variable( dataProfile, [] );
+                    body.variable( hostComponent.columnProfile, hostComponent.columns);
+                    head.variable( hostComponent.columnProfile, hostComponent.columns );
+                    pagination.dataSource = dataSource;
+
+                    dataSource.addEventListener(DataSourceEvent.SELECT, function (event:DataSourceEvent)
                     {
-                        body.variable( dataProfile , event.data );
-                        body.display();
-                    }
-                });
-                dataSource.select( pagination.current );
+                        if ( !event.waiting )
+                        {
+                            body.variable( dataProfile , event.data   );
+                            body.display();
+                        }
+                    });
+                    dataSource.select( pagination.current );
+               }
             }
         ]]>
     </s:Script>
@@ -61,15 +66,15 @@
         <s:template>
             <:foreach name="datalist" value="item">
                 <tr>
-                    <:foreach name="item" value="val" key="ukey">
-                        <:switch condition="ukey">
+                    <:foreach name="columns" value="val" key="field">
+                        <:switch condition="field">
                             <:case condition="name" break="true">
-                                <td data-column="{key}" style="height:{rowHeight}px;line-height:{rowHeight}px;">
-                                    <input value="{val}" style="height: 25px;" />
+                                <td data-column="{field}" style="height:{rowHeight}px;line-height:{rowHeight}px;">
+                                    <input value="{item[field]}" style="height: 25px;" />
                                 </td>
                             </:case>
                             <:default>
-                                <td data-column="{key}" style="height:{rowHeight}px;line-height:{rowHeight}px;">{val}</td>
+                                <td data-column="{field}" style="height:{rowHeight}px;line-height:{rowHeight}px;">{item[field]}</td>
                             </:default>
                         </:switch>
                     </:foreach>

@@ -79,6 +79,8 @@ class Render extends BaseObject
                 if( isset($match[2]) )
                 {
                     $val= trim($match[2][0]);
+                    $val = preg_replace('/([a-zA-Z_]+\w+)\s*\[\s*([a-zA-Z_]+\w+)\s*\]/i','\\1[$\\2]', $val );
+
                     if( preg_match(self::call_regexp, $val, $result) )
                     {
                         $val = preg_replace('/([\(\,])\s*([a-zA-Z_]+\w+)/i','\\1\$\\2', $val );

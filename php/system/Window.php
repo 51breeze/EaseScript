@@ -8,10 +8,38 @@
  */
 class Window extends EventDispatcher
 {
-    public $document = null;
-    public function __construct()
+    /**
+     * @var null
+     */
+    private static $window=null;
+
+    /**
+     * 获取Window的实例对象
+     * @return Window|null
+     * @throws Error
+     */
+    public static function __callStatic($name,$args)
     {
-        parent::__construct();
-        $this->document = new Document();
+        switch ($name){
+            case "window" :
+                if (Window::$window === null)
+                {
+                    return new Window();
+                }
+                return Window::$window;
+                break;
+            case "document" :
+                return Document::document();
+                break;
+        }
+    }
+
+    /**
+     * @param $name
+     * @return mixed|null
+     */
+    public function __get($name)
+    {
+          return Window::$name();
     }
 }

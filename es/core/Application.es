@@ -8,7 +8,6 @@ package es.core
        public function Application()
        {
            super( document );
-           Reflect.set(System, System, "context", this);
        }
 
        /**
@@ -162,7 +161,7 @@ package es.core
        /**
         * 渲染并且显示一个视图
         */
-       public function render( view:View ):void
+       protected function render( view:View ):View
        {
            view.display();
            when( RunPlatform(server) )
@@ -171,6 +170,7 @@ package es.core
                script.content='window["'+Interaction.key+'"]='+ propertiesToJson();
                document.head.addChild( script );
            }
+           return view;
        }
    }
 }

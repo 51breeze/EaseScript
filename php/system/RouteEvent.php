@@ -7,21 +7,13 @@
  * @author Jun Ye <664371281@qq.com>
  * @require Event
  */
-class HttpEvent extends Event
+class RouteEvent extends Event
 {
-    const  LOAD_START = 'httpLoadStart';
-    const SUCCESS = 'httpSuccess';
-    const PROGRESS = 'httpProgress';
-    const ERROR   = 'httpError';
-    const CANCELED  = 'httpCanceled';
-    const TIMEOUT = 'httpTimeout';
-
+    const HTTP_MATCH = 'routeHttpMatch';
     public $data=null;
-    public $url=null;
-    public $loaded = 0;
-    public $total = 0;
+    public $response=null;
     public $request = null;
-
+    public $matched = false;
     public function __construct($type, $bubbles=true, $cancelable=true)
     {
         parent::__construct($type, $bubbles, $cancelable);

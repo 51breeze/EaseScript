@@ -5,7 +5,7 @@
  * Released under the MIT license
  * https://github.com/51breeze/EaseScript
  * @author Jun Ye <664371281@qq.com>
- * @require BaseObject,EventDispatcher,ReferenceError
+ * @require BaseObject,EventDispatcher,ReferenceError,Document
  */
 class Node extends EventDispatcher
 {
@@ -50,6 +50,8 @@ class Node extends EventDispatcher
                 return $this->style;
             case 'parentNode' :
                 return $this->parentNode;
+            case "ownerDocument" :
+                return Document::document();
         }
         return isset($this->attr->$name) ? $this->attr->$name : null;
     }

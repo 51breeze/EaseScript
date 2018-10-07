@@ -81,7 +81,7 @@ import es.events.ComponentEvent;
             when( Syntax(origin,javascript) ){
                 return true;
             }then{
-                return !this.async;
+                return  Syntax(javascript) ? this.async : !this.async;
             }
         }
 

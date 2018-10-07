@@ -95,6 +95,15 @@ function loader(requirements, then)
     }());
 }
 
+function initModule(module)
+{
+    if( typeof EaseScript.Load[module] === "function" && EaseScript.Load[module].init !==true )
+    {
+        EaseScript.Load[module].init = true;
+        EaseScript.Load[module](Internal, System);
+    }
+}
+
 /**
  * 文档加载就绪
  */
@@ -111,6 +120,10 @@ global.addEventListener(Event.READY,function (e) {
         var controller = router.split("@");
         var module = controller[0];
         var method = controller[1];
+
+        //如果存在先初始化
+        initModule(module);
+
         //如果模块类已经加载
         if( System.hasClass( module ) )
         {
@@ -137,10 +150,7 @@ global.addEventListener(Event.READY,function (e) {
                 //加载主模块
                 loadScript(moduleInfo.script, function () {
                     //初始化模块
-                    if( typeof EaseScript.Load[module] === "function" )
-                    {
-                        EaseScript.Load[module](Internal, System);
-                    }
+                    initModule(module);
                     start(module, method);
                 },module);
             });

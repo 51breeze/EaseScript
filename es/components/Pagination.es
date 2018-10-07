@@ -357,11 +357,13 @@ package es.components
         override protected function initializing()
         {
             super.initializing();
-            var dataSource:DataSource = _dataSource;
-            if( !dataSource )throw new ReferenceError('dataSource is not defined');
-            var size:int = pageSize;
-            if( !isNaN(size) )dataSource.pageSize(size);
-            dataSource.select( this.current );
+            if( this.isNeedCreateSkin() ) {
+                var dataSource: DataSource = _dataSource;
+                if (!dataSource) throw new ReferenceError('dataSource is not defined');
+                var size: int = pageSize;
+                if (!isNaN(size)) dataSource.pageSize(size);
+                dataSource.select(this.current);
+            }
         }
 
         /**

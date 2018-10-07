@@ -5,7 +5,7 @@
  * Released under the MIT license
  * https://github.com/51breeze/EaseScript
  * @author Jun Ye <664371281@qq.com>
- * @require System,BaseObject,HttpEvent,Request,EventDispatcher
+ * @require System,BaseObject,HttpEvent,Request,EventDispatcher,Document,RouteEvent
  */
 
 class Http extends EventDispatcher
@@ -59,15 +59,29 @@ class Http extends EventDispatcher
     {
     }
 
+    /**
+     * 在请求前先尝试匹配服务，如果成功直接返回数据。
+     * @param Request $request
+     * @param null $data
+     * @return null
+     */
+    private function match(Request $request, $data=null)
+    {
+        $document = Document::document();
+        $event = new RouteEvent( RouteEvent::HTTP_MATCH );
+        $event->request = $request;
+        $event->data = $data;
+        $response = $document->dispatchEvent( $event );
+        if( $event->matched===true ){
+            return $response !== null && $event->response===null ? $response : $event->response;
+        }
+        return null;
+    }
+
     public function load($url, $data=null, $method=Http::METHOD_GET )
     {
         $request = new Request( $url );
-        $fp = fsockopen( $request->host() , $request->port() , $errno, $errstr,5);
-        if( !$fp )
-        {
-            throw new Error( $errstr );
-        }
-
+        $request->method( $method );
         $param = "";
         if( $data )
         {
@@ -88,6 +102,22 @@ class Http extends EventDispatcher
             }
         }
 
+        if( ( $data = $this->match($request) ) !== null )
+        {
+            $event = new HttpEvent(HttpEvent::SUCCESS);
+            $event->data = $data;
+            $event->total = 0;
+            $event->loaded = 0;
+            $event->url = $url;
+            return $this->dispatchEvent( $event );
+        }
+
+        $fp = fsockopen( $request->host() , $request->port() , $errno, $errstr,5);
+        if( !$fp )
+        {
+            throw new Error( $errstr );
+        }
+
         $out = $method." ".$request->uri()." HTTP/1.1\r\n";
         $out .= "Host: ".$request->host()."\r\n";
         $out .= "Content-Type: ".$this->option->contentType."\r\n";
@@ -101,6 +131,8 @@ class Http extends EventDispatcher
         
         $content = '';
         $len = 0;
+        $chunked = false;
+
         while( !feof($fp) ){
             $ret = fgets($fp, 1024);
             if( $ret )
@@ -109,22 +141,34 @@ class Http extends EventDispatcher
                 {
                     $len = intval( trim(substr($ret,16)) );
                 }
+                if( $chunked===false && substr($ret,0,18) === 'Transfer-Encoding:' )
+                {
+                    $chunked = trim(substr($ret,19))==="chunked";
+                }
                 $content.=$ret;
             }
         }
-
-        if( !empty($content) && $len>0 )
-        {
-           $content = substr($content, -$len);
-        }
         fclose($fp);
-        $event = null;
-        if( !empty($content)  )
+
+        $content = preg_split('/\r\n\r\n/s', $content, 2);
+        $header = $content[0];
+        $body   = $content[1];
+        if( $chunked )
         {
-            $len = strlen( $content );
-            $content = json_decode($content, true);
+            $body= preg_replace_callback(
+                '/(?:(?:\r\n|\n)|^)([0-9A-F]+)(?:\r\n|\n){1,2}(.*?)'.'((?:\r\n|\n)(?:[0-9A-F]+(?:\r\n|\n))|$)/si',
+                function ($matches){
+                    return hexdec($matches[1]) == strlen($matches[2]) ? $matches[2] : $matches[0];
+                }, $body);
+        }
+
+        $event = null;
+        if( !empty($body)  )
+        {
+            $len = strlen( $body );
+            $body = json_decode($body,true);
             $event = new HttpEvent(HttpEvent::SUCCESS);
-            $event->data = $content;
+            $event->data = $body;
             $event->total = $len;
             $event->loaded = $len;
 

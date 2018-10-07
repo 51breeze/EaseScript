@@ -80,7 +80,8 @@ class DataSource extends EventDispatcher
     public function options($opt = null)
     {
         if (!is_null($opt)) {
-            $this->_options = array_merge($this->_options, $opt);
+
+            $this->_options = BaseObject::merge($this->_options, $opt);
         }
         return $this;
     }
@@ -232,11 +233,6 @@ class DataSource extends EventDispatcher
     {
         return count($this->_items);
     }
-
-    /**
-     * @private
-     */
-    private $__totalSize__ = 0;
 
     /**
      * 预计数据源的总数
@@ -505,27 +501,49 @@ class DataSource extends EventDispatcher
      */
     private function success($event)
     {
-        $options = (object)$this->_options;
-        $responseProfile =  (object)$options->responseProfile;
-        $totalProfile = $responseProfile->total;
-        $dataProfile = $responseProfile->data;
-        $stateProfile =$responseProfile->code;
-        if ($event->data[$stateProfile] != $responseProfile->successCode) {
-            throw new Error('Loading data failed '.$event->data[$responseProfile->error]);
-        }
-        $data = $event->data;
+        $data = null;
         $total = 0;
-        if ( is_array($data) )
+        $status = 0;
+        $successCode = 200;
+        $options = (object)$this->_options;
+        if( is_callable($options->responseProfile) )
         {
-            if (($dataProfile && !isset($data[$dataProfile])) || ($totalProfile && !isset($data[$totalProfile]))) {
-                throw new Error('Response data profile fields is not correct.');
-            }
-            $total = $totalProfile ? $data[$totalProfile] >> 0 : 0;
-            $data = $data[$dataProfile];
-            if ($total === 0) $total = count($data) >> 0;
+            $profile = array("data","total","status","successCode");
+            extract( array_combine( $profile, array_map(function ($name)use($event,$options){
+                return call_user_func($options->responseProfile, $event->data, $name);
+            }, $profile ) ), EXTR_OVERWRITE );
 
-        } else {
-            $total = count($data) >> 0;
+            if ( $successCode != $status)
+            {
+                throw new Error('Loading data failed. error status:' . $status);
+            }
+
+        }else
+        {
+            $responseProfile = (object)$options->responseProfile;
+            $totalProfile = $responseProfile->total;
+            $dataProfile = $responseProfile->data;
+            $stateProfile = $responseProfile->code;
+            if ($event->data[$stateProfile] != $responseProfile->successCode)
+            {
+                throw new Error('Loading data failed. error status:' . $event->data[$responseProfile->error]);
+            }
+
+            if ($dataProfile || $totalProfile)
+            {
+                if (($dataProfile && !isset($event->data[$dataProfile])) || ($totalProfile && !isset($event->data[$totalProfile])))
+                {
+                    throw new Error('Response data profile fields is not correct.');
+                }
+                $total = $totalProfile ? $event->data[$totalProfile] >> 0 : 0;
+                $data = $event->data[$dataProfile];
+                if ($total === 0) {
+                    $total = count($data) >> 0;
+                }
+
+            } else {
+                $total = count($event->data) >> 0;
+            }
         }
 
         //必须是返回一个数组

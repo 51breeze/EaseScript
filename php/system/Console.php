@@ -12,17 +12,38 @@ class Console
     static public function log()
     {
         $param = func_get_args();
-        if( is_string($param[0]) && !preg_match("/%(s|d|f)\s+/", $param[0] ) )
+        $format = $param[0];
+        if( is_string($format) )
         {
-           array_unshift($param, str_repeat("%s ", count($param) ) );
+            $count = count($param) - 1;
+            $index = preg_match_all("/%(s|d|f)\s+/", $format, $matches);
+            if( $index > 0){
+                array_shift( $param );
+            }
+            if( $index != $count ){
+                if($index>0) {
+                    $format .= str_repeat(",%s", count($param) - $index);
+                }else{
+                   $format = rtrim(str_repeat("%s,", count($param) ),',');
+                }
+            }
+        }else {
+            $format = rtrim(str_repeat("%s,", count($param) ),',');
         }
         $param = array_map(function ($item){
-            if( $item instanceof \Object && get_class($item) !=="Object" )
+            if( is_a($item, '\es\system\BaseObject') && !System::isObject($item,true) )
             {
                 return "[object ".get_class($item)."]";
             }
+            if( is_a($item, '\es\system\BaseObject') ){
+                return var_export($item->valueOf(),true);
+            }
+            if( !is_scalar($item) ){
+                return var_export($item,true);
+            }
             return $item;
         },$param);
+        array_unshift( $param, $format );
         echo call_user_func_array("sprintf", $param );
     }
 }

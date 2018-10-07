@@ -568,28 +568,44 @@ DataSource.prototype.select=function select( page )
 function success(event)
 {
     var options = storage(this,'options');
-    var totalProfile = options.responseProfile.total;
-    var dataProfile = options.responseProfile.data;
-    var stateProfile = options.responseProfile.code;
-    if( event.data[ stateProfile ] != options.responseProfile.successCode )
+    var data = null;
+    var total = 0;
+    var status=0;
+    var successCode = 200;
+    if( typeof options.responseProfile === "function" )
     {
-        throw new Error('Loading data failed '+event.data[ options.responseProfile.error ]);
-    }
-    var data = event.data;
-    var total= 0;
-    if( !System.isArray( data ) )
-    {
-        if(  ( dataProfile && typeof data[ dataProfile ] === 'undefined' ) || ( totalProfile && data[totalProfile] === 'undefined') )
+        var profile = ["data","total","status","successCode"].map(function (name) {
+            return options.responseProfile(event.data,name);
+        });
+        data = profile[0];
+        total = profile[1];
+        status = profile[2];
+        successCode = profile[3];
+        if ( status != successCode )
         {
-            throw new Error('Response data profile fields is not correct.');
+            throw new Error('Loading data failed. current status:' + status);
         }
-        total = totalProfile ? data[totalProfile] >> 0 : 0;
-        data = data[dataProfile];
-        if( total===0 )total = data.length >> 0;
 
     }else
     {
-        total = data.length >>0;
+        var totalProfile = options.responseProfile.total;
+        var dataProfile = options.responseProfile.data;
+        var stateProfile = options.responseProfile.code;
+        if (event.data[stateProfile] != options.responseProfile.successCode) {
+            throw new Error('Loading data failed. current status:' + event.data[options.responseProfile.error]);
+        }
+        if (!System.isArray(event.data))
+        {
+            if ((dataProfile && typeof event.data[dataProfile] === 'undefined') || (totalProfile && event.data[totalProfile] === 'undefined')) {
+                throw new Error('Response data profile fields is not correct.');
+            }
+            total = totalProfile ? event.data[totalProfile] >> 0 : 0;
+            data = event.data[dataProfile];
+            if (total === 0 && data) total = data.length >> 0;
+        } else {
+            data = event.data[dataProfile];
+            total = data.length >> 0;
+        }
     }
 
     //必须是返回一个数组

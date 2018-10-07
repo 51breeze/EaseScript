@@ -3,6 +3,7 @@ const PATH = require('path');
 const Utils = require('./lib/utils.js');
 const uglify = require('uglify-js');
 const Maker = require('./lib/maker.js');
+const MakeSkin = require('./lib/skin.js');
 const Compile = Maker.Compile;
 var globals = Maker.globalDescriptions;
 
@@ -716,10 +717,17 @@ var font_builded = false;
  * @param file
  * @return {string}
  */
-function getRelativeWebrootPath(config, file )
+function getLoadFileRelativePath(config, file, type)
 {
-    return PATH.relative( Utils.getBuildPath(config, 'build.webroot') , file ).replace(/\\/g,"/").replace(/^[\/\.]+/g,'');
+    var root = Utils.getBuildPath(config,"build.webroot");
+    var prefix = config.originMakeSyntax !=="javascript" || config.enable_webroot ? "/" : "";
+    if( !config.enable_webroot && config.originMakeSyntax !=="javascript" )
+    {
+        root = Utils.getBuildPath(config,"build");
+    }
+    return prefix+PATH.relative( root, file ).replace(/\\/g,"/");
 }
+MakeSkin.getLoadFileRelativePath = getLoadFileRelativePath;
 
 //目前支持的语法
 const syntax_supported={
@@ -869,11 +877,9 @@ const SyntaxBuilder={
 
             //应用模块需要的依赖文件
             loadRequiremnets[ bootstrap.fullclassname ] = {
-                script:getRelativeWebrootPath(config,PATH.resolve(Utils.getBuildPath(config, 'build.js'), outputname + '.js')),
-                css:getRelativeWebrootPath(config, PATH.resolve( Utils.getBuildPath(config, 'build.css'), outputname + '.css')  ),
-                require:external_requires.map(function (file) {
-                    return getRelativeWebrootPath(config, file)
-                })
+                script:getLoadFileRelativePath(config,PATH.resolve(Utils.getBuildPath(config, 'build.js'), outputname + '.js')),
+                css:getLoadFileRelativePath(config, PATH.resolve( Utils.getBuildPath(config, 'build.css'), outputname + '.css')  ),
+                require:external_requires
             };
 
             //如果需要把基础类与本地类分开加载
@@ -951,15 +957,15 @@ const SyntaxBuilder={
                     META_CONTENT:"IE=edge",
                     META_KEYWORD_HTTP_EQUIV:"es,easescript",
                     BASE_STYLE_FILE:"",
-                    APP_STYLE_FILE: getRelativeWebrootPath(
+                    APP_STYLE_FILE: getLoadFileRelativePath(
                         config,
                         PATH.resolve(
                             Utils.getBuildPath(config, 'build.css'),
                             default_bootstrap+".css"
                         )
                     ),
-                    BASE_SCRIPT_FILE:getRelativeWebrootPath( config, baseScriptFile ),
-                    APP_SCRIPT_FILE:getRelativeWebrootPath(
+                    BASE_SCRIPT_FILE:getLoadFileRelativePath( config, baseScriptFile ),
+                    APP_SCRIPT_FILE:getLoadFileRelativePath(
                         config,
                         PATH.resolve(
                             Utils.getBuildPath(config, 'build.js'),
@@ -1178,6 +1184,7 @@ function createServiceProvider(config, provider )
         for(var p in item)
         {
             var param = item[p].param;
+            var paramName = [];
             if( param )
             {
                 param = param.map(function (val) {
@@ -1185,6 +1192,7 @@ function createServiceProvider(config, provider )
                     if( val.indexOf(":") < 0 ){
                         val = val+":*";
                     }
+                    paramName.push( val.substr(0, val.indexOf(":") ) );
                     return val;
                 });
             }else{
@@ -1192,9 +1200,19 @@ function createServiceProvider(config, provider )
             }
             code.push("\t\tpublic function ", p, "(",param.join(","),"){\n");
             if( item[p].method ==="get" ){
-                code.push("\t\t\treturn [];\n");
-            }else{
-                code.push("\t\t\treturn true;\n");
+                if( paramName.length > 0 ){
+                    code.push("\t\t\tvar result:* = this.query('select * from "+className.toLowerCase()+"  where "+paramName.join("=? and")+" = ?', ["+paramName.join(",")+"]);\n");
+                }else {
+                    code.push("\t\t\tvar result:* = this.query('select * from " + className.toLowerCase() + " limit 100');\n");
+                }
+                code.push("\t\t\treturn this.success(result);\n");
+            }else if(item[p].method ==="put" || item[p].method ==="post"){
+                code.push("\t\t\tvar result:Boolean = true;\n");
+                code.push("\t\t\treturn this.success(result);\n");
+            }else if(item[p].method ==="delete" )
+            {
+                code.push("\t\t\tvar result:Boolean = true;\n");
+                code.push("\t\t\treturn this.success(result);\n");
             }
             code.push("\t\t}\n");
         }
@@ -1471,8 +1489,6 @@ function make( config, isGlobalConfig )
         config.originMakeSyntax = config.syntax;
         //服务提供者
         config.ServiceProviderList = {};
-        //指定构建后应用的入口根目录,默认为webroot下面
-        config.build_bootstrap_root_path = Utils.getBuildPath(config,"build");
         //静态页面需要模拟path信息的接收名
         config.static_url_path_name = "PATH";
         //浏览器中的全局模块

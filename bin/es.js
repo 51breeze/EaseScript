@@ -43,7 +43,7 @@ program
 .option('--tfp, --theme-file-path [project_path/themes]', '指定主题配置文件的目录,默认为当前工程目录,每一个配置文件名必须与主题名一致','themes')
 .option('-r, --reserved [keyword1,keyword2,...]', '指定需要保护的关键字', function (val) {
     return val.split(',');
-})
+}).option('--webroot', '指示项目是部署在webroot下运行,否则为构建目录下运行',"enable")
 .option('--dbc, --default-bootstrap-class [ExampleClass]', '指定默认的入口类')
 .option('--ssc, --skin-style-config [style.conf,skinClassName:style.less,...]', '皮肤样式配置文件或者指定具体组件名称键对样式名文件', keyValue)
 .option('-L, --library [name,name:alias,...]', '指定使用第三方组件库',keyValue)
@@ -104,6 +104,7 @@ var config = {
     'skin_style_config':program.skinStyleConfig,
     'service_provider_syntax':program.serviceProviderSyntax,
     "default_bootstrap_class":program.defaultBootstrapClass,
+    "enable_webroot":!!program.webroot,
     'mode': program.mode=='dev' ? 1 : program.mode=='test' ? 2 : 3, //1 标准模式（开发时使用） 2 测试  3 性能模式（生产环境使用）
 };
 
