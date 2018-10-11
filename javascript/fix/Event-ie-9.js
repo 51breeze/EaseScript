@@ -64,7 +64,7 @@ Event.fix.hooks[ Event.LOAD ]=function (listener, dispatcher)
         }
     }
 }
-
+var document_head = null;
 Event.fix.hooks[ Event.READY ]=function (listener, dispatcher)
 {
     var target=this;
@@ -86,6 +86,10 @@ Event.fix.hooks[ Event.READY ]=function (listener, dispatcher)
         }
         if( event )
         {
+            if( document_head === null && !document.head )
+            {
+                document.head = (new System.Element("head"))[0];
+            }
             event = event instanceof Event ? event : Event.create( event );
             event.currentTarget = target;
             event.target = target;
@@ -94,7 +98,6 @@ Event.fix.hooks[ Event.READY ]=function (listener, dispatcher)
     }
     var type = Event.type(Event.READY);
     doc.addEventListener ? doc.addEventListener( type, handle ) : doc.attachEvent(type, handle);
-
     //不是一个顶级文档或者窗口对象
     if( !this.contentWindow && win && doc )
     {

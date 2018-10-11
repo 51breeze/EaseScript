@@ -59,14 +59,13 @@ class Locator
         static $path=null;
         if( $path === null )
         {
-            $str = preg_replace("/^\\\\//","", Locator::getRequest()->path() );
-            $str = preg_split("/\\\\/", $str);
+            $str = preg_replace('/^\/|\/$/',"", Locator::getRequest()->path() );
+            $str = preg_split('/\//', $str);
             $file = array_shift( $str );
-            $file = current($file);
             if( strpos($file,".") === false )
             {
-                  array_unshift($str, $file );
-                  $file = "";
+               array_unshift($str, $file );
+               $file = "";
             }
             $path = $str;
         }

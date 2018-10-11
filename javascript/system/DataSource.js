@@ -574,7 +574,7 @@ function success(event)
     var successCode = 200;
     if( typeof options.responseProfile === "function" )
     {
-        var profile = ["data","total","status","successCode"].map(function (name) {
+        var profile = Array.prototype.map.call(["data","total","status","successCode"],function (name) {
             return options.responseProfile(event.data,name);
         });
         data = profile[0];

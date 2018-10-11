@@ -132,9 +132,12 @@ package es.components
             return _rowHeight;
         }
 
-        private var _current:*=0;
+        private var _current:*=null;
         public function get current():*
         {
+            if( _current===null ){
+                return (Locator.path() as Array).join("/");
+            }
             return _current;
         }
 

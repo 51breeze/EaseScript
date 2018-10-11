@@ -71,13 +71,23 @@ function loadScript(filename,callback){
  */
 function start(module, method)
 {
-    var main = System.getDefinitionByName(module);
-    var obj = Reflect.construct(null,main);
-    var Event = System.Event;
-    Reflect.call(main, obj, method);
-    if( global.hasEventListener(Event.INITIALIZE_COMPLETED) )
+    try {
+        var main = System.getDefinitionByName(module);
+        var obj = Reflect.construct(null, main);
+        var Event = System.Event;
+        Reflect.call(main, obj, method);
+        if (global.hasEventListener(Event.INITIALIZE_COMPLETED)) {
+            global.dispatchEvent(new Event(Event.INITIALIZE_COMPLETED));
+        }
+
+    }catch(e)
     {
-        global.dispatchEvent( new Event( Event.INITIALIZE_COMPLETED ) );
+        if( Internal.environment == 1 )
+        {
+            window.console.log( Internal.getStack() );
+        }
+        window.console.log(e.message);
+        //throw new Error( e.message );
     }
 }
 
@@ -109,6 +119,7 @@ function initModule(module)
  */
 global.addEventListener(Event.READY,function (e) {
     try{
+
         var locator = System.Locator;
         var router = routeMap.get || {};
         var path = locator.query("[CODE[STATIC_URL_PATH_NAME]]");

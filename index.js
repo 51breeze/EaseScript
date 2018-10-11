@@ -783,6 +783,7 @@ const SyntaxBuilder={
                     return content.replace(/var\s+codeMap=\{\};/, "var codeMap=" + JSON.stringify(hashMap) + ";");
                 },
                 "HANDLE":handle,
+                "MAKE_VERSION":config.makeVersion,
                 "JS_LOAD_PATH":js_load_path,
                 "CSS_LOAD_PATH":css_load_path,
                 "NAMESPACE_HASH_MAP": hashMap,
@@ -957,6 +958,7 @@ const SyntaxBuilder={
                     META_CONTENT:"IE=edge",
                     META_KEYWORD_HTTP_EQUIV:"es,easescript",
                     BASE_STYLE_FILE:"",
+                    MAKE_VERSION:config.makeVersion,
                     APP_STYLE_FILE: getLoadFileRelativePath(
                         config,
                         PATH.resolve(
@@ -964,7 +966,7 @@ const SyntaxBuilder={
                             default_bootstrap+".css"
                         )
                     ),
-                    BASE_SCRIPT_FILE:getLoadFileRelativePath( config, baseScriptFile ),
+                    BASE_SCRIPT_FILE:getLoadFileRelativePath( config, baseScriptFile )+"?v="+config.makeVersion,
                     APP_SCRIPT_FILE:getLoadFileRelativePath(
                         config,
                         PATH.resolve(
@@ -1053,6 +1055,7 @@ const SyntaxBuilder={
             "NAMESPACE_HASH_MAP":hashMap,
             "SERVICE_ROUTE_LIST": routeMapping,
             "BOOTSTRAP_CLASS_FILE_NAME":"Bootstrap.php",
+            "MAKE_VERSION":config.makeVersion,
             "ORIGIN_SYNTAX":config.originMakeSyntax,
             "STATIC_URL_PATH_NAME":config.static_url_path_name,
             "DEFAULT_BOOTSTRAP_ROUTER_PROVIDER":config.default_bootstrap_router_provider,
@@ -1498,6 +1501,8 @@ function make( config, isGlobalConfig )
             Utils.merge(globals,browser);
         }
         config.globals=globals;
+        //编译版本号
+        config.makeVersion = (new Date()).getTime();
 
         if( config.library )
         {

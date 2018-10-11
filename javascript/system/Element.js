@@ -340,7 +340,7 @@ function getStyleName(name )
  */
 function formatStyleSheet( cssText, elem)
 {
-    return cssText.replace(/([\w\-]+)\s*\:([^\;]*)/g, function (all, name, value) {
+    return cssText.replace(/([\w\-]+)\s*\:([^\;\}]*)/g, function (all, name, value) {
         if( value.substr(0,5).toLowerCase() === "rgba(" && System.env.platform("IE",8) )
         {
             value = value.replace( /rgba\(.*?\)/i, rgbToHex( value ) );
@@ -380,44 +380,22 @@ var querySelector = typeof Sizzle === "function" ?  function(selector, context, 
 {
     if( !results || !System.isArray(results) )
     {
-        results = null;
-        if( context && (context === document || Element.isWindow(context) ) )
+        if( context )
         {
-            context = null;
-        }
-
-        //设置上下文
-        var contextId = context ? getIdSelector( context ) : null;
-        var selectorId = null;
-
-        //如果选择器不是一个字符串
-        if( typeof selector !== "string" )
-        {
-            if( ( Element.isNodeElement(selector) || Element.isWindow(selector) ) && !context )
+            if( Element.isWindow(context) )
             {
-                results = [selector];
-            }else
+                context = document;
+            }else if( typeof context === "string" && !( context = document.querySelector( context ) ) )
             {
-                selectorId = getIdSelector( selector );
-                if( selectorId )
-                {
-                    selector = selectorId.id;
-                }else{
-                    results = [];
-                }
+                return [];
+            }
+
+            if( !Element.isHTMLContainer(context) )
+            {
+               throw new TypeError("Invalid context in Element.querySelector");
             }
         }
-
-        if( results==null )
-        {
-            var tem = [];
-            selector = (contextId ? contextId.id : typeof context==="string" ? context : '') + ' ' + selector;
-            results = document.querySelectorAll(selector);
-            if (results.length > 0)for(var i = 0; i < results.length; i++)tem[i] = results[i];
-            results = tem;
-        }
-        if (contextId && contextId.has === true)contextId.elem.removeAttribute('id');
-        if (selectorId && selectorId.has === true)selectorId.elem.removeAttribute('id');
+        results = Array.prototype.slice.call( (context||document).querySelectorAll(selector) );
     }
 
     if( seed && System.isArray(seed) )
@@ -2288,7 +2266,7 @@ Element.addStyleSheet=function addStyleSheet(styleName, StyleSheetObject)
     {
         var head = document.getElementsByTagName('head')[0];
         headStyle = document.createElement('style');
-        document.getElementsByTagName('head')[0].appendChild( headStyle );
+        head.appendChild( headStyle );
     }
     if( System.isObject(StyleSheetObject) )
     {
@@ -2297,14 +2275,21 @@ Element.addStyleSheet=function addStyleSheet(styleName, StyleSheetObject)
     if( typeof StyleSheetObject === "string" )
     {
         StyleSheetObject = formatStyleSheet( System.trim( StyleSheetObject ) );
-        if( System.env.platform( System.env.BROWSER_IE, 9 ) )
+        if( System.env.platform( System.env.BROWSER_IE, 8 ) )
         {
             var styleName = styleName.split(',');
+            var styleSheet = headStyle.styleSheet;
             StyleSheetObject = StyleSheetObject.replace(/^\{/,'').replace(/\}$/,'');
-            for(var i=0; i<styleName.length; i++ )
-            {
-                headStyle.StyleSheet.addRule(styleName[i], StyleSheetObject, -1);
-            }
+            try {
+                for (var i = 0; i < styleName.length; i++) {
+                    if (styleSheet.insertRule) {
+                        styleSheet.insertRule(styleName + '{' + StyleSheetObject + '}', styleSheet.cssRules.length);
+                    }
+                    else {
+                        styleSheet.addRule(styleName[i], StyleSheetObject, -1);
+                    }
+                }
+            }catch (e){}
 
         }else
         {

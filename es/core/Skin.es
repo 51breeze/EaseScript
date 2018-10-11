@@ -225,12 +225,12 @@ package es.core
             {
                 var str:String = render.fetch();
                 if( str )element.html( str );
-
             }else
             {
                 var children:Array = this.children;
                 var len:int = children.length;
                 var c:int = 0;
+
                 for (; c < len; c++)
                 {
                     var child:IDisplay = children[c] as IDisplay;
@@ -242,7 +242,7 @@ package es.core
                             continue;
                         }
                     }
-                    if( !ele[0].parentNode )
+                    if( !ele[0].parentNode || ele[0].parentNode.nodeType === 11 )
                     {
                         element.addChild( ele );
                     }

@@ -306,7 +306,7 @@ final class Request extends BaseObject
             {
                 $value = http_build_query( (array)$value );
             }
-            if( $this->body->query ){
+            if( isset($this->body->query) && $this->body->query ){
                 $this->body->query .='&'.$value;
             }else{
                 $this->body->query =$value;

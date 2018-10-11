@@ -1,6 +1,7 @@
 <?php
 $start = microtime(true);
 define("EASESCRIPT_ROOT", realpath( __DIR__."[CODE[EASESCRIPT_ROOT]]") );
+define("URL_PATH_NAME", "[CODE[STATIC_URL_PATH_NAME]]");
 spl_autoload_register(function( $name )
 {
     static $globals=['BaseObject','Function','Array','String','Number','EventDispatcher','Event',"PropertyEvent",
@@ -37,17 +38,12 @@ class EaseScript extends \es\system\EventDispatcher
         parent::__construct( \es\system\Document::document() );
         $this->routes = $routes;
         $this->addEventListener( \es\system\RouteEvent::HTTP_MATCH,function ($event)use($routes){
-            $method = strtolower($event->request->method());
-            $path = $event->request->path();
-            if( isset($routes[$method]) )
+            $result = $this->match($event->request->method(), $event->request->path() );
+            if( $result )
             {
-                $result = $this->match($routes[$method], $path);
-                if( $result )
-                {
-                    list($module,$method) = explode("@", $result["provider"]);
-                    $event->response = $this->response( $module,  $method, $result["param"] );
-                    $event->matched = true;
-                }
+                list($module,$method) = explode("@", $result["provider"]);
+                $event->response = $this->response( $module,  $method, $result["param"] );
+                $event->matched = true;
             }
         });
     }
@@ -58,8 +54,13 @@ class EaseScript extends \es\system\EventDispatcher
      * @param $path
      * @return array
      */
-    private function match($routes, $path )
+    public function match($method, $path )
     {
+         $method = strtolower($method);
+         if( !isset($this->routes[$method]) ){
+             return null;
+         }
+         $routes = $this->routes[$method];
          if( isset($routes[ $path ]) )
          {
              return array(
@@ -68,12 +69,12 @@ class EaseScript extends \es\system\EventDispatcher
              );
          }
 
-         $segment_path = explode("/", rtrim($path,'/'));
+         $segment_path = explode("/", trim($path,'/'));
          $count_path = count($segment_path);
 
          foreach ($routes as $key=>$value)
          {
-             $segment = explode("/", rtrim($key,'/') );
+             $segment = explode("/", trim($key,'/') );
              $count = count($segment);
              if( $count === $count_path )
              {
@@ -126,7 +127,7 @@ class EaseScript extends \es\system\EventDispatcher
      * @param $controller
      * @return string
      */
-    private function response( $module , $method , $args=array() )
+    public function response( $module , $method , $args=array() )
     {
         $obj = new $module();
 
@@ -159,10 +160,10 @@ class EaseScript extends \es\system\EventDispatcher
         {
             foreach ($route as $name => $controller )
             {
-                $callback($method, $name , function()use( $controller )
+                $callback($method, $name , function(...$args)use( $controller )
                 {
-                    list($module,$method) = explode("@", $controller);
-                    return $this->response( $module, $method );
+                     list($module,$method) = explode("@", $controller);
+                     return $this->response( $module, $method, $args );
                 });
             }
         }

@@ -100,7 +100,7 @@ function DataGrep( dataItems )
     if( !System.instanceOf( dataItems, Array ) )throw new Error('error','Invalid data list');
     storage(this,true,{
         'dataItems':dataItems,
-        'filter':dataItems,
+        'filter':dataItems
     });
     Object.defineProperty(this,"length", {value:0,writable:true});
 }

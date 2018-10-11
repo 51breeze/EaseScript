@@ -31,9 +31,9 @@
                     matched = current(item,key) as Boolean;
                 } else if(current==key){
                    matched=true;
-                 }else if( item["link"] == current || item["label"] == current ){
+                 }else if( item["link"] === current || item["label"] === current ){
                     matched=true;
-                }else{
+                }else if(current){
                    matched = new RegExp( current ).test( (String)item.link );
                 }
                 if( matched )loadContent(item);

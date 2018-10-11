@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<s:View uu="sss" xmlns:s="es.core"  xmlns:c="es.components" xmlns:b="@" xmlns:p="view.page">
+<s:View uu="sss" xmlns:s="es.core"  xmlns:c="es.components" xmlns:b="com" xmlns:p="view.page">
     <s:Metadata>[HostComponent("IndexApplication")]</s:Metadata>
     <s:Script>
     <![CDATA[
@@ -127,6 +127,35 @@
         </div>
 
     <div>===============================</div>
+
+
+
+
+    <b:Selection>
+        <b:dataSource>
+            <:item type="Object">
+                <id>1</id>
+                <name>123</name>
+            </:item>
+            <:item type="Object">
+                <id>2</id>
+                <name>234</name>
+            </:item>
+            <:item type="Object">
+                <id>3</id>
+                <name>345</name>
+            </:item>
+            <:item type="Object">
+                <id>4</id>
+                <name>456</name>
+            </:item>
+            <:item type="Object">
+                <id>5</id>
+                <name>567</name>
+            </:item>
+        </b:dataSource>
+        <b:current>0</b:current>
+    </b:Selection>
 
     </body>
 </s:View>

@@ -15,8 +15,8 @@ function EventDispatcher( target )
         return target && target instanceof EventDispatcher ? target : new EventDispatcher( target );
     }
     if( target != null && !( typeof target.addEventListener === "function" ||
-        typeof target.attachEvent=== "function" ||
-        typeof target.onreadystatechange !== "undefined" ||
+        System.typeOf( target.attachEvent )=== "function" ||
+        System.typeOf( target.onreadystatechange ) !== "undefined" ||
         target instanceof EventDispatcher ) )
     {
         target = null;
@@ -80,7 +80,6 @@ EventDispatcher.prototype.addEventListener=function addEventListener(type,callba
         target.addEventListener(type,callback,useCapture,priority,reference||this);
         return this;
     }
-
     var listener=new Listener(type,callback,useCapture,priority,reference,this);
     var len = target.length >> 0;
     if( len > 0 )
@@ -157,10 +156,8 @@ function $addEventListener(target, listener )
     var type = listener.type;
     var data = storage(target);
     var events = data.events || (data.events={});
-
     //获取指定事件类型的引用
     events = events[ type ] || ( events[ type ]=[] );
-
     //如果不是 EventDispatcher 则在第一个事件中添加事件代理。
     if( events.length===0 && !(target instanceof EventDispatcher) )
     {
