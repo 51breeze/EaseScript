@@ -4,42 +4,12 @@
     <s:Script>
     <![CDATA[
 
-        import es.interfaces.IContainer;
-
         override protected function initializing()
         {
             var hostComponent:Navigate = this.hostComponent;
             var dataSource:DataSource =  hostComponent.dataSource;
             var dataProfile:String =  hostComponent.dataProfile;
             var container:Skin = this.container;
-            container.variable( dataProfile, hostComponent );
-            var viewport:IContainer = hostComponent.viewport;
-            var loadContent:Function = function(item:Object){
-                 if( viewport && item.content instanceof Class )
-                 {
-                     var obj:Skin = Reflect.construct(null, item.content, [hostComponent] ) as Skin;
-                     viewport.removeAllChild();
-                     viewport.addChild( obj );
-                 }
-            };
-
-            var current:* = hostComponent.current;
-            container.variable( "current",  function(item:Object,key:*){
-                var matched:Boolean = false;
-                if( typeof current === "function" )
-                {
-                    matched = current(item,key) as Boolean;
-                } else if(current==key){
-                   matched=true;
-                 }else if( item["link"] === current || item["label"] === current ){
-                    matched=true;
-                }else if(current){
-                   matched = new RegExp( current ).test( (String)item.link );
-                }
-                if( matched )loadContent(item);
-                return matched;
-            });
-
             dataSource.addEventListener(DataSourceEvent.SELECT, function (event:DataSourceEvent)
             {
                 if ( !event.waiting )
@@ -56,7 +26,7 @@
     <s:Skin id="@container" name="ul" class="nav nav-pills">
         <s:template>
             <:foreach name="datalist" value="item" key="link">
-                <:if condition="current(item,forIndex)">
+                <:if condition="match(item,forIndex)">
                    <li role="presentation" class="active"><a href="{item.link}">{item.label}</a></li>
                 <:else />
                     <li role="presentation"><a href="{item.link}">{item.label}</a></li>

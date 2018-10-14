@@ -133,7 +133,6 @@ package es.core
             var win:Element = SystemManage.getWindow();
             var winX:int =  win.width();
             var winY:int =  win.height();
-
             switch ( horizontal )
             {
                 case "left" :

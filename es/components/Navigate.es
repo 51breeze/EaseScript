@@ -8,7 +8,11 @@
 package es.components
 {
     import es.components.SkinComponent;
+    import es.events.NavigateEvent;
+    import es.core.Skin;
+    import es.core.Display;
     import es.interfaces.IContainer;
+    import es.interfaces.IDisplay;
 
     [Syntax(origin)]
     [Skin("es.skins.NavigateSkin")]
@@ -135,8 +139,9 @@ package es.components
         private var _current:*=null;
         public function get current():*
         {
-            if( _current===null ){
-                return (Locator.path() as Array).join("/");
+            if( _current===null )
+            {
+                return System.getEnvironment("RoutePath")||0;
             }
             return _current;
         }
@@ -153,9 +158,77 @@ package es.components
             }
         }
 
+        /**
+         * 加载当前匹配项的内容
+         * @param item
+         */
+        protected function loadContent(item:Object)
+        {
+            var event:NavigateEvent = new NavigateEvent( NavigateEvent.LOAD_CONTENT_BEFORE );
+            event.item = item;
+            event.viewport = this.viewport;
+            event.content = item.content;
+            if( !this.dispatchEvent(event) || !(event.viewport && event.content) )return;
+
+            var viewport:IContainer = event.viewport;
+            var content:* = event.content;
+            var child:IDisplay=null;
+            if( content instanceof Class  )
+            {
+                child = new (content as Class)( this ) as IDisplay;
+            }
+            else if( System.isFunction(content) )
+            {
+                child = content() as IDisplay;
+            }
+            else if( System.isString(content) )
+            {
+                content = System.trim( content );
+                if( /^https?/i.test(content) )
+                {
+                    var http:Http = new Http();
+                    http.addEventListener(HttpEvent.SUCCESS,function (e:HttpEvent) {
+                        child = new Display( new Element( Element.createElement(e.data as String) ) ) as IDisplay;
+                        viewport.removeAllChild();
+                        viewport.addChild( child );
+                    });
+                   http.load(content);
+                   return;
+                }else{
+                    child = new Display( new Element( Element.createElement(content) ) ) as IDisplay;
+                }
+            }
+            viewport.removeAllChild();
+            viewport.addChild( child );
+        }
+
         override protected function initializing()
         {
             super.initializing();
+            var hostComponent:Navigate = this;
+            var dataProfile:String =  hostComponent.dataProfile;
+            var container:Skin = this.skin["container"] as Skin;
+            if( container )
+            {
+                container.variable(dataProfile, []);
+                container.variable("match", function (item: Object, key: *) {
+                    var matched: Boolean = false;
+                    var current: * = hostComponent.current;
+                    if (typeof current === "function") {
+                        matched = current(item, key) as Boolean;
+                    } else if (current == key) {
+                        matched = true;
+                    } else if (item["link"] === current || item["label"] === current) {
+                        matched = true;
+                    } else if (current) {
+                        matched = new RegExp( current ).test( (String)item.link );
+                    }
+                    if (matched) {
+                        hostComponent.loadContent(item);
+                    }
+                    return matched;
+                });
+            }
         }
 
 

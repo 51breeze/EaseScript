@@ -124,6 +124,7 @@ Object.forEach=function forEach(object,callback,thisObject)
 {
     if( object == null || object instanceof System.Class || typeof callback !== "function" )return;
     var isIterator = false;
+    var value = null;
     if( System.hasClass( Internal.iteratorClass ) )
     {
         isIterator = System.is(object, System.getDefinitionByName( Internal.iteratorClass ) );
@@ -139,7 +140,11 @@ Object.forEach=function forEach(object,callback,thisObject)
         rewind.call(object);
         for ( ;next.call(object); )
         {
-            callback.call(thisObject, current.call(object), key.call(object) );
+            value = current.call(object);
+            if( callback.call(thisObject, value, key.call(object) ) === false )
+            {
+                return value;
+            }
         }
 
     }else
@@ -156,7 +161,10 @@ Object.forEach=function forEach(object,callback,thisObject)
             if (System.Symbol.isSymbolPropertyName && System.Symbol.isSymbolPropertyName(prop))continue;
             if (prop !== token && $propertyIsEnumerable.call(object, prop))
             {
-                callback.call(thisObject, object[prop], prop);
+                value = object[prop];
+                if( callback.call(thisObject, value, prop) === false ){
+                    return value;
+                }
             }
         }
     }

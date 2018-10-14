@@ -161,6 +161,10 @@ final class System
         return is_numeric($obj);
     }
 
+    public static function isFunction($obj){
+        return is_callable($obj);
+    }
+
     public static function isNaN($value)
     {
         return $value === NaN || !is_numeric($value);
@@ -322,5 +326,15 @@ final class System
     static function getContext()
     {
         return static::$context;
+    }
+
+    static private $environmentObject = array();
+    static public function getEnvironment( $name=null )
+    {
+        if( is_string($name) )
+        {
+            return static::$environmentObject[ $name ];
+        }
+        return static::$environmentObject;
     }
 }

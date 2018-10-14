@@ -75,11 +75,15 @@ var fix={
     {
         if ( Element.isWindow(this) )
         {
-            return Math.max(
+            var val =  Math.max(
                 this['inner'+prop] || 0,
                 this['offset'+prop] || 0,
                 this['client'+prop] || 0
-            );
+            ) || document.documentElement['client'+prop];
+            if( document.compatMode ==="BackCompat" ){
+                val = document.body['client'+prop];
+            }
+            return val;
 
         } else if ( Element.isDocument(this) )
         {
@@ -309,7 +313,10 @@ function recursion(prop, selector, deep, exclude)
  */
 function makeElement( instance, results , index )
 {
-    Array.prototype.splice.apply( instance, [].concat.apply([index||0,0],results) );
+    if( typeof results.valueOf === "function"  ){
+        results = results.valueOf();
+    }
+    Array.prototype.splice.apply(instance, [].concat.apply([index || 0, 0], results));
     return instance;
 }
 
@@ -425,20 +432,20 @@ var singleTagRegex=/^<(\w+)(.*?)\/\s*>$/;
  * @param html 一个html字符串
  * @returns {Node}
  */
-function createElement(html , flag )
+function createElement(html , flag , isTable )
 {
     if(System.isString(html) )
     {
         html=System.trim( html ).replace(/[\r\n]+/g,'');
         if( html )
         {
-            if( flag ===true && html.charAt(0) !== "<" )
+            if( flag ===true )
             {
                 return document.createTextNode( html );
             }
 
             var match;
-            if ( html.charAt(0) !== "<" && html.charAt(html.length - 1) !== ">" && html.length >= 1)
+            if ( html.charAt(0) !== "<" && html.charAt(html.length - 1) !== ">" && html.length >= 1 && /^[a-zA-Z]+$/.test(html) )
             {
                 try {
                     return document.createElement(html);
@@ -480,10 +487,20 @@ function createElement(html , flag )
                 }
 
                 div.innerHTML = html;
-                for (var i = 0; i < level; i++)div = div.childNodes.item(0);
+                for (var i = 0; i < level; i++)
+                {
+                    div = div.childNodes.item(0);
+                    div.parentNode.removeChild( div );
+                }
+
                 if( !div )
                 {
                     throw new Error('Invalid html');
+                }
+
+                if( isTable )
+                {
+                    return div;
                 }
 
             }else
@@ -502,7 +519,6 @@ function createElement(html , flag )
                 }
                 return fragment;
             }
-
             div=div.childNodes.item(0);
             return div.parentNode.removeChild( div );
         }
@@ -674,6 +690,7 @@ function Element(selector, context)
         //是一个选择器或者指定一个需要创建的html标签
         else if (typeof selector === "string")
         {
+            selector = System.trim( selector );
             //创建一个指定标签的新元素
             if( selector.charAt(0) === '<' && selector.charAt(selector.length - 1) === '>' )
             {
@@ -1624,29 +1641,25 @@ Element.prototype.html=function html( htmlObject )
         }
         try
         {
-            if( System.env.platform(System.env.BROWSER_IE,9) )
+            elem.innerHTML = htmlObject;
+            if( System.env.platform(System.env.BROWSER_IE,8) )
             {
-                var nodename = Element.getNodeName(elem);
-                switch ( nodename ){
-                    case "thead" :
-                    case "tbody":
-                    case "tfoot":
-                        this[ this.indexOf( elem ) ] = replaceHtmlElement(elem, htmlObject);
-                    break;
-                    default :
-                        elem.innerHTML = htmlObject;
-                }
-
-            }else
-            {
-                elem.innerHTML = htmlObject;
+               switch ( Element.getNodeName(elem) ){
+                   case "thead" :
+                   case "tbody":
+                   case "tfoot":
+                   case "table":
+                   case "tr":
+                   case "th":
+                   case "td":
+                       this[ this.indexOf( elem ) ] = replaceHtmlElement(elem, htmlObject);
+               }
             }
 
         } catch (e)
         {
             this[ this.indexOf( elem ) ] = replaceHtmlElement(elem, htmlObject);
         }
-
     });
 };
 
@@ -1663,7 +1676,16 @@ function replaceHtmlElement(elem, htmlObject )
     {
         htmlObject ="<"+nodename+">"+htmlObject+"</"+nodename+">";
     }
-    var child = createElement(htmlObject);
+
+    var child = createElement(htmlObject,false,true);
+
+    //thead,tbody,tfoot,tr,th,td
+    if( Element.getNodeName(child.childNodes[0]) === nodename )
+    {
+        child = child.childNodes[0];
+        child.parentNode.removeChild( child );
+    }
+
     mergeAttributes(child, elem);
     var parent = elem.parentNode;
     if( !parent ){
@@ -1816,17 +1838,6 @@ Element.prototype.removeChildAt=function removeChildAt( index )
 };
 
 /**
- * 测试指定的元素是否为当前匹配集合元素中第一个元素的子级
- * @param child
- * @returns {boolean}
- */
-Element.prototype.contains=function contains( child )
-{
-    child = child instanceof Element ? child[0] : child;
-    return Element.contains(this[0], child);
-}
-
-/**
  * 判断是否这空的集合
  * @returns {boolean}
  */
@@ -1862,6 +1873,8 @@ Element.prototype.isNodeInDocumentChain=function isNodeInDocumentChain()
 Element.contains=function contains(parent,child)
 {
     if( !parent || !child )return false;
+    if( parent instanceof Element )parent = parent.current();
+    if( child instanceof Element )child = child.current();
     if( Element.isNodeElement(child) && Element.isNodeElement(parent) )
     {
         if('contains' in parent){

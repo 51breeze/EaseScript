@@ -399,12 +399,20 @@ function builder(main, config , code, requirements , replacements)
  */
 function segment( content, requirements, handle, classname )
 {
+    var requires = ['System','Class','Namespace','Interface','ListIterator','EventDispatcher','Event'].concat( globals.slice(0) );
+    for (var p in requirements )
+    {
+        if( requires.indexOf( requirements[p] ) < 0 )
+        {
+            requires.push( requirements[p] );
+        }
+    }
     return [
         'window["'+handle+'"]["Load"]["'+classname+'"]=function(Internal,System,undefined){',
-        '(function(define,'+requirements.join(',')+'){',
+        '(function(define,'+requires.join(',')+'){',
         '"use strict";',
             content,
-        '})(Internal.define,'+requirements.map(function (a){
+        '})(Internal.define,'+requires.map(function (a){
             a = mapname[a] || a;
             if(a==='System')return a;
             return 'System.'+a;

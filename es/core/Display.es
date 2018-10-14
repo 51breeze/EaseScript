@@ -318,9 +318,9 @@ package es.core
          * 判断当前元素是否已经添加到文档链中
          * @returns {*}
          */
-        public function isChain()
+        public function inDocumentChain()
         {
-            return !!this._element[0].parentNode;
+            return Element.contains( document, this._element[0] );
         }
 
         /**

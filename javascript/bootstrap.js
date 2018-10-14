@@ -6,11 +6,25 @@ var EaseScript = {
     "Internal":Internal,
     "DefaultRoute":defaultRoute,
     "RouteMap":routeMap,
+    "URL_PATH_NAME":"[CODE[STATIC_URL_PATH_NAME]]",
     "Version":[CODE[VERSION]],
     "JsLoadPath":"[CODE[JS_LOAD_PATH]]",
     "CssLoadPath":"[CODE[CSS_LOAD_PATH]]",
     "Requirements":[CODE[LOAD_REQUIREMENTS]],
     "Load":{}
+};
+
+/**
+ * 运行环境相关信息
+ */
+System.environmentObject={
+    "DefaultRoute":EaseScript.DefaultRoute,
+    "RouteMap":EaseScript.RouteMap,
+    "URL_PATH_NAME":EaseScript.URL_PATH_NAME,
+    "Version":EaseScript.Version,
+    "JsLoadPath":EaseScript.JsLoadPath,
+    "CssLoadPath":EaseScript.CssLoadPath,
+    "Requirements":EaseScript.Requirements,
 };
 
 /**
@@ -82,12 +96,8 @@ function start(module, method)
 
     }catch(e)
     {
-        if( Internal.environment == 1 )
-        {
-            window.console.log( Internal.getStack() );
-        }
-        window.console.log(e.message);
-        //throw new Error( e.message );
+        window.console.log(e);
+        throw new Error( e.message );
     }
 }
 
@@ -131,6 +141,17 @@ global.addEventListener(Event.READY,function (e) {
         var controller = router.split("@");
         var module = controller[0];
         var method = controller[1];
+        System.environmentObject.RouteController=router;
+        if( typeof routeMap.get[ path ] !== "undefined"){
+            System.environmentObject.RoutePath=  path ;
+        }else{
+            System.Object.forEach(routeMap.get,function (provider,name) {
+                if( provider === router ){
+                    System.environmentObject.RoutePath = name;
+                    return false;
+                }
+            });
+        }
 
         //如果存在先初始化
         initModule(module);
@@ -169,11 +190,8 @@ global.addEventListener(Event.READY,function (e) {
 
     }catch(e)
     {
-        if( Internal.environment == 1)
-        {
-            window.console.log(Internal.getStack().join("\n"));
-        }
-        throw e.valueOf();
+        window.console.log(e);
+        throw new Error( e.message );
     }
 },false,-500);
 window["[CODE[HANDLE]]"]=EaseScript;

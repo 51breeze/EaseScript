@@ -783,13 +783,12 @@ const SyntaxBuilder={
                     return content.replace(/var\s+codeMap=\{\};/, "var codeMap=" + JSON.stringify(hashMap) + ";");
                 },
                 "HANDLE":handle,
-                "MAKE_VERSION":config.makeVersion,
+                "VERSION":config.makeVersion,
                 "JS_LOAD_PATH":js_load_path,
                 "CSS_LOAD_PATH":css_load_path,
                 "NAMESPACE_HASH_MAP": hashMap,
                 "SERVICE_ROUTE_LIST": serverRoutes,
                 "BOOTSTRAP_CLASS_FILE_NAME": "",
-                "VERSION":(new Date).getTime(),
                 "LOAD_REQUIREMENTS":loadRequirements||"{}",
                 "ORIGIN_SYNTAX": config.originMakeSyntax,
                 "STATIC_URL_PATH_NAME": config.static_url_path_name,
@@ -958,7 +957,7 @@ const SyntaxBuilder={
                     META_CONTENT:"IE=edge",
                     META_KEYWORD_HTTP_EQUIV:"es,easescript",
                     BASE_STYLE_FILE:"",
-                    MAKE_VERSION:config.makeVersion,
+                    VERSION:config.makeVersion,
                     APP_STYLE_FILE: getLoadFileRelativePath(
                         config,
                         PATH.resolve(
@@ -987,11 +986,12 @@ const SyntaxBuilder={
             //如果服务不存在则生成
             createServiceProvider(config, serviceProviders );
 
+          //  console.log( serviceProviders )
+
             //加载服务类的描述信息
             Utils.forEach(serviceProviders,function (item,fullclassname)
             {
                 var module = Maker.loadModuleDescription(config.service_provider_syntax, fullclassname, config, null, null,true);
-                module.controllerRouteList = item.routes;
                 providerModuleList.push( module );
             });
 
@@ -1003,6 +1003,10 @@ const SyntaxBuilder={
     'php':function(config, descriptions, onlyServer )
     {
         Utils.info("building php start...");
+        //加载js文件的路径
+        var js_load_path = PATH.relative( Utils.getBuildPath(config, 'build.webroot') , Utils.getBuildPath(config, 'build.js') ).replace(/\\/g,"/").replace(/^[\/\.]+/g,'');
+        //加载css文件的路径
+        var css_load_path = PATH.relative( Utils.getBuildPath(config, 'build.webroot') , Utils.getBuildPath(config, 'build.css') ).replace(/\\/g,"/").replace(/^[\/\.]+/g,'');
         //所有引用模块
         var allModules = systemMainClassModules.slice(0);
         //已经使用的模块
@@ -1055,8 +1059,10 @@ const SyntaxBuilder={
             "NAMESPACE_HASH_MAP":hashMap,
             "SERVICE_ROUTE_LIST": routeMapping,
             "BOOTSTRAP_CLASS_FILE_NAME":"Bootstrap.php",
-            "MAKE_VERSION":config.makeVersion,
+            "VERSION":config.makeVersion,
             "ORIGIN_SYNTAX":config.originMakeSyntax,
+            "JS_LOAD_PATH":js_load_path,
+            "CSS_LOAD_PATH":css_load_path,
             "STATIC_URL_PATH_NAME":config.static_url_path_name,
             "DEFAULT_BOOTSTRAP_ROUTER_PROVIDER":config.default_bootstrap_router_provider,
             "BOOTSTRAP_CLASS_PATH":Utils.getRelativePath(
@@ -1129,9 +1135,10 @@ function getServiceProvider(config, allModules)
                 alias: item.bind,
                 provider: item.provider + "@" + item.action
             };
-           (provider.routes || (provider.routes = {}))[ item.method + ':' + item.bind ] = routes[item.method + ':' + item.bind];
+           (provider[item.action].routes || (provider[item.action].routes = {}))[ item.method + ':' + item.bind ] = routes[item.method + ':' + item.bind];
         });
     });
+
     return {
         providers:providers,
         routes:routes
@@ -1178,6 +1185,7 @@ function createServiceProvider(config, provider )
         {
             return;
         }
+
         var package = name.split(".");
         var className = package.pop();
         package = package.join(".");
@@ -1201,6 +1209,11 @@ function createServiceProvider(config, provider )
             }else{
                 param = [];
             }
+
+            Utils.forEach(item[p].routes,function (route) {
+                code.push("\t\t[Router(method='"+route.method+"',alias='"+(route.alias||p)+"')]\n");
+            });
+
             code.push("\t\tpublic function ", p, "(",param.join(","),"){\n");
             if( item[p].method ==="get" ){
                 if( paramName.length > 0 ){

@@ -100,6 +100,10 @@ package es.core
                 child = (child as SkinComponent).skin as IDisplay;
             }
             (child as Display).displayParent = this;
+            if( this.inDocumentChain() )
+            {
+                this.element.addChildAt(child.element,index);
+            }
             return child;
         };
 
@@ -157,7 +161,7 @@ package es.core
          */
         public function contains( child:IDisplay ):Boolean
         {
-            return element.contains( child.element );
+            return Element.contains(this.element, child.element);
         }
     }
 }

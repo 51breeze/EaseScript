@@ -544,6 +544,15 @@ System.getContext=function getContext()
     return System.context;
 }
 
+System.environmentObject = {};
+System.getEnvironment=function getEnvironment( name )
+{
+    if( typeof name === "string" ) {
+        return System.environmentObject[name] || null;
+    }
+    return System.environmentObject;
+}
+
 Internal.createSymbolStorage=function(symbol)
 {
     return function(target, name, value )

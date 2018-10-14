@@ -139,11 +139,6 @@ class Locator
         }
         return (object)$_GET;
     }
-
-    static public function real( $name )
-    {
-        return $name;
-    }
 }
 
 

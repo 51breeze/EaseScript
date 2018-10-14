@@ -32,15 +32,31 @@ function Element($selector,  $context = null)
 class EaseScript extends \es\system\EventDispatcher
 {
     private $routes = array();
-
+    //运行环境相关信息
+    private $environmentObject = null;
     public function __construct( &$routes )
     {
         parent::__construct( \es\system\Document::document() );
-        $this->routes = $routes;
-        $this->addEventListener( \es\system\RouteEvent::HTTP_MATCH,function ($event)use($routes){
+        $this->routes = &$routes;
+        $environmentObject = new \es\system\BaseObject(array(
+            "DefaultRoute"=>"[CODE[DEFAULT_BOOTSTRAP_ROUTER_PROVIDER]]",
+            "RouteMap"=>&$routes,
+            "UrlPathName"=>URL_PATH_NAME,
+            "Version"=>[CODE[VERSION]],
+            "RouteController"=>null,
+            "RoutePath"=>null,
+            "JsLoadPath"=>"[CODE[JS_LOAD_PATH]]",
+            "CssLoadPath"=>"[CODE[CSS_LOAD_PATH]]",
+        ));
+        $this->environmentObject = $environmentObject;
+        \es\system\Reflect::set(\es\system\System::class, \es\system\System::class, "environmentObject", $environmentObject);
+
+        $this->addEventListener( \es\system\RouteEvent::HTTP_MATCH,function ($event)use($routes, $environmentObject ){
             $result = $this->match($event->request->method(), $event->request->path() );
             if( $result )
             {
+                $environmentObject->RouteController = $result["provider"];
+                $environmentObject->RoutePath = $event->request->path();
                 list($module,$method) = explode("@", $result["provider"]);
                 $event->response = $this->response( $module,  $method, $result["param"] );
                 $event->matched = true;
@@ -156,12 +172,15 @@ class EaseScript extends \es\system\EventDispatcher
      */
     public function bindRoute(\Closure $callback)
     {
+        $environmentObject = $this->environmentObject;
         foreach ( $this->routes as $method => $route )
         {
             foreach ($route as $name => $controller )
             {
-                $callback($method, $name , function(...$args)use( $controller )
+                $callback($method, $name , function(...$args)use( $controller , $name, $environmentObject )
                 {
+                     $environmentObject->RouteController = $controller;
+                     $environmentObject->RoutePath = $name;
                      list($module,$method) = explode("@", $controller);
                      return $this->response( $module, $method, $args );
                 });

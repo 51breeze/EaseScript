@@ -225,16 +225,15 @@ package es.core
             {
                 var str:String = render.fetch();
                 if( str )element.html( str );
+
             }else
             {
                 var children:Array = this.children;
                 var len:int = children.length;
                 var c:int = 0;
-
                 for (; c < len; c++)
                 {
                     var child:IDisplay = children[c] as IDisplay;
-                    var ele:Element = child.display();
                     when(RunPlatform(server))
                     {
                         if (child is SkinComponent && (child as SkinComponent).async === true)
@@ -242,6 +241,8 @@ package es.core
                             continue;
                         }
                     }
+
+                    var ele:Element = child.display();
                     if( !ele[0].parentNode || ele[0].parentNode.nodeType === 11 )
                     {
                         element.addChild( ele );

@@ -9207,7 +9207,7 @@ jQuery.extend({
 
 			try {
 				state = 1;
-				transport.send( requestHeaders, done );
+				transport.load( requestHeaders, done );
 			} catch ( e ) {
 				// Propagate exception as error if not done
 				if ( state < 2 ) {
@@ -9611,7 +9611,7 @@ if ( xhrSupported ) {
 			var callback;
 
 			return {
-				send: function( headers, complete ) {
+				load: function(headers, complete ) {
 					var i,
 						xhr = options.xhr(),
 						id = ++xhrId;
@@ -9656,7 +9656,7 @@ if ( xhrSupported ) {
 					// Do send the request
 					// This may raise an exception which is actually
 					// handled in jQuery.ajax (so no try/catch here)
-					xhr.send( ( options.hasContent && options.data ) || null );
+					xhr.load( ( options.hasContent && options.data ) || null );
 
 					// Listener
 					callback = function( _, isAbort ) {
@@ -9791,7 +9791,7 @@ jQuery.ajaxTransport( "script", function(s) {
 
 		return {
 
-			send: function( _, callback ) {
+			load: function(_, callback ) {
 
 				script = document.createElement("script");
 

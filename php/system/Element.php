@@ -70,6 +70,11 @@ class Element extends EventDispatcher implements \ArrayAccess,\Countable
         return $element instanceof Node;
     }
 
+    static function contains( $parent, $child )
+    {
+        return false;
+    }
+
     static function isHTMLContainer( $element )
     {
         return $element instanceof HTMLElement;
