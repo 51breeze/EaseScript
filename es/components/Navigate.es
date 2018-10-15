@@ -216,9 +216,7 @@ package es.components
                     var current: * = hostComponent.current;
                     if (typeof current === "function") {
                         matched = current(item, key) as Boolean;
-                    } else if (current == key) {
-                        matched = true;
-                    } else if (item["link"] === current || item["label"] === current) {
+                    } else if (current == key || current===item.link || item["label"] === current ) {
                         matched = true;
                     } else if (current) {
                         matched = new RegExp( current ).test( (String)item.link );

@@ -19,7 +19,7 @@ class RegExp extends BaseObject
 
     public function valueOf()
     {
-        return '/'.preg_replace('/\//','\/',$this->_pattern).'/'.$this->_flag;
+        return '/'.preg_quote($this->_pattern,'/').'/'.$this->_flag;
     }
 
     public function exec( $str )
