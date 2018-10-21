@@ -328,13 +328,13 @@ final class System
         return static::$context;
     }
 
-    static private $environmentObject = array();
-    static public function getEnvironment( $name=null )
+    static private $environmentMap = array();
+    static public function environments( $name=null )
     {
         if( is_string($name) )
         {
-            return static::$environmentObject[ $name ];
+            return static::$environmentMap[ $name ];
         }
-        return static::$environmentObject;
+        return static::$environmentMap;
     }
 }

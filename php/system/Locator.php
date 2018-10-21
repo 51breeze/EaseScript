@@ -4,7 +4,7 @@
  * Released under the MIT license
  * https://github.com/51breeze/EaseScript
  * @author Jun Ye <664371281@qq.com>
- * @require TypeError
+ * @require TypeError,System
  */
 
 
@@ -120,9 +120,14 @@ class Locator
      * @param index
      * @returns *
      */
-    static public function fragment( $index )
+    static public function fragment( $index=-1 )
     {
-        return Locator::getRequest()->fragment();
+        $fragment = Locator::getRequest()->fragment();
+        if( $index > 0 )
+        {
+            return isset($fragment[$index]) ? $fragment[$index] : null ;
+        }
+        return $fragment;
     }
 
     /**
@@ -138,6 +143,81 @@ class Locator
             return isset($_GET[ $name ]) ? $_GET[ $name ] : $defaultValue;
         }
         return (object)$_GET;
+    }
+
+    /**
+     * 将一个url的片段组装成url
+     * @param urlSegments
+     * @return {string}
+     */
+    static public function toUrl( $urlSegments )
+    {
+        return http_build_url( (array)$urlSegments );
+    }
+
+    /**
+     * 创建一个指定的url的分段信息
+     * @param url  一个完整的url信息
+     * @param name 返回指定的段名部分
+     * @return {}
+     */
+    static public function create($url,$name=null)
+    {
+        if( !is_string($url) )return false;
+        $url = time($url);
+        if( !preg_match('/^https?\:\/\//i',$url) )
+        {
+            $request = static::getRequest();
+            $port = $request->host();
+            if( $port==80 ){
+                $port=0;
+            }
+            $http = $request->scheme().'://'.$request->host().($port?':'.$port:'');
+            $url = $url[0] === '/' || $url[0] === '?' ? $http.$url : $http.'/'.$url;
+        }
+
+        if( !preg_match('/^((https?)\:\/\/)([^\:\/]+)(\:(\d+))?([\/\?]+[\w\=\-\#\&\{\}\[\]\%\.\,\;\$\~\^\*]+?)?$/si', $url) )
+        {
+            return null;
+        }
+
+        if( is_string($name) )
+        {
+            $name = strtoupper( $name );
+            return defined( 'PHP_URL_'.$name ) ? parse_url($url, constant( 'PHP_URL_'.$name  ) ) : null;
+        }
+        return (object)parse_url($url);
+    }
+
+    /**
+     * 返回一个匹配的路由服务提供者
+     * @param name
+     * @return {*}
+     */
+    static public function match( $name )
+    {
+        $urlSegments = static::create( $name );
+        if( !$urlSegments )return null;
+        if( $urlSegments->host !== static::getRequest()->host() )
+        {
+            return null;
+        }
+        $pathName = System::environments("URL_PATH_NAME");
+        if( isset($urlSegments->query[ $pathName ])  )
+        {
+            $name = $urlSegments->query[ $pathName ];
+        }else{
+            $name = '/'. implode('/',$urlSegments->path);
+        }
+        $routes = System::environments("HTTP_ROUTES");
+        foreach($routes as $method => $route )
+        {
+            if( isset($route[$name]) )
+            {
+                return $route[$name];
+            }
+        }
+        return null;
     }
 }
 

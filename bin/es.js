@@ -61,6 +61,7 @@ program
    return item;
 })
 .option('--bs, --block-scope [enable|disabled]', '是否需要启用块级域','disabled')
+.option('--switch, --command-switch [value]', '需要编译到程序中的指令开关，通常的值为N^2用作模式值',0)
 .option('--bsc, --base-skin-class [value]', '指定皮肤文件的基础类','es.core.Skin')
 .option('--sfs, --skin-file-suffix [value]', '皮肤文件的后缀','html')
 //.option('--gh, --global-handle [variable name]', '全局引用EaseScript对象的变量名','EaseScript')
@@ -105,6 +106,7 @@ var config = {
     'service_provider_syntax':program.serviceProviderSyntax,
     "default_bootstrap_class":program.defaultBootstrapClass,
     "enable_webroot":!!program.webroot,
+    "command_switch":program.commandSwitch,
     'mode': program.mode=='dev' ? 1 : program.mode=='test' ? 2 : 3, //1 标准模式（开发时使用） 2 测试  3 性能模式（生产环境使用）
 };
 

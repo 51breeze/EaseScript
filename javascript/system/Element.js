@@ -1637,7 +1637,7 @@ Element.prototype.html=function html( htmlObject )
         //如果是一个节点对象
         if(is)
         {
-            return this.addChild.call( htmlObject );
+            return this.addChild( htmlObject );
         }
         try
         {

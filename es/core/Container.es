@@ -124,6 +124,10 @@ package es.core
                 }
                 (child as Display).displayParent = null;
                 this._children.splice(index, 1);
+                if( (child as Display).inDocumentChain() )
+                {
+                    child.element.parent().removeChild( child.element );
+                }
                 return child;
             }
             throw new ReferenceError('The child is null or undefined');

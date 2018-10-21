@@ -789,6 +789,7 @@ const SyntaxBuilder={
                 "NAMESPACE_HASH_MAP": hashMap,
                 "SERVICE_ROUTE_LIST": serverRoutes,
                 "BOOTSTRAP_CLASS_FILE_NAME": "",
+                "COMMAND_SWITCH":config.command_switch,
                 "LOAD_REQUIREMENTS":loadRequirements||"{}",
                 "ORIGIN_SYNTAX": config.originMakeSyntax,
                 "STATIC_URL_PATH_NAME": config.static_url_path_name,
@@ -957,6 +958,7 @@ const SyntaxBuilder={
                     META_CONTENT:"IE=edge",
                     META_KEYWORD_HTTP_EQUIV:"es,easescript",
                     BASE_STYLE_FILE:"",
+                    COMMAND_SWITCH:config.command_switch,
                     VERSION:config.makeVersion,
                     APP_STYLE_FILE: getLoadFileRelativePath(
                         config,
@@ -1063,6 +1065,7 @@ const SyntaxBuilder={
             "ORIGIN_SYNTAX":config.originMakeSyntax,
             "JS_LOAD_PATH":js_load_path,
             "CSS_LOAD_PATH":css_load_path,
+            "COMMAND_SWITCH":config.command_switch,
             "STATIC_URL_PATH_NAME":config.static_url_path_name,
             "DEFAULT_BOOTSTRAP_ROUTER_PROVIDER":config.default_bootstrap_router_provider,
             "BOOTSTRAP_CLASS_PATH":Utils.getRelativePath(

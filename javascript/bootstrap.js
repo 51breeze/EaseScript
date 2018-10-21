@@ -1,30 +1,28 @@
-var routeMap = [CODE[SERVICE_ROUTE_LIST]];
+var httpRoutes = [CODE[SERVICE_ROUTE_LIST]];
 var defaultRoute = "[CODE[DEFAULT_BOOTSTRAP_ROUTER_PROVIDER]]";
 var global = System.getGlobalEvent();
-var EaseScript = {
-    "System":System,
-    "Internal":Internal,
-    "DefaultRoute":defaultRoute,
-    "RouteMap":routeMap,
-    "URL_PATH_NAME":"[CODE[STATIC_URL_PATH_NAME]]",
-    "Version":[CODE[VERSION]],
-    "JsLoadPath":"[CODE[JS_LOAD_PATH]]",
-    "CssLoadPath":"[CODE[CSS_LOAD_PATH]]",
-    "Requirements":[CODE[LOAD_REQUIREMENTS]],
-    "Load":{}
-};
 
 /**
  * 运行环境相关信息
  */
-System.environmentObject={
-    "DefaultRoute":EaseScript.DefaultRoute,
-    "RouteMap":EaseScript.RouteMap,
-    "URL_PATH_NAME":EaseScript.URL_PATH_NAME,
-    "Version":EaseScript.Version,
-    "JsLoadPath":EaseScript.JsLoadPath,
-    "CssLoadPath":EaseScript.CssLoadPath,
-    "Requirements":EaseScript.Requirements,
+System.environmentMap={
+    "HTTP_DEFAULT_ROUTE":defaultRoute,
+    "HTTP_ROUTES":httpRoutes,
+    "HTTP_ROUTE_PATH":null,
+    "HTTP_ROUTE_CONTROLLER":null,
+    "COMMAND_SWITCH":[CODE[COMMAND_SWITCH]],
+    "URL_PATH_NAME":"[CODE[STATIC_URL_PATH_NAME]]",
+    "VERSION":[CODE[VERSION]],
+    "LOAD_JS_PATH":"[CODE[JS_LOAD_PATH]]",
+    "LOAD_CSS_PATH":"[CODE[CSS_LOAD_PATH]]",
+}
+
+var EaseScript = {
+    "System":System,
+    "Internal":Internal,
+    "Requirements":[CODE[LOAD_REQUIREMENTS]],
+    "Load":{},
+    "Environments":System.environmentMap
 };
 
 /**
@@ -34,8 +32,16 @@ System.environmentObject={
  * @param classname
  * @return {HTMLScriptElement}
  */
+var loadMap = {};
 function loadScript(filename,callback){
 
+    if( loadMap[filename] )
+    {
+        if(typeof callback === "function"){
+            callback();
+        }
+        return loadMap[filename];
+    }
     var script = null;
     var match = filename.match(/\.(css|js)$/i);
     switch ( match[1].toLowerCase() ){
@@ -50,12 +56,11 @@ function loadScript(filename,callback){
             script.setAttribute('href', filename );
             break;
     }
-
     if( !script )
     {
         throw new TypeError("Invalid script file. only support css or js for the '"+filename+"'");
     }
-
+    loadMap[filename] = script;
     if( callback )
     {
         var loaded = false;
@@ -89,10 +94,11 @@ function start(module, method)
         var main = System.getDefinitionByName(module);
         var obj = Reflect.construct(null, main);
         var Event = System.Event;
-        Reflect.call(main, obj, method);
+        var response = Reflect.call(main, obj, method);
         if (global.hasEventListener(Event.INITIALIZE_COMPLETED)) {
             global.dispatchEvent(new Event(Event.INITIALIZE_COMPLETED));
         }
+        return response;
 
     }catch(e)
     {
@@ -131,7 +137,7 @@ global.addEventListener(Event.READY,function (e) {
     try{
 
         var locator = System.Locator;
-        var router = routeMap.get || {};
+        var router = httpRoutes.get || {};
         var path = locator.query("[CODE[STATIC_URL_PATH_NAME]]");
         if( !path ){
             path = '/'+locator.path().join("/");
@@ -141,52 +147,57 @@ global.addEventListener(Event.READY,function (e) {
         var controller = router.split("@");
         var module = controller[0];
         var method = controller[1];
-        System.environmentObject.RouteController=router;
-        if( typeof routeMap.get[ path ] !== "undefined"){
-            System.environmentObject.RoutePath=  path ;
+        System.environmentMap.HTTP_ROUTE_CONTROLLER=router;
+        if( typeof httpRoutes.get[ path ] !== "undefined"){
+            System.environmentMap.HTTP_ROUTE_PATH = path ;
         }else{
-            System.Object.forEach(routeMap.get,function (provider,name) {
+            System.Object.forEach(httpRoutes.get,function (provider, name) {
                 if( provider === router ){
-                    System.environmentObject.RoutePath = name;
+                    System.environmentMap.HTTP_ROUTE_PATH = name;
                     return false;
                 }
             });
         }
 
-        //如果存在先初始化
-        initModule(module);
+        //调度指定模块中的方法
+        (System.environmentMap.HTTP_DISPATCHER=function(module, method, callback)
+        {
+            //如果存在先初始化
+            initModule(module);
 
-        //如果模块类已经加载
-        if( System.hasClass( module ) )
-        {
-            start(module, method);
-        }
-        //需要加载模块及模块相关脚本
-        else
-        {
-            //如果没有配置指定的模块
-            var moduleInfo = EaseScript.Requirements[ module ]
-            if( !moduleInfo || !moduleInfo.script )
+            //如果模块类已经加载
+            if( System.hasClass( module ) )
             {
-                throw new ReferenceError("Not found the '"+module+"'." );
+                typeof callback === "function" ? callback( start(module, method) ) : start(module, method);
+            }
+            //需要加载模块及模块相关脚本
+            else
+            {
+                //如果没有配置指定的模块
+                var moduleInfo = EaseScript.Requirements[ module ]
+                if( !moduleInfo || !moduleInfo.script )
+                {
+                    throw new ReferenceError("Not found the '"+module+"'." );
+                }
+
+                //加载模块样式
+                if( moduleInfo.css )
+                {
+                    loadScript( moduleInfo.css );
+                }
+
+                //加载模块依赖文件
+                loader(moduleInfo.require, function () {
+                    //加载主模块
+                    loadScript(moduleInfo.script, function () {
+                        //初始化模块
+                        initModule(module);
+                        typeof callback === "function" ? callback( start(module, method) ) : start(module, method);
+                    },module);
+                });
             }
 
-            //加载模块样式
-            if( moduleInfo.css )
-            {
-                loadScript( moduleInfo.css );
-            }
-
-            //加载模块依赖文件
-            loader(moduleInfo.require, function () {
-                //加载主模块
-                loadScript(moduleInfo.script, function () {
-                    //初始化模块
-                    initModule(module);
-                    start(module, method);
-                },module);
-            });
-        }
+        })(module, method);
 
     }catch(e)
     {

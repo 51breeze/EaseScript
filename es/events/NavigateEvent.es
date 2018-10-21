@@ -11,6 +11,7 @@ package es.events
     public class NavigateEvent extends Event
     {
         static public const LOAD_CONTENT_BEFORE:String ='navigateLoadContentBefore';
+        static public const URL_JUMP_BEFORE:String ='navigateUrlJumpBefore';
         public var item:Object=null;
         public var viewport:IContainer=null;
         public var content:*=null;

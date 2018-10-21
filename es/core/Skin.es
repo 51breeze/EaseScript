@@ -28,13 +28,18 @@ package es.core
             else if( name instanceof Element )
             {
                 ele=name as Element;
-            }else if( name instanceof String ) 
+
+            }else if( name is IDisplay )
+            {
+                ele=(name as IDisplay).element;
+
+            }else if( name instanceof String )
             {
                 var id:String = (name as String).charAt(0);
                 ele = id === "#" || id==="." || id==="<" ? new Element(name) : new Element('<' + name +'/>');
             }else
             {
-                throw new Error( "Invalid parameter." );
+                throw new Error( "Invalid parameter. in Skin" );
             }
             if( attr )
             {
@@ -157,12 +162,18 @@ package es.core
         };
 
         /**
+         * @private
+         */
+        private var hasChildTemplate:Boolean = false;
+
+        /**
          * 设置一个皮肤模板
          * @param value
          * @returns {*}
          */
         public function set template( value:String ):void
         {
+            hasChildTemplate = !!value;
             this.render.template( value );
         };
 
@@ -180,10 +191,28 @@ package es.core
          * @param name
          * @param value
          */
-        public function variable(name:String,value:*):*
+        public function variable(name:String,value:*=null):*
         {
-            invalidate = false;
-            return this.render.variable( name,value );
+            var children:Array = this.children;
+            var len:int = children.length;
+            var c:int = 0;
+            for (; c < len; c++)
+            {
+                if( children[c] is Skin )
+                {
+                    var child:Skin = children[c] as Skin;
+                    if( child.hasChildTemplate && child.variable( name ) !== value )
+                    {
+                        child.variable( name,value );
+                    }
+                }
+            }
+            if( this.render.variable(name) !== value)
+            {
+                invalidate = false;
+                this.render.variable( name,value );
+            }
+            return value;
         };
 
         /**
@@ -221,7 +250,7 @@ package es.core
             invalidate = true;
             var element:Element = this.element;
             var render:Render = this._render;
-            if( render )
+            if( render && hasChildTemplate )
             {
                 var str:String = render.fetch();
                 if( str )element.html( str );

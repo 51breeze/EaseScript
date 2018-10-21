@@ -361,7 +361,7 @@ function replaceContent(content, data, config)
                 return makeServiceRouteList( data["SERVICE_ROUTE_LIST"]||{});
             break;
         }
-        return data[ b ]||"";
+        return typeof data[ b ] !== "undefined" ? data[ b ] : "null";
     });
     return content;
 }

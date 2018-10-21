@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<s:View uu="sss" xmlns:s="es.core"  xmlns:c="es.components" xmlns:b="com" xmlns:p="view.page">
+    <s:Metadata>[HostComponent("IndexApplication")]</s:Metadata>
+    <s:Script>
+    <![CDATA[
+    ]]>
+    </s:Script>
+
+    <head>
+        <title>{title}</title>
+        <meta charset="UTF-8" http-equiv="X-UA-Compatible" />
+        <meta name="keyword" http-equiv="es,easescript" />
+        <script src="jquery-1.11.2.js" ></script>
+    </head>
+
+    <body>
+        <c:Navigate id="@navigate" >
+            <c:source>@context.menus</c:source>
+        </c:Navigate>
+        <div id="@content">
+        </div>
+    </body>
+</s:View>

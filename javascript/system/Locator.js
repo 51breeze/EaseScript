@@ -6,48 +6,7 @@
  * @require System,Object,TypeError
  */
 
-var map={
-    "host":location.hostname,
-    "origin":location.origin,
-    "scheme":location.protocol.replace(/:$/,''),
-    "port":location.port,
-    "uri":location.search,
-    "url":location.href,
-    "filename":"",
-    "path":[],
-    "query":{},
-    "fragment":[]
-}
-
-var fragment = location.href.match(/(#\w+)/g);
-if( fragment )
-{
-    map.fragment = fragment;
-}
-
-var query = map.uri.match(/[\w\-]+\=[^\&]*/g);
-if( query )
-{
-    var obj = {};
-    for(var i in query)
-    {
-        var item = query[i].split("=");
-        map.query[ item[0] ] = item[1]||'';
-    }
-}
-
-var path = location.pathname.replace(/^\//,"");
-if( path )
-{
-    path = path.split("/");
-    if( path[0].indexOf(".") > 0 )
-    {
-        map.filename = path.shift();
-    }else if( path[ path.length-1 ].indexOf(".") > 0 ){
-        map.filename = path.pop();
-    }
-    map.path = path;
-}
+var urlSegments={}
 
 /**
  * 资源定位器
@@ -64,7 +23,7 @@ function Locator()
  */
 Locator.url=function url()
 {
-    return map.url;
+    return urlSegments.url;
 }
 
 /**
@@ -73,7 +32,7 @@ Locator.url=function url()
  */
 Locator.uri=function uri()
 {
-    return map.uri;
+    return urlSegments.uri;
 }
 
 /**
@@ -86,9 +45,9 @@ Locator.path = function path( index )
 {
     if( index >= 0 )
     {
-        return map.path[index];
+        return urlSegments.path[index];
     }
-    return map.path.slice(0);
+    return urlSegments.path.slice(0);
 }
 
 /**
@@ -97,7 +56,7 @@ Locator.path = function path( index )
  */
 Locator.host = function host()
 {
-    return map.host;
+    return urlSegments.host;
 }
 
 /**
@@ -107,7 +66,7 @@ Locator.host = function host()
  */
 Locator.origin = function origin()
 {
-   return map.origin;
+   return urlSegments.origin;
 }
 
 /**
@@ -117,7 +76,7 @@ Locator.origin = function origin()
  */
 Locator.scheme = function scheme()
 {
-    return map.scheme;
+    return urlSegments.scheme;
 }
 
 /**
@@ -126,7 +85,7 @@ Locator.scheme = function scheme()
  */
 Locator.port = function port()
 {
-    return map.port;
+    return urlSegments.port;
 }
 
 /**
@@ -139,9 +98,9 @@ Locator.fragment = function fragment( index )
 {
     if( index >=0 )
     {
-        return map.fragment[ index ] || null;
+        return urlSegments.fragment[ index ] || null;
     }
-    return map.fragment.slice(0);
+    return urlSegments.fragment.slice(0);
 }
 
 /**
@@ -155,8 +114,114 @@ Locator.query = function query(name, defaultValue)
     if( typeof name === "string" )
     {
         defaultValue = typeof defaultValue === "undefined" ? null : defaultValue;
-        return map.query[name] || defaultValue;
+        return urlSegments.query[name] || defaultValue;
     }
-    return Object.merge({}, map.query);
+    return Object.merge({}, urlSegments.query);
 }
+
+/**
+ * 将一个url的片段组装成url
+ * @param urlSegments
+ * @return {string}
+ */
+Locator.toUrl=function toUrl( urlSegments )
+{
+    var query = System.serialize(urlSegments.query||{},"url",true);
+    if( urlSegments.fragment )
+    {
+        if( typeof urlSegments.fragment === "string" )
+        {
+            query+="#"+urlSegments.fragment;
+        }else if( urlSegments.fragment.length > 0)
+        {
+            query+="#"+urlSegments.fragment.join("#");
+        }
+    }
+    return (urlSegments.scheme||"http")+"://"+urlSegments.host
+        +(urlSegments.port ? ":"+urlSegments.port : "")
+        +( urlSegments.path && urlSegments.path.length>0? "/"+urlSegments.path.join("/") : "" )
+        +(query?"?"+query:"");
+}
+
+/**
+ * 创建一个指定的url的分段信息
+ * @param url  一个完整的url信息
+ * @param name 返回指定的段名部分
+ * @return {}
+ */
+Locator.create=function create(url,name){
+    if( typeof url !== "string" )return false;
+    url = System.trim(url);
+    if( !/^https?\:\/\//.test(url) ){
+       var http = location.protocol+"//"+location.hostname+(location.port ? ":"+location.port : "");
+       url = url.charAt(0) === "/" || url.charAt(0) === "?" ? http+url : http+"/"+url;
+    }
+    var match= url.match(/^((https?)\:\/\/)([\w\.\-]+)(\:(\d+))?(((\/([a-zA-Z]+[\w+](\.[a-zA-Z]+[\w+])?)*)+)?(\?(&?\w+\=?[^&#=]*)+)?([#\w+]*)?)?$/si);
+    if( !match )return null;
+    var segments={
+        "host":match[3],
+        "origin":match[2]+"://"+match[3]+(match[5]?":"+match[5]:""),
+        "scheme":match[2],
+        "port":match[5]||"",
+        "uri":match[6],
+        "url":url,
+        "path":[],
+        "query":{},
+        "fragment":[]
+    }
+
+    var info = segments.uri.split("?",2);
+    var path = info[0].substr(1);
+    segments.path = path.split("/");
+    if( info[1] )
+    {
+        var query=info[1];
+        query = query.replace(/#(\w+)$/g, function (a, b) {
+            if (b) segments.fragment.push(b);
+            return "";
+        });
+        query = query.split("&");
+        for (var i in query) {
+            var item = query[i].split("=");
+            segments.query[System.trim(item[0])] = window.decodeURIComponent(System.trim(item[1]));
+        }
+    }
+    return name ? segments[name] : segments;
+}
+
+/**
+ * 返回一个匹配的路由服务提供者
+ * @param name
+ * @return {*}
+ */
+Locator.match = function match( name )
+{
+    var segments = name;
+    if( typeof name === "string" ) {
+        segments = Locator.create(name);
+    }
+    if( !segments )return null;
+    if( segments.host !== location.hostname ){
+        return null;
+    }
+    var pathName = System.environments("URL_PATH_NAME");
+    if( typeof segments.query[ pathName ] !== "undefined" )
+    {
+        name = segments.query[ pathName ];
+    }else{
+        name = '/'+segments.path.join('/');
+    }
+
+    var routes = System.environments("HTTP_ROUTES");
+    for(var method in routes)
+    {
+        var route = routes[method];
+        if( typeof route[name] !== "undefined" )
+        {
+            return route[name];
+        }
+    }
+    return null;
+}
+urlSegments = Locator.create(location.href);
 System.Locator = Locator;

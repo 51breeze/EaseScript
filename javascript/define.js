@@ -26,6 +26,12 @@ var fix = !$Array.prototype.map;
 function define(requires , callback )
 {
     var name = requires[0];
+    var context=getContext( name );
+    var name = getClassName( name );
+    if( context.hasOwnProperty(name) && context[name].__T__ )
+    {
+        return;
+    }
     requires = Array.prototype.map.call( requires , function (item)
     {
         if( System.hasOwnProperty( item ) )return System[item];

@@ -4,12 +4,21 @@
     <s:Script>
     <![CDATA[
 
+        import es.events.NavigateEvent;
+
+        override protected function createChildren()
+        {
+          //  container.variable("uuuuu","uuuuu");
+            container.display();
+            super.createChildren();
+        }
         override protected function initializing()
         {
             var hostComponent:Navigate = this.hostComponent;
             var dataSource:DataSource =  hostComponent.dataSource;
             var dataProfile:String =  hostComponent.dataProfile;
             var container:Skin = this.container;
+            var self:Skin = this;
             dataSource.addEventListener(DataSourceEvent.SELECT, function (event:DataSourceEvent)
             {
                 if ( !event.waiting )
@@ -19,6 +28,22 @@
                 }
             });
             dataSource.select(1);
+            Element("li > a", this.container.element).addEventListener( MouseEvent.CLICK, function(e:MouseEvent){
+                var event:NavigateEvent = new NavigateEvent( NavigateEvent.URL_JUMP_BEFORE );
+                event.content = this.property("href");
+                var datalist:Array = container.variable( dataProfile ) as Array;
+                for(var i:int in datalist){
+                    if(datalist[i].link===event.content)
+                    {
+                       event.item=datalist[i];
+                       break;
+                    }
+                }
+                hostComponent.dispatchEvent(event);
+                if( event.defaultPrevented === true ){
+                   e.preventDefault();
+                }
+            });
         }
     ]]>
     </s:Script>
@@ -27,9 +52,9 @@
         <s:template>
             <:foreach name="datalist" value="item" key="link">
                 <:if condition="match(item,forIndex)">
-                   <li role="presentation" class="active"><a href="{item.link}">{item.label}</a></li>
+                    <li role="presentation" class="active"><a href="{item.link}" target="{openTarget ? '_blank' : '_self'}">{item.label}</a></li>
                 <:else />
-                    <li role="presentation"><a href="{item.link}">{item.label}</a></li>
+                    <li role="presentation"><a href="{item.link}" target="{openTarget ? '_blank' : '_self'}">{item.label}</a></li>
                 </:if>
             </:foreach>
         </s:template>

@@ -32,7 +32,7 @@ package es.core
          */
         public function View( context:Application )
         {
-            super( document.body );
+            super( context.getContainer() );
             _context = context;
         }
 

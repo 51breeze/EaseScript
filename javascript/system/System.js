@@ -538,19 +538,17 @@ System.getGlobalEvent=function getGlobalEvent()
       return _globalEvent;
 }
 
-System.context=null;
-System.getContext=function getContext()
-{
-    return System.context;
-}
-
-System.environmentObject = {};
-System.getEnvironment=function getEnvironment( name )
+/**
+ * 运行相关的环境信息
+ * @type {{}}
+ */
+System.environmentMap = {};
+System.environments=function environments( name )
 {
     if( typeof name === "string" ) {
-        return System.environmentObject[name] || null;
+        return System.environmentMap[name] || null;
     }
-    return System.environmentObject;
+    return System.Object.merge({},System.environmentMap);
 }
 
 Internal.createSymbolStorage=function(symbol)

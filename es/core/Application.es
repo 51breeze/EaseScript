@@ -3,11 +3,24 @@ package es.core
    import es.core.View;
    import es.core.Skin;
    import es.core.Interaction;
+   import es.events.ApplicationEvent;
    public class Application extends EventDispatcher
    {
        public function Application()
        {
            super( document );
+       }
+
+       /**
+        * 视图的根容器
+        * @return {*}
+        */
+       public function getContainer()
+       {
+           var event:ApplicationEvent = new ApplicationEvent( ApplicationEvent.FETCH_ROOT_CONTAINER );
+           event.container = document.body;
+           this.dispatchEvent( event );
+           return event.container;
        }
 
        /**
@@ -143,7 +156,7 @@ package es.core
        public function get async():Boolean
        {
            when( Syntax(origin,javascript) ){
-           return true;
+               return true;
            }then{
                return _async;
            }

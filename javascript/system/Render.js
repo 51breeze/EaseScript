@@ -159,6 +159,8 @@ function Render( options )
         // _split=new RegExp(o.left+'([^'+o.right+']+)'+o.right+'|'+o.shortLeft+'([^'+o.shortRight+']+)'+o.shortRight,'gi');
         this.__split__=new RegExp(o.left+'(.*?)'+o.right+'|'+o.shortLeft+'(.*?)'+o.shortRight,'gi');
     }
+    this.__variable__ = new Variable();
+    this.__variable__.__render__= this;
     EventDispatcher.call(this);
 }
 
@@ -175,12 +177,6 @@ Render.prototype.__split__=  new RegExp(_options.left+'(.*?)'+_options.right+'|'
  */
 Render.prototype.variable=function variable(name, value)
 {
-    if (this.__variable__ === null)
-    {
-        this.__variable__ = new Variable();
-        this.__variable__.__render__= this;
-    }
-    if( name == null )return this.__variable__;
     if( value != null )
     {
         this.__variable__.set(name, value);
@@ -218,9 +214,9 @@ Render.prototype.fetch=function fetch( view )
 {
     if( typeof view === "string" )
     {
-        return make.call(this, view , this.variable() );
+        return make.call(this, view , this.__variable__ );
     }
-    return make.call(this, this.__template__ , this.variable() );
+    return make.call(this, this.__template__ , this.__variable__ );
 };
 
 Object.defineProperty( Render.prototype, "toString", {value:function toString()
@@ -270,7 +266,7 @@ Variable.prototype.set=function(name,val)
  */
 Variable.prototype.get=function(name)
 {
-    return typeof name === 'undefined' ? this.__data__ : this.__data__[name];
+    return !name ? this.__data__ : this.__data__[name];
 };
 
 /**

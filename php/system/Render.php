@@ -177,6 +177,7 @@ class Render extends BaseObject
     );
 
     private $_split = null;
+    private $_variable = null;
 
     public  function __construct( array $options=null )
     {
@@ -186,16 +187,11 @@ class Render extends BaseObject
             $o =(object)array_merge( $this->_options, $options );
         }
         $this->_split = '/'.$o->left.'(.*?)'.$o->right.'|'.$o->shortLeft.'(.*?)'.$o->shortRight.'/i';
+        $this->_variable= new Variable( $this );
     }
 
-    private $_variable = null;
     public function variable($name=null, $value=null)
     {
-        if ($this->_variable === null)
-        {
-            $this->_variable= new Variable( $this );
-        }
-        if( $name == null )return $this->_variable;
         if( $value != null )
         {
             $this->_variable->set($name, $value);
@@ -236,9 +232,9 @@ class Render extends BaseObject
     {
         if( is_string($view) )
         {
-            return self::make($view , $this->variable() , $this->_split );
+            return self::make($view , $this->_variable , $this->_split );
         }
-        return self::make( $this->_template , $this->variable() ,  $this->_split  );
+        return self::make( $this->_template , $this->_variable ,  $this->_split  );
     }
 }
 
@@ -286,7 +282,7 @@ class Variable
      */
     public function get($name=null)
     {
-        return $name == null ? $this->data : $this->data[$name];
+        return !$name ? $this->data : $this->data[$name];
     }
 
     /**

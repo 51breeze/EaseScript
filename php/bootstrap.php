@@ -28,35 +28,36 @@ function Element($selector,  $context = null)
     return new es\system\Element( $selector,  $context);
 }
 
-
 class EaseScript extends \es\system\EventDispatcher
 {
     private $routes = array();
     //运行环境相关信息
-    private $environmentObject = null;
+    private $environmentMap = null;
     public function __construct( &$routes )
     {
         parent::__construct( \es\system\Document::document() );
         $this->routes = &$routes;
-        $environmentObject = new \es\system\BaseObject(array(
-            "DefaultRoute"=>"[CODE[DEFAULT_BOOTSTRAP_ROUTER_PROVIDER]]",
-            "RouteMap"=>&$routes,
-            "UrlPathName"=>URL_PATH_NAME,
-            "Version"=>[CODE[VERSION]],
-            "RouteController"=>null,
-            "RoutePath"=>null,
-            "JsLoadPath"=>"[CODE[JS_LOAD_PATH]]",
-            "CssLoadPath"=>"[CODE[CSS_LOAD_PATH]]",
+        $environmentMap = new \es\system\BaseObject(array(
+            "HTTP_DEFAULT_ROUTE"=>"[CODE[DEFAULT_BOOTSTRAP_ROUTER_PROVIDER]]",
+            "HTTP_ROUTES"=>&$routes,
+            "URL_PATH_NAME"=>URL_PATH_NAME,
+            "VERSION"=>[CODE[VERSION]],
+            "ROOT_PATH"=>EASESCRIPT_ROOT,
+            "HTTP_ROUTE_CONTROLLER"=>null,
+            "HTTP_ROUTE_PATH"=>null,
+            "COMMAND_SWITCH"=>[CODE[COMMAND_SWITCH]],
+            "LOAD_JS_PATH"=>"[CODE[JS_LOAD_PATH]]",
+            "LOAD_CSS_PATH"=>"[CODE[CSS_LOAD_PATH]]",
         ));
-        $this->environmentObject = $environmentObject;
-        \es\system\Reflect::set(\es\system\System::class, \es\system\System::class, "environmentObject", $environmentObject);
 
-        $this->addEventListener( \es\system\RouteEvent::HTTP_MATCH,function ($event)use($routes, $environmentObject ){
+        $this->environmentMap = $environmentMap;
+        \es\system\Reflect::set(\es\system\System::class, \es\system\System::class, "environmentMap", $environmentMap);
+        $this->addEventListener( \es\system\RouteEvent::HTTP_MATCH,function ($event)use($routes, $environmentMap ){
             $result = $this->match($event->request->method(), $event->request->path() );
             if( $result )
             {
-                $environmentObject->RouteController = $result["provider"];
-                $environmentObject->RoutePath = $event->request->path();
+                $environmentMap->HTTP_ROUTE_CONTROLLER = $result["provider"];
+                $environmentMap->HTTP_ROUTE_PATH = $event->request->path();
                 list($module,$method) = explode("@", $result["provider"]);
                 $event->response = $this->response( $module,  $method, $result["param"] );
                 $event->matched = true;
@@ -153,10 +154,23 @@ class EaseScript extends \es\system\EventDispatcher
             $obj->addEventListener($pipe[0], $pipe[1], false, $pipe[2]);
         }
         $response = call_user_func_array( array($obj, $method), $args);
+        if( class_exists('\es\events\PipelineEvent',false) && method_exists($obj,"dispatchEvent") )
+        {
+            $event = new \es\events\PipelineEvent( \es\events\PipelineEvent::RESPONSE_BEFORE );
+            $event->data = $response;
+            $obj->dispatchEvent( $event );
+            $response = $event->data;
+        }
 
         if( class_exists('\es\core\View',false) && is_a($response,'\es\core\View') )
         {
             return "<!DOCTYPE html>\r\n".(\es\system\Document::document()->documentElement->outerHTML);
+        }else if( class_exists('\es\core\Skin',false) && is_a($response,'\es\core\Skin') )
+        {
+            return $response->Get_element()->html(true);
+        }else if( is_a($response,'\es\system\Element') )
+        {
+            return $response->html(true);
         }else if( is_a($response,'\es\system\BaseObject') )
         {
             return $response->valueOf();
@@ -172,15 +186,15 @@ class EaseScript extends \es\system\EventDispatcher
      */
     public function bindRoute(\Closure $callback)
     {
-        $environmentObject = $this->environmentObject;
+        $environmentMap = $this->environmentMap;
         foreach ( $this->routes as $method => $route )
         {
             foreach ($route as $name => $controller )
             {
-                $callback($method, $name , function(...$args)use( $controller , $name, $environmentObject )
+                $callback($method, $name , function(...$args)use( $controller , $name, $environmentMap )
                 {
-                     $environmentObject->RouteController = $controller;
-                     $environmentObject->RoutePath = $name;
+                     $environmentMap->HTTP_ROUTE_CONTROLLER = $controller;
+                     $environmentMap->HTTP_ROUTE_PATH = $name;
                      list($module,$method) = explode("@", $controller);
                      return $this->response( $module, $method, $args );
                 });

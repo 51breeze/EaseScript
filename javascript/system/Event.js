@@ -55,6 +55,7 @@ Event.prototype.bubbles = true;
 //是否可以取消浏览器默认关联的事件
 Event.prototype.cancelable = true;
 Event.prototype.currentTarget = null;
+Event.prototype.target = null;
 Event.prototype.defaultPrevented = false;
 Event.prototype.originalEvent = null;
 Event.prototype.type = null;
