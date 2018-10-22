@@ -5,33 +5,20 @@
     <![CDATA[
 
         import es.events.NavigateEvent;
-
-        override protected function createChildren()
-        {
-          //  container.variable("uuuuu","uuuuu");
-            container.display();
-            super.createChildren();
-        }
         override protected function initializing()
         {
             var hostComponent:Navigate = this.hostComponent;
-            var dataSource:DataSource =  hostComponent.dataSource;
             var dataProfile:String =  hostComponent.dataProfile;
-            var container:Skin = this.container;
             var self:Skin = this;
-            dataSource.addEventListener(DataSourceEvent.SELECT, function (event:DataSourceEvent)
-            {
-                if ( !event.waiting )
-                {
-                    container.variable( dataProfile , event.data );
-                    container.display();
-                }
-            });
-            dataSource.select(1);
-            Element("li > a", this.container.element).addEventListener( MouseEvent.CLICK, function(e:MouseEvent){
+
+            console.log( Element("li > a", this.element ) );
+
+            Element("li > a", this.element).addEventListener( MouseEvent.CLICK, function(e:MouseEvent){
+
                 var event:NavigateEvent = new NavigateEvent( NavigateEvent.URL_JUMP_BEFORE );
                 event.content = this.property("href");
-                var datalist:Array = container.variable( dataProfile ) as Array;
+                event.originalEvent = e;
+                var datalist:Array = self.variable( dataProfile ) as Array;
                 for(var i:int in datalist){
                     if(datalist[i].link===event.content)
                     {
@@ -40,15 +27,14 @@
                     }
                 }
                 hostComponent.dispatchEvent(event);
-                if( event.defaultPrevented === true ){
-                   e.preventDefault();
-                }
+                e.preventDefault();
+
             });
         }
     ]]>
     </s:Script>
     <style file="NavigateStyle.less" />
-    <s:Skin id="@container" name="ul" class="nav nav-pills">
+    <s:Skin name="ul" class="nav nav-pills" id="@container">
         <s:template>
             <:foreach name="datalist" value="item" key="link">
                 <:if condition="match(item,forIndex)">

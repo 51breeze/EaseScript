@@ -303,37 +303,34 @@ package es.components
         {
             super.initializing();
             var hostComponent:Navigate = this;
-            var dataProfile:String =  hostComponent.dataProfile;
-            var container:Skin = this.skin["container"] as Skin;
-            if( container )
+            var dataProfile:String =  this.dataProfile;
+            var container:Skin = this.skin;
+            container.assign(dataProfile, []);
+            container.assign("openTarget",this.target);
+            container.assign("match", function (item: Object, key: *) {
+                var matched: Boolean = false;
+                var current: * = hostComponent.current;
+                if (typeof current === "function") {
+                    matched = current(item, key) as Boolean;
+                } else if (current == key || current===item.link || item["label"] === current ) {
+                    matched = true;
+                } else if (current) {
+                    matched = new RegExp( current ).test( (String)item.link );
+                }
+                if (matched && System.isDefined(item.content) )
+                {
+                    hostComponent.loadContent( item.content );
+                }
+                return matched;
+            });
+            this.dataSource.addEventListener(DataSourceEvent.SELECT, function (event:DataSourceEvent)
             {
-                container.variable(dataProfile, []);
-                container.variable("openTarget",this.target);
-                container.variable("match", function (item: Object, key: *) {
-                    var matched: Boolean = false;
-                    var current: * = hostComponent.current;
-                    if (typeof current === "function") {
-                        matched = current(item, key) as Boolean;
-                    } else if (current == key || current===item.link || item["label"] === current ) {
-                        matched = true;
-                    } else if (current) {
-                        matched = new RegExp( current ).test( (String)item.link );
-                    }
-                    if (matched && System.isDefined(item.content) )
-                    {
-                        hostComponent.loadContent( item.content );
-                    }
-                    return matched;
-                });
-            }
-        }
-
-        /**
-         * @override
-         */
-        override protected function commitPropertyAndUpdateSkin()
-        {
-            super.commitPropertyAndUpdateSkin();
+                if ( !event.waiting )
+                {
+                    container.assign( dataProfile , event.data );
+                }
+            });
+            this.dataSource.select(1);
         }
 
         /**
@@ -350,15 +347,20 @@ package es.components
             if( _viewport===null )
             {
                 var self:Navigate = this;
+                console.log("=====");
                 this.addEventListener(NavigateEvent.URL_JUMP_BEFORE, function (e:NavigateEvent)
                 {
                     var content:*= e.item.content || e.content;
+                    console.log(content);
                     if( typeof content === "string" )
                     {
                         var isUrl: Boolean = /^https?/i.test(content);
                         var segment: Object = Locator.create(content);
                         var provider: String = Locator.match(segment);
+
+                          console.log(isUrl, provider, content );
                         if( isUrl && !provider ){
+
                             return;
                         }
                     }

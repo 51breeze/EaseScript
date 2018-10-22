@@ -50,9 +50,13 @@ package es.core
          * @param value
          * @return
          */
-        public function assign(name:String, value:*=null)
+        override public function assign(name:String, value:*=null):*
         {
-           return _context.assign(name,value);
+           if( value===null )
+           {
+               return _context.assign(name);
+           }
+           return super.assign(name,value);
         }
 
         /**

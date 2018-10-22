@@ -187,33 +187,74 @@ package es.core
         };
 
         /**
-         * 为模板设置变量
+         * 设置或者获取指定名称在模板数据集中的值
          * @param name
          * @param value
          */
         public function variable(name:String,value:*=null):*
         {
-            var children:Array = this.children;
-            var len:int = children.length;
-            var c:int = 0;
-            for (; c < len; c++)
+            var oldValue:* = this.render.variable(name);
+            if(value===null)return oldValue;
+            if( oldValue !== value )
             {
-                if( children[c] is Skin )
+                this.render.variable(name, value);
+                if (initialized === true)
                 {
-                    var child:Skin = children[c] as Skin;
-                    if( child.hasChildTemplate && child.variable( name ) !== value )
-                    {
-                        child.variable( name,value );
-                    }
+                    invalidate = false;
+                    this.display();
                 }
-            }
-            if( this.render.variable(name) !== value)
-            {
-                invalidate = false;
-                this.render.variable( name,value );
             }
             return value;
         };
+
+        /**
+         * 分配指定名称的值到模板数据集中
+         * @param name
+         * @param value
+         */
+        public function assign(name:String,value:*=null):*
+        {
+            if( value !== null )
+            {
+                var children: Array = this.children;
+                var len: int = children.length;
+                var c: int = 0;
+                for (; c < len; c++) {
+                    if (children[c] is Skin) {
+                        var child: Skin = children[c] as Skin;
+                        if (child.hasChildTemplate && _inheritAssign === true) {
+                            child.assign(name, value);
+                        }
+                    }
+                }
+            }
+            return this.variable(name,value);
+        }
+
+        /**
+         * @private
+         */
+        private var _inheritAssign:Boolean=true;
+
+        /**
+         * 指示当前皮肤是否继承为父级指定的数据。
+         * true为继承,false为不继承。
+         * 默认为true
+         * @param value
+         */
+        public function set inheritAssign(value:Boolean):void
+        {
+            _inheritAssign = value;
+        }
+
+        /**
+         * 获取可继承的数据标记
+         * @return {Boolean}
+         */
+        public function get inheritAssign():Boolean
+        {
+            return _inheritAssign;
+        }
 
         /**
          * 渲染显示皮肤对象。
