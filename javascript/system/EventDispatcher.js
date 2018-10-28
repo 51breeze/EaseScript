@@ -30,37 +30,29 @@ EventDispatcher.prototype.constructor=EventDispatcher;
 /**
  * 判断是否有指定类型的侦听器
  * @param type
+ * @param listener
  * @returns {boolean}
  */
-EventDispatcher.prototype.hasEventListener=function hasEventListener( type )
+EventDispatcher.prototype.hasEventListener=function hasEventListener( type , listener )
 {
     var target =  storage(this,'target') || this;
     if( target instanceof EventDispatcher && target !== this )
     {
-        return target.hasEventListener(type);
+        return target.hasEventListener(type, listener);
     }
-
-    var events;
     var len = target.length >> 0;
     if( len > 0 )
     {
         while(len>0 && target[--len] )
         {
-            events =  storage(target[len],'events');
-            if( events && Object.prototype.hasOwnProperty.call(events,type) )
-            {
-                events =events[type];
-                return events && events.length > 0;
-            }
+           if( $hasEventListener(target[len], type, listener) )
+           {
+               return true;
+           }
         }
         return false;
     }
-    events =  storage(target,'events');
-    if( events && Object.prototype.hasOwnProperty.call(events,type) )
-    {
-        return events[type].length > 0;
-    }
-    return false;
+    return $hasEventListener(target, type, listener);
 };
 
 /**
@@ -141,6 +133,36 @@ EventDispatcher.prototype.dispatchEvent=function dispatchEvent( event )
     event.target = event.currentTarget=target;
     return $dispatchEvent( event );
 };
+
+/**
+ * 判断是否有指定的侦听器
+ * @param target
+ * @param type
+ * @param listener
+ * @return {boolean}
+ */
+function $hasEventListener(target, type, listener)
+{
+    var is = typeof listener === "function";
+    var events =  storage(target,'events');
+    if( events && Object.prototype.hasOwnProperty.call(events,type) )
+    {
+        events = events[type];
+        var length = events.length;
+        if( !is ){
+            return length > 0;
+        }
+        while (length > 0)
+        {
+            --length;
+            if ( events[length].callback === listener )
+            {
+                return true;
+            }
+        }
+    }
+    return false;
+}
 
 /**
  * 添加侦听器到元素中

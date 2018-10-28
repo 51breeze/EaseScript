@@ -347,25 +347,20 @@ package es.components
             if( _viewport===null )
             {
                 var self:Navigate = this;
-                console.log("=====");
                 this.addEventListener(NavigateEvent.URL_JUMP_BEFORE, function (e:NavigateEvent)
                 {
                     var content:*= e.item.content || e.content;
-                    console.log(content);
                     if( typeof content === "string" )
                     {
-                        var isUrl: Boolean = /^https?/i.test(content);
-                        var segment: Object = Locator.create(content);
-                        var provider: String = Locator.match(segment);
-
-                          console.log(isUrl, provider, content );
+                        var isUrl:Boolean = /^https?/i.test(content);
+                        var segment:Object = Locator.create(content);
+                        var provider:String = Locator.match(segment);
                         if( isUrl && !provider ){
-
                             return;
                         }
                     }
-                    e.preventDefault();
                     self.current = content;
+                    e.preventDefault();
                 });
             }
             _viewport = value;

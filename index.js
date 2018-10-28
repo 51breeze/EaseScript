@@ -97,7 +97,6 @@ function fetchAllParent( module , results )
     return results;
 }
 
-
 function fetchAllImplements( module, results )
 {
     results = results || [];
@@ -105,7 +104,6 @@ function fetchAllImplements( module, results )
     {
         return results;
     }
-
     for(var i in module.implements )
     {
         var classname = module.implements[i];
@@ -113,12 +111,12 @@ function fetchAllImplements( module, results )
         {
             classname = module.import[classname];
         }
-        module = Maker.getLoaclAndGlobalModuleDescription(classname);
-        if( results.indexOf(module) < 0 )
+        var m = Maker.getLoaclAndGlobalModuleDescription(classname);
+        if( results.indexOf(m) < 0 )
         {
-            results.push(module);
+            results.push(m);
         }
-        fetchAllParent( module, results );
+        fetchAllParent( m, results );
     }
     return results;
 }

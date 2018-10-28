@@ -19,7 +19,6 @@ package es.components
          */
         protected var initialized:Boolean = false;
 
-
         /**
          * 组件初始化时调用
          * 此方法由组件内部实现，无需手动调用

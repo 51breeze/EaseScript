@@ -10,31 +10,28 @@
             var hostComponent:Navigate = this.hostComponent;
             var dataProfile:String =  hostComponent.dataProfile;
             var self:Skin = this;
-
-            console.log( Element("li > a", this.element ) );
-
-            Element("li > a", this.element).addEventListener( MouseEvent.CLICK, function(e:MouseEvent){
-
-                var event:NavigateEvent = new NavigateEvent( NavigateEvent.URL_JUMP_BEFORE );
-                event.content = this.property("href");
-                event.originalEvent = e;
-                var datalist:Array = self.variable( dataProfile ) as Array;
-                for(var i:int in datalist){
-                    if(datalist[i].link===event.content)
-                    {
-                       event.item=datalist[i];
-                       break;
+            this.element.addEventListener( MouseEvent.CLICK, function(e:MouseEvent){
+                if( Element.getNodeName(e.target) === "a" && Element.getNodeName(e.target.parentNode)==="li"  )
+                {
+                    var event:NavigateEvent = new NavigateEvent( NavigateEvent.URL_JUMP_BEFORE );
+                    event.content = this.property("href");
+                    event.originalEvent = e;
+                    var datalist:Array = self.variable( dataProfile ) as Array;
+                    for(var i:int in datalist){
+                        if(datalist[i].link===event.content)
+                        {
+                           event.item=datalist[i];
+                           break;
+                        }
                     }
+                    hostComponent.dispatchEvent(event);
                 }
-                hostComponent.dispatchEvent(event);
-                e.preventDefault();
-
             });
         }
     ]]>
     </s:Script>
     <style file="NavigateStyle.less" />
-    <s:Skin name="ul" class="nav nav-pills" id="@container">
+    <s:Skin name="ul" class="nav nav-pills">
         <s:template>
             <:foreach name="datalist" value="item" key="link">
                 <:if condition="match(item,forIndex)">

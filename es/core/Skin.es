@@ -12,6 +12,7 @@ package es.core
     import es.events.SkinEvent;
     import es.core.State;
     import es.interfaces.IDisplay;
+    import es.interfaces.IContainer;
     public class Skin extends Container
     {
         /**
@@ -64,6 +65,16 @@ package es.core
                 ele.property("id", id);
             }
             return id;
+        }
+
+        /**
+         * 获取一个承载子级对象的容器
+         * 如果需要改变此默认容器，请在子类中覆盖此方法
+         * @return {es.interfaces.IContainer}
+         */
+        public function getContainer():IContainer
+        {
+            return this;
         }
 
         /**

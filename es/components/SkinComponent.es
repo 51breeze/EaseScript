@@ -7,14 +7,15 @@
 package es.components
 {
     import es.components.Component;
-import es.components.SkinComponent;
-import es.events.ComponentEvent;
+    import es.components.SkinComponent;
+    import es.events.ComponentEvent;
     import es.core.Skin;
     import es.interfaces.IContainer;
     import es.interfaces.IDisplay;
     import es.core.Interaction;
+    import es.core.Position;
 
-    public class SkinComponent extends Component implements IDisplay
+    public class SkinComponent extends Component implements IDisplay,IContainer
     {
         private static var componentIdHash:Object={};
         private var _componentId:String;
@@ -128,7 +129,9 @@ import es.events.ComponentEvent;
                     event.property = 'skin';
                     this.dispatchEvent(event);
                 }
-                commitPropertyAndUpdateSkin();
+                this.installChildren();
+                this.commitProperty();
+                this.commitPropertyAndUpdateSkin();
             }
         }
 
@@ -170,6 +173,17 @@ import es.events.ComponentEvent;
                 }
             }
         }
+
+        private var _position:Position=null;
+        public function set newPosition(value:Position):void
+        {
+            _position = value;
+        }
+        public function get newPosition():Position
+        {
+           return _position;
+        }
+
 
         /**
          * 此组件的属性集
@@ -373,8 +387,154 @@ import es.events.ComponentEvent;
         }
 
         /**
+         * @private
+         */
+        private var childrenItems:Array=[];
+
+        /**
+         * 获取所有的子级元素
+         * @returns {Array}
+         */
+        public function get children():Array
+        {
+            if( this.initialized ){
+                return this.skin.getContainer().children;
+            }
+            return childrenItems.slice(0);
+        }
+
+        /**
+         * 获取指定索引处的子级元素
+         * @param index
+         * @returns {IDisplay}
+         */
+        public function getChildAt( index:Number ):IDisplay
+        {
+            if( this.initialized ){
+                return this.skin.getContainer().getChildAt(index);
+            }
+            if( index < 0 ){
+                index = index+childrenItems.length;
+            }
+            return childrenItems[ index ] as IDisplay;
+        }
+
+        /**
+         * 根据子级皮肤返回索引
+         * @param child
+         * @returns {Number}Number
+         */
+        public function getChildIndex( child:IDisplay ):Number
+        {
+            if( this.initialized ){
+                return this.skin.getContainer().getChildIndex(child);
+            }
+            return childrenItems.indexOf(child);
+        }
+
+        /**
+         * 添加一个子级元素
+         * @param child
+         * @returns {Display}
+         */
+        public function addChild( child:IDisplay ):IDisplay
+        {
+            if( this.initialized )
+            {
+                return this.skin.getContainer().addChild(child);
+            }
+            childrenItems.push( child );
+            return child;
+        }
+        /**
+         * 在指定索引位置添加元素
+         * @param child
+         * @param index
+         * @returns {Display}
+         */
+        public function addChildAt( child:IDisplay, index:Number ):IDisplay
+        {
+            if( this.initialized )
+            {
+                return this.skin.getContainer().addChildAt(child,index);
+            }
+            if( index < 0 ){
+                index = index+childrenItems.length;
+            }
+            childrenItems.splice(index,0,child);
+            return child;
+        }
+        /**
+         * 移除指定的子级元素
+         * @param child
+         * @returns {Display}
+         */
+        public function removeChild( child:IDisplay ):IDisplay
+        {
+            if( this.initialized )
+            {
+                return this.skin.getContainer().removeChild(child);
+            }
+            var index:int = this.childrenItems.indexOf(child);
+            if( index >= 0 ){
+                this.removeChildAt( index );
+            }else{
+                throw new ReferenceError("child is not exists.");
+            }
+        }
+
+        /**
+         * 移除指定索引的子级元素
+         * @param index
+         * @returns {Display}
+         */
+        public function removeChildAt( index:Number ):IDisplay
+        {
+            if( this.initialized )
+            {
+                return this.skin.getContainer().removeChildAt(index);
+            }
+            if( index < 0 ){
+                index = index+childrenItems.length;
+            }
+            if( childrenItems[index] ){
+                return childrenItems.splice(index,1) as IDisplay;
+            }
+            throw new ReferenceError("Index is out of range");
+        }
+
+        /**
+         * 移除所有的子级元素
+         *  @returns {void}
+         */
+        public function removeAllChild():void
+        {
+            if( this.initialized )
+            {
+                this.skin.getContainer().removeAllChild();
+            }else{
+                childrenItems = [];
+            }
+        }
+
+        /**
+         * 测是是否包括指定的子级（包括孙级）元素，在没有初始时此方法始终返回false。
+         * 此操作与Element.contains()一致
+         * @param child
+         * @return Boolean
+         */
+        public function contains( child:IDisplay ):Boolean
+        {
+            if( !this.initialized ){
+                return false;
+            }
+            return this.skin.getContainer().contains(child);
+        }
+
+        /**
          * 渲染显示皮肤对象。
-         * 调用此方法会重新创建子级对象，在非必要情况下请谨慎使用，可以节省资源。
+         * 此方法主要是用来初始化并安装组件时使用。
+         * 如果有属性更新并期望应用到皮肤时请使用 nowUpdateSkin 方法。
          */
         public function display():Element
         {
@@ -387,18 +547,70 @@ import es.events.ComponentEvent;
         };
 
         /**
-         * 提交属性并且立即刷新视图
-         * 此方法只对使用模板渲染的皮肤对象才管用。
-         * 并且要在调用方法之前有重新分配过数据,才会重新创建视图。
+         * @override
+         * 初始化组件
+         * 此方法只会在初始化时调用一次且由内部调用，无需手动调用。
+         * 如果需要判断是否已初始化请使用 initialized 属性
          */
-        protected function commitPropertyAndUpdateSkin()
+        override protected function initializing()
+        {
+            super.initializing();
+            if( _position )
+            {
+                _position.target = this.skin.element;
+            }
+            this.installChildren();
+            this.commitProperty();
+        }
+
+        /**
+         * 安装子级元素
+         * 对于新添加到组件的元素都要添加到皮肤对象上。
+         */
+        private function installChildren()
+        {
+            var len:int = childrenItems.length;
+            var index:int=0;
+            var container:IContainer=this.skin.getContainer();
+            for(;index<len;index++)
+            {
+                container.addChild( childrenItems[index] as IDisplay );
+            }
+        }
+
+        /**
+         * 将组件属性提交到皮肤。
+         * 对于一个在初始化之前的组件有可能是没有指定皮肤对象的。所以需要把指定的属性统一管理起来稍后在初始化时统一提交到皮肤。
+         */
+        protected function commitProperty()
         {
             var skin:Skin = this.skin;
-            Object.forEach(properties, function (value:*, name:String){
+            Object.forEach(this.properties, function (value:*, name:String){
                 if( name in skin ) {
                     skin[name] = value;
                 }
             });
+        }
+
+        /**
+         * 提交属性并且立即刷新视图
+         * 此方法只对使用模板渲染的皮肤对象才管用。
+         * 并且要在调用方法之前有重新分配过数据,才会重新创建视图。
+         * 调用此方法可能会消耗较多资源，请谨慎使用。
+         */
+        protected function commitPropertyAndUpdateSkin()
+        {
+            this.nowUpdateSkin();
+        }
+
+        /**
+         * 立即刷新皮肤
+         * 此方法只对使用模板渲染的皮肤对象才有效，并且要在调用该方法之前有重新为皮肤对象分配过数据。
+         * 调用此方法可能会消耗较多资源，请谨慎使用。
+         */
+        protected function nowUpdateSkin()
+        {
+            var skin:Skin = this.skin;
             when( RunPlatform(server) )
             {
                 if( this.async === false ){
@@ -409,7 +621,6 @@ import es.events.ComponentEvent;
                 skin.display();
             }
         }
-
 
         /**
          * 将属性推送到共享池(前后端互相访问)

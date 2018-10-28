@@ -1222,7 +1222,7 @@ accessor['scroll']={
     get:function(prop){
         var e = this.defaultView || this.parentWindow || this;
         var p= 'scroll'+prop;
-        return Element.isWindow( e ) ? e[ prop.toLowerCase()==='top'?'pageYOffset':'pageXOffset'] || e.document.documentElement[p] || e.document.body[p] : e[p] ;
+        return parseInt( Element.isWindow( e ) ? e[ prop.toLowerCase()==='top'?'pageYOffset':'pageXOffset'] || e.document.documentElement[p] || e.document.body[p] : e[p] );
     },
     set:function(prop,newValue,obj)
     {
@@ -1369,7 +1369,7 @@ accessor['position']={
         {
             accessor.style.set.call(this,'position','relative');
         }
-        return accessor.style.set.call(this,prop,newValue>>0,obj);
+        return accessor.style.set.call(this,prop,newValue,obj);
     }
 };
 
@@ -1378,7 +1378,7 @@ accessor['position']={
  * @param number val
  * @returns {number|Element}
  */
-Element.prototype.left=function left(val )
+Element.prototype.left=function left( val )
 {
     return access.call(this,'position','left',val)
 };
@@ -1875,6 +1875,10 @@ Element.contains=function contains(parent,child)
     if( !parent || !child )return false;
     if( parent instanceof Element )parent = parent.current();
     if( child instanceof Element )child = child.current();
+    if( Element.isWindow(parent) )
+    {
+        parent = document.documentElement;
+    }
     if( Element.isNodeElement(child) && Element.isNodeElement(parent) )
     {
         if('contains' in parent){

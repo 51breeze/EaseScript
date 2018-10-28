@@ -127,7 +127,12 @@ function make(template, variable)
     }
     code += '___code___+="'+escape( template.substr(cursor, template.length - cursor) )+'";\n';
     code += 'return ___code___;';
-    return new Function( code ).call( variable , template );
+    try {
+        return new Function(code).call(variable, template);
+    }catch (e){
+        console.log( code );
+        throw e;
+    }
 };
 
 /**
