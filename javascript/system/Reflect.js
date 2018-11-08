@@ -283,13 +283,8 @@ Reflect.type=function type(value, typeClass)
                 value = parseFloat(value);
                 break;
         }
-        if( flag )
-        {
-            if (isNaN(value))throw new System.TypeError(original + " can not be convert for " + typeClass);
-            return value;
-        }
+        return value;
     }
-
     if( value == null || typeClass === System.Object )return value;
     if ( typeClass && !System.is(value, typeClass) )
     {

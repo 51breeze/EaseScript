@@ -13,6 +13,7 @@ package es.core
     import es.core.State;
     import es.interfaces.IDisplay;
     import es.interfaces.IContainer;
+    import es.core.BaseLayout;
     public class Skin extends Container
     {
         /**
@@ -51,7 +52,9 @@ package es.core
                 }
                 ele.setProperties( attr );
             }
+           
             super( ele );
+
         }
 
         [RunPlatform(server)]
@@ -65,6 +68,18 @@ package es.core
                 ele.property("id", id);
             }
             return id;
+        }
+
+        private var _layout:BaseLayout=null;
+        public function set layout( value:BaseLayout )
+        {
+            value.target = this;
+            _layout = value;
+        }
+
+        public function get layout():BaseLayout
+        {
+            return _layout;
         }
 
         /**

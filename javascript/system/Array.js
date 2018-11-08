@@ -64,17 +64,17 @@ if( $Array.prototype.map )
  * 如果返回 false 则退出循环
  * @returns {Object}
  */
-Array.prototype.forEach=function forEach(callback, thisArg)
+Array.prototype.forEach = $Array.prototype.forEach;
+if( !Array.prototype.forEach )
 {
-    if (!System.isFunction(callback))throw new TypeError(callback + " is not a function");
-    if (this==null)throw new ReferenceError('this is null or not defined');
-    var obj = System.Object(this);
-    var len = obj.length >> 0;
-    var k = 0;
-    thisArg = thisArg || this;
-    while (k<len)if (k in obj)callback.call(thisArg, obj[k++], k, obj);
-    return this;
-};
+    Array.prototype.forEach = function forEach(callback, thisArg)
+    {
+        if (!System.isFunction(callback)) throw new TypeError(callback + " is not a function");
+        if (this == null) throw new ReferenceError('this is null or not defined');
+        Object.forEach(this,callback,thisArg||this);
+        return this;
+    };
+}
 
 /**
  * 方法使用指定的函数测试所有元素，并创建一个包含所有通过测试的元素的新数组。

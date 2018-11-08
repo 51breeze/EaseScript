@@ -18,6 +18,7 @@ ElementEvent.prototype.parent=null;
 ElementEvent.prototype.child=null;
 ElementEvent.prototype.constructor=ElementEvent;
 ElementEvent.ADD='elementAdd';
+ElementEvent.ADD_TO_DOCUMENT='elementAddToDocument';
 ElementEvent.REMOVE='elementRemove';
 ElementEvent.CHANGE='elementChildrenChange';
 

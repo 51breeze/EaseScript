@@ -257,14 +257,13 @@ function getChildNodes(elem)
 /**
  * @private
  */
-function dispatchEvent(dispatch, type, parent, child, result )
+function dispatchEvent(dispatch, type, parent, child )
 {
     if( dispatch.hasEventListener(type) )
     {
         var event = new ElementEvent(type);
         event.parent = parent;
         event.child = child;
-        event.result = !!result;
         return dispatch.dispatchEvent(event);
     }
     return true;
@@ -345,20 +344,95 @@ function getStyleName(name )
  * @param cssText
  * @returns {string}
  */
-function formatStyleSheet( cssText, elem)
+function formatStyleSheet( styleObject,type,node,elem)
 {
-    return cssText.replace(/([\w\-]+)\s*\:([^\;\}]*)/g, function (all, name, value) {
-        if( value.substr(0,5).toLowerCase() === "rgba(" && System.env.platform("IE",8) )
+    if( type==="object" )
+    {
+        var results=[];
+        for( var name in styleObject )
         {
-            value = value.replace( /rgba\(.*?\)/i, rgbToHex( value ) );
+            var value = formatStyleValue(name, styleObject[name], node, elem);
+            if( value !==false )
+            {
+                value = typeof value === "object" ? System.serialize(value, 'style') : getStyleName(name) + ":" + value;
+                results.push(value);
+            }
         }
-        if (fix.cssHooks[name] && typeof fix.cssHooks[name].set === "function") {
-            var obj = {};
-            fix.cssHooks[name].set.call(elem||{}, obj, value);
-            return System.serialize(obj, 'style');
-        }
-        return getStyleName(name) + ':' + value;
+        return results.join(";");
+    }
+    return styleObject.replace(/([\w\-]+)\s*\:([^\;\}]*)/g, function (all, name, value) {
+        value = formatStyleValue(name, value, node, elem);
+        if( !value )return "";
+        return typeof value === "object" ? System.serialize(value, 'style') : getStyleName(name)+":"+value;
     });
+}
+
+/**
+ * 格式化样式名及属性值
+ * @param name
+ * @param value
+ * @return {string}
+ */
+function formatStyleValue(name, value, node, elem, apply )
+{
+    var type = typeof value;
+    if( type === "string" )
+    {
+        value = System.trim(value);
+        type = /^\d+$/.test( value ) ? 'number' : type;
+    }
+    if( type === "string" )
+    {
+        var increment = /^([\-+])=([\-+.\de]+)/.exec(value);
+        if (increment)
+        {
+            var inc = accessor.style.get.call(node||{}, name, elem);
+            inc = parseFloat(inc) || 0;
+            value = (+(increment[1] + 1) * +increment[2]) + inc;
+            type = "number";
+
+        } else if( System.env.platform("IE", 8) && value.substr(0, 5) === "rgba(" )
+        {
+            value = value.replace(/rgba\(.*?\)/i, rgbToHex(value));
+        }
+    }
+
+    if( type === "number" && isNaN( value ) )
+    {
+        return false;
+    }
+
+    //添加单位
+    if( type === "number" && !fix.cssNumber[name] )
+    {
+        value += "px";
+    }
+    if( fix.cssHooks[name] && typeof fix.cssHooks[name].set === "function")
+    {
+        if( apply )
+        {
+            var orgname = getStyleName(name);
+            if( !fix.cssHooks[name].set.call(node,node.style,value,orgname) )
+            {
+                node.style[ orgname ] = value;
+            }
+
+        }else
+        {
+            var obj = {};
+            fix.cssHooks[name].set.call(node||{},obj,value,elem);
+            return obj;
+        }
+
+    }else
+    {
+        if( apply )
+        {
+            node.style[ getStyleName(name) ] = value;
+        }else{
+            return value;
+        }
+    }
 }
 
 //获取并设置id
@@ -849,7 +923,7 @@ Element.prototype.current=function current( elem )
 accessor['property']={
     get:function(name){
         name = fix.attrMap[ name ] || name;
-        return  ( fix.attrtrue[name] || !this.getAttribute  ? this[name] : this.getAttribute(name) ) || undefined;
+        return  ( fix.attrtrue[name] || !this.getAttribute  ? this[name] : this.getAttribute(name) ) || null;
     }
     ,set:function(name,newValue){
         name = fix.attrMap[ name ] || name;
@@ -957,44 +1031,30 @@ accessor['style']= {
         var style = getComputedStyle(this);
         return getter ? getter.call(this, style, name) : style[name]||'';
     }
-    ,set:function(name,value, obj ){
+    ,set:function(name, value, obj ){
         var type = typeof value;
-        if( type === "string" ){
-            value = System.trim(value);
-            type = /^\d+$/.test( value ) ? 'number' : type;
-        }
-
-        if( !this || !this.style || ( type === "number" && isNaN( value ) ) )return;
-        var increment = type === "string" ? /^([\-+])=([\-+.\de]+)/.exec( value ) : null;
-
-        //增量值
-        if (increment) {
-            var inc =accessor.style.get.call(this,name);
-            inc = parseFloat(inc) || 0;
-            value = ( +( increment[1] + 1 ) * +increment[2] ) + inc;
-            type = "number";
-        }else if(type==='string' && value.substr(0,5) === "rgba(" && System.env.platform("IE",8) )
+        if( type === "object" )
         {
-            value = value.replace( /rgba\(.*?\)/i, rgbToHex( value ) );
-        }
-
-        //添加单位
-        if (type === "number" && !fix.cssNumber[name])
-            value += "px";
-
-        //解析 cssText 样式名
-        if (name === 'cssText')
-        {
-           value = value === null ? "" : (this.style.cssText || "") + ";" + formatStyleSheet(value, this);
-        }
-        try {
-            var orgname = getStyleName(name);
-            if ( !fix.cssHooks[name] || typeof fix.cssHooks[name].set !== "function"
-                || !fix.cssHooks[name].set.call(this, this.style, value, orgname) )
+            for( var b in value )
             {
-                this.style[ orgname ] = value;
+                formatStyleValue(b, value[b], this , obj , true );
             }
-        } catch (e) {}
+        }else
+        {
+            //解析 cssText 样式名
+            if( name === 'cssText' )
+            {
+                if( value == null )
+                {
+                    value = "";
+                }else if( type === "string" )
+                {
+                    var _cssText = this.style.cssText;
+                    value = (_cssText ? _cssText+";" : "")+formatStyleSheet(value, type, this, obj);
+                }
+            }
+            formatStyleValue(name, value, this , obj , true );
+        }
         return StyleEvent.CHANGE;
     }
 };
@@ -1145,8 +1205,12 @@ Element.prototype.removeClass=function removeClass( className )
  */
 Element.prototype.width=function width( value )
 {
-    var val = access.call(this,'style','width',value);
-    return value == null ? parseFloat( val ) : this;
+    if( value == null )
+    {
+        return parseFloat( fix.getsizeval.call(this.current(),'Width') );
+    }
+    access.call(this,'style','width',value);
+    return this;
 };
 
 /**
@@ -1156,8 +1220,12 @@ Element.prototype.width=function width( value )
  */
 Element.prototype.height=function height( value )
 {
-    var val = access.call(this,'style','height',value);
-    return value == null ? parseFloat( val ) : this;
+    if( value == null )
+    {
+        return parseFloat( fix.getsizeval.call(this.current(),'Height') );
+    }
+    access.call(this,'style','height',value);
+    return this;
 };
 
 /**
@@ -1735,15 +1803,35 @@ Element.prototype.addChildAt=function addChildAt( childElemnet, index )
 
     var refChild=index===-1 ? null : this.getChildAt(index);
     if( childElemnet.parentNode )this.removeChild( childElemnet );
-    var result = parent.insertBefore( childElemnet , refChild || null );
+    parent.insertBefore( childElemnet , refChild || null );
     if( Element.getNodeName(childElemnet)==="#document-fragment" )
     {
         childElemnet['parent-element'] = parent;
     }
-    dispatchEvent( EventDispatcher( childElemnet ) ,ElementEvent.ADD, parent, childElemnet , result );
-    dispatchEvent( EventDispatcher( parent ) , ElementEvent.CHANGE, parent, childElemnet , result );
+    dispatchEvent( new EventDispatcher( childElemnet ) ,ElementEvent.ADD, parent, childElemnet );
+    dispatchEvent( new EventDispatcher( parent ) , ElementEvent.CHANGE, parent, childElemnet );
+    if( this.isNodeInDocumentChain() ){
+        dispatchAddToDocumentEvent(parent,childElemnet );
+    }
     return childElemnet;
 };
+
+/**
+ * 触发元素已经添加到文档中事件
+ * @param parent
+ * @param child
+ */
+function dispatchAddToDocumentEvent( parent, child )
+{
+    dispatchEvent( new EventDispatcher( child ) , ElementEvent.ADD_TO_DOCUMENT, parent, child);
+    if( child.hasChildNodes() && child.childNodes.length > 0 )
+    {
+        for(var i=0; i<child.childNodes.length;i++)
+        {
+            dispatchAddToDocumentEvent( child, child.childNodes.item(i) )
+        }
+    }
+}
 
 /**
  * 返回指定索引位置的子级元素( 匹配选择器的第一个元素 )
@@ -1814,12 +1902,29 @@ Element.prototype.removeChild=function removeChild( childElemnet )
         }
     }else
     {
-        var result = parent.removeChild(childElemnet);
-        dispatchEvent( EventDispatcher( childElemnet ) , ElementEvent.REMOVE, parent, childElemnet , result );
-        dispatchEvent( EventDispatcher( parent ) , ElementEvent.CHANGE, parent, childElemnet , result );
+        parent.removeChild(childElemnet);
+        dispatchEveryRemoveEvent(parent, childElemnet);
+        dispatchEvent( new EventDispatcher( parent ) , ElementEvent.CHANGE, parent, childElemnet );
     }
     return childElemnet;
 };
+
+/**
+ * 触发每一个元素的删除事件
+ * @param parent
+ * @param child
+ */
+function dispatchEveryRemoveEvent( parent, child )
+{
+    dispatchEvent( new EventDispatcher( child ) , ElementEvent.REMOVE, parent, child);
+    if(child.hasChildNodes() && child.childNodes.length > 0 )
+    {
+        for(var i=0; i<child.childNodes.length;i++)
+        {
+            dispatchEveryRemoveEvent( child, child.childNodes.item(i) )
+        }
+    }
+}
 
 /**
  * 移除子级元素
@@ -1853,15 +1958,7 @@ Element.prototype.isEmpty=function isEmpty()
 Element.prototype.isNodeInDocumentChain=function isNodeInDocumentChain()
 {
     var node = this.current();
-    while (node)
-    {
-        if ( node===document.body || node === document.ownerDocument )
-        {
-            return true;
-        }
-        node = node.parentNode;
-    }
-    return false;
+    return node && Element.contains(document.documentElement, node);
 }
 
 /**
@@ -2192,16 +2289,6 @@ fix.cssHooks.radialGradient=fix.cssHooks.linearGradient={
     }
 };
 
-//add get width hooks
-fix.cssHooks.width= {
-    get:function(){ return fix.getsizeval.call(this,'Width')+"px"; }
-};
-
-//add get height hooks
-fix.cssHooks.height={
-    get:function (){return fix.getsizeval.call(this,'Height')+"px";}
-};
-
 //@internal Element.fix;
 Element.fix = fix;
 Element.createElement = createElement;
@@ -2285,40 +2372,39 @@ Element.addStyleSheet=function addStyleSheet(styleName, StyleSheetObject)
         headStyle = document.createElement('style');
         head.appendChild( headStyle );
     }
+
     if( System.isObject(StyleSheetObject) )
     {
-        StyleSheetObject=System.serialize( StyleSheetObject, 'style' );
+        StyleSheetObject= formatStyleSheet(StyleSheetObject,'object');
+    }else {
+        StyleSheetObject = formatStyleSheet( System.trim(StyleSheetObject) ,'string');
     }
-    if( typeof StyleSheetObject === "string" )
-    {
-        StyleSheetObject = formatStyleSheet( System.trim( StyleSheetObject ) );
-        if( System.env.platform( System.env.BROWSER_IE, 8 ) )
-        {
-            var styleName = styleName.split(',');
-            var styleSheet = headStyle.styleSheet;
-            StyleSheetObject = StyleSheetObject.replace(/^\{/,'').replace(/\}$/,'');
-            try {
-                for (var i = 0; i < styleName.length; i++) {
-                    if (styleSheet.insertRule) {
-                        styleSheet.insertRule(styleName + '{' + StyleSheetObject + '}', styleSheet.cssRules.length);
-                    }
-                    else {
-                        styleSheet.addRule(styleName[i], StyleSheetObject, -1);
-                    }
-                }
-            }catch (e){}
 
-        }else
-        {
-            if (StyleSheetObject.charAt(0) !== '{')
-            {
-                StyleSheetObject = '{' + StyleSheetObject + '}';
+    if( System.env.platform( System.env.BROWSER_IE, 8 ) )
+    {
+        var styleName = styleName.split(',');
+        var styleSheet = headStyle.styleSheet;
+        StyleSheetObject = StyleSheetObject.replace(/^\{/,'').replace(/\}$/,'');
+        try {
+            for (var i = 0; i < styleName.length; i++) {
+                if (styleSheet.insertRule) {
+                    styleSheet.insertRule(styleName + '{' + StyleSheetObject + '}', styleSheet.cssRules.length);
+                }
+                else {
+                    styleSheet.addRule(styleName[i], StyleSheetObject, -1);
+                }
             }
-            headStyle.appendChild( document.createTextNode(styleName + StyleSheetObject ) );
+        }catch (e){}
+
+    }else
+    {
+        if (StyleSheetObject.charAt(0) !== '{')
+        {
+            StyleSheetObject = '{' + StyleSheetObject + '}';
         }
-        return true;
+        headStyle.appendChild( document.createTextNode(styleName + StyleSheetObject ) );
     }
-    return false;
+    return true;
 };
 
 System.Element = Element;

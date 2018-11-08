@@ -99,7 +99,6 @@ function start(module, method)
             global.dispatchEvent(new Event(Event.INITIALIZE_COMPLETED));
         }
         return response;
-
     }catch(e)
     {
         window.console.log(e);
@@ -135,7 +134,6 @@ function initModule(module)
  */
 global.addEventListener(Event.READY,function (e) {
     try{
-
         var locator = System.Locator;
         var router = httpRoutes.get || {};
         var path = locator.query("[CODE[STATIC_URL_PATH_NAME]]");
@@ -164,7 +162,6 @@ global.addEventListener(Event.READY,function (e) {
         {
             //如果存在先初始化
             initModule(module);
-
             //如果模块类已经加载
             if( System.hasClass( module ) )
             {
@@ -196,7 +193,6 @@ global.addEventListener(Event.READY,function (e) {
                     },module);
                 });
             }
-
         })(module, method);
 
     }catch(e)

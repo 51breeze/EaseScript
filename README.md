@@ -71,4 +71,6 @@ node ./bin/es -p test -C -m test -s php
 
 node ./bin/es -p test -C -m test -o ../webroot/working -s php
 
+node ./bin/es -p test -C -m test -o ../webroot/working -s javascript
+
 node ../../EaseScript/bin/es -p ../../EaseScript/test -C -m test -o ./ -s php
