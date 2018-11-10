@@ -6,7 +6,6 @@
  */
 package es.core
 {
-    import es.core.HorizontalAlign;
     import es.core.BaseLayout;
     public class HorizontalLayout extends BaseLayout
     {
@@ -71,11 +70,6 @@ package es.core
             var children:Array=[];
             target.children(":not([includeLayout=false])").forEach(function(elem:Object,index:*)
             {
-                if( this.style('position')==="static" )
-                {
-                    this.style('position','absolute');
-                }
-
                 var box:Object = self.getRectangleBox(this);
                 var newValue:Object={target:elem,rect:box};
                 newValue.height = self.calculateHeight(this,parentHeight);
@@ -108,7 +102,6 @@ package es.core
 
             var xOffset:int=0;
             var widthOffset:int=0;
-            var childElement:Element = new Element();
             var align:String = this.horizontalAlign;
             switch ( align )
             {
@@ -128,7 +121,7 @@ package es.core
             }
 
             children.forEach(function(item:Object,index:*){
-                childElement.current( item.target );
+                var childElement:Element = new Element(item.target);
                 var left:int = (isNaN(item.rect.left) ? item.left : item.rect.left) as int;
                 var top:int = (isNaN(item.rect.top) ? item.top : item.rect.top) as int;
                 if( align === CONTENT_JUSTIFY  || align === JUSTIFY){
@@ -140,7 +133,8 @@ package es.core
                     left:left,
                     top:top,
                     width:item.width+widthOffset,
-                    height:item.height
+                    height:item.height,
+                    position:'absolute'
                 });
             });
             this.setLayoutSize( parentWidth, parentHeight );

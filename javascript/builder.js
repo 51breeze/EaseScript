@@ -284,6 +284,7 @@ function builder(main, config , code, requirements , replacements)
         'double':true,
         'Double':true,
         'arguments':true,
+        "NodeList":true
     };
 
     /**

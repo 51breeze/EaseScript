@@ -902,7 +902,10 @@ Element.prototype.forEach=function forEach(callback , refObject)
  */
 Element.prototype.current=function current( elem )
 {
-    if( typeof elem === "undefined" )return storage(this,'forEachCurrentItem') || this[0];
+    if( typeof elem === "undefined" )
+    {
+        return storage(this,'forEachCurrentItem') || this[0];
+    }
     if( elem )
     {
         if (typeof elem === "string")
@@ -1028,7 +1031,10 @@ var rgbToHex = function(value)
 accessor['style']= {
     get:function(name){
         var getter = fix.cssHooks[name] && typeof fix.cssHooks[name].get === "function" ? fix.cssHooks[name].get : null;
-        var style = getComputedStyle(this);
+        var style = this.currentStyle || this.style;
+        if( name !=="cssText" ){
+            style = getComputedStyle(this);
+        }
         return getter ? getter.call(this, style, name) : style[name]||'';
     }
     ,set:function(name, value, obj ){
@@ -1789,7 +1795,10 @@ Element.prototype.addChildAt=function addChildAt( childElemnet, index )
      if( System.isNaN(index) )throw new Error('Invalid param the index in addChildAt');
      if( System.instanceOf(childElemnet,Element) )
      {
-         childElemnet =  childElemnet.current();
+         childElemnet.forEach(function(child,at) {
+             this.addChildAt(child, !isNaN(at) ? at+index : index );
+         },this);
+         return childElemnet;
      }
      if( !Element.isNodeElement( childElemnet ) )
      {

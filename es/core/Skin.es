@@ -70,13 +70,26 @@ package es.core
             return id;
         }
 
+        /**
+         * @private
+         */
         private var _layout:BaseLayout=null;
+
+        /**
+         * 设置一个指定布局对象
+         * @param value
+         */
+        [RunPlatform(client)]
         public function set layout( value:BaseLayout )
         {
             value.target = this;
             _layout = value;
         }
 
+        /**
+         * 获取一个指定的布局对象
+         * @return {BaseLayout}
+         */
         public function get layout():BaseLayout
         {
             return _layout;

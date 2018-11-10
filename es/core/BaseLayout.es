@@ -6,8 +6,6 @@
  */
 package es.core
 {
-    import es.core.HorizontalAlign;
-    import es.core.VerticalAlign;
     import es.interfaces.IDisplay;
     public class BaseLayout extends EventDispatcher
     {
@@ -268,6 +266,7 @@ package es.core
                      this.removeEventListener(ElementEvent.REMOVE);
                      removeLayout(self);
                 });
+               // styleChange( value.element );
                 _target = value;
             }
         }
@@ -293,6 +292,7 @@ package es.core
         public function set viewport(value:Element)
         {
             _viewport = value;
+            styleChange( _viewport );
         }
 
         /**
@@ -301,11 +301,53 @@ package es.core
          */
         public function get viewport():Element
         {
-            if( _viewport ===null )
+            if( _viewport === null )
             {
                 _viewport = this._target.element.parent();
+                styleChange( _viewport );
             }
             return _viewport;
+        }
+
+        /**
+         * @private
+         * @param target
+         */
+        private function styleChange(target:Element)
+        {
+            var self:BaseLayout = this;
+            var oldWidth:int=NaN;
+            var oldHeight:int=NaN;
+            target.addEventListener( StyleEvent.CHANGE , function(e:StyleEvent) {
+                var width:int = target.width();
+                var height:int = target.height();
+                if( oldWidth !== width || oldHeight !== height )
+                {
+                    oldWidth = width;
+                    oldHeight = height;
+                    self.nowUpdateChildren( width, height );
+                }
+            });
+        }
+
+        /**
+         * 查找子级布局
+         * @param nodeElement
+         * @return {BaseLayout}
+         */
+        protected function getChildByNode( nodeElement:* ):BaseLayout
+        {
+            var len:int = _children.length;
+            var i:int = 0;
+            for(;i<len;i++)
+            {
+                var item:BaseLayout = _children[i] as BaseLayout;
+                if( item.target.element[0] === nodeElement )
+                {
+                    return item;
+                }
+            }
+            return null;
         }
 
         /**
@@ -479,10 +521,29 @@ package es.core
             height = this.calculateHeight( this.target.element, height );
             var len:int = this._children.length;
             var index:int = 0;
+            var parentNode:Node = this.target.element.current() as Node;
             for(;index<len;index++)
             {
                 var layout:BaseLayout = this._children[index] as BaseLayout;
-                layout.nowUpdateChildren(width, height);
+                var childNode:Node = layout.target.element.current() as Node;
+                var isChild:Boolean = false;
+                if( parentNode.hasChildNodes() )
+                {
+                    var j:int=0;
+                    for( ;j<parentNode.childNodes.length;j++ )
+                    {
+                        if( parentNode.childNodes.item(j)===childNode )
+                        {
+                            isChild = true;
+                            break;
+                        }
+                    }
+                }
+                if( isChild ){
+                    layout.nowUpdateChildren( width, height );
+                }else{
+                    layout.nowUpdateChildren( layout.viewport.width(), layout.viewport.height() );
+                }
             }
             this.calculateChildren( width , height );
         }
