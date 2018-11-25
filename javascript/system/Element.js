@@ -957,10 +957,28 @@ Element.prototype.property=function property(name,value)
  * @param propsObject
  * @returns {Element}
  */
-Element.prototype.setProperties=function setProperties( propsObject )
+Element.prototype.properties=function properties( propsObject )
 {
-    for(var i in propsObject )access.call(this,'property',i,propsObject[i]);
-    return this;
+    if( propsObject && typeof propsObject === "object" )
+    {
+        Object.forEach(propsObject,function(value,name)
+        {
+            access.call(this,'property',name,value);
+        },this);
+        return this;
+    }
+
+    var elem = this.current();
+    var props={};
+    if (elem.hasAttributes()) 
+    {
+       var attrs = elem.attributes;
+       for(var i=0;i<attrs.length;i++)
+       {
+         props[ attrs[i].name ] = attrs[i].value;
+       }
+    } 
+    return props;
 }
 
 /**

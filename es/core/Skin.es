@@ -16,12 +16,18 @@ package es.core
     import es.core.BaseLayout;
     public class Skin extends Container
     {
+        private var _name:String="div";
+
+        private var _attr:Object = null;
+
         /**
          * 皮肤类
          * @constructor
          */
         function Skin( name:*, attr:Object=null)
         {
+            this._name = name;
+            this._attr = attr;
             var ele:Element = null;
             if( Element.isHTMLContainer(name) )
             {
@@ -50,12 +56,21 @@ package es.core
                     ele.html( attr.innerHtml );
                     delete attr.innerHtml;
                 }
-                ele.setProperties( attr );
+                ele.properties( attr );
             }
-           
             super( ele );
-
         }
+
+        public function get name():String
+        {
+            return _name;
+        }
+
+        public function get attr():Object
+        {
+            return _attr;
+        }
+
 
         [RunPlatform(server)]
         public function generateId():String
@@ -210,19 +225,20 @@ package es.core
          * @param value
          * @returns {*}
          */
-        public function set template( value:String ):void
+        public function set template( value:Function ):void
         {
-            hasChildTemplate = !!value;
-            this.render.template( value );
+           // hasChildTemplate = !!value;
+           // this.render.template( value );
         };
 
         /**
          * 获取皮肤模板
          * @returns {String}
          */
-        public function get template():String
+        public function get template():Function
         {
-            return this.render.template();
+            //return this.render.template();
+            return null;
         };
 
         /**
@@ -307,8 +323,35 @@ package es.core
                 this.initializing();
             }
             this.createChildren();
+            this.updateVirtualElements();
             return super.display();
         };
+
+        /**
+        *  支持对虚拟元素的处理
+        *  更新虚拟元素列表
+        */
+        protected function updateVirtualElements():void
+        {
+           var count:int = this.virtualChildrenCount;
+           var lastCount:int = this.virtualChildrenLastCount;
+        
+           //当前的虚拟子级元素小于上一次时需要删除
+           if( count < lastCount )
+           {
+                var hashElements:Object = this.virtualHashElements;
+                this.virtualChildrenElements.splice(count, lastCount - count).forEach(function(key:int)
+                {
+                      var obj:IDisplay = hashElements[ key ] as IDisplay;
+                      if( obj.parent )
+                      {
+                         (obj.parent as IContainer).removeChild( obj );
+                      } 
+                      delete hashElements[ key ];
+                });
+                this.virtualChildrenLastCount = count;
+           }
+        }
 
         /**
          * @private
@@ -439,6 +482,65 @@ package es.core
                     this.dispatchEvent( e );
                 }
             }
+        }
+
+        private var virtualChildrenElements:Array=[];
+        private var virtualChildrenCount:int=0;
+        private var virtualChildrenLastCount:int=0;
+        private var virtualHashElements:Object={};
+
+
+         /**
+         * 创建一个子级虚拟元素，如果不存在
+         */ 
+        protected function createVirtualElement(childIndex:int,key:int,id:int,name:String,attr:Object=null,bidding:Object=null):IDisplay
+        {
+            var uniquekey:int = key+id;
+            var obj:IDisplay = virtualHashElements[ uniquekey ] as IDisplay;
+            if( !obj || obj.name !== name )
+            {
+                if( obj && obj.parent )
+                {
+                   (obj.parent as IContainer).removeChild( obj );
+                   this.virtualChildrenElements.splice( this.virtualChildrenElements.indexOf( uniquekey ) , 1);
+                }
+                obj = new Skin(name,attr) as IDisplay;
+                virtualHashElements[ uniquekey ] = obj;
+                this.addChildAt(obj,childIndex);
+                this.virtualChildrenElements.push( uniquekey );
+            }
+            if( bidding )
+            {
+                obj.element.properties( bidding );
+            }
+            this.virtualChildrenCount++;
+            return obj;
+        }
+
+         /**
+         * 创建一个子级元素，如果不存在
+         */ 
+        protected function createVirtualComponent(childIndex:int,key:int,id:int,callback:Function,bidding:Function=null):IDisplay
+        {
+            var uniquekey:int = key+id;
+            var obj:IDisplay = virtualHashElements[ uniquekey ] as IDisplay;
+            var newObj:IDisplay = callback( obj ) as IDisplay;
+            if( newObj !== obj )
+            {
+               if( obj && obj.parent )
+               {
+                   (obj.parent as IContainer).removeChild( obj );
+                   this.virtualChildrenElements.splice( this.virtualChildrenElements.indexOf( uniquekey ) , 1);
+               }
+               virtualHashElements[ uniquekey ] = newObj; 
+               this.addChildAt(newObj,childIndex); 
+               this.virtualChildrenElements.push( uniquekey );
+            }
+            if( bidding ){
+                bidding( newObj );
+            }
+            this.virtualChildrenCount++;
+            return newObj;
         }
     }
 }
