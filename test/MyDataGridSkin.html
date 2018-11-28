@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<s:Skin name="table" class="table mydata-grid-skin"  xmlns:c="es.components" xmlns:s="es.core">
+    <s:Metadata>[HostComponent("es.components.DataGrid")]</s:Metadata>
+    <![CDATA[
+       import es.events.PaginationEvent;
+       import es.components.DataGrid;
+       import es.core.Display;
+       import es.events.SkinEvent;
+       override protected function createChildren()
+       {
+            var hostComponent:DataGrid = this.hostComponent as DataGrid;
+            var body:Skin = this.body as Skin;
+            var head:Skin = this.head as Skin;
+            body.variable('rowHeight', hostComponent.rowHeight );
+            head.variable('headHeight', hostComponent.headHeight );
+            super.createChildren();
+       }
+
+       override protected function updateDisplayList()
+       {
+            super.updateDisplayList();
+            var hostComponent:DataGrid = this.hostComponent as DataGrid;
+            var radius:String = hostComponent.radius+'px';
+            var table:Element =  this.element;
+            table.style('borderRadius', radius );
+            Element('thead > tr:first-child >th:first-child' , table).style('borderTopLeftRadius',radius );
+            Element('thead > tr:first-child >th:last-child' , table).style('borderTopRightRadius',radius );
+            Element('tfoot > tr:last-child >td:first-child' , table).style('borderBottomLeftRadius',radius );
+            Element('tfoot > tr:last-child >td:last-child' , table).style('borderBottomRightRadius',radius );
+            Element('td',  (this.foot as Display).element ).height( hostComponent.footHeight );
+        }
+
+    override protected function initializing()
+    {
+        var hostComponent:DataGrid = this.hostComponent as DataGrid;
+        var dataSource:DataSource =  hostComponent.dataSource;
+        var body:Skin = this.body;
+        var dataProfile:String =  hostComponent.dataProfile;
+        body.variable('rowHeight', hostComponent.rowHeight );
+        head.variable('headHeight', hostComponent.headHeight );
+        body.variable( dataProfile, [] );
+        head.variable( hostComponent.columnProfile, hostComponent.columns );
+        pagination.dataSource = dataSource;
+        dataSource.addEventListener(DataSourceEvent.SELECT, function (event:DataSourceEvent)
+        {
+            if ( !event.waiting )
+            {
+                body.variable( dataProfile , event.data );
+                body.display();
+            }
+        });
+        dataSource.select( pagination.current );
+
+        var self:MyDataGridSkin = this;
+        body.addEventListener( SkinEvent.CREATE_CHILDREN_COMPLETED , function(event:SkinEvent){
+
+            Element("input",body.element).addEventListener(PropertyEvent.CHANGE,function(e:PropertyEvent){
+                var id:* = this.property("data-index");
+                 dataSource.update( {name:e.newValue}, "id="+id );
+                 self.childText = e.newValue as String;
+            });
+
+        });
+
+        body.addEventListener(MouseEvent.CLICK, function(event:MouseEvent){
+
+           if( event.target && event.target.nodeName==="INPUT" ){
+                self.childText = event.target.value as String;
+           }
+
+        });
+    }
+
+        [Bindable]
+        public var childText:String = "Hello Word!";
+
+        [Embed('./Tulips.jpg')]
+        private var img:*;
+
+        public var myName:String = "yejun";
+
+    ]]>
+
+    <style>
+        <![CDATA[
+
+        @background_color:@theme-color;
+        @radius:5px;
+        @border_color:darken(@background_color, 3.5%);
+
+        .head-text-color(@color) when( lightness(@color) <= 50% ){
+            @text-color:#fff;
+            @shine-color:rgba(255,255,255,.3);
+        }.head-text-color(@color) when( default() ){
+            @text-color:#555;
+            @shine-color:rgba(255,255,255,.8);
+        }
+        .head-text-color( @background_color );
+
+        .mydata-grid-skin {
+            border-collapse: separate;
+            *border-collapse: collapse; /* IE7 and lower */
+            border-spacing: 0;
+            width: 100%;
+            border:1px solid @border_color;
+            margin:0px;
+            .border-radius( @radius, @radius,  @radius,  @radius);
+            .box-shadow( 0px 2px 8px rgba(0,0,0,.35) );
+            background: url(@Embed("./Tulips.jpg"));
+        }
+
+        /*ie6*/
+        .mydata-grid-skin tbody td,
+        .mydata-grid-skin thead th{
+            border-left: 1px solid @border_color;
+            border-top: 1px solid @border_color;
+            text-align: left;
+            margin: 0px;
+            padding: 4px;
+        }
+        .mydata-grid-skin thead th{
+            background-color: @background_color;
+            color: @text-color;
+        }
+
+        .mydata-grid-skin > thead > tr > td,
+        .mydata-grid-skin > thead > tr > th,
+        .mydata-grid-skin > tbody > tr > td
+        {
+            border-left: 1px solid @border_color;
+            border-top: 1px solid @border_color;
+            text-align: left;
+            margin: 0px;
+            padding: 4px;
+        }
+
+        .mydata-grid-skin > tbody > tr:hover {
+            background: #fbf8e9;
+            .transition(all 0.1s ease-in-out);
+        }
+
+        .mydata-grid-skin > thead > tr:first-child > th {
+            border-top: none;
+            line-height: 25px;
+            background-color: @background_color;
+            background-clip: padding-box;
+            position:relative;
+           .gradient-vertical( lighten(@background_color, 6.5%),  @background_color );
+           .box-shadow( 0px 1px 0px @shine-color inset );
+        }
+
+        .mydata-grid-skin > thead > tr:last-child > th {
+            border-bottom: none;
+        }
+
+        .mydata-grid-skin > tbody > tr:last-child > td {
+            border-bottom: 1px solid @border_color;
+        }
+
+        .mydata-grid-skin > tbody > tr > td:first-child,
+        .mydata-grid-skin > thead > tr > th:first-child {
+            border-left: none;
+        }
+
+        .mydata-grid-skin > thead > tr:first-child > th:first-child {
+            border-top-left-radius:@radius;
+        }
+
+        .mydata-grid-skin > thead > tr:first-child > th:last-child
+        {
+            border-top-right-radius:@radius;
+        }
+
+        .mydata-grid-skin > tfoot > tr:last-child > td:first-child {
+            border-bottom-left-radius:@radius;
+            border-top: none;
+        }
+
+        .mydata-grid-skin > tfoot > tr:last-child > td:last-child {
+            border-bottom-right-radius:@radius;
+        }
+
+        ]]>
+    </style>
+
+    <s:Skin name="thead" id="@head">
+      <s:template>
+      <tr>
+          <:foreach name="columns" value="name" >
+              <th style="height:{headHeight}px;line-height:{headHeight}px;">{name}</th>
+          </:foreach>
+      </tr>
+      </s:template>
+    </Skin>
+
+    <tbody id="@body">
+        <:foreach name="datalist" value="item">
+            <tr>
+                <:foreach name="item" value="val" key="ukey">
+                    <:switch condition="ukey">
+                        <:case condition="name" break="true">
+                            <td data-column="{key}" style="height:{rowHeight}px;line-height:{rowHeight}px;">
+                                <input value="{val}" data-index="{item.id}" style="height: 25px;" />
+                            </td>
+                        </:case>
+                        <:default>
+                             <td data-column="{key}" style="height:{rowHeight}px;line-height:{rowHeight}px;">{val}</td>
+                             <c:DataGrid id="@dataGrid" radius="3">
+                             </c:DataGrid>
+                        </:default>
+                    </:switch>
+                </:foreach>
+            </tr>
+        </:foreach>
+    </tbody>
+
+    <tfoot id="@foot">
+         <tr>
+             <td colspan="3">
+                 <c:Pagination id="@pagination" radius="3" async="@hostComponent.async" wheelTarget="{@foot}" >
+                     <c:wheelTarget>{@foot}</c:wheelTarget>
+                 </c:Pagination>
+             </td>
+         </tr>
+         <tr>
+             <td colspan="3" includeIn="success" html="{{childText}}" style="color:#ffffff">
+                 fdgdfgdf
+             </td>
+         </tr>
+    </tfoot>
+
+</s:Skin>

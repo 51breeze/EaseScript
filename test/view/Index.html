@@ -38,7 +38,7 @@
 
         <table>
            
-                <:foreach name="datalist" value="item">
+                <:foreach name="bind::datalist" value="item">
                     <tr>
                         <:foreach name="item" value="val" key="ukey">
                             <:switch condition="ukey">
@@ -59,7 +59,7 @@
 
         <div class="uuuu " style="margin: 10px;">
             <h1>
-                这里是内容9999999999   {context.title}
+                这里是内容9999999999   {assign.title}
             </h1>
         </div>
 

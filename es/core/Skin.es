@@ -542,5 +542,55 @@ package es.core
             this.virtualChildrenCount++;
             return newObj;
         }
+
+        private var binddingHashMap:Object={};
+        public function bindding(target:IDisplay,callback:Function,properties:Array,...data:*):void
+        {
+             var map:Object = binddingHashMap;
+             var bind:Array = [target,callback,properties,data];
+             properties.map(function(property:String)
+             {
+                  map[property]=bind;
+             });
+        }
+
+        public function trigger(properties:Object)
+        {
+            var map:Object = binddingHashMap;
+            var assigns:Object = {};
+            Object.forEach(properties,function(value:*,name:String)
+            {
+                 var item:Array = map[ name ] as Array;
+                 if( item && item[4] !== value )
+                 {
+                      var fn:Function = item[1] as Function;
+                      var elem:Element = (item[0] as IDisplay).element;
+                      var data:* = item[3];
+                      var props:Array = item[2] as Array;
+                      var state:Object={};
+                      var newValue:Array=[];
+                      for(var i:int ; i<props.length; i++)
+                      {
+                           var propName:String = props[i];
+                           if( !assigns.hasOwnProperty( propName ) )
+                           {
+                               throw new ReferenceError("is not assign property for '"+propName+"'");
+                           }
+
+                           var val:* = assigns[ propName ];
+                           if( properties.hasOwnProperty( propName ) )
+                           {
+                                val=properties[ propName ];
+                           }
+
+                           var binding:Array = map[ propName ] as Array;
+                           state[ propName ] = binding[4] !== val;
+                           binding[4] = val;
+                           newValue.push( val );
+                      }
+                      //fn(elem,state,...newValue,...data);
+                 }
+            });
+        }
     }
 }

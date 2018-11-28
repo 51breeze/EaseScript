@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<s:View xmlns:s="es.core"  xmlns:c="es.components">
+    <s:Metadata>[HostComponent("IndexApplication")]</s:Metadata>
+    <![CDATA[
+
+        public function get title():String
+        {
+             return this.assign("title");
+         }
+
+         public function set title(value:String):void
+         {
+               this.assign("title",value);
+               document.title = value;
+         }
+
+    ]]>
+
+    <head>
+        <title>{title}</title>
+    </head>
+
+    <body>
+         <input value="{{this.title}}" />
+         <div>
+             <h1>the is {message}</h1>
+             <h1>这里是内容 Person</h1>
+             <c:DataGrid source="http://local.working.com/json.php" skinClass="MyDataGridSkin">
+                 <c:dataSource>
+                     <c:dataType>@Http.TYPE_JSONP</c:dataType>
+                 </c:dataSource>
+                 <c:columns>
+                     <id>ID</id>
+                     <name>名称</name>
+                     <phone>电话</phone>
+                 </c:columns>
+             </c:DataGrid>
+         </div>
+    </body>
+</s:View>

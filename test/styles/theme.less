@@ -1,0 +1,12 @@
+@background_color: #000;
+@radius:5px;
+@border_color:darken(@background_color, 3.5%);
+
+.head-text-color(@color) when( lightness(@color) <= 50% ){
+  @text-color:#fff;
+  @shine-color:rgba(255,255,255,.3);
+}.head-text-color(@color) when( default() ){
+  @text-color:#555;
+  @shine-color:rgba(255,255,255,.8);
+}
+.head-text-color( @background_color );

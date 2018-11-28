@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<s:View uu="sss" xmlns:s="es.core"  xmlns:c="es.components" xmlns:b="com" xmlns:p="view.page">
+    <s:Metadata>[HostComponent("IndexApplication")]</s:Metadata>
+    <s:Script>
+    <![CDATA[
+        import es.core.PopUp;
+        import es.skins.PopUpSkin;
+        import es.core.Display;
+        import BaseApplication;
+        import es.skins.DataGridSkin;
+        import view.page.IndexSkin;
+
+        override protected function initializing()
+        {
+            /*var gridSkin:MyDataGridSkin = dataGrid.skin as MyDataGridSkin;
+            gridSkin.pagination.profile="mypage";
+            gridSkin.pagination.wheelTarget =  gridSkin['foot'] as Display;*/
+            super.initializing();
+        }
+
+        [RunPlatform('server')]
+        private function server(){
+
+        }
+
+        override protected function updateDisplayList()
+        {
+            super.updateDisplayList();
+            this.server();
+            this.client();
+        }
+
+        [RunPlatform('client')]
+        private function client(){
+
+            Locator.url();
+             button.addEventListener( MouseEvent.CLICK, function (e:MouseEvent) {
+                console.log("click");
+
+                /*PopUp.confirm("您有3条信息未处理2", function (type:String) {
+                    console.log( type );
+                }); */
+
+                //e.stopPropagation();
+
+              //PopUp.title("修改信息 sfdfdsf");
+
+
+
+              var modal:PopUp =  PopUp.modality("修改信息",  Element(".uuuu").html( true ) , {callback:function (type:String) {
+                    console.log( type );
+                },profile:{width:700, height:500}}) as PopUp;
+
+                modal.skin.addEventListener(MouseEvent.CLICK, function(){
+
+                        PopUp.confirm("您有3条信息未处理2", function (type:String) {
+                        console.log( type );
+                        });
+                });
+            });
+        }
+    ]]>
+    </s:Script>
+
+    <head>
+        <title>{title}</title>
+        <meta charset="UTF-8" http-equiv="X-UA-Compatible" />
+        <meta name="keyword" http-equiv="es,easescript" />
+        <script src="jquery-1.11.2.js" ></script>
+    </head>
+
+    <body id="@body">
+
+        <div>
+            <button id="@button" type='button' class="btn btn-success" style="width: 100px;">点 我</button>
+        </div>
+
+        <div>
+            dsfdsfdsfsdf
+        </div>
+
+        <s:Skin minWidth="300" minHeight="300" percentWidth="80" left="20"
+                style="background-color:rgba(36,172,255,0.41);padding-top:20px;overflow: auto;" >
+            <s:layout>
+                <s:HorizontalLayout horizontalAlign="center" gap="10"></s:HorizontalLayout>
+            </s:layout>
+
+            <div style="background-color: #cccccc;width:100px; height: 100px;" ></div>
+
+            <div style="width:500px; height: 300px;background-color: #ccca4c" top="60">
+
+                <s:Skin percentWidth="100">
+                    <s:layout>
+                        <s:HorizontalLayout horizontalAlign="center" gap="10"></s:HorizontalLayout>
+                    </s:layout>
+                    <div style="background-color: #cccccc;width:100px; height: 100px;" ></div>
+                    <div style="background-color:#3bb8cc;width:100px; height: 100px">
+                    </div>
+                    <div style="background-color:#3bb8cc;width:100px; height: 100px"></div>
+                </s:Skin>
+
+            </div>
+            <div style="background-color:#3bb8cc;width:100px; height: 100px"></div>
+
+
+            <s:Skin style="background-color: #cccccc;width:100px; height: 100px;">
+                <s:layout>
+                    <s:HorizontalLayout horizontalAlign="center" gap="10"></s:HorizontalLayout>
+                </s:layout>
+                <div style="background-color:#cc6164;" percentWidth="50" percentHeight="50"></div>
+            </s:Skin>
+
+
+        </s:Skin>
+
+
+        <s:Skin>
+            <s:template>
+
+            <:for condition="var i=0; i lt 5; i++">
+                <div>
+                    ssss ==============yejun {i}
+                    <:if condition="i eq 3">
+                       <div>rrrrrrrrrrrrrr</div>
+                    <:else/>
+                       <span>wwwwwwwwww</span> 
+                    </:if>
+                </div>
+            </:for>
+
+
+
+
+
+                <div>99999</div>
+                <s:Skin>
+                    <c:DataGrid>
+                         <c:dataSource>
+                            <c:dataType>@Http.TYPE_JSONP</c:dataType>
+                        </c:dataSource>
+                        <c:columns>
+                            <id>ID</id>
+                            <name>名称ssss</name>
+                            <phone>电话ss</phone>
+                        </c:columns>
+                        <c:rows>5</c:rows>
+                    </c:DataGrid>
+                </s:Skin>
+
+
+                <:foreach name="datalist" value="item">
+                    <tr>
+                        <:foreach name="item" value="val" key="ukey">
+                            <:switch condition="ukey">
+                                <:case condition="name" break="true">
+                                    <td data-column="{key}" style="height:{rowHeight}px;line-height:{rowHeight}px;">
+                                        <input value="{val}" data-index="{item.id}" style="height: 25px;" />
+                                    </td>
+                                </:case>
+                                <:default>
+                                     <td data-column="{key}" style="height:{rowHeight}px;line-height:{rowHeight}px;">{val}</td>
+                                     <c:DataGrid id="@dataGrid" radius="3">
+                                     </c:DataGrid>
+                                </:default>
+                            </:switch>
+                        </:foreach>
+                    </tr>
+                </:foreach>
+
+
+            </s:template>
+        </s:Skin>
+
+        <div class="uuuu " style="margin: 10px;">
+            <h1>
+                这里是内容9999999999   {context.title}
+            </h1>
+            <c:DataGrid source="http://local.working.com/json.php?pp=ooo"  width="500"  async="false" >
+                <c:dataSource>
+                    <c:dataType>@Http.TYPE_JSONP</c:dataType>
+                </c:dataSource>
+                <c:columns>
+                    <id>ID</id>
+                    <name>名称ssss</name>
+                    <phone>电话ss</phone>
+                </c:columns>
+                <c:rows>5</c:rows>
+            </c:DataGrid>
+        </div>
+
+        <div style="margin: 10px;">
+          <c:DataGrid  id="@dataGrid" source="http://local.working.com/json.php" skinClass="MyDataGridSkin"  async="true" >
+                <c:dataSource>
+                    <c:dataType>@Http.TYPE_JSONP</c:dataType>
+                </c:dataSource>
+                <c:columns>
+                    <id>ID</id>
+                    <name>名称ss</name>
+                    <phone>电话</phone>
+                </c:columns>
+            </c:DataGrid>
+        </div>
+
+    <div>===============================</div>
+
+
+
+
+    <b:Selection>
+        <b:dataSource>
+            <:item type="Object">
+                <id>1</id>
+                <name>123</name>
+            </:item>
+            <:item type="Object">
+                <id>2</id>
+                <name>234</name>
+            </:item>
+            <:item type="Object">
+                <id>3</id>
+                <name>345</name>
+            </:item>
+            <:item type="Object">
+                <id>4</id>
+                <name>456</name>
+            </:item>
+            <:item type="Object">
+                <id>5</id>
+                <name>567</name>
+            </:item>
+        </b:dataSource>
+        <b:current>0</b:current>
+    </b:Selection>
+
+    </body>
+</s:View>
