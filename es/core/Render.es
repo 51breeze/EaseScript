@@ -6,212 +6,236 @@
  */
 package es.core
 {
+    import es.interfaces.IContainer;
     import es.interfaces.IDisplay;
-    public class Render extends EventDispatcher implements IDisplay
+    import es.interfaces.IRender;
+    import es.core.VirtualElement;
+    public class Render extends EventDispatcher implements IRender
     {
         /**
          * @private
          */
-        private var factory:Function;
+        private var _factory:Function;
+
+        /**
+         * @private
+         */
+        private var _context:IContainer;
+
+        /**
+         * 动态元素渲染类
+         * @constructor
+         * @param context 上下文对象
+         */
+        public function Render( context:IContainer )
+        {
+            this._context = context;
+            super( (context as IDisplay).element );
+        }
+
+        /**
+        * 获取一个上下文对象
+        * 此对象表示一个渲染器宿主对象
+        */
+        public function get context():IContainer
+        { 
+            return _context;
+        }
+
+        /**
+        * 设置一个渲染器的工厂函数
+        * 在调用此函数时会传递一个 context 作为第一个参数
+        * context 是一个 IContainer 数据类型
+        * 此工厂函数负责生产一个元素集并应用于指定的 Element 集中
+        */
+        public function set factory(value:Function):void
+        { 
+             _factory = value;
+        }
+
+        /**
+        * 获取一个渲染器的工厂函数
+        * 每一个工厂函数必须返回一个 Element 对象
+        */
+        public function get factory():Function
+        {
+            return _factory;
+        }
+
+        private var _dataset:Object={};
+
+        private var initialized:Boolean=false;
+
+        /**
+        * 为此渲染器分配一个指定名称的数据值
+        */
+        public function assign(name:String, value:*):void
+        {
+            if( _dataset[ name ] !== value )
+            {
+                 _dataset[name]=value;  
+                 if( initialized === true )
+                 {
+                    this.trigger({name:value});
+                 } 
+            }
+        }
+
+        /**
+        * 获取已经为此渲染器分配的数据集
+        */
+        public function get dataset():Object
+        {
+            return Object.merge({},_dataset);
+        }
 
         /**
         * @private
+        * 所有绑定属性的集合对象
+        */
+        private var binddingHashMap:Object={};
+
+        /**
+        * 绑定一组属性，在当前作用域中变化时调度
+        * @param properties 需要绑定的属性集
+        * @param callback 当前属性变化时的回调函数
+        * @param data 需要传递到回调函数中的参数
+        */
+        public function bindding(properties:Array,callback:Function,...data:*):void
+        {
+             var map:Object = binddingHashMap;
+             var prop:String = properties[0] as String;
+             var ref:Array = ( map.hasOwnProperty( prop ) ? map[ prop ] : null ) as Array;
+             if( ref && ref[0] === properties && ref[1] === callback )
+             {
+                 ref[2] = data;
+
+             }else
+             {
+                 var bind:Array = [properties,callback,data];
+                 properties.map(function(property:String)
+                 {
+                      map[property]=bind;
+                 });
+             }
+        }
+
+        /**
+        * 触发指定的属性集
+        * @param properties 需要触发的属性集
         */ 
-        private var mapInstance:Object={};
-
-        /**
-         * 视图类
-         * @constructor
-         */
-        public function Render(factory:Function)
+        public function trigger(properties:Object):void
         {
-            super();
-            this.factory = factory;
-        }
+            var map:Object = binddingHashMap;
+            var dataset:Object = this._dataset;
+            Object.forEach(properties,function(value:*,name:String)
+            {
+                 var item:Array = map[ name ] as Array;
+                 if( item && item[3] !== value )
+                 {
+                      var props:Array = item[0] as Array;
+                      var fn:Function = item[1] as Function;
+                      var data:* = item[2];
+                      
+                      //当前属性的状态
+                      var state:Object={};
+                      //当前变化的属性值
+                      var propsValue:Array=[];
 
-        public function set assign(val:String){
+                      //获取每个绑定器中所有属性的默认值
+                      for(var i:int ; i<props.length; i++)
+                      {
+                           //绑定的属性名
+                           var propName:String = props[i] as String;
 
-        }
+                           //绑定的属性必须要在当前作用域中存在
+                           if( !dataset.hasOwnProperty( propName ) )
+                           {
+                               throw new ReferenceError("is not assign property for '"+propName+"'");
+                           }
 
-        public function get assign():String{
-             return '';
-        }
+                           //默认的属性值
+                           var val:* = dataset[ propName ];
 
+                           //一个新的属性值
+                           if( properties.hasOwnProperty( propName ) )
+                           {
+                                val=properties[ propName ];
+                           }
 
-        public function createElement(id:String,nodeName:String,children:Array=null)
-        {
-             var element:Element = mapInstance.hasProperty(id) ? mapInstance[ id ] : null;
-             if( element===null )
-             {
-                 element = new Element( nodeName );
-                 mapInstance[ id ] = element;
-             }
-             if( children && children.length>0 )
-             {
-                children.forEacth(function(item:Object){
-                   element.addChild(item);
-                });
-             }
-             return element;
-        }
-
-        public function createComponent()
-        {
-            
-        }
-
-        /**
-         * 获取元素对象
-         * @returns {Element}
-         */
-        public function get element():Element
-        {
-            return _element;
-        }
-
-        /**
-         * 设置显示对象的宽度
-         * @returns {Number}
-         */
-        public function get width():uint
-        {
-             return 0;
+                           var binding:Array = map[ propName ] as Array;
+                           //当前属性值的变化状态
+                           state[ propName ] = binding[3] !== val;
+                           //保存当前属性值
+                           binding[3] = val;
+                           //属性值
+                           propsValue.push( val );
+                      }
+                      //fn(state,...data,...propsValue);
+                 }
+            });
         }
 
         /**
-         * 获取显示对象的宽度
-         * @param value
-         */
-        public function set width(value:uint):void
+        * @private
+        * 所有子级元素对象的集合
+        */
+        private var hashMapElements:Object={};
+
+         /**
+         * 创建一个节点元素
+         * @param childIndex 子级位于父级中的索引位置
+         * @param key 元素位于当前Render中的唯一键
+         * @param id 元素的唯一ID
+         * @param name 元素的节点名
+         * @param attr 元素的初始属性
+         * @param bindding 元素的动态属性
+         */ 
+        public function createElement(uniqueKey:int, name:String, children:Array=null, attr:Object=null,bidding:Object=null):IDisplay
         {
+            var obj:IDisplay = hashMapElements[ uniqueKey ] as IDisplay;
+            if( !obj )
+            {
+                if( obj )
+                {
+                    (obj.parent as IContainer).removeChild( obj );
+                    delete hashMapElements[ uniqueKey ];
+                }
+                obj = new VirtualElement(name,attr);
+            }
+            if( bidding )
+            {
+                obj.element.properties( bidding );
+            }
+            return obj as IDisplay;
         }
 
-        /**
-         * 设置显示对象的高度
-         * @returns {Number}
-         */
-        public function get height():uint
+         /**
+         * 创建一个组件元素
+         * @param childIndex 子级位于父级中的索引位置
+         * @param key 元素位于当前Render中的唯一键
+         * @param id 元素的唯一ID
+         * @param callback 生成组件对象的回调函数
+         * @param bindding 设置组件属性的回调函数
+         */ 
+        public function createComponent(uniqueKey:String,callback:Function,bidding:Function=null):IDisplay
         {
-            return 0;
-        }
-
-        /**
-         * 获取显示对象的高度
-         * @param value
-         */
-        public function set height(value:uint):void
-        {
-
-        }
-
-        /**
-         * 标记此显示对象是否可见
-         * @param flag
-         */
-        public function set visible( flag:Boolean ):void
-        {
-
-        }
-
-        /**
-         * 获取此显示对象的可见状态
-         * @returns {Boolean}
-         */
-        public function get visible():Boolean
-        {
-            return false;
-        }
-
-        /**
-         * 获取元素相对父元素的左边距
-         * @returns {Number}
-         */
-        public function get left():int
-        {
-            return 0;
-        }
-
-        /**
-         * 设置元素相对父元素的左边距
-         * @returns {Number}
-         */
-        public function set left( value:int ):void
-        {
-        }
-
-        /**
-         * 获取元素相对父元素的上边距
-         * @returns {Number}
-         */
-        public function get top():int
-        {
-            return 0;
-        }
-
-        /**
-         * 设置元素相对父元素的上边距
-         * @returns {Number}
-         */
-        public function set top( value:int ):void
-        {
-        }
-
-        /**
-         * 获取元素相对父元素的右边距
-         * @returns {Number}
-         */
-        public function get right():int
-        {
-            return 0;
-        }
-
-        /**
-         * 设置元素相对父元素的右边距
-         * @returns {Number}
-         */
-        public function set right( value:int ):void
-        {
-        }
-
-        /**
-         * 获取元素相对父元素的下边距
-         * @returns {Number}
-         */
-        public function get bottom():int
-        {
-            return 0;
-        }
-
-        /**
-         * 设置元素相对父元素的下边距
-         * @returns {Number}
-         */
-        public function set bottom( value:int ):void
-        {
-        }
-
-        /**
-         * @protected
-         */
-        protected var displayParent:IDisplay=null;
-
-        /**
-         * 获取父级皮肤元素
-         * 只有已经添加到父级元素中才会返回父级皮肤元素，否则返回 null
-         * @returns {Display}
-         */
-        public function get parent():IDisplay
-        {
-           return displayParent;
-        }
-
-        /**
-         * 渲染显示皮肤对象。
-         * 调用此方法会重新创建子级对象，在非必要情况下请谨慎使用，可以节省资源。
-         */
-        public function display():Element
-        {
-            return element;
+            var obj:IDisplay = hashMapElements[ uniqueKey ] as IDisplay;
+            var newObj:IDisplay = callback( obj , uniqueKey ) as IDisplay;
+            if( newObj !== obj )
+            {
+                if( obj )
+                {
+                    (obj.parent as IContainer).removeChild( obj );
+                    delete hashMapElements[ uniqueKey ];
+                }
+                hashMapElements[ uniqueKey ] = newObj;
+            }
+            if( bidding )
+            {
+                bidding( newObj );
+            }
+            return newObj;
         }
     }
 }

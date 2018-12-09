@@ -2,14 +2,13 @@ package
 {
     import BaseApplication;
     import view.Index;
-    import view.Home;
-    import view.Viewport;
+   // import view.Viewport;
     import es.core.es_internal;
     import es.interfaces.IListIterator;
-    import es.core.PopUp;
+  //  import es.core.PopUp;
     import es.core.View;
-    import es.components.DataGrid;
-    import es.skins.DataGridSkin;
+    /*import es.components.DataGrid;
+    import es.skins.DataGridSkin;*/
     import es.core.SystemManage;
 
     [Router(default=viewport, alias=MyIndex)]
@@ -66,16 +65,16 @@ package
 
           //  view.navigate.current=1;
 
-            var grid: DataGrid = new DataGrid();
+           // var grid: DataGrid = new DataGrid();
           //  grid.source = ServiceProvider("/getNews/","server.News@index");
-            grid.source = ServiceProvider("/getNews/{id:int}","server.News@one",'get',2);
+            //grid.source = ServiceProvider("/getNews/{id:int}","server.News@one",'get',2);
            // grid.dataSource.dataType( Http.TYPE_JSONP );
 
-            ServiceProvider("/Person/list","server.Person@all",'get');
-            ServiceProvider("/Person/save/{id}","server.Person@set",'post',6);
+           // ServiceProvider("/Person/list","server.Person@all",'get');
+           // ServiceProvider("/Person/save/{id}","server.Person@set",'post',6);
 
 
-            grid.dataSource.options({responseProfile:function (response:Object,name:String) {
+            /*grid.dataSource.options({responseProfile:function (response:Object,name:String) {
                     switch (name){
                         case "data":
                             return response["data"];
@@ -99,10 +98,12 @@ package
             gridSkin.pagination.wheelTarget = gridSkin.foot;
 
             grid.async = true;
+            */
            // gridSkin.pagination.async = true;
 
 
-            view.addChild(grid);
+           // view.addChild(grid);
+
             return this.render( view );
         }
 

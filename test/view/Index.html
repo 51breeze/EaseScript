@@ -19,49 +19,7 @@
         </div>
 
 
-            <:for condition="var i=0; i lt 5; i++">
-                <div>
-                    ssss ==============yejun {i}
-                    <:if condition="i eq 3">
-                       <div>rrrrrrrrrrrrrr</div>
-                    <:else/>
-                       <span>wwwwwwwwww</span> 
-                    </:if>
-                </div>
-            </:for>
-
-
-        <div>99999</div>
-
-        <s:Skin>
-        </s:Skin>
-
-        <table>
-           
-                <:foreach name="bind::datalist" value="item">
-                    <tr>
-                        <:foreach name="item" value="val" key="ukey">
-                            <:switch condition="ukey">
-                                <:case condition="name" break="true">
-                                    <td data-column="{bind::maxIndex}" style="height:{bind::maxHeight}px;z-index:{key};line-height:{bind::rowHeight}px;">
-                                        <input value="{val}" data-index="{item.id}" style="height: 25px;" />
-                                    </td>
-                                </:case>
-                                <:default>
-                                     <td data-column="{key}" style="height:{bind::rowHeight}px;line-height:{bind::rowHeight}px;">{val}</td>
-                                </:default>
-                            </:switch>
-                        </:foreach>
-                    </tr>
-                </:foreach>
-            
-        </table>
-
-        <div class="uuuu " style="margin: 10px;">
-            <h1>
-                这里是内容9999999999   {assign.title}
-            </h1>
-        </div>
-
     </body>
+
+
 </s:View>

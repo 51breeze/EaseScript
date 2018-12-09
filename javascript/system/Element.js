@@ -1913,6 +1913,7 @@ Element.prototype.removeChild=function removeChild( childElemnet )
         throw new TypeError('is not HTMLElement in removeChild');
     }
     var parent = childElemnet.parentNode;
+    var nodeChild;
     if( !parent )
     {
         if( Element.getNodeName(childElemnet)==="#document-fragment" )
@@ -1922,16 +1923,18 @@ Element.prototype.removeChild=function removeChild( childElemnet )
             {
                 while ( parent.childNodes.length > 0 )
                 {
-                    this.removeChild( parent.childNodes[0] );
+                   nodeChild = this.removeChild( parent.childNodes[0] );
+                   nodeChild = null;
                 }
                 return childElemnet;
             }
         }
     }else
     {
-        parent.removeChild(childElemnet);
+        nodeChild=parent.removeChild(childElemnet);
         dispatchEveryRemoveEvent(parent, childElemnet);
         dispatchEvent( new EventDispatcher( parent ) , ElementEvent.CHANGE, parent, childElemnet );
+        nodeChild = null;
     }
     return childElemnet;
 };

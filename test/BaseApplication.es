@@ -12,8 +12,8 @@ package
 		public function get menus():Array
 		{
              return [
-				 {"link":"/MyIndex","label":"首页","content":"view.page.IndexSkin"},
-				 {"link":"/Person","label":"个人","content":view.page.IndexSkin},
+				 {"link":"/MyIndex","label":"首页","content":""},
+				 {"link":"/Person","label":"个人","content":""},
 			 ];
         }
 

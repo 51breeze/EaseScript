@@ -8,6 +8,7 @@ package es.core
 {
      import Element;
      import es.interfaces.IDisplay;
+     import es.core.es_internal;
     public class Display extends EventDispatcher implements IDisplay
     {
         /**
@@ -300,9 +301,9 @@ package es.core
         };
         
         /**
-         * @protected
+         * @es_internal
          */
-        protected var displayParent:IDisplay=null;
+        es_internal var displayParent:IDisplay=null;
 
         /**
          * 获取父级皮肤元素
@@ -311,7 +312,7 @@ package es.core
          */
         public function get parent():IDisplay
         {
-            return displayParent;
+            return this.es_internal::displayParent;
         };
 
         /**

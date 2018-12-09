@@ -14,20 +14,19 @@ package es.core
     import es.interfaces.IDisplay;
     import es.interfaces.IContainer;
     import es.core.BaseLayout;
+    import es.core.Render;
+    import es.interfaces.IRender;
+
     public class Skin extends Container
     {
-        private var _name:String="div";
-
-        private var _attr:Object = null;
-
+       
         /**
          * 皮肤类
          * @constructor
          */
         function Skin( name:*, attr:Object=null)
         {
-            this._name = name;
-            this._attr = attr;
+        
             var ele:Element = null;
             if( Element.isHTMLContainer(name) )
             {
@@ -59,16 +58,6 @@ package es.core
                 ele.properties( attr );
             }
             super( ele );
-        }
-
-        public function get name():String
-        {
-            return _name;
-        }
-
-        public function get attr():Object
-        {
-            return _attr;
         }
 
 
@@ -118,6 +107,19 @@ package es.core
         public function getContainer():IContainer
         {
             return this;
+        }
+
+        private var _render:IRender=null;
+
+        protected function get render():IRender
+        {
+             var render:IRender = this._render;
+             if( render===null )
+             {
+                render = new Render(this);
+                this._render = render;
+             }
+             return render;
         }
 
         /**
@@ -187,128 +189,13 @@ package es.core
         protected function initializing(){}
 
         /**
-         * @private
-         */
-        private var _render:Render;
-
-        /**
-         * 设置一个渲染器
-         * @param value
-         */
-        public function set render( value:Render ):void
-        {
-             _render = value;
-        };
-
-        /**
-         * 获取一个渲染器
-         * @returns {Render}
-         */
-        public function get render():Render
-        {
-            var obj:Render = _render;
-            if( !obj )
-            {
-                obj = new Render();
-                _render = obj;
-            }
-            return obj;
-        };
-
-        /**
-         * @private
-         */
-        private var hasChildTemplate:Boolean = false;
-
-        /**
-         * 设置一个皮肤模板
-         * @param value
-         * @returns {*}
-         */
-        public function set template( value:Function ):void
-        {
-           // hasChildTemplate = !!value;
-           // this.render.template( value );
-        };
-
-        /**
-         * 获取皮肤模板
-         * @returns {String}
-         */
-        public function get template():Function
-        {
-            //return this.render.template();
-            return null;
-        };
-
-        /**
-         * 设置或者获取指定名称在模板数据集中的值
-         * @param name
-         * @param value
-         */
-        public function variable(name:String,value:*=null):*
-        {
-            var oldValue:* = this.render.variable(name);
-            if(value===null)return oldValue;
-            if( oldValue !== value )
-            {
-                this.render.variable(name, value);
-                if (initialized === true)
-                {
-                    invalidate = false;
-                    this.display();
-                }
-            }
-            return value;
-        };
-
-        /**
          * 分配指定名称的值到模板数据集中
          * @param name
          * @param value
          */
-        public function assign(name:String,value:*=null):*
+        public function assign(name:String,value:*=null):void
         {
-            if( value !== null )
-            {
-                var children: Array = this.children;
-                var len: int = children.length;
-                var c: int = 0;
-                for (; c < len; c++) {
-                    if (children[c] is Skin) {
-                        var child: Skin = children[c] as Skin;
-                        if (child.hasChildTemplate && _inheritAssign === true) {
-                            child.assign(name, value);
-                        }
-                    }
-                }
-            }
-            return this.variable(name,value);
-        }
-
-        /**
-         * @private
-         */
-        private var _inheritAssign:Boolean=true;
-
-        /**
-         * 指示当前皮肤是否继承为父级指定的数据。
-         * true为继承,false为不继承。
-         * 默认为true
-         * @param value
-         */
-        public function set inheritAssign(value:Boolean):void
-        {
-            _inheritAssign = value;
-        }
-
-        /**
-         * 获取可继承的数据标记
-         * @return {Boolean}
-         */
-        public function get inheritAssign():Boolean
-        {
-            return _inheritAssign;
+           
         }
 
         /**
@@ -323,35 +210,9 @@ package es.core
                 this.initializing();
             }
             this.createChildren();
-            this.updateVirtualElements();
             return super.display();
         };
 
-        /**
-        *  支持对虚拟元素的处理
-        *  更新虚拟元素列表
-        */
-        protected function updateVirtualElements():void
-        {
-           var count:int = this.virtualChildrenCount;
-           var lastCount:int = this.virtualChildrenLastCount;
-        
-           //当前的虚拟子级元素小于上一次时需要删除
-           if( count < lastCount )
-           {
-                var hashElements:Object = this.virtualHashElements;
-                this.virtualChildrenElements.splice(count, lastCount - count).forEach(function(key:int)
-                {
-                      var obj:IDisplay = hashElements[ key ] as IDisplay;
-                      if( obj.parent )
-                      {
-                         (obj.parent as IContainer).removeChild( obj );
-                      } 
-                      delete hashElements[ key ];
-                });
-                this.virtualChildrenLastCount = count;
-           }
-        }
 
         /**
          * @private
@@ -372,6 +233,7 @@ package es.core
             if( invalidate === true )return;
             invalidate = true;
             var element:Element = this.element;
+            /*
             var render:Render = this._render;
             if( render && hasChildTemplate )
             {
@@ -400,7 +262,7 @@ package es.core
                         element.addChild( ele );
                     }
                 }
-            }
+            }*/
 
             if( this.hasEventListener(SkinEvent.CREATE_CHILDREN_COMPLETED) )
             {
@@ -484,113 +346,6 @@ package es.core
             }
         }
 
-        private var virtualChildrenElements:Array=[];
-        private var virtualChildrenCount:int=0;
-        private var virtualChildrenLastCount:int=0;
-        private var virtualHashElements:Object={};
 
-
-         /**
-         * 创建一个子级虚拟元素，如果不存在
-         */ 
-        protected function createVirtualElement(childIndex:int,key:int,id:int,name:String,attr:Object=null,bidding:Object=null):IDisplay
-        {
-            var uniquekey:int = key+id;
-            var obj:IDisplay = virtualHashElements[ uniquekey ] as IDisplay;
-            if( !obj || obj.name !== name )
-            {
-                if( obj && obj.parent )
-                {
-                   (obj.parent as IContainer).removeChild( obj );
-                   this.virtualChildrenElements.splice( this.virtualChildrenElements.indexOf( uniquekey ) , 1);
-                }
-                obj = new Skin(name,attr) as IDisplay;
-                virtualHashElements[ uniquekey ] = obj;
-                this.addChildAt(obj,childIndex);
-                this.virtualChildrenElements.push( uniquekey );
-            }
-            if( bidding )
-            {
-                obj.element.properties( bidding );
-            }
-            this.virtualChildrenCount++;
-            return obj;
-        }
-
-         /**
-         * 创建一个子级元素，如果不存在
-         */ 
-        protected function createVirtualComponent(childIndex:int,key:int,id:int,callback:Function,bidding:Function=null):IDisplay
-        {
-            var uniquekey:int = key+id;
-            var obj:IDisplay = virtualHashElements[ uniquekey ] as IDisplay;
-            var newObj:IDisplay = callback( obj ) as IDisplay;
-            if( newObj !== obj )
-            {
-               if( obj && obj.parent )
-               {
-                   (obj.parent as IContainer).removeChild( obj );
-                   this.virtualChildrenElements.splice( this.virtualChildrenElements.indexOf( uniquekey ) , 1);
-               }
-               virtualHashElements[ uniquekey ] = newObj; 
-               this.addChildAt(newObj,childIndex); 
-               this.virtualChildrenElements.push( uniquekey );
-            }
-            if( bidding ){
-                bidding( newObj );
-            }
-            this.virtualChildrenCount++;
-            return newObj;
-        }
-
-        private var binddingHashMap:Object={};
-        public function bindding(target:IDisplay,callback:Function,properties:Array,...data:*):void
-        {
-             var map:Object = binddingHashMap;
-             var bind:Array = [target,callback,properties,data];
-             properties.map(function(property:String)
-             {
-                  map[property]=bind;
-             });
-        }
-
-        public function trigger(properties:Object)
-        {
-            var map:Object = binddingHashMap;
-            var assigns:Object = {};
-            Object.forEach(properties,function(value:*,name:String)
-            {
-                 var item:Array = map[ name ] as Array;
-                 if( item && item[4] !== value )
-                 {
-                      var fn:Function = item[1] as Function;
-                      var elem:Element = (item[0] as IDisplay).element;
-                      var data:* = item[3];
-                      var props:Array = item[2] as Array;
-                      var state:Object={};
-                      var newValue:Array=[];
-                      for(var i:int ; i<props.length; i++)
-                      {
-                           var propName:String = props[i];
-                           if( !assigns.hasOwnProperty( propName ) )
-                           {
-                               throw new ReferenceError("is not assign property for '"+propName+"'");
-                           }
-
-                           var val:* = assigns[ propName ];
-                           if( properties.hasOwnProperty( propName ) )
-                           {
-                                val=properties[ propName ];
-                           }
-
-                           var binding:Array = map[ propName ] as Array;
-                           state[ propName ] = binding[4] !== val;
-                           binding[4] = val;
-                           newValue.push( val );
-                      }
-                      //fn(elem,state,...newValue,...data);
-                 }
-            });
-        }
     }
 }

@@ -52,54 +52,6 @@ package es.interfaces
         public function get visible():Boolean;
 
         /**
-         * 获取元素相对父元素的左边距
-         * @returns {Number}
-         */
-        public function get left():int;
-
-        /**
-         * 设置元素相对父元素的左边距
-         * @returns {Number}
-         */
-        public function set left( value:int ):void;
-
-        /**
-         * 获取元素相对父元素的上边距
-         * @returns {Number}
-         */
-        public function get top():int;
-
-        /**
-         * 设置元素相对父元素的上边距
-         * @returns {Number}
-         */
-        public function set top( value:int ):void;
-
-        /**
-         * 获取元素相对父元素的右边距
-         * @returns {Number}
-         */
-        public function get right():int;
-
-        /**
-         * 设置元素相对父元素的右边距
-         * @returns {Number}
-         */
-        public function set right( value:int ):void;
-
-        /**
-         * 获取元素相对父元素的下边距
-         * @returns {Number}
-         */
-        public function get bottom():int;
-
-        /**
-         * 设置元素相对父元素的下边距
-         * @returns {Number}
-         */
-        public function set bottom( value:int ):void;
-
-        /**
          * 获取父级皮肤元素
          * 只有已经添加到父级元素中才会返回父级皮肤元素，否则返回 null
          * @returns {Display}

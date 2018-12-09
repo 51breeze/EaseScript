@@ -82,18 +82,20 @@ function fetchAllParent( module , results )
 {
     results = results || [];
     if( !module.inherit )return results;
-    do {
-        var classname = module.inherit;
+    var old = module;
+    module.inherit.split(",").forEach(function(classname)
+    {
         if( module.nonglobal===true && module.import[ classname ] )
         {
-            classname = module.import[ classname ]
+            classname = module.import[ classname ];
         }
-        module = Maker.getLoaclAndGlobalModuleDescription( classname );
-        if( results.indexOf(module)<0 )
+        var m = Maker.getLoaclAndGlobalModuleDescription( classname );
+        if( results.indexOf(m)<0 )
         {
-            results.push(module);
+            results.push(m);
         }
-    }while( module.inherit );
+        fetchAllParent( m , results ); 
+    });
     return results;
 }
 

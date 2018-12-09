@@ -10,6 +10,8 @@ package es.core
     import es.core.Display;
     import es.interfaces.IDisplay;
     import es.interfaces.IContainer;
+    import es.core.es_internal;
+
     public class Container extends Display implements IContainer
     {
         /**
@@ -99,7 +101,7 @@ package es.core
             {
                 child = (child as SkinComponent).skin as IDisplay;
             }
-            (child as Display).displayParent = this;
+            (child as Display).es_internal::displayParent = this;
             if( this.inDocumentChain() )
             {
                 this.element.addChildAt(child.element,index);
@@ -122,7 +124,7 @@ package es.core
                 {
                     child = (child as SkinComponent).skin as IDisplay;
                 }
-                (child as Display).displayParent = null;
+                (child as Display).es_internal::displayParent = null;
                 this._children.splice(index, 1);
                 if( (child as Display).inDocumentChain() )
                 {
