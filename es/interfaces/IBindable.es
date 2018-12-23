@@ -8,7 +8,7 @@ package es.interfaces
         * @param callback 当前属性变化时的回调函数
         * @param data 需要传递到回调函数中的参数
         */
-        public function bindding(properties:Array,callback:Function,...data:*):void
+        public function binding(properties:Array,callback:Function,...data:*):void
 
         /**
         * 触发指定的属性集

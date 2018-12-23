@@ -1,7 +1,8 @@
 package es.interfaces
 {
 	import es.interfaces.IBindable;
-	import es.interfaces.IDisplay;
+    import es.interfaces.IDisplay;
+	import es.interfaces.IContainer;
     public interface IRender extends IBindable
     {
     	/**
@@ -30,13 +31,14 @@ package es.interfaces
 
         /**
          * 创建一个节点元素
+         * @param index 子级位于父级中的索引位置
          * @param uniqueKey 元素位于当前父级中的唯一键
          * @param name 元素的节点名
          * @param attr 元素的初始属性
          * @param bindding 元素的动态属性
          * @returns {IDisplay}
          */ 
-    	 public function createElement(uniqueKey:int, name:String, children:Array=null, attr:Object=null,bidding:Object=null):IDisplay
+    	 public function createElement(index:int,uniqueKey:*, name:String, children:*=null, attr:Object=null,bidding:Object=null):IDisplay
 
     	 /**
          * 创建一个组件元素
@@ -46,6 +48,8 @@ package es.interfaces
          * @returns {IDisplay}
          */ 
         public function createComponent(uniqueKey:String,callback:Function,bidding:Function=null):IDisplay
+
+        public function updateChildren( parent:IContainer,index:int, children:Array ):void
 
     }
 }

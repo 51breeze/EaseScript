@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<s:View uu="sss" xmlns:s="es.core"  xmlns:c="es.components" xmlns:b="com" xmlns:p="view.page">
+<s:View uu="sss" xmlns:s="es.core" xmlns:base="@" xmlns:c="es.components" xmlns:b="com" xmlns:p="view.page">
     <s:Metadata>[HostComponent("IndexApplication")]</s:Metadata>
     <head>
         <title>{title}</title>
@@ -8,27 +8,13 @@
         <script src="jquery-1.11.2.js" ></script>
     </head>
 
-    <body id="@body">
 
         <div>
-            <button id="@button" type='button' class="btn btn-success" style="width: 100px;">点 我</button>
+            <button type='button' class="btn btn-success" style="width: 100px;">点 我</button>
         </div>
 
         <div ooo="ssss">
             dsfdsfdsfsdf
-        </div>
-
-        <s:Skin>
-            <s:currentState>{bind::sssss}</s:currentState>
-            <ul>
-                <li>====</li>
-            </ul>
-        </s:Skin>
-
-        <div class="uuuu " style="margin: 10px;">
-            <h1>
-                这里是内容9999999999   {bind::title}
-            </h1>
         </div>
 
         <table>
@@ -52,8 +38,12 @@
             
         </table>
 
+        <div class="uuuu " style="margin: 10px;">
+            <h1>
+                这里是内容9999999999   {bind::title}
+            </h1>
+        </div>
 
-    </body>
 
 
 </s:View>

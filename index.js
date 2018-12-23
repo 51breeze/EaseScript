@@ -1428,8 +1428,13 @@ function getConfigure(config)
         }
     }
     if( config.reserved.indexOf('System')<0 )config.reserved.push('System');
-    if( config.reserved.indexOf('Context')<0 )config.reserved.push('Context');
+    //if( config.reserved.indexOf('Context')<0 )config.reserved.push('Context');
     if( config.reserved.indexOf('Reflect')<0 )config.reserved.push('Reflect');
+
+    var ind = config.reserved.indexOf('Context');
+    if( ind > 0 ){
+        config.reserved.splice(ind,1);
+    }
 
     //主题配置文件路径
     if( !PATH.isAbsolute( config.theme_file_path ) )

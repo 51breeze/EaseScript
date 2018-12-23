@@ -101,7 +101,7 @@ package es.core
         * @param callback 当前属性变化时的回调函数
         * @param data 需要传递到回调函数中的参数
         */
-        public function bindding(properties:Array,callback:Function,...data:*):void
+        public function binding(properties:Array,callback:Function,...data:*):void
         {
              var map:Object = binddingHashMap;
              var prop:String = properties[0] as String;
@@ -184,24 +184,26 @@ package es.core
 
          /**
          * 创建一个节点元素
-         * @param childIndex 子级位于父级中的索引位置
+         * @param index 子级位于父级中的索引位置
          * @param key 元素位于当前Render中的唯一键
          * @param id 元素的唯一ID
          * @param name 元素的节点名
          * @param attr 元素的初始属性
          * @param bindding 元素的动态属性
          */ 
-        public function createElement(uniqueKey:int, name:String, children:Array=null, attr:Object=null,bidding:Object=null):IDisplay
+        public function createElement(index:int,uniqueKey:*, name:String, children:*=null, attr:Object=null,bidding:Object=null):IDisplay
         {
-            var obj:IDisplay = hashMapElements[ uniqueKey ] as IDisplay;
+            var uukey:String = uniqueKey+''+index as String;
+            var obj:IDisplay = hashMapElements[ uukey ] as IDisplay;
             if( !obj )
             {
                 if( obj )
                 {
                     (obj.parent as IContainer).removeChild( obj );
-                    delete hashMapElements[ uniqueKey ];
+                    delete hashMapElements[ uukey ];
                 }
                 obj = new VirtualElement(name,attr);
+                hashMapElements[ uukey ] = obj;
             }
             if( bidding )
             {
@@ -236,6 +238,11 @@ package es.core
                 bidding( newObj );
             }
             return newObj;
+        }
+
+        public function updateChildren( parent:IContainer,index:int, children:Array ):void
+        {
+
         }
     }
 }
