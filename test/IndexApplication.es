@@ -11,7 +11,7 @@ package
     import es.skins.DataGridSkin;*/
     import es.core.SystemManage;
 
-    [Router(default=viewport, alias=MyIndex)]
+    [Router(default=index, alias=MyIndex)]
 	public class IndexApplication extends BaseApplication implements IListIterator
 	{
 		public function IndexApplication()
@@ -60,6 +60,28 @@ package
             this.title = "the is index page";
 
             var view:view.Index = new view.Index( this );
+
+            view.assign("address","<span style='color:red'>sssssss</span>");
+            view.assign("rowHeight",40);
+            view.assign("maxHeight",40);
+            view.assign("title","Hello world!!");
+            view.assign("name","Hello world!!");
+
+
+            var datalist:Array=[];
+
+            var len:int = Math.abs( Math.random() * 100 );
+            len = 1000;
+
+            for(var i:int=0;i<len;i++)
+            {
+
+                datalist.push({"name":i,"id":i,"address":i});
+
+            }
+            view.assign("datalist",datalist);
+
+
 
             //var view:View =  new View(this);
 

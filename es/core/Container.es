@@ -101,11 +101,12 @@ package es.core
             {
                 child = (child as SkinComponent).skin as IDisplay;
             }
+           
             (child as Display).es_internal::displayParent = this;
-            if( this.inDocumentChain() )
-            {
+            //if( this.inDocumentChain() )
+            //{
                 this.element.addChildAt(child.element,index);
-            }
+           // }
             return child;
         };
 

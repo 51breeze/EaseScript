@@ -20,12 +20,12 @@ package es.core
         public function VirtualElement(name:String="div",attrs:Object=null)
         {
            var elem:Element = new Element( Element.createElement( name ) );
-           this._name = name;
+           super( elem );
            if( attrs )
            {
               elem.properties( attrs );
            }
-           super( elem );
+           this._name = name;
         }
 
         /**
@@ -67,154 +67,30 @@ package es.core
             this._uniqueKey=val;
         }
 
-        /**
-         * 在指定索引位置添加元素
-         * @param child
-         * @param index
-         * @returns {Display}
-         */
-        override public function addChildAt( child:IDisplay , index:Number ):IDisplay
-        {
-            super.addChildAt(child,index);
-            childrenElementCount++;
-            return child;
-        }
+         private var invalidate:Boolean= false;
 
-         /**
-         * 移除指定的子级元素
-         * @param child
-         * @returns {Display}
-         */
-        override public function removeChild( child:IDisplay ):IDisplay
+        /*override public function display():Element
         {
-            super.removeChild( child );
-            childrenElementCount--;
-            return child;
-        }
+              var element:Element = this.element;
+              if( invalidate === true )return element;
+                 invalidate = true;
 
-        /**
-         * 移除所有的子级元素
-         */
-        override public function removeAllChild():void
-        {
-            super.removeAllChild();
-            childrenElementCount = 0;
-        }
-
-        /**
-         * @protected
-         */
-        protected var validateFlag:Boolean=false;
-
-        /**
-         * 渲染显示皮肤对象。
-         * 调用此方法会重新创建子级对象，在非必要情况下请谨慎使用，可以节省资源。
-         */
-        override public function display():Element
-        {
-            if( validateFlag === true )
+          
+            var children:Array = this.children;
+            var len:int = children.length;
+            var c:int = 0;
+            for (; c < len; c++)
             {
-                validateFlag = false;
-                var newCount:int = childrenElementCount;
-                var children:Array = this.children;
-                var lastCount:int = children.length;
-                while( newCount < lastCount )
+                var child:IDisplay = children[c] as IDisplay;
+                var ele:Element = child.display();
+                if( !ele[0].parentNode || ele[0].parentNode.nodeType === 11 )
                 {
-                    this.removeChild( children[ --lastCount ] as IDisplay );
+                    element.addChild( ele );
                 }
-                while(lastCount>0)
-                {
-                    (children[ --lastCount ] as  IDisplay).display(); 
-                }
-            }
+            } 
+
             return super.display();
-        }
-
-         /**
-         * 移除所有的虚拟节点元素
-         * 此方法不会立即删除节点元素，而是在调用 display 方法时才会去才会去删除通过此方法被标记的所有元素
-         * @returns {void}
-         */ 
-        public function removeVirtualElementAll():void
-        {
-           childrenElementCount = 0;
-           validateFlag = true;
-        }
-
-        /**
-         * @private
-         */
-        private var childrenElementCount:int=0;
-
-        /**
-        * @private
-        * 所有子级元素对象的集合
-        */
-        private var hashMapElements:Object={};
-
-         /**
-         * 创建一个节点元素
-         * @param childIndex 子级位于父级中的索引位置
-         * @param key 元素位于当前Render中的唯一键
-         * @param id 元素的唯一ID
-         * @param name 元素的节点名
-         * @param attr 元素的初始属性
-         * @param bindding 元素的动态属性
-         */ 
-        public function createElement(childIndex:int, key:int,name:String,attr:Object=null,bidding:Object=null):IVirtualElement
-        {
-            var uniqueKey:int = childIndex+key;
-            var obj:VirtualElement = hashMapElements[ uniqueKey ] as VirtualElement;
-            if( !obj || obj.name !== name )
-            {
-                if( obj )
-                {
-                    (obj.parent as IContainer).removeChild( obj );
-                }
-                var pkey:* = this._uniqueKey;
-                obj = new VirtualElement(name,attr);
-                obj.uniqueKey = (pkey ? pkey+"-"+uniqueKey : uniqueKey) as String;
-                this.addChildAt(obj,childIndex);
-            }else{
-                 childrenElementCount++;
-            }
-            if( bidding )
-            {
-                obj.element.properties( bidding );
-            }
-            return obj as IVirtualElement;
-        }
-
-         /**
-         * 创建一个组件元素
-         * @param childIndex 子级位于父级中的索引位置
-         * @param key 元素位于当前Render中的唯一键
-         * @param id 元素的唯一ID
-         * @param callback 生成组件对象的回调函数
-         * @param bindding 设置组件属性的回调函数
-         */ 
-        public function createComponent(childIndex:int, key:int,callback:Function,bidding:Function=null):IDisplay
-        {
-            var uniqueKey:int = childIndex+key;
-            var obj:IDisplay = hashMapElements[ uniqueKey ] as IDisplay;
-            var newObj:IDisplay = callback( obj , uniqueKey ) as IDisplay;
-            if( newObj !== obj )
-            {
-                if( obj )
-                {
-                    (obj.parent as IContainer).removeChild( obj );
-                }
-                hashMapElements[ uniqueKey ] = newObj; 
-                this.addChildAt(newObj,childIndex);
-            }
-            if( bidding )
-            {
-                bidding( newObj );
-            }
-            childrenElementCount++;
-            return newObj;
-        }
-
+        }*/
     }
 }
 

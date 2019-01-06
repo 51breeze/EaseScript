@@ -125,9 +125,14 @@ Object.forEach=function forEach(object,callback,thisObject)
     if( object == null || object instanceof System.Class || typeof callback !== "function" )return;
     var isIterator = false;
     var value = null;
-    if( System.hasClass( Internal.iteratorClass ) )
+    if( object && System.hasClass( Internal.iteratorClass ) )
     {
-        isIterator = System.is(object, System.getDefinitionByName( Internal.iteratorClass ) );
+        if( object.constructor && object.constructor instanceof System.Class )
+        {
+            isIterator = System.is(object, System.getDefinitionByName( Internal.iteratorClass ) );
+        }else{
+            isIterator = object instanceof System.ListIterator;
+        }
     }
     thisObject = thisObject||object;
     if( isIterator )

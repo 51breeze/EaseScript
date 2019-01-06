@@ -6,40 +6,27 @@
  */
 package es.core
 {
-    import es.interfaces.IContainer;
     import es.interfaces.IDisplay;
     import es.interfaces.IRender;
-    import es.core.VirtualElement;
     public class Render extends EventDispatcher implements IRender
     {
+        /**
+        * @private
+        */ 
+        private var invalidate:Boolean=false;
+
         /**
          * @private
          */
         private var _factory:Function;
 
         /**
-         * @private
-         */
-        private var _context:IContainer;
-
-        /**
          * 动态元素渲染类
          * @constructor
-         * @param context 上下文对象
          */
-        public function Render( context:IContainer )
+        public function Render()
         {
-            this._context = context;
-            super( (context as IDisplay).element );
-        }
-
-        /**
-        * 获取一个上下文对象
-        * 此对象表示一个渲染器宿主对象
-        */
-        public function get context():IContainer
-        { 
-            return _context;
+            super();
         }
 
         /**
@@ -50,7 +37,7 @@ package es.core
         */
         public function set factory(value:Function):void
         { 
-             _factory = value;
+            _factory = value;
         }
 
         /**
@@ -62,117 +49,89 @@ package es.core
             return _factory;
         }
 
-        private var _dataset:Object={};
-
-        private var initialized:Boolean=false;
-
-        /**
-        * 为此渲染器分配一个指定名称的数据值
-        */
-        public function assign(name:String, value:*):void
+         /**
+         * 分配指定名称的值到模板数据集中
+         * @param name
+         * @param value
+         */
+        public function assign(name:String, value:*=null):*
         {
-            if( _dataset[ name ] !== value )
+            var dataset:Object=_dataset;
+            if( value === null )
             {
-                 _dataset[name]=value;  
-                 if( initialized === true )
-                 {
-                    this.trigger({name:value});
-                 } 
+                return dataset[name];
             }
-        }
 
-        /**
-        * 获取已经为此渲染器分配的数据集
-        */
-        public function get dataset():Object
-        {
-            return Object.merge({},_dataset);
+            if( dataset[name] !== value )
+            {
+                invalidate = false;
+                dataset[name]=value;
+            }
+            return value;
         }
 
         /**
         * @private
-        * 所有绑定属性的集合对象
-        */
-        private var binddingHashMap:Object={};
+        */  
+        private var _dataset:Object={};
 
         /**
-        * 绑定一组属性，在当前作用域中变化时调度
-        * @param properties 需要绑定的属性集
-        * @param callback 当前属性变化时的回调函数
-        * @param data 需要传递到回调函数中的参数
+        * 获取数据集
+        * @return {Object}
         */
-        public function binding(properties:Array,callback:Function,...data:*):void
+        public function get dataset():Object
         {
-             var map:Object = binddingHashMap;
-             var prop:String = properties[0] as String;
-             var ref:Array = ( map.hasOwnProperty( prop ) ? map[ prop ] : null ) as Array;
-             if( ref && ref[0] === properties && ref[1] === callback )
-             {
-                 ref[2] = data;
-
-             }else
-             {
-                 var bind:Array = [properties,callback,data];
-                 properties.map(function(property:String)
-                 {
-                      map[property]=bind;
-                 });
-             }
+            return _dataset;
         }
 
         /**
-        * 触发指定的属性集
-        * @param properties 需要触发的属性集
-        */ 
-        public function trigger(properties:Object):void
+        * 设置一组数据集
+        * @return {Object}
+        */
+        public function set dataset(value:Object):void
         {
-            var map:Object = binddingHashMap;
-            var dataset:Object = this._dataset;
-            Object.forEach(properties,function(value:*,name:String)
+            invalidate = false;
+            _dataset = value;
+        }
+
+        /**
+        * @private
+        */
+        private var _destruction:Boolean=false;
+
+        /**
+        * 元素移除时是否需要销毁元素节点
+        * 设置为 true 时销毁
+        */
+        public function get destruction():Boolean
+        {
+            return _destruction;
+        }
+
+        /**
+        * 元素移除时是否需要销毁元素节点
+        * 设置为 true 时销毁
+        */
+        public function set destruction(value:Boolean):void
+        {
+            _destruction = value;
+        }
+
+        /**
+        * @protected
+        */
+        protected function setAttrs(target:Node,attrs:Object):void
+        {
+            Object.forEach(attrs,function(value:*,name:String)
             {
-                 var item:Array = map[ name ] as Array;
-                 if( item && item[3] !== value )
-                 {
-                      var props:Array = item[0] as Array;
-                      var fn:Function = item[1] as Function;
-                      var data:* = item[2];
-                      
-                      //当前属性的状态
-                      var state:Object={};
-                      //当前变化的属性值
-                      var propsValue:Array=[];
+                if( name ==="innerHTML" && target.innerHTML !== value)
+                {
+                    target.innerHTML = value as String;
 
-                      //获取每个绑定器中所有属性的默认值
-                      for(var i:int ; i<props.length; i++)
-                      {
-                           //绑定的属性名
-                           var propName:String = props[i] as String;
-
-                           //绑定的属性必须要在当前作用域中存在
-                           if( !dataset.hasOwnProperty( propName ) )
-                           {
-                               throw new ReferenceError("is not assign property for '"+propName+"'");
-                           }
-
-                           //默认的属性值
-                           var val:* = dataset[ propName ];
-
-                           //一个新的属性值
-                           if( properties.hasOwnProperty( propName ) )
-                           {
-                                val=properties[ propName ];
-                           }
-
-                           var binding:Array = map[ propName ] as Array;
-                           //当前属性值的变化状态
-                           state[ propName ] = binding[3] !== val;
-                           //保存当前属性值
-                           binding[3] = val;
-                           //属性值
-                           propsValue.push( val );
-                      }
-                      //fn(state,...data,...propsValue);
-                 }
+                }else if( target.getAttribute(name) != attrs[name] )
+                {
+                    target.setAttribute(name, attrs[name] );
+                }
             });
         }
 
@@ -191,25 +150,33 @@ package es.core
          * @param attr 元素的初始属性
          * @param bindding 元素的动态属性
          */ 
-        public function createElement(index:int,uniqueKey:*, name:String, children:*=null, attr:Object=null,bidding:Object=null):IDisplay
+        public function createElement(index:int,uniqueKey:*, name:String, children:*=null, attr:Object=null,updateAttrs:Object=null):Object
         {
-            var uukey:String = uniqueKey+''+index as String;
-            var obj:IDisplay = hashMapElements[ uukey ] as IDisplay;
+            var uukey:String = (uniqueKey+''+index) as String;
+            var obj:Node = hashMapElements[ uukey ] as Node;
             if( !obj )
             {
-                if( obj )
-                {
-                    (obj.parent as IContainer).removeChild( obj );
-                    delete hashMapElements[ uukey ];
-                }
-                obj = new VirtualElement(name,attr);
+                obj = document.createElement( name );
+                obj["unique-key"] = uukey;
                 hashMapElements[ uukey ] = obj;
+                if( attr )
+                {
+                    this.setAttrs(obj,attr);
+                }
             }
-            if( bidding )
+            if( children )
             {
-                obj.element.properties( bidding );
+                if( children instanceof Array ){
+                    this.createChildren(obj,children as Array);
+                }else{
+                    obj.textContent=children+"";
+                }
             }
-            return obj as IDisplay;
+            if( updateAttrs )
+            {
+                this.setAttrs(obj,updateAttrs);
+            }
+            return obj;
         }
 
          /**
@@ -220,29 +187,144 @@ package es.core
          * @param callback 生成组件对象的回调函数
          * @param bindding 设置组件属性的回调函数
          */ 
-        public function createComponent(uniqueKey:String,callback:Function,bidding:Function=null):IDisplay
+        public function createComponent(index:int,uniqueKey:*,callback:Function):Object
         {
-            var obj:IDisplay = hashMapElements[ uniqueKey ] as IDisplay;
-            var newObj:IDisplay = callback( obj , uniqueKey ) as IDisplay;
+            var uukey:String = (uniqueKey+""+index) as String;
+            var obj:IDisplay = hashMapElements[ uukey ] as IDisplay;
+            var newObj:IDisplay = callback( obj , uukey ) as IDisplay;
             if( newObj !== obj )
             {
-                if( obj )
-                {
-                    (obj.parent as IContainer).removeChild( obj );
-                    delete hashMapElements[ uniqueKey ];
-                }
-                hashMapElements[ uniqueKey ] = newObj;
-            }
-            if( bidding )
-            {
-                bidding( newObj );
+                hashMapElements[ uukey ] = newObj;
+                newObj.element[0]["unique-key"] = uukey;
             }
             return newObj;
         }
 
-        public function updateChildren( parent:IContainer,index:int, children:Array ):void
+        /**
+        * @private
+        */
+        private function unsetNode( oldNode:Node )
         {
+            var uniqueKey:* = oldNode["unique-key"];
+            if( uniqueKey )
+            {
+                var child:* = hashMapElements[uniqueKey];
+                if( child )
+                {
+                    hashMapElements[uniqueKey] = null;
+                    delete hashMapElements[uniqueKey];
+                    if(child instanceof EventDispatcher)
+                    {
+                        var e:ElementEvent = new ElementEvent( ElementEvent.REMOVE );
+                        e.parent = oldNode.parentNode;
+                        e.child = oldNode;
+                        (child as EventDispatcher).dispatchEvent( e );
+                    }
+                }
+            }
+        }
 
+        /**
+        * @param parent 
+        * 创建子级元素
+        */
+        public function createChildren(parentNode:Object,children:Array):void
+        {
+            var parent:Node = parentNode as Node;
+            var len:int = Math.max(children.length, parent.childNodes.length);
+            var i:int=0;
+            var destruct:Boolean = _destruction;
+            while( i<len )
+            {
+                var newNode:Node=null;
+                var isDisplay:Boolean = children[i] is IDisplay;
+                if( isDisplay )
+                {
+                    var elem:Element =(children[i] as IDisplay).display();
+                    newNode = elem[0] as Node;
+
+                }else
+                { 
+                    newNode = children[i] as Node;
+                }
+                
+                //两边节点不一致 
+                if( newNode !== parent.childNodes[i] )
+                {
+                    //替换元素
+                    if( newNode && parent.childNodes[i] )
+                    {
+                        parent.replaceChild(newNode, parent.childNodes[i] as Node);
+                        //需要销毁元素
+                        if( destruct )
+                        {
+                            this.unsetNode( parent.childNodes[i] as Node );
+                        } 
+
+                    }else
+                    {
+                        //移除元素
+                        if( parent.childNodes[i] )
+                        {
+                            var oldNode:Node = parent.childNodes[i] as Node;
+                            (oldNode.parentNode as Node).removeChild( oldNode );
+
+                             //需要销毁元素
+                            if( destruct )
+                            {
+                                this.unsetNode( oldNode );
+                            } 
+
+                            len--;
+                            continue;
+                        }
+
+                         //添加元素
+                        if( newNode )
+                        {
+                            parent.appendChild(newNode);
+                        }
+                    }
+
+                    //调度事件
+                    if( newNode && isDisplay )
+                    {
+                        var e:ElementEvent=new ElementEvent( ElementEvent.ADD );
+                        e.parent = parent;
+                        e.child = newNode;
+                        (children[i] as EventDispatcher).dispatchEvent( e );
+                    }
+                }
+                i++;
+            }
+        }
+
+        /**
+        * @private
+        */
+        private var _result:Array=null;
+
+        /**
+        * 从指定的元素工厂中创建元素
+        * @return {Array}
+        */
+        public function create(context:Object=null):Array
+        {
+            var factory:Function = _factory;
+            if( !factory )
+            {
+                return [];
+            }
+
+            if( invalidate )
+            {
+                return _result;
+            }
+
+            invalidate = true;
+            var result:Array = factory(this,context,_dataset) as Array;
+            _result = result;
+            return result;
         }
     }
 }

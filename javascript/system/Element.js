@@ -519,14 +519,7 @@ function createElement(html , flag , isTable )
             }
 
             var match;
-            if ( html.charAt(0) !== "<" && html.charAt(html.length - 1) !== ">" && html.length >= 1 && /^[a-zA-Z]+$/.test(html) )
-            {
-                try {
-                    return document.createElement(html);
-                } catch (e) {
-                }
-
-            } else if (html.charAt(0) === "<" && ( match = singleTagRegex.exec(html) ))
+            if (html.charAt(0) === "<" && ( match = singleTagRegex.exec(html) ))
             {
                 var elem = document.createElement(match[1]);
                 var attr = matchAttr(html);
@@ -534,7 +527,14 @@ function createElement(html , flag , isTable )
                     accessor['property'].set.call( elem, prop, attr[prop]);
                 }
                 return elem;
-            }
+
+            }else if ( html.length >= 1 && /^[^\d+][a-zA-Z0-9]+$/.test(html) )
+            {
+                try {
+                    return document.createElement(html);
+                } catch (e) {
+                }
+            }  
 
             var div = document.createElement("div");
             var result = html.match(/^\<(tr|th|td|tbody|thead|tfoot)(?:[\s\>]+)/i);

@@ -778,6 +778,7 @@ const SyntaxBuilder={
         var builder = require( './javascript/builder.js');
         var buildBaseScript = function (config, scriptContent, requirements, hashMap , serverRoutes, bootstrap,loadRequirements )
         {
+            console.log( handle )
             return builder(config.build_path, config, scriptContent, requirements, {
                 "namespace": function (content) {
                     return content.replace(/var\s+codeMap=\{\};/, "var codeMap=" + JSON.stringify(hashMap) + ";");

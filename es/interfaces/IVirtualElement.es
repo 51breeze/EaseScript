@@ -9,7 +9,7 @@ package es.interfaces
          * 此方法不会立即删除节点元素，需要在调用 display 方法时才会去删除通过此方法被标记的所有元素
          * @returns {void}
          */ 
-    	public function removeVirtualElementAll():void
+    	//public function removeVirtualElementAll():void
 
 		/**
          * 创建一个节点元素
@@ -20,7 +20,7 @@ package es.interfaces
          * @param bindding 元素的动态属性
          * @returns {IVirtualElement}
          */ 
-    	 public function createElement(childIndex:int,key:int,name:String,attr:Object=null,bidding:Object=null):IVirtualElement
+    	//public function createElement(childIndex:int,key:int,name:String,attr:Object=null,bidding:Object=null):IVirtualElement
 
     	 /**
          * 创建一个组件元素
@@ -30,7 +30,7 @@ package es.interfaces
          * @param bindding 设置组件属性的回调函数
          * @returns {IDisplay}
          */ 
-        public function createComponent(childIndex:int,key:int,callback:Function,bidding:Function):IDisplay
+       // public function createComponent(childIndex:int,key:int,callback:Function,bidding:Function):IDisplay
 
         /**
          * 获取节点元素指定的唯一键

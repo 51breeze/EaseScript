@@ -1,49 +1,121 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <s:View uu="sss" xmlns:s="es.core" xmlns:base="@" xmlns:c="es.components" xmlns:b="com" xmlns:p="view.page">
     <s:Metadata>[HostComponent("IndexApplication")]</s:Metadata>
+
+      <![CDATA[
+
+        import es.core.VirtualElement;
+
+        private var but:EventDispatcher=null;
+
+    
+        override protected function updateDisplayList()
+        {
+
+
+               var bnt:EventDispatcher = this.but;
+               if( !bnt ){
+
+                  bnt = new EventDispatcher( this.button );
+                  but = bnt;
+               }
+
+              // console.log("====", this.button  );
+
+
+               bnt.removeEventListener(MouseEvent.CLICK);
+               bnt.addEventListener( MouseEvent.CLICK, function(e:MouseEvent){
+
+                    var datalist:Array=[
+                    ];
+
+                    var len:int = Math.round( Math.random() * 1000 );
+                    len = 1000;
+
+                   // console.log("==+++==");
+
+                    
+                  //this.table.element.html("");
+
+                    var htmls:Array=[];
+                    for(var i:int=0;i<len;i++)
+                    {
+
+
+                      // htmls.push( "<tr>"+"<td><input value="+i+" /></td>"+"<td>"+i+"</td>"+"<td>"+(Math.random() * 10000)+"</td></tr>");
+
+                      datalist.push({"name":Math.random() * 10000,"id":i,"address":Math.random() * 10000});
+
+                    }
+
+                   var str:String=  htmls.join("");
+
+                  // console.log( str );
+                  // this.table.element.html("<tbody>"+str+"</tbody>");
+
+                    //  this.removeChild( this.table );
+                    this.assign("datalist",datalist);
+                    this.assign("rowHeight",30);
+                   // this.assign("rowHeight", Math.max( Math.abs( Math.random() * 100 ), Math.abs( Math.random() * 100 ) )  );
+
+                    // this.addChildAt( this.table, 2 );
+
+                    this.display();
+                        
+                },false,0,this);
+
+                
+
+              
+        }
+
+      ]]>
+
+
     <head>
         <title>{title}</title>
         <meta charset="UTF-8" http-equiv="X-UA-Compatible" />
         <meta name="keyword" http-equiv="es,easescript" />
-        <script src="jquery-1.11.2.js" ></script>
     </head>
 
+    <body>
 
         <div>
-            <button type='button' class="btn btn-success" style="width: 100px;">点 我</button>
+            <s:Skin name="button" id="@button" type='button' class="btn btn-success" style="width: 100px;">点 我 {name}</s:Skin>
         </div>
 
         <div ooo="ssss">
             dsfdsfdsfsdf
         </div>
 
-        <table>
-           
-                <:foreach name="bind::datalist" value="item">
-                    <tr id="@header">
-                        <:foreach name="item" value="val" key="ukey">
-                            <:switch condition="ukey">
-                                <:case condition="name" break="true">
-                                    <td data-column="{bind::maxIndex}" style="height:{bind::maxHeight}px;z-index:{key};line-height:{bind::rowHeight}px;">
-                                        <input value="{val}" data-index="{item.id}" style="height: 25px;" />
-                                    </td>
-                                </:case>
-                                <:default>
-                                     <td data-column="{key}" style="height:{bind::rowHeight}px;line-height:{bind::rowHeight}px;">{val}</td>
-                                </:default>
-                            </:switch>
-                        </:foreach>
-                    </tr>
-                </:foreach>
-            
+        <table id="@table">
+            <:foreach name="datalist" value="item">
+                <tr id="@head">
+                    <:foreach name="item" value="val" key="ukey">
+                        <:switch condition="ukey">
+                            <:case condition="name" break="true">
+                                <td data-column="{key}" style="height:{rowHeight}px;line-height:{rowHeight}px;">
+                                    <input value="{val}" data-index="{item.id}" style="height: 25px;" />
+                                </td>
+                            </:case>
+                            <:default>
+                                 <td data-column="{ukey}" style="height:{rowHeight}px;line-height:{rowHeight}px; width: 120px;">
+                                    <span style="color:red;">{val}</span>
+                                </td>
+                            </:default>
+                        </:switch>
+                    </:foreach>
+                </tr>
+            </:foreach>
         </table>
 
         <div class="uuuu " style="margin: 10px;">
             <h1>
-                这里是内容9999999999   {bind::title}
+                这里是内容9999999999
             </h1>
         </div>
 
+    </body>    
 
 
 </s:View>

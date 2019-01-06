@@ -298,8 +298,8 @@ function $dispatchEvent(e, currentTarget )
     var events = storage(target,'events');
     if( !events || !Object.prototype.hasOwnProperty.call(events, e.type) )return true;
     events = events[e.type];
-    var length= 0,listener,thisArg;
-    while( length < events.length )
+    var length= 0,listener,thisArg,count=events.length;
+    while( length < count )
     {
         listener = events[ length++ ];
         thisArg = listener.reference || listener.dispatcher;

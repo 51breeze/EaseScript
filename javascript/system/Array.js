@@ -7,7 +7,7 @@
  */
 function Array(length)
 {
-    if ( !System.instanceOf(this, Array) )
+    if( !(this instanceof Array) )
     {
         var obj = new Array();
         $Array.apply(obj , Array.prototype.slice.call(arguments, 0) );

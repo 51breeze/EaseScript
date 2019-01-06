@@ -1,9 +1,6 @@
 package es.interfaces
 {
-	import es.interfaces.IBindable;
-    import es.interfaces.IDisplay;
-	import es.interfaces.IContainer;
-    public interface IRender extends IBindable
+    public interface IRender
     {
     	/**
     	* 设置一个渲染器的工厂函数
@@ -21,35 +18,57 @@ package es.interfaces
 
         /**
     	* 为此渲染器分配一个指定名称的数据值
+        * @param name 指定值的名称
+        * @param value 指定的值
     	*/
-        public function assign(name:String, value:*):void
+        public function assign(name:String, value:*):*
 
         /**
-    	* 获取已经为此渲染器分配的数据集
+    	* 获取数据集
+        * @returns {Object}
     	*/
         public function get dataset():Object
 
         /**
+        * 设置数据集
+        * @returns {void}
+        */
+        public function set dataset(value:Object):void
+
+        /**
          * 创建一个节点元素
-         * @param index 子级位于父级中的索引位置
-         * @param uniqueKey 元素位于当前父级中的唯一键
+         * @param index 当前节点元素的索引位置
+         * @param uniqueKey 当前元素位于当前域中的唯一键值
          * @param name 元素的节点名
          * @param attr 元素的初始属性
          * @param bindding 元素的动态属性
-         * @returns {IDisplay}
+         * @returns {Object} 一个表示当前节点元素的对象
          */ 
-    	 public function createElement(index:int,uniqueKey:*, name:String, children:*=null, attr:Object=null,bidding:Object=null):IDisplay
+    	 public function createElement(index:int,uniqueKey:*, name:String, children:*=null, attr:Object=null,bidding:Object=null):Object
 
     	 /**
          * 创建一个组件元素
-         * @param uniqueKey 元素位于当前父级中的唯一键
+         * @param index 当前节点元素的索引位置
+         * @param uniqueKey 当前组件位于当前域中的唯一键值
          * @param callback 生成组件对象的回调函数
-         * @param bindding 设置组件属性的回调函数
-         * @returns {IDisplay}
+         * @returns {Object}  一个表示当前节点元素的对象
          */ 
-        public function createComponent(uniqueKey:String,callback:Function,bidding:Function=null):IDisplay
+        public function createComponent(index:int,uniqueKey:*,callback:Function):Object
 
-        public function updateChildren( parent:IContainer,index:int, children:Array ):void
+         /**
+         * 创建子级元素
+         * @param children 当前有效的子级元素。如果在当前父级节点中的子级元素不包含在此数组中的都会被移除。
+         * @param parent 需要应用到的父级节点元素
+         * @returns {void}
+         */ 
+        public function createChildren(parent:Object,children:Array):void
+
+        /**
+        * 从指定的元素工厂中创建元素
+        * @param context 指定一个在工厂函数里面需要用到的上文对象
+        * @return {Array}
+        */
+        public function create(context:Object):Array
 
     }
 }

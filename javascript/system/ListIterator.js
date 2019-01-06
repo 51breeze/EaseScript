@@ -4,7 +4,7 @@
  * Released under the MIT license
  * https://github.com/51breeze/EaseScript
  * @author Jun Ye <664371281@qq.com>
- * @require Object,Symbol,TypeError,Reflect
+ * @require Object,Symbol,TypeError,Reflect,Internal
  */
 var storage=Internal.createSymbolStorage( Symbol('ListIterator') );
 var has = $Object.prototype.hasOwnProperty;
@@ -18,9 +18,15 @@ function callMethod(target, name)
 
 function ListIterator( target )
 {
-    if( System.is(target,ListIterator) )return target;
+    if( target instanceof ListIterator )return target;
     if( !(this instanceof ListIterator) )return new ListIterator(target);
-    var isIterator = System.is(target, System.getDefinitionByName( Internal.iteratorClass ) );
+    var isIterator = false;
+    //如果是一个类则有可能实现迭代器接口
+    if( target && target.constructor && Internal.iteratorClass && target.constructor instanceof System.Class )
+    {
+        isIterator = System.is(object, System.getDefinitionByName( Internal.iteratorClass ) );
+    }
+
     storage(this,true,{
         "isIterator":isIterator,
         "target":target,

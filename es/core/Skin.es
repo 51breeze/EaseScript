@@ -9,6 +9,7 @@ package es.core
     import es.components.SkinComponent;
     import es.core.Container;
     import es.core.Skin;
+    import es.core.VirtualElement;
     import es.events.SkinEvent;
     import es.core.State;
     import es.interfaces.IDisplay;
@@ -109,19 +110,6 @@ package es.core
             return this;
         }
 
-        private var _render:IRender=null;
-
-        protected function get render():IRender
-        {
-             var render:IRender = this._render;
-             if( render===null )
-             {
-                render = new Render(this);
-                this._render = render;
-             }
-             return render;
-        }
-
         /**
          * @private
          */
@@ -188,16 +176,7 @@ package es.core
          */
         protected function initializing(){}
 
-        /**
-         * 分配指定名称的值到模板数据集中
-         * @param name
-         * @param value
-         */
-        public function assign(name:String,value:*=null):void
-        {
-           
-        }
-
+    
         /**
          * 渲染显示皮肤对象。
          * 调用此方法会重新创建子级对象，在非必要情况下请谨慎使用，可以节省资源。
@@ -230,46 +209,22 @@ package es.core
          */
         protected function createChildren()
         {
-            if( invalidate === true )return;
-            invalidate = true;
+            if( invalidate === false )
+            {
+                invalidate = true;
+            }
+
+            var children:Array = this.render.create( this );
             var element:Element = this.element;
-            /*
-            var render:Render = this._render;
-            if( render && hasChildTemplate )
+            var len:int = children.length;
+            var c:int = 0;
+            for (; c < len; c++)
             {
-                var str:String = render.fetch();
-                if( str )element.html( str );
-
-            }else
-            {
-                var children:Array = this.children;
-                var len:int = children.length;
-                var c:int = 0;
-                for (; c < len; c++)
+                var node:Node = children[c] as Node;
+                if( !node.parentNode )
                 {
-                    var child:IDisplay = children[c] as IDisplay;
-                    when(RunPlatform(server))
-                    {
-                        if (child is SkinComponent && (child as SkinComponent).async === true)
-                        {
-                            continue;
-                        }
-                    }
-
-                    var ele:Element = child.display();
-                    if( !ele[0].parentNode || ele[0].parentNode.nodeType === 11 )
-                    {
-                        element.addChild( ele );
-                    }
+                    element.addChild( children[c] );
                 }
-            }*/
-
-            if( this.hasEventListener(SkinEvent.CREATE_CHILDREN_COMPLETED) )
-            {
-                var e:SkinEvent = new SkinEvent( SkinEvent.CREATE_CHILDREN_COMPLETED );
-                e.parent = this.parent;
-                e.child = this;
-                this.dispatchEvent( e );
             }
             this.updateDisplayList();
         };
@@ -346,26 +301,71 @@ package es.core
             }
         }
 
+         /**
+         * @private
+         */
+        private var _render:IRender=null;
+
+         /**
+         * 获取当前元素的渲染工厂
+         * @param name
+         * @param value
+         */
+        protected function get render():IRender
+        {
+             var render:IRender = this._render;
+             if( render===null )
+             {
+                render = new Render();
+                render.dataset = _dataset;
+                this._render = render;
+             }
+             return render;
+        }
 
         /**
-        * 绑定一组属性，在当前作用域中变化时调度
-        * @param properties 需要绑定的属性集
-        * @param callback 当前属性变化时的回调函数
-        * @param data 需要传递到回调函数中的参数
+         * 分配指定名称的值到模板数据集中
+         * @param name
+         * @param value
+         * @return {*}
+         */
+        public function assign(name:String,value:*=null):*
+        {
+            var dataset:Object = _dataset;
+            if( value===null )
+            {
+                return dataset[name];
+            }
+
+            if( dataset[name] !== value )
+            {
+                invalidate=false;
+                this.render.assign(name,value);
+            }
+            return value;
+        }
+
+        /**
+        *@private
+        */  
+        private var _dataset:Object={};
+
+        /**
+        * 获取数据集
         */
-        public function binding(properties:Array,callback:Function,...data:*):void
+        public function get dataset():Object
         {
-
+            return _dataset;
         }
 
         /**
-        * 触发指定的属性集
-        * @param properties 需要触发的属性集
-        */ 
-        public function trigger(properties:Object):void
+        * 设置数据集
+        */
+        public function set dataset(value:Object):void
         {
-
+            _dataset = value;
+            this.render.dataset=value;
+            invalidate=false;
         }
-
     }
 }

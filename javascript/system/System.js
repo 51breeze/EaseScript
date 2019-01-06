@@ -26,6 +26,7 @@ System.Error  = $Error;
 System.TypeError  = $TypeError;
 System.ReferenceError  = $ReferenceError;
 System.SyntaxError = $SyntaxError;
+System.Node = Node;
 
 ;(function(f){
     System.setTimeout =f(setTimeout);
@@ -160,14 +161,24 @@ System.instanceOf = function instanceOf(instanceObj, theClass)
         return System.isObject(instanceObj);
     }
 
-    try {
-        if( theClass instanceof System.Class )theClass = theClass.constructor;
-        if ( Object(instanceObj) instanceof theClass)return true;
-        if ( theClass === System.Array )return instanceObj instanceof $Array;
-        if ( theClass === System.Object )return instanceObj instanceof $Object;
-        if ( theClass === System.Function )return instanceObj instanceof $Function;
-    } catch (e) {}
-    return false;
+    if( theClass instanceof System.Class )
+    {
+        theClass = theClass.constructor;
+        return theClass && instanceObj instanceof theClass;
+    }
+    if ( theClass === System.Array )
+    {
+        return System.isArray( instanceObj );
+    }
+    if ( theClass === System.Object )
+    {
+        return typeof instanceObj ==="object";
+    }
+    if ( theClass === System.Function )
+    {
+        return System.isFunction( instanceObj );
+    }
+    return Object(instanceObj) instanceof theClass;
 };
 
 /**
@@ -186,11 +197,12 @@ System.is=function is(instanceObj, theClass)
     {
         return instanceObj instanceof System.Class;
     }
-    if( instanceObj && instanceObj.constructor instanceof System.Class && theClass instanceof System.Interface)
+    var isClass = instanceObj.constructor instanceof System.Class;
+    var isInterfaceClass = theClass instanceof System.Interface;
+    if( instanceObj && isClass && isInterfaceClass )
     {
         var objClass =instanceObj.constructor;
         if (objClass === theClass)return true;
-
         while ( objClass instanceof System.Class )
         {
             var impls = objClass.__T__.implements;
@@ -200,20 +212,52 @@ System.is=function is(instanceObj, theClass)
                 var len = impls.length;
                 for (; i < len; i++)
                 {
-                    var interfaceModule = impls[i];
-                    while (interfaceModule) {
-                        if (interfaceModule === theClass)return true;
-                        interfaceModule =interfaceModule.__T__["extends"];
-                    }
+                   if( isInterfaceEqual(impls[i],theClass) )
+                   {
+                       return true;
+                   }
                 }
             }
             objClass =objClass.__T__["extends"] || System.Object;
             if (objClass === theClass)return true;
         }
-        if( objClass.prototype )instanceObj = objClass.prototype;
+        if( objClass.prototype )instanceObj = objClass.prototype;  
     }
+    if( isInterfaceClass )return false;
     return System.instanceOf(instanceObj, theClass);
 };
+
+/**
+* 判断接口模块是否有继承指定的接口类
+*/
+function isInterfaceEqual(interfaceModule,interfaceClass)
+{
+    if (interfaceModule === interfaceClass)
+    {
+        return true;
+    }
+    interfaceModule = interfaceModule.__T__["extends"];
+    if( interfaceModule )
+    {
+        if( interfaceModule instanceof Array )
+        {
+            var len = interfaceModule.length;
+            var i = 0;
+            for( ;i<len;i++)
+            {
+                if( isInterfaceEqual(interfaceModule[i],interfaceClass) )
+                {
+                    return true;
+                }
+            }
+
+        }else
+        {
+            return isInterfaceEqual(interfaceModule,interfaceClass);
+        }
+    }
+    return false;
+}
 
 /**
  * 判断是否为一个单纯的对象
