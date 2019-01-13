@@ -18,13 +18,13 @@ package es.core
          * 显示对象构造类
          * @constructor
          */
-        function Container( element:Element )
+        function Container( element:Element, attr:Object=null )
         {
             if( !Element.isHTMLContainer( element[0] ) )
             {
                 throw new TypeError("Invalid container element");
             }
-            super( element );
+            super( element, attr );
         }
 
         [ArrayElementType("es.interfaces.IDisplay")]

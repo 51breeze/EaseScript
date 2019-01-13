@@ -21,7 +21,7 @@ package es.core
          * 显示对象构造类
          * @constructor
          */
-        function Display( element:Element )
+        function Display( element:Element, attr:Object=null )
         {
             if( element==null || element.length != 1 )
             {
@@ -32,6 +32,15 @@ package es.core
                throw new TypeError("Invalid node element");
             }
             _element = element;
+            if( attr )
+            {
+                if( attr.innerHTML )
+                {
+                    element.html( attr.innerHTML );
+                    delete attr.innerHTML;
+                }
+                element.properties( attr );
+            }
             super( element );
         }
 

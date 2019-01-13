@@ -1725,7 +1725,7 @@ Element.prototype.html=function html( htmlObject )
         {
             this.removeChild( elem.childNodes.item(0) );
         }
-
+        
         //如果是一个节点对象
         if(is)
         {

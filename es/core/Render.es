@@ -8,6 +8,7 @@ package es.core
 {
     import es.interfaces.IDisplay;
     import es.interfaces.IRender;
+    import es.core.State;
     public class Render extends EventDispatcher implements IRender
     {
         /**
@@ -24,9 +25,10 @@ package es.core
          * 动态元素渲染类
          * @constructor
          */
-        public function Render()
+        public function Render(factory:Function=null)
         {
             super();
+            _factory = factory;
         }
 
         /**
@@ -230,6 +232,11 @@ package es.core
         */
         public function createChildren(parentNode:Object,children:Array):void
         {
+            if( parentNode is IDisplay )
+            {
+               parentNode = (parentNode as IDisplay).element[0] as Object; 
+            }
+
             var parent:Node = parentNode as Node;
             var len:int = Math.max(children.length, parent.childNodes.length);
             var i:int=0;
@@ -242,7 +249,6 @@ package es.core
                 {
                     var elem:Element =(children[i] as IDisplay).display();
                     newNode = elem[0] as Node;
-
                 }else
                 { 
                     newNode = children[i] as Node;
@@ -322,7 +328,7 @@ package es.core
             }
 
             invalidate = true;
-            var result:Array = factory(this,context,_dataset) as Array;
+            var result:Array = factory(this,context, _dataset) as Array;
             _result = result;
             return result;
         }

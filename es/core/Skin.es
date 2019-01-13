@@ -27,7 +27,6 @@ package es.core
          */
         function Skin( name:*, attr:Object=null)
         {
-        
             var ele:Element = null;
             if( Element.isHTMLContainer(name) )
             {
@@ -49,16 +48,7 @@ package es.core
             {
                 throw new Error( "Invalid parameter. in Skin" );
             }
-            if( attr )
-            {
-                if( attr.innerHtml )
-                {
-                    ele.html( attr.innerHtml );
-                    delete attr.innerHtml;
-                }
-                ele.properties( attr );
-            }
-            super( ele );
+            super( ele, attr );
         }
 
 
@@ -113,7 +103,7 @@ package es.core
         /**
          * @private
          */
-        private var stateGroup:Object={};
+        private var statesGroup:Object={};
 
         /**
          * 设置状态对象
@@ -125,17 +115,17 @@ package es.core
         {
             var len:int = value.length;
             var i:int=0;
-            var stateGroup:Object=this.stateGroup;
+            var statesGroup:Object=this.statesGroup;
             for(;i<len;i++)
             {
                 var stateObj:State = value[i] as State;
                 var name:String = stateObj.name;
-                if( !name )throw new TypeError('name is not define in Skin.prototype.states');
-                if( stateGroup.hasOwnProperty(name) )
+                if( !name )throw new TypeError('name is not define in Skin.states');
+                if( statesGroup.hasOwnProperty(name) )
                 {
-                    throw new TypeError('"'+name+'" has already been declared in Skin.prototype.states');
+                    throw new TypeError('"'+name+'" has already been declared in Skin.states');
                 }
-                stateGroup[ name ] = stateObj;
+                statesGroup[ name ] = stateObj;
             }
         };
 
@@ -153,10 +143,11 @@ package es.core
             if( current !== name )
             {
                 this._currentState=name;
-                currentStateObject = null;
+                this._defaultStateGroup = null;
                 if( this.initialized )
                 {
-                    this.updateDisplayList();
+                    this.invalidate = false;
+                    this.createChildren();
                 }
             }
         };
@@ -168,6 +159,66 @@ package es.core
         public function get currentState():String
         {
             return this._currentState;
+        }
+
+          /**
+         * @private
+         */
+        private var _defaultStateGroup:State=null;
+
+        /**
+        * @private
+        */
+        private function getDefaultStateGroup():State
+        {
+            var obj:State = this._defaultStateGroup;
+            if( !obj ){
+               obj = new State("default");
+               this._defaultStateGroup = obj;
+            }
+            return obj;
+        }
+
+        /**
+         * @private
+         */
+        private var _currentStateGroup:State=null;
+
+        /**
+         * @private
+         * @param stateGroup
+         * @param currentState
+         * @returns {*}
+         */
+        protected function getCurrentStateGroup():State
+        {
+            var currentState:String = this.currentState;
+            if( !currentState )
+            {
+                return this.getDefaultStateGroup();
+            }
+
+            if( this._currentStateGroup )
+            {
+                return this._currentStateGroup;
+            }
+
+            var statesGroup:Object = this.statesGroup;
+            if( statesGroup.hasOwnProperty( currentState ) )
+            {
+                return statesGroup[ currentState ] as State;
+            }
+
+            for( var p:String in statesGroup )
+            {
+                var state:State = statesGroup[p] as State;
+                if( state.includeIn(currentState) )
+                {
+                    this._currentStateGroup = state;
+                    return state;
+                }
+            }
+            throw new ReferenceError('"' + currentState + '"' + ' is not define');
         }
 
         /**
@@ -212,66 +263,22 @@ package es.core
             if( invalidate === false )
             {
                 invalidate = true;
+                var children:Array = this.render.create(this);
+                this.render.createChildren(this.element[0],children);
+                this.updateDisplayList();
             }
-
-            var children:Array = this.render.create( this );
-            var element:Element = this.element;
-            var len:int = children.length;
-            var c:int = 0;
-            for (; c < len; c++)
-            {
-                var node:Node = children[c] as Node;
-                if( !node.parentNode )
-                {
-                    element.addChild( children[c] );
-                }
-            }
-            this.updateDisplayList();
         };
 
-        /**
-         * @private
-         */
-        [RunPlatform(client)]
-        private var currentStateObject:State=null;
-
-        /**
-         * @private
-         * @param stateGroup
-         * @param currentState
-         * @returns {*}
-         */
-        [RunPlatform(client)]
-        private function getCurrentState():State
-        {
-            var currentState:String = this.currentState;
-            if( !currentState )return null;
-            if( this.currentStateObject )
-            {
-                return this.currentStateObject;
-            }
-            var stateGroup:Object = this.stateGroup;
-            if( stateGroup.hasOwnProperty( currentState ) )return stateGroup[ currentState ] as State;
-            for( var p:String in stateGroup )
-            {
-                var state:State = stateGroup[p] as State;
-                if( state.includeIn(currentState) )
-                {
-                    this.currentStateObject = state;
-                    return state;
-                }
-            }
-            throw new ReferenceError('"' + currentState + '"' + ' is not define');
-        }
+       
 
         /**
          * 更新显示列表
          * 此方法主要用来显示和隐藏指定对应状态的元素
          * 当调用 createChildren 方法后，系统会自动调用无需手动调用。
          */
-        [RunPlatform(client)]
         protected function updateDisplayList()
         {
+            /*
             var stateGroup:State = getCurrentState();
             if( stateGroup )
             {
@@ -298,7 +305,7 @@ package es.core
                     e.state = stateGroup;
                     this.dispatchEvent( e );
                 }
-            }
+            }*/
         }
 
          /**
@@ -321,6 +328,11 @@ package es.core
                 this._render = render;
              }
              return render;
+        }
+
+        protected function set render(value:IRender):void
+        {
+            this._render = value;
         }
 
         /**

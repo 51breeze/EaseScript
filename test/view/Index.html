@@ -4,73 +4,18 @@
 
       <![CDATA[
 
-        import es.core.VirtualElement;
-
         private var but:EventDispatcher=null;
-
-    
-        override protected function updateDisplayList()
-        {
-
-
-               var bnt:EventDispatcher = this.but;
-               if( !bnt ){
-
-                  bnt = new EventDispatcher( this.button );
-                  but = bnt;
-               }
-
-              // console.log("====", this.button  );
-
-
-               bnt.removeEventListener(MouseEvent.CLICK);
-               bnt.addEventListener( MouseEvent.CLICK, function(e:MouseEvent){
-
-                    var datalist:Array=[
-                    ];
-
-                    var len:int = Math.round( Math.random() * 1000 );
-                    len = 1000;
-
-                   // console.log("==+++==");
-
-                    
-                  //this.table.element.html("");
-
-                    var htmls:Array=[];
-                    for(var i:int=0;i<len;i++)
-                    {
-
-
-                      // htmls.push( "<tr>"+"<td><input value="+i+" /></td>"+"<td>"+i+"</td>"+"<td>"+(Math.random() * 10000)+"</td></tr>");
-
-                      datalist.push({"name":Math.random() * 10000,"id":i,"address":Math.random() * 10000});
-
-                    }
-
-                   var str:String=  htmls.join("");
-
-                  // console.log( str );
-                  // this.table.element.html("<tbody>"+str+"</tbody>");
-
-                    //  this.removeChild( this.table );
-                    this.assign("datalist",datalist);
-                    this.assign("rowHeight",30);
-                   // this.assign("rowHeight", Math.max( Math.abs( Math.random() * 100 ), Math.abs( Math.random() * 100 ) )  );
-
-                    // this.addChildAt( this.table, 2 );
-
-                    this.display();
-                        
-                },false,0,this);
-
-                
-
-              
-        }
-
       ]]>
 
+    <s:states>
+        <s:State name="tips" stateGroup="simple" />
+        <s:State name="title" stateGroup="simple" />
+        <s:State name="alert" stateGroup="normal" />
+        <s:State name="confirm" stateGroup="normal" />
+        <s:State name="modality" stateGroup="normal" />
+    </s:states>
+
+    <s:currentState>alert</s:currentState>
 
     <head>
         <title>{title}</title>
@@ -80,11 +25,28 @@
 
     <body>
 
+
         <div>
-            <s:Skin name="button" id="@button" type='button' class="btn btn-success" style="width: 100px;">点 我 {name}</s:Skin>
+            <s:Container name="button" id="@button" type='button' class="btn btn-success" style="width: 100px;">
+                 <span>点 我 {name}</span>
+                 <:if condition="name eq 222">
+                 <span>===</span>
+                 </:if>
+            </s:Container>
+            <s:Skin>
+                <s:render>
+                    <s:Render>
+                   
+                        <div>
+                            <ul>sdfsd========fsdf</ul>
+                        </div>
+                
+                    </s:Render>
+                </s:render>
+            </s:Skin>
         </div>
 
-        <div ooo="ssss">
+        <div ooo="ssss" class.tips="pppp" class="sss pppp" class.title="99999" class.normal="yyyyy"  >
             dsfdsfdsfsdf
         </div>
 
@@ -111,11 +73,25 @@
 
         <div class="uuuu " style="margin: 10px;">
             <h1>
-                这里是内容9999999999
+                这里是\\\"内容\\\"9999999999=9999
             </h1>
         </div>
 
-    </body>    
+        <div class="popup-container fixed"  addClass.modality="popup-lg">
+            <div class="popup-head" excludeFrom="tips">
+                <span class="popup-title" >title</span>
+                <button type="button" class="close" >×</button>
+            </div>
+            <div class="popup-body" >
+            </div>
+            <div class="popup-footer"  excludeFrom="simple">
+                <button type="button" class="btn btn-sm btn-default" removeClass.modality="btn-sm"  excludeFrom="alert">取 消</button>
+                <button type="button" class="btn btn-sm btn-primary" removeClass.modality="btn-sm" >确 定</button>
+            </div>
+        </div>
 
+
+    </body>
+ 
 
 </s:View>
