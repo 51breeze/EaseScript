@@ -101,12 +101,8 @@ package es.core
             {
                 child = (child as SkinComponent).skin as IDisplay;
             }
-           
-            (child as Display).es_internal::displayParent = this;
-            //if( this.inDocumentChain() )
-            //{
-                this.element.addChildAt(child.element,index);
-           // }
+            child.es_internal::setParentDisplay(this);
+            this.element.addChildAt(child.element,index);
             return child;
         };
 
@@ -117,23 +113,13 @@ package es.core
          */
         public function removeChild( child:IDisplay ):IDisplay
         {
-            if( child )
+            var index:int = this.getChildIndex( child );
+            if( index >= 0 )
             {
-                var children:Array = this._children;
-                var index:int = children.indexOf( child );
-                if( child is SkinComponent )
-                {
-                    child = (child as SkinComponent).skin as IDisplay;
-                }
-                (child as Display).es_internal::displayParent = null;
-                this._children.splice(index, 1);
-                if( (child as Display).inDocumentChain() )
-                {
-                    child.element.parent().removeChild( child.element );
-                }
-                return child;
+                return this.removeChildAt( index );
+            }else{
+                throw new ReferenceError('The child is not added.');
             }
-            throw new ReferenceError('The child is null or undefined');
         };
 
         /**
@@ -143,7 +129,26 @@ package es.core
          */
         public function removeChildAt( index:Number ):IDisplay
         {
-            return this.removeChild( this.getChildAt(index) );
+            var children:Array = this._children;
+            index = index < 0 ? index+children.length : index;
+            if( !(children.length > index) )
+            {
+                throw new RangeError('The index out of range');
+            }
+            var child:IDisplay = children[index].target as IDisplay;
+            children.splice(index, 1);
+            if( child is SkinComponent )
+            {
+                child = (child as SkinComponent).skin as IDisplay;
+            }
+
+            if( child.parent )
+            {
+                child.element.parent().removeChild( child.element );
+            }
+            child.es_internal::setParentDisplay(null);
+            return child;
+            
         };
 
         /**
@@ -151,13 +156,11 @@ package es.core
          */
         public function removeAllChild():void
         {
-            var children:Array = this._children;
-            var len:int = children.length;
+            var len:int = this._children.length;
             while( len>0 )
             {
-                this.removeChild( children[ --len ] as IDisplay );
+                this.removeChildAt( --len );
             }
-            this._children = [];
         }
 
         /**

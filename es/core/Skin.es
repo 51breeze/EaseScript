@@ -11,12 +11,15 @@ package es.core
     import es.core.Skin;
     import es.core.VirtualElement;
     import es.events.SkinEvent;
+    import es.events.StateEvent;
     import es.core.State;
     import es.interfaces.IDisplay;
+    import es.core.Display;
     import es.interfaces.IContainer;
     import es.core.BaseLayout;
     import es.core.Render;
     import es.interfaces.IRender;
+    import es.core.es_internal;
 
     public class Skin extends Container
     {
@@ -101,6 +104,138 @@ package es.core
         }
 
         /**
+        * @private
+        */
+        private var _children:Array=[];
+
+        /**
+         * 获取子级元素
+         * @returns {Array}
+         */
+        override public function get children():Array
+        {
+            return this._children.slice(0);
+        };
+
+        /**
+         * 获取指定索引处的子级元素
+         * @param index
+         * @returns {IDisplay}
+         */
+        override public function getChildAt( index:Number ):IDisplay
+        {
+            var children:Array = this._children;
+            index = index < 0 ? index+children.length : index;
+            if( !children[index] )
+            {
+                throw new RangeError('The index out of range');
+            }
+            return children[index].target as IDisplay;
+        };
+
+        /**
+         * 根据子级皮肤返回索引
+         * @param child
+         * @returns {Number}
+         */
+        override public function getChildIndex( child:IDisplay ):Number
+        {
+            var children:Array = this._children;
+            var len:int = children.length;
+            var index:int = 0;
+            for(;index<len;index++)
+            {
+                if( children[index].target === child )
+                {
+                    return index;
+                }
+            }
+            return -1;
+        };
+
+
+         /**
+         * 在指定索引位置添加元素
+         * @param child
+         * @param index
+         * @returns {Display}
+         */
+        override public function addChildAt( child:IDisplay , index:Number ):IDisplay
+        {
+            var parent:IDisplay = child.parent;
+            if( parent )
+            {
+                (parent as Container).removeChild( child );
+            }
+            var children:Array = this._children;
+            var at:Number = index < 0 ? index+children.length+1 : index;
+            children.splice(at, 0, {target:child,index:index});
+            if( child is SkinComponent )
+            {
+                child = (child as SkinComponent).skin as IDisplay;
+            }
+            child.es_internal::setParentDisplay(this);
+            return child;
+        };
+
+        /**
+         * 移除指定的子级元素
+         * @param child
+         * @returns {Display}
+         */
+        override public function removeChild( child:IDisplay ):IDisplay
+        {
+            var children:Array = this._children;
+            var index:int = this.getChildIndex( child );
+            if( index >= 0 )
+            {
+                return this.removeChildAt( index );
+            }else{
+                throw new ReferenceError('The child is not added.');
+            }
+        };
+
+        /**
+         * 移除指定索引的子级元素
+         * @param index
+         * @returns {Display}
+         */
+        override public function removeChildAt( index:Number ):IDisplay
+        {
+            var children:Array = this._children;
+            index = index < 0 ? index+children.length : index;
+            if( !(children.length > index) )
+            {
+                throw new RangeError('The index out of range');
+            }
+
+            var child:IDisplay = children[index].target as IDisplay;
+            children.splice(index, 1);
+            if( child is SkinComponent )
+            {
+                child = (child as SkinComponent).skin as IDisplay;
+            }
+            if( child.parent )
+            {
+                child.element.parent().removeChild( child.element );
+            }
+            child.es_internal::setParentDisplay(null);
+            return child;
+        };
+
+        /**
+         * 移除所有的子级元素
+         */
+        override public function removeAllChild():void
+        {
+            var len:int = this._children.length;
+            while( len>0 )
+            {
+                this.removeChildAt( --len );
+            }
+        }
+
+        /**
          * @private
          */
         private var statesGroup:Object={};
@@ -143,7 +278,14 @@ package es.core
             if( current !== name )
             {
                 this._currentState=name;
-                this._defaultStateGroup = null;
+                this._currentStateGroup = null;
+                if( this.hasEventListener(StateEvent.CHANGE) )
+                {
+                    var e:StateEvent = new StateEvent(StateEvent.CHANGE);
+                    e.oldState = current;
+                    e.newState = name;
+                    this.dispatchEvent(e);
+                }
                 if( this.initialized )
                 {
                     this.invalidate = false;
@@ -161,24 +303,6 @@ package es.core
             return this._currentState;
         }
 
-          /**
-         * @private
-         */
-        private var _defaultStateGroup:State=null;
-
-        /**
-        * @private
-        */
-        private function getDefaultStateGroup():State
-        {
-            var obj:State = this._defaultStateGroup;
-            if( !obj ){
-               obj = new State("default");
-               this._defaultStateGroup = obj;
-            }
-            return obj;
-        }
-
         /**
          * @private
          */
@@ -192,26 +316,28 @@ package es.core
          */
         protected function getCurrentStateGroup():State
         {
-            var currentState:String = this.currentState;
+            var currentState:String = this._currentState;
             if( !currentState )
             {
-                return this.getDefaultStateGroup();
+                throw new ReferenceError('State is not define.');
             }
 
             if( this._currentStateGroup )
             {
                 return this._currentStateGroup;
             }
-
+            var state:State = null;
             var statesGroup:Object = this.statesGroup;
             if( statesGroup.hasOwnProperty( currentState ) )
             {
-                return statesGroup[ currentState ] as State;
+                state = statesGroup[ currentState ] as State;
+                this._currentStateGroup = state;
+                return state;
             }
 
             for( var p:String in statesGroup )
             {
-                var state:State = statesGroup[p] as State;
+                state = statesGroup[p] as State;
                 if( state.includeIn(currentState) )
                 {
                     this._currentStateGroup = state;
@@ -263,13 +389,48 @@ package es.core
             if( invalidate === false )
             {
                 invalidate = true;
-                var children:Array = this.render.create(this);
-                this.render.createChildren(this.element[0],children);
+
+                var children:Array = this._children;
+                var i:int = 0;
+                var len:int = children.length;
+                var child:IDisplay = null;
+                var parent:IDisplay = null;
+                var container:Element = this.element;
+                var render:IRender = this._render;
+                if( render )
+                {
+                    var nodes:Array= render.create(this) as Array;
+                    for(;i<len;i++)
+                    {
+                        child = children[i].target as IDisplay;
+                        parent = child.parent;
+                        if( parent && parent !== this )
+                        {
+                            (parent as Container).removeChild( child );
+                        }
+                        nodes.splice(children[i].index,0, child.display()[0] );
+                    }
+                    render.createChildren( container[0], nodes);
+
+                }else
+                {
+                    for(;i<len;i++)
+                    {
+                       child = children[i].target as IDisplay;
+                       parent = child.parent;
+                       if( parent !== this )
+                       {
+                            if( parent )
+                            {
+                                (parent as Container).removeChild( child );
+                            }
+                            container.addChildAt( (children[i].target as IDisplay).display(), children[i].index );
+                       }
+                    }
+                }
                 this.updateDisplayList();
             }
         };
-
-       
 
         /**
          * 更新显示列表
@@ -330,9 +491,10 @@ package es.core
              return render;
         }
 
-        protected function set render(value:IRender):void
+        protected function set render(value:IRender=null):void
         {
             this._render = value;
+            invalidate = false;
         }
 
         /**
@@ -353,6 +515,10 @@ package es.core
             {
                 invalidate=false;
                 this.render.assign(name,value);
+                if( initialized )
+                {
+                    // this.createChildren();
+                }
             }
             return value;
         }

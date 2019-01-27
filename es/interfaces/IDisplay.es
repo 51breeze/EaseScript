@@ -54,7 +54,12 @@ package es.interfaces
          */
         //public function get visible():Boolean;
 
-       // es_internal function setParentDisplay(parent:IDisplay):void;
+        /**
+         * 设置父级显示对象
+         * 此方法公提供组件开发人员使用
+         * @returns {Boolean}
+         */
+        es_internal function setParentDisplay(parent:IDisplay):void;
 
         /**
          * 获取父级皮肤元素

@@ -7,7 +7,7 @@
  */
 package es.core {
 
-    public class State {
+    public class State extends EventDispatcher {
         private var _name:String = '';
         private var _stateGroup:Array = [];
 

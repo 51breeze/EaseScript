@@ -14,6 +14,7 @@ package es.components
     import es.interfaces.IDisplay;
     import es.core.Interaction;
     import es.core.Position;
+    import es.core.es_internal; 
 
     public class SkinComponent extends Component implements IDisplay,IContainer
     {
@@ -372,6 +373,14 @@ package es.components
             }
             properties.bottom=value;
         };
+
+        /**
+        * @es_internal
+        */
+        es_internal function setParentDisplay(value:IDisplay=null):void
+        {
+            this.skin.es_internal::setParentDisplay(value);
+        }
 
         /**
          * 获取父级皮肤元素

@@ -45,6 +45,22 @@ package es.core
         }
 
         /**
+        * 获取视图标题
+        */
+        public function get title():String
+        {
+             return _context.title;
+        }
+
+        /**
+        * 设置视图标题
+        */
+        public function set title(value:String):void
+        { 
+            _context.title=value;
+        }
+
+        /**
          * 获取或者指定数据
          * @param name
          * @param value

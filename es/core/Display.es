@@ -310,9 +310,17 @@ package es.core
         };
         
         /**
+         * @private
+         */
+        private var parentDisplay:IDisplay=null;
+
+        /**
          * @es_internal
          */
-        es_internal var displayParent:IDisplay=null;
+        es_internal function setParentDisplay(value:IDisplay=null):void
+        {
+            parentDisplay = value;
+        }
 
         /**
          * 获取父级皮肤元素
@@ -321,7 +329,7 @@ package es.core
          */
         public function get parent():IDisplay
         {
-            return this.es_internal::displayParent;
+            return parentDisplay;
         };
 
         /**

@@ -33,7 +33,12 @@ package es.interfaces
         * 设置数据集
         * @returns {void}
         */
-        public function set dataset(value:Object):void
+        public function set dataset(value:Object):void;
+
+        /**
+        * 绑定事件至指定的目标元素
+        */
+        public function bindEvent(index:int,uniqueKey:*,target:Object,events:Object,context:Object=null):void;
 
         /**
          * 创建一个节点元素
@@ -42,9 +47,10 @@ package es.interfaces
          * @param name 元素的节点名
          * @param attr 元素的初始属性
          * @param bindding 元素的动态属性
+         * @param bindEvent 绑定元素的事件
          * @returns {Object} 一个表示当前节点元素的对象
          */ 
-    	 public function createElement(index:int,uniqueKey:*, name:String, children:*=null, attr:Object=null,bidding:Object=null):Object
+    	 public function createElement(index:int,uniqueKey:*, name:String, children:*=null, attr:Object=null,bidding:Object=null,bindEvent:Object=null,bindContext:Object=null):Object
 
     	 /**
          * 创建一个组件元素

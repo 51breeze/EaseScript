@@ -2,10 +2,60 @@
 <s:View uu="sss" xmlns:s="es.core" xmlns:base="@" xmlns:c="es.components" xmlns:b="com" xmlns:p="view.page">
     <s:Metadata>[HostComponent("IndexApplication")]</s:Metadata>
 
-      <![CDATA[
+    <s:Script>
+    <![CDATA[
 
-        private var but:EventDispatcher=null;
-      ]]>
+        import es.core.Display;
+      
+        override protected function updateDisplayList()
+        {
+            console.log("updateDisplayList",  this.currentState );
+            if( !button ){
+               return;
+            }
+            button.removeEventListener(MouseEvent.CLICK);
+            button.addEventListener( MouseEvent.CLICK, function (e:MouseEvent)
+            {
+                console.log("click");
+
+                this.addChildAt( new Display( new Element("<div>==== the add child 2====</div>") ) , 2);
+
+                var datalist:Array=[];
+                var len:int = Math.abs( Math.random() * 100 );
+                len = 1000;
+
+                for(var i:int=0;i<len;i++)
+                {
+                    datalist.push({"name":i,"id":i,"address":Math.abs( Math.random() * 100000 )});
+                }
+                this.assign("datalist",datalist);
+                if( this.currentState ==="tips"){
+                    this.currentState = "modality";
+                }else{
+                    this.currentState = "tips";
+
+                }
+                 this.display();
+               
+               
+
+            },false,0,this);
+        }
+
+        private function goto(e:Event):void
+        {
+
+            console.log( "===goto====", this );
+
+        }
+
+        private function gototips(e:Event)
+        {
+             console.log( "===gototips====", this );
+        }
+
+    ]]>
+    </s:Script>
 
     <s:states>
         <s:State name="tips" stateGroup="simple" />
@@ -15,34 +65,33 @@
         <s:State name="modality" stateGroup="normal" />
     </s:states>
 
-    <s:currentState>alert</s:currentState>
+    <s:currentState>modality</s:currentState>
+
+    <s:title>yejun 5555</s:title>
 
     <head>
-        <title>{title}</title>
+        <title>yejun 5555</title>
         <meta charset="UTF-8" http-equiv="X-UA-Compatible" />
-        <meta name="keyword" http-equiv="es,easescript" />
+        <meta name="keyword" http-equiv="es,easescript,569999" />
     </head>
 
     <body>
 
-
-        <div>
+        <div onClick.normal="{this.goto}" onClick.tips="{this.gototips}" >
             <s:Container name="button" id="@button" type='button' class="btn btn-success" style="width: 100px;">
                  <span>点 我 {name}</span>
-                 <:if condition="name eq 222">
-                 <span>===</span>
-                 </:if>
+                 <span includeIn="alert">===</span>
             </s:Container>
             <s:Skin>
-                <s:render>
+
+                <s:render excludeFrom="normal" >
                     <s:Render>
-                   
-                        <div>
-                            <ul>sdfsd========fsdf</ul>
-                        </div>
-                
+                         <div>
+                            <ul>9999999999999999999999999999999</ul>
+                         </div>
                     </s:Render>
                 </s:render>
+
             </s:Skin>
         </div>
 
@@ -61,7 +110,7 @@
                                 </td>
                             </:case>
                             <:default>
-                                 <td data-column="{ukey}" style="height:{rowHeight}px;line-height:{rowHeight}px; width: 120px;">
+                                <td data-column="{ukey}" style="height:{rowHeight}px;line-height:{rowHeight}px; width: 120px;">
                                     <span style="color:red;">{val}</span>
                                 </td>
                             </:default>
@@ -83,10 +132,11 @@
                 <button type="button" class="close" >×</button>
             </div>
             <div class="popup-body" >
+                popup-body
             </div>
             <div class="popup-footer"  excludeFrom="simple">
-                <button type="button" class="btn btn-sm btn-default" removeClass.modality="btn-sm"  excludeFrom="alert">取 消</button>
-                <button type="button" class="btn btn-sm btn-primary" removeClass.modality="btn-sm" >确 定</button>
+                <button type="button" class="btn btn-sm btn-default" class.modality="{statname}"  excludeFrom="alert">取 消</button>
+                <button type="button" class="btn btn-sm btn-primary" class.modality="btn btn-default" >确 定</button>
             </div>
         </div>
 

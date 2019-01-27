@@ -99,6 +99,48 @@ package es.core
         /**
         * @private
         */
+        private var bindEventHash:Object={};
+
+        /**
+        * 绑定事件至指定的目标元素
+        */
+        public function bindEvent(index:int,uniqueKey:*,target:Object,events:Object,context:Object=null):void
+        {
+            context = context || _context || null;
+            var uukey:String = (uniqueKey+''+index) as String;
+            var binded:Object = bindEventHash[uukey] as Object;
+            if( !binded )
+            {
+                binded = {items:{},origin:target};
+                bindEventHash[uukey] = binded;
+                if( target instanceof EventDispatcher )
+                {
+                    binded.eventTarget = target;
+                }else{
+                    binded.eventTarget = new EventDispatcher(target);
+                }
+            }
+
+            for( var p:String in events)
+            {
+                if( binded.items[ p ] !== events[p] )
+                {
+                    if( binded.items[ p ] )
+                    {
+                        binded.eventTarget.removeEventListener( p , binded.items[ p ] );
+                    }
+                    if( events[p] )
+                    {
+                        binded.items[ p ] = events[p];
+                        binded.eventTarget.addEventListener('click',events[p],false,0,context);
+                    }
+                }
+            }
+        }
+
+        /**
+        * @private
+        */
         private var _destruction:Boolean=false;
 
         /**
@@ -152,7 +194,7 @@ package es.core
          * @param attr 元素的初始属性
          * @param bindding 元素的动态属性
          */ 
-        public function createElement(index:int,uniqueKey:*, name:String, children:*=null, attr:Object=null,updateAttrs:Object=null):Object
+        public function createElement(index:int,uniqueKey:*, name:String, children:*=null, attr:Object=null,updateAttrs:Object=null,bindEvent:Object=null,bindContext:Object=null):Object
         {
             var uukey:String = (uniqueKey+''+index) as String;
             var obj:Node = hashMapElements[ uukey ] as Node;
@@ -178,6 +220,10 @@ package es.core
             {
                 this.setAttrs(obj,updateAttrs);
             }
+            if( bindEvent )
+            {
+                this.bindEvent(index,uniqueKey,obj, bindEvent, bindContext);
+            }
             return obj;
         }
 
@@ -192,12 +238,14 @@ package es.core
         public function createComponent(index:int,uniqueKey:*,callback:Function):Object
         {
             var uukey:String = (uniqueKey+""+index) as String;
-            var obj:IDisplay = hashMapElements[ uukey ] as IDisplay;
-            var newObj:IDisplay = callback( obj , uukey ) as IDisplay;
+            var obj:Object = hashMapElements[ uukey ];
+            var newObj:Object = callback( obj , uukey );
             if( newObj !== obj )
             {
                 hashMapElements[ uukey ] = newObj;
-                newObj.element[0]["unique-key"] = uukey;
+                if( newObj is IDisplay ){
+                    (newObj as IDisplay).element[0]["unique-key"] = uukey;
+                }
             }
             return newObj;
         }
@@ -249,6 +297,7 @@ package es.core
                 {
                     var elem:Element =(children[i] as IDisplay).display();
                     newNode = elem[0] as Node;
+
                 }else
                 { 
                     newNode = children[i] as Node;
@@ -281,6 +330,8 @@ package es.core
                                 this.unsetNode( oldNode );
                             } 
 
+                            children.splice(i,1);
+
                             len--;
                             continue;
                         }
@@ -308,6 +359,11 @@ package es.core
         /**
         * @private
         */
+        private var _context:Object=null;
+
+        /**
+        * @private
+        */
         private var _result:Array=null;
 
         /**
@@ -326,7 +382,7 @@ package es.core
             {
                 return _result;
             }
-
+            _context = context;
             invalidate = true;
             var result:Array = factory(this,context, _dataset) as Array;
             _result = result;

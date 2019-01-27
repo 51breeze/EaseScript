@@ -112,6 +112,7 @@ package es.core
        public function set title( value:String ):void
        {
            _assignments.title = value;
+           document.title = value;
        }
 
        /**
@@ -121,7 +122,7 @@ package es.core
         */
        public function get title():String
        {
-           return _assignments.title as String;
+          return _assignments.title as String;
        }
 
        /**
