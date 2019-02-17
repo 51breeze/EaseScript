@@ -38,19 +38,28 @@ package es.interfaces
         /**
         * 绑定事件至指定的目标元素
         */
-        public function bindEvent(index:int,uniqueKey:*,target:Object,events:Object,context:Object=null):void;
+        public function bindEvent(uniqueKey:*,target:Object,events:Object,context:Object=null):void;
+
+        /**
+        * 设置一组指定的属性
+        * @param target
+        * @param attrs
+        */ 
+        public function attributes(target:Object, attrs:Object):void;
 
         /**
          * 创建一个节点元素
          * @param index 当前节点元素的索引位置
          * @param uniqueKey 当前元素位于当前域中的唯一键值
          * @param name 元素的节点名
-         * @param attr 元素的初始属性
-         * @param bindding 元素的动态属性
-         * @param bindEvent 绑定元素的事件
+         * @param attrs 元素的初始属性
+         * @param update 元素的动态属性
+         * @param binding 双向绑定元素属性
+         * @param event 绑定元素的事件
+         * @param context 指定当前上下文对象
          * @returns {Object} 一个表示当前节点元素的对象
          */ 
-    	 public function createElement(index:int,uniqueKey:*, name:String, children:*=null, attr:Object=null,bidding:Object=null,bindEvent:Object=null,bindContext:Object=null):Object
+    	 public function createElement(index:int,uniqueKey:*, name:String, children:*=null, attrs:Object=null,update:Object=null,binding:Array=null,event:Object=null,context:Object=null):Object
 
     	 /**
          * 创建一个组件元素

@@ -71,7 +71,7 @@ package
             var datalist:Array=[];
 
             var len:int = Math.abs( Math.random() * 100 );
-            len = 1000;
+            len = 100;
 
             for(var i:int=0;i<len;i++)
             {

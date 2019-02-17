@@ -8,7 +8,9 @@
     "es": "./bin/es.js"
   },
   "scripts": {
-    "test": "./bin/es.js -V"
+    "test": "node ./bin/es.js -V",
+    "dev":"npm run development",
+    "development":"node ./bin/es.js -p ./test -C -m test -s javascript -b IndexApplication -o E:\\webroot\\working"
   },
   "repository": {
     "type": "git",

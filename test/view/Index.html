@@ -6,23 +6,30 @@
     <![CDATA[
 
         import es.core.Display;
+
+        static var count:int = 0;
       
         override protected function updateDisplayList()
         {
-            console.log("updateDisplayList",  this.currentState );
+            //console.log("updateDisplayList",  this.currentState );
             if( !button ){
                return;
             }
+            var self:Index= this;
             button.removeEventListener(MouseEvent.CLICK);
             button.addEventListener( MouseEvent.CLICK, function (e:MouseEvent)
             {
-                console.log("click");
+                count++;
+                //console.log("click=========", self.change );
 
-                this.addChildAt( new Display( new Element("<div>==== the add child 2====</div>") ) , 2);
+                console.log( self.skin1.currentState,"=========skin1 currentState====" );
+
+
+                this.addChildAt( new Display( new Element("<div>==== the add child "+count+"====</div>") ) , 2);
 
                 var datalist:Array=[];
                 var len:int = Math.abs( Math.random() * 100 );
-                len = 1000;
+                len = 100;
 
                 for(var i:int=0;i<len;i++)
                 {
@@ -33,9 +40,16 @@
                     this.currentState = "modality";
                 }else{
                     this.currentState = "tips";
-
                 }
-                 this.display();
+                self.change=this.currentState;
+
+                 //this.display();
+
+                /*if( self.change ==="tips"){
+                    self.change = "modality";
+                }else{
+                    self.change = "tips";
+                }*/
                
                
 
@@ -51,8 +65,16 @@
 
         private function gototips(e:Event)
         {
-             console.log( "===gototips====", this );
+          //   console.log( "===gototips====", this );
         }
+
+        [Bindable] 
+        public var change:*="ssss";
+
+        [Bindable] 
+        public var address:*="ssaddressss";
+
+        public var statName:String="ssssss";
 
     ]]>
     </s:Script>
@@ -65,7 +87,7 @@
         <s:State name="modality" stateGroup="normal" />
     </s:states>
 
-    <s:currentState>modality</s:currentState>
+    <s:currentState>tips</s:currentState>
 
     <s:title>yejun 5555</s:title>
 
@@ -78,26 +100,29 @@
     <body>
 
         <div onClick.normal="{this.goto}" onClick.tips="{this.gototips}" >
-            <s:Container name="button" id="@button" type='button' class="btn btn-success" style="width: 100px;">
+            <s:Container name="button" id="@button" type='button' class="btn btn-success" value="{this.change}" style="width: 100px;">
                  <span>点 我 {name}</span>
                  <span includeIn="alert">===</span>
             </s:Container>
-            <s:Skin>
-
+            <s:Skin id="@skin1" onClick="{this.goto}" >
+               <s:currentState>{{this.change}}</s:currentState> 
                 <s:render excludeFrom="normal" >
                     <s:Render>
                          <div>
-                            <ul>9999999999999999999999999999999</ul>
+                            <ul>99999999999999============9999999999999999</ul>
                          </div>
                     </s:Render>
                 </s:render>
-
             </s:Skin>
         </div>
 
-        <div ooo="ssss" class.tips="pppp" class="sss pppp" class.title="99999" class.normal="yyyyy"  >
+        <div ooo="ssss" class.tips="pppp" class="sss pppp" class.title="99999" class.normal="yyyyy"  data-api="{name}" >
             dsfdsfdsfsdf
         </div>
+
+        <input value="{{change}}" />
+        <br />
+        <input value="{skin1.currentState}"  />
 
         <table id="@table">
             <:foreach name="datalist" value="item">

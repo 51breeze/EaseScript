@@ -16,12 +16,13 @@ package es.core
     import es.interfaces.IDisplay;
     import es.core.Display;
     import es.interfaces.IContainer;
+    import es.interfaces.IBindable;
     import es.core.BaseLayout;
     import es.core.Render;
     import es.interfaces.IRender;
     import es.core.es_internal;
 
-    public class Skin extends Container
+    public class Skin extends Container implements IBindable
     {
        
         /**
@@ -66,6 +67,48 @@ package es.core
                 ele.property("id", id);
             }
             return id;
+        }
+
+        /**
+         * @private
+         */
+        private var _bindable:Bindable=null;
+
+        /**
+         * @protected
+         */
+        protected function getBindable():Bindable
+        {
+            var value:Bindable = _bindable;
+            if( !value )
+            {
+                value = new Bindable(this,"*");
+                _bindable = value;
+            }
+            return value;
+        }
+
+        /**
+        * 观察指定的属性，如果当前对象或者目标对象上有指定的属性发生变化时相互调度
+        * @param name 数据源上的属性名
+        * @param target 目标对象
+        * @param propName 目标属性名
+        */
+        public function watch(name:String,target:Object,propName:String):void
+        {
+           var bindable:Bindable= this.getBindable();
+           bindable.bind(target, propName, name);
+        }
+
+        /**
+        * 取消观察指定的属性
+        * @param target 目标对象
+        * @param propName 目标属性名
+        */
+        public function unwatch(target:Object,propName:String=null):void
+        {
+           var bindable:Bindable= this.getBindable();
+           bindable.unbind(target, propName);
         }
 
         /**
@@ -168,8 +211,7 @@ package es.core
                 (parent as Container).removeChild( child );
             }
             var children:Array = this._children;
-            var at:Number = index < 0 ? index+children.length+1 : index;
-            children.splice(at, 0, {target:child,index:index});
+            children.push({target:child,index:index < 0 ? index+children.length+1 : index});
             if( child is SkinComponent )
             {
                 child = (child as SkinComponent).skin as IDisplay;
@@ -353,7 +395,6 @@ package es.core
          */
         protected function initializing(){}
 
-    
         /**
          * 渲染显示皮肤对象。
          * 调用此方法会重新创建子级对象，在非必要情况下请谨慎使用，可以节省资源。
@@ -389,7 +430,6 @@ package es.core
             if( invalidate === false )
             {
                 invalidate = true;
-
                 var children:Array = this._children;
                 var i:int = 0;
                 var len:int = children.length;
@@ -408,9 +448,9 @@ package es.core
                         {
                             (parent as Container).removeChild( child );
                         }
-                        nodes.splice(children[i].index,0, child.display()[0] );
+                        nodes.splice(children[i].index,0, child.display().current() );
                     }
-                    render.createChildren( container[0], nodes);
+                    render.createChildren( this, nodes );
 
                 }else
                 {
@@ -493,8 +533,30 @@ package es.core
 
         protected function set render(value:IRender=null):void
         {
+            if( value===null )
+            {
+                var children:Array = this._children.map(function(child:IDisplay){
+                    return child.element[0];
+                });
+                var eleChildren:Element = this.element.children();
+                var len:int = eleChildren.length;
+                var i:int = 0;
+                for(;i<len;i++)
+                {
+                    var childNode:Node =  eleChildren[i] as Node;
+                    //如果不是手动添加的元素移除
+                    if( children.indexOf( childNode ) < 0  )
+                    {
+                        this.element.removeChild( childNode );
+                    }
+                }
+            }
             this._render = value;
             invalidate = false;
+            if( initialized === true )
+            {
+                this.createChildren();
+            }
         }
 
         /**
@@ -517,7 +579,7 @@ package es.core
                 this.render.assign(name,value);
                 if( initialized )
                 {
-                    // this.createChildren();
+                    //this.createChildren();
                 }
             }
             return value;
@@ -544,6 +606,10 @@ package es.core
             _dataset = value;
             this.render.dataset=value;
             invalidate=false;
+            if( initialized === true )
+            {
+                this.createChildren();
+            }
         }
     }
 }

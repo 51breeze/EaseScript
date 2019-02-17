@@ -9,6 +9,9 @@ package es.core
     import es.interfaces.IDisplay;
     import es.interfaces.IRender;
     import es.core.State;
+    import es.core.es_internal;
+    import es.interfaces.IBindable;
+
     public class Render extends EventDispatcher implements IRender
     {
         /**
@@ -104,35 +107,34 @@ package es.core
         /**
         * 绑定事件至指定的目标元素
         */
-        public function bindEvent(index:int,uniqueKey:*,target:Object,events:Object,context:Object=null):void
+        public function bindEvent(uniqueKey:*,target:Object,events:Object,context:Object=null):void
         {
             context = context || _context || null;
-            var uukey:String = (uniqueKey+''+index) as String;
-            var binded:Object = bindEventHash[uukey] as Object;
-            if( !binded )
+            var uukey:String = uniqueKey as String;
+            var data:Object = bindEventHash[uukey] as Object;
+            if( !data )
             {
-                binded = {items:{},origin:target};
-                bindEventHash[uukey] = binded;
+                data = {items:{},origin:target};
+                bindEventHash[uukey] = data;
                 if( target instanceof EventDispatcher )
                 {
-                    binded.eventTarget = target;
+                    data.eventTarget = target;
                 }else{
-                    binded.eventTarget = new EventDispatcher(target);
+                    data.eventTarget = new EventDispatcher(target);
                 }
             }
-
             for( var p:String in events)
             {
-                if( binded.items[ p ] !== events[p] )
+                if( data.items[ p ] !== events[p] )
                 {
-                    if( binded.items[ p ] )
+                    if( data.items[ p ] )
                     {
-                        binded.eventTarget.removeEventListener( p , binded.items[ p ] );
+                        data.eventTarget.removeEventListener( p , data.items[ p ] );
                     }
                     if( events[p] )
                     {
-                        binded.items[ p ] = events[p];
-                        binded.eventTarget.addEventListener('click',events[p],false,0,context);
+                        data.items[ p ] = events[p];
+                        data.eventTarget.addEventListener(p,events[p],false,0,context);
                     }
                 }
             }
@@ -162,6 +164,42 @@ package es.core
         }
 
         /**
+        * 设置一组指定的属性
+        * @param target
+        * @param attrs
+        */ 
+        public function attributes(target:Object, attrs:Object):void
+        {
+            var isElem:Boolean = target instanceof Element;
+            Object.forEach(attrs,function(value:*,name:String)
+            {
+                if( isElem )
+                {
+                    var elem:Element = target as Element;
+                    if( name ==="innerHTML" && target.innerHTML !== value)
+                    {
+                        elem.html( value as String );
+
+                    }else if( elem.property(name) != attrs[name] )
+                    {
+                        elem.property(name, attrs[name]);
+                    }
+
+                }else
+                {
+                    if( name ==="innerHTML" && target.innerHTML !== value)
+                    {
+                        target.innerHTML = value as String;
+
+                    }else if( target.getAttribute(name) != attrs[name] )
+                    {
+                        target.setAttribute(name, attrs[name] );
+                    }
+                }
+            });
+        }
+
+        /**
         * @protected
         */
         protected function setAttrs(target:Node,attrs:Object):void
@@ -180,21 +218,55 @@ package es.core
         }
 
         /**
+        * @protected
+        */
+        protected function watch(elem:Object,binding:Array)
+        {
+            binding.forEach(function(item:Object)
+            {
+                if( item.unwatch )
+                {
+                    if( item.unwatch instanceof Array )
+                    {
+                        item.unwatch.forEach(function(target:IBindable){
+                            target.unwatch(elem);
+                        });
+
+                    }else
+                    {
+                        (item.unwatch as IBindable).unwatch(elem);
+                    }
+
+                }else
+                {
+                    if( !(item.target is IBindable) )
+                    {
+                        throw new TypeError("Bind target is not IBindable");
+                    }
+                    (item.target as IBindable).watch(item.name,elem,item.prop);
+                }
+            }); 
+        }
+
+        /**
         * @private
         * 所有子级元素对象的集合
         */
         private var hashMapElements:Object={};
 
-         /**
+          /**
          * 创建一个节点元素
-         * @param index 子级位于父级中的索引位置
-         * @param key 元素位于当前Render中的唯一键
-         * @param id 元素的唯一ID
+         * @param index 当前节点元素的索引位置
+         * @param uniqueKey 当前元素位于当前域中的唯一键值
          * @param name 元素的节点名
-         * @param attr 元素的初始属性
-         * @param bindding 元素的动态属性
+         * @param attrs 元素的初始属性
+         * @param update 元素的动态属性
+         * @param binding 双向绑定元素属性
+         * @param event 绑定元素的事件
+         * @param context 指定当前上下文对象
+         * @returns {Object} 一个表示当前节点元素的对象
          */ 
-        public function createElement(index:int,uniqueKey:*, name:String, children:*=null, attr:Object=null,updateAttrs:Object=null,bindEvent:Object=null,bindContext:Object=null):Object
+        public function createElement(index:int,uniqueKey:*, name:String, children:*=null, attrs:Object=null,update:Object=null,binding:Array=null,event:Object=null,context:Object=null):Object
         {
             var uukey:String = (uniqueKey+''+index) as String;
             var obj:Node = hashMapElements[ uukey ] as Node;
@@ -203,11 +275,17 @@ package es.core
                 obj = document.createElement( name );
                 obj["unique-key"] = uukey;
                 hashMapElements[ uukey ] = obj;
-                if( attr )
+                if( attrs )
                 {
-                    this.setAttrs(obj,attr);
+                    this.setAttrs(obj,attrs);
                 }
             }
+
+            if( binding )
+            {
+                this.watch(obj, binding );
+            }
+            
             if( children )
             {
                 if( children instanceof Array ){
@@ -216,13 +294,13 @@ package es.core
                     obj.textContent=children+"";
                 }
             }
-            if( updateAttrs )
+            if( update)
             {
-                this.setAttrs(obj,updateAttrs);
+                this.setAttrs(obj,update);
             }
-            if( bindEvent )
+            if( event )
             {
-                this.bindEvent(index,uniqueKey,obj, bindEvent, bindContext);
+                this.bindEvent(uukey,obj,event,context);
             }
             return obj;
         }
@@ -243,8 +321,11 @@ package es.core
             if( newObj !== obj )
             {
                 hashMapElements[ uukey ] = newObj;
-                if( newObj is IDisplay ){
-                    (newObj as IDisplay).element[0]["unique-key"] = uukey;
+                if( newObj is IDisplay )
+                {
+                    var elem:Element = (newObj as IDisplay).element;
+                    var node:Object = elem.current();
+                    node["unique-key"] = uukey;
                 }
             }
             return newObj;
@@ -280,9 +361,11 @@ package es.core
         */
         public function createChildren(parentNode:Object,children:Array):void
         {
+            var parentDisplay:IDisplay=null;
             if( parentNode is IDisplay )
             {
-               parentNode = (parentNode as IDisplay).element[0] as Object; 
+                parentDisplay = parentNode as IDisplay;
+                parentNode = (parentNode as IDisplay).element.current() as Object; 
             }
 
             var parent:Node = parentNode as Node;
@@ -295,9 +378,7 @@ package es.core
                 var isDisplay:Boolean = children[i] is IDisplay;
                 if( isDisplay )
                 {
-                    var elem:Element =(children[i] as IDisplay).display();
-                    newNode = elem[0] as Node;
-
+                    newNode =(children[i] as IDisplay).display().current() as Node;
                 }else
                 { 
                     newNode = children[i] as Node;
@@ -314,7 +395,7 @@ package es.core
                         if( destruct )
                         {
                             this.unsetNode( parent.childNodes[i] as Node );
-                        } 
+                        }
 
                     }else
                     {
@@ -329,9 +410,7 @@ package es.core
                             {
                                 this.unsetNode( oldNode );
                             } 
-
                             children.splice(i,1);
-
                             len--;
                             continue;
                         }
@@ -346,10 +425,14 @@ package es.core
                     //调度事件
                     if( newNode && isDisplay )
                     {
+                        var childDisplay:IDisplay = children[i] as IDisplay;
+                        if( parentDisplay ){
+                            childDisplay.es_internal::setParentDisplay( parentDisplay );
+                        }
                         var e:ElementEvent=new ElementEvent( ElementEvent.ADD );
-                        e.parent = parent;
+                        e.parent = parentDisplay || parent;
                         e.child = newNode;
-                        (children[i] as EventDispatcher).dispatchEvent( e );
+                        (childDisplay as EventDispatcher).dispatchEvent( e );
                     }
                 }
                 i++;
