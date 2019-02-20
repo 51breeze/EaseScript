@@ -16,6 +16,21 @@ package es.interfaces
     	*/
         public function get factory():Function
 
+         /**
+        * 设置一个渲染器的工厂的上下文对象
+        */
+        public function set context(value:Object):void;
+
+        /**
+        * 获取一个渲染器的工厂的上下文对象
+        */
+        public function get context():Object;
+
+        /**
+        * 绑定一组指定对象的属性
+        */
+        public function watch(elem:Object,binding:Array):void
+
         /**
     	* 为此渲染器分配一个指定名称的数据值
         * @param name 指定值的名称
@@ -83,7 +98,7 @@ package es.interfaces
         * @param context 指定一个在工厂函数里面需要用到的上文对象
         * @return {Array}
         */
-        public function create(context:Object):Array
+        public function create():Array
 
     }
 }

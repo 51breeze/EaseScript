@@ -321,13 +321,6 @@ package es.core
             {
                 this._currentState=name;
                 this._currentStateGroup = null;
-                if( this.hasEventListener(StateEvent.CHANGE) )
-                {
-                    var e:StateEvent = new StateEvent(StateEvent.CHANGE);
-                    e.oldState = current;
-                    e.newState = name;
-                    this.dispatchEvent(e);
-                }
                 if( this.initialized )
                 {
                     this.invalidate = false;
@@ -439,7 +432,8 @@ package es.core
                 var render:IRender = this._render;
                 if( render )
                 {
-                    var nodes:Array= render.create(this) as Array;
+                    render.context = this;
+                    var nodes:Array= render.create() as Array;
                     for(;i<len;i++)
                     {
                         child = children[i].target as IDisplay;
@@ -479,34 +473,6 @@ package es.core
          */
         protected function updateDisplayList()
         {
-            /*
-            var stateGroup:State = getCurrentState();
-            if( stateGroup )
-            {
-                var elems:Element = new Element('[includeIn],[excludeFrom]', this.element );
-
-                //隐藏或者显示当前已设置的状态
-                elems.forEach(function ()
-                {
-                    var includeIn:String = elems.property('includeIn');
-                    var excludeFrom:String = elems.property('excludeFrom');
-                    var _include:Boolean    = true;
-                    if( includeIn ){
-                        _include = stateGroup.includeIn(includeIn);
-                    }
-                    if( excludeFrom ) {
-                        _include = !stateGroup.includeIn(excludeFrom);
-                    }
-                    _include ? elems.show() : elems.hide();
-                });
-
-                if( this.hasEventListener(SkinEvent.INTERNAL_UPDATE_STATE) )
-                {
-                    var e:SkinEvent = new SkinEvent( SkinEvent.INTERNAL_UPDATE_STATE );
-                    e.state = stateGroup;
-                    this.dispatchEvent( e );
-                }
-            }*/
         }
 
          /**
@@ -536,7 +502,7 @@ package es.core
             if( value===null )
             {
                 var children:Array = this._children.map(function(child:IDisplay){
-                    return child.element[0];
+                    return child.element.current();
                 });
                 var eleChildren:Element = this.element.children();
                 var len:int = eleChildren.length;

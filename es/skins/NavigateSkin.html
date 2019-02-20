@@ -16,7 +16,7 @@
                     var event:NavigateEvent = new NavigateEvent( NavigateEvent.URL_JUMP_BEFORE );
                     event.content = this.property("href");
                     event.originalEvent = e;
-                    var datalist:Array = self.variable( dataProfile ) as Array;
+                    var datalist:Array = self.assign( dataProfile ) as Array;
                     for(var i:int in datalist){
                         if(datalist[i].link===event.content)
                         {
@@ -32,14 +32,12 @@
     </s:Script>
     <style file="NavigateStyle.less" />
     <s:Skin name="ul" class="nav nav-pills">
-        <s:template>
-            <:foreach name="datalist" value="item" key="link">
-                <:if condition="match(item,forIndex)">
-                    <li role="presentation" class="active"><a href="{item.link}" target="{openTarget ? '_blank' : '_self'}">{item.label}</a></li>
-                <:else />
-                    <li role="presentation"><a href="{item.link}" target="{openTarget ? '_blank' : '_self'}">{item.label}</a></li>
-                </:if>
-            </:foreach>
-        </s:template>
+        <:foreach name="datalist" value="item" key="link">
+            <:if condition="dataset.match(item,link)">
+                <li role="presentation" class="active"><a href="{item.link}" target="{openTarget? '_blank' : '_self'}">{item.label}</a></li>
+            <:else />
+                <li role="presentation"><a href="{item.link}" target="{openTarget ? '_blank' : '_self'}">{item.label}</a></li>
+            </:if>
+        </:foreach>
     </s:Skin>
 </s:Skin>

@@ -20,11 +20,6 @@ package es.core
         private var invalidate:Boolean=false;
 
         /**
-         * @private
-         */
-        private var _factory:Function;
-
-        /**
          * 动态元素渲染类
          * @constructor
          */
@@ -33,6 +28,11 @@ package es.core
             super();
             _factory = factory;
         }
+
+        /**
+         * @private
+         */
+        private var _factory:Function;
 
         /**
         * 设置一个渲染器的工厂函数
@@ -52,6 +52,31 @@ package es.core
         public function get factory():Function
         {
             return _factory;
+        }
+
+        /**
+         * @private
+         */
+        private var _context:Object=null;
+
+        /**
+        * 设置一个渲染器的工厂函数
+        * 在调用此函数时会传递一个 context 作为第一个参数
+        * context 是一个 IContainer 数据类型
+        * 此工厂函数负责生产一个元素集并应用于指定的 Element 集中
+        */
+        public function set context(value:Object):void
+        { 
+            _context = value;
+        }
+
+        /**
+        * 获取一个渲染器的工厂函数
+        * 每一个工厂函数必须返回一个 Element 对象
+        */
+        public function get context():Object
+        {
+            return _context;
         }
 
          /**
@@ -176,18 +201,30 @@ package es.core
                 if( isElem )
                 {
                     var elem:Element = target as Element;
-                    if( name ==="innerHTML" && target.innerHTML !== value)
+                    if( name ==="content" && elem.text() !== value )
+                    {
+                        elem.text( value );
+                          
+                    }else if( name ==="innerHTML" && target.innerHTML !== value)
                     {
                         elem.html( value as String );
 
-                    }else if( elem.property(name) != attrs[name] )
+                    }else if( elem.property(name) != value )
                     {
-                        elem.property(name, attrs[name]);
+                        elem.property(name, value );
                     }
 
                 }else
                 {
-                    if( name ==="innerHTML" && target.innerHTML !== value)
+                    if( name ==="content" )
+                    {
+                        var prop:String = typeof target.textContent === "string" ? "textContent" : "innerText";
+                        if( target[prop] !== value )
+                        {
+                            target[prop] = value;
+                        }
+                          
+                    }else if( name ==="innerHTML" && target.innerHTML !== value)
                     {
                         target.innerHTML = value as String;
 
@@ -202,25 +239,7 @@ package es.core
         /**
         * @protected
         */
-        protected function setAttrs(target:Node,attrs:Object):void
-        {
-            Object.forEach(attrs,function(value:*,name:String)
-            {
-                if( name ==="innerHTML" && target.innerHTML !== value)
-                {
-                    target.innerHTML = value as String;
-
-                }else if( target.getAttribute(name) != attrs[name] )
-                {
-                    target.setAttribute(name, attrs[name] );
-                }
-            });
-        }
-
-        /**
-        * @protected
-        */
-        protected function watch(elem:Object,binding:Array)
+        public function watch(elem:Object,binding:Array):void
         {
             binding.forEach(function(item:Object)
             {
@@ -277,7 +296,7 @@ package es.core
                 hashMapElements[ uukey ] = obj;
                 if( attrs )
                 {
-                    this.setAttrs(obj,attrs);
+                    this.attributes(obj,attrs);
                 }
             }
 
@@ -296,7 +315,7 @@ package es.core
             }
             if( update)
             {
-                this.setAttrs(obj,update);
+                this.attributes(obj,update);
             }
             if( event )
             {
@@ -442,32 +461,25 @@ package es.core
         /**
         * @private
         */
-        private var _context:Object=null;
-
-        /**
-        * @private
-        */
         private var _result:Array=null;
 
         /**
         * 从指定的元素工厂中创建元素
         * @return {Array}
         */
-        public function create(context:Object=null):Array
+        public function create():Array
         {
             var factory:Function = _factory;
             if( !factory )
             {
                 return [];
             }
-
             if( invalidate )
             {
                 return _result;
             }
-            _context = context;
             invalidate = true;
-            var result:Array = factory(this,context, _dataset) as Array;
+            var result:Array = factory(this,_context, _dataset) as Array;
             _result = result;
             return result;
         }

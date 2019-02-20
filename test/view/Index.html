@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<s:View uu="sss" xmlns:s="es.core" xmlns:base="@" xmlns:c="es.components" xmlns:b="com" xmlns:p="view.page">
+<s:View uu="{{this.change}}" xmlns:s="es.core" xmlns:base="@" xmlns:c="es.components" xmlns:b="com" xmlns:p="view.page">
     <s:Metadata>[HostComponent("IndexApplication")]</s:Metadata>
 
     <s:Script>
@@ -56,7 +56,7 @@
             },false,0,this);
         }
 
-        private function goto(e:Event):void
+        public function goto(e:Event):void
         {
 
             console.log( "===goto====", this );
@@ -87,7 +87,7 @@
         <s:State name="modality" stateGroup="normal" />
     </s:states>
 
-    <s:currentState>tips</s:currentState>
+    <s:currentState>normal</s:currentState>
 
     <s:title>yejun 5555</s:title>
 
@@ -96,6 +96,8 @@
         <meta charset="UTF-8" http-equiv="X-UA-Compatible" />
         <meta name="keyword" http-equiv="es,easescript,569999" />
     </head>
+
+     <style file="../index.less" />
 
     <body>
 
@@ -116,9 +118,11 @@
             </s:Skin>
         </div>
 
-        <div ooo="ssss" class.tips="pppp" class="sss pppp" class.title="99999" class.normal="yyyyy"  data-api="{name}" >
+        <div ooo="ssss" class.tips="navigate" data-api="{name}" >
             dsfdsfdsfsdf
         </div>
+
+        <c:Navigate></c:Navigate>
 
         <input value="{{change}}" />
         <br />

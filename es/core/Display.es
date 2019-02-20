@@ -38,6 +38,10 @@ package es.core
                 {
                     element.html( attr.innerHTML );
                     delete attr.innerHTML;
+                }else if( attr.content )
+                {
+                    element.text( attr.content );
+                    delete attr.content;
                 }
                 element.properties( attr );
             }
