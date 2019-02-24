@@ -76,6 +76,10 @@ package es.interfaces
          */ 
     	 public function createElement(index:int,uniqueKey:*, name:String, children:*=null, attrs:Object=null,update:Object=null,binding:Array=null,event:Object=null,context:Object=null):Object
 
+        public function getElement(index:int,uniqueKey:*):Object;
+        public function setElement(index:int,uniqueKey:*,value:Object):Object;
+        
+
     	 /**
          * 创建一个组件元素
          * @param index 当前节点元素的索引位置

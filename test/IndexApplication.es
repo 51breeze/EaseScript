@@ -2,7 +2,7 @@ package
 {
     import BaseApplication;
     import view.Index;
-   // import view.Viewport;
+    import view.Viewport;
     import es.core.es_internal;
     import es.interfaces.IListIterator;
   //  import es.core.PopUp;
@@ -24,10 +24,10 @@ package
         [Router(method="get")]
         public function viewport()
         {
-           /*
+           
             console.log(" ====enter viewport====");
             var view:view.Viewport = new view.Viewport( this );
-            return this.render(view);*/
+            return this.render(view);
         }
 
         [Router(method="get,post,put", alias="home")]
@@ -66,7 +66,6 @@ package
             view.assign("maxHeight",40);
             view.assign("title","Hello world!!");
             view.assign("name","Hello world!!");
-
 
             var datalist:Array=[];
 

@@ -324,6 +324,28 @@ package es.core
             return obj;
         }
 
+        public function getElement(index:int,uniqueKey:*):Object
+        {
+            var uukey:String = (uniqueKey+""+index) as String;
+            return hashMapElements[ uukey ]||null;
+        }
+
+        public function setElement(index:int,uniqueKey:*,value:Object):Object
+        {
+            var uukey:String = (uniqueKey+""+index) as String;
+            hashMapElements[ uukey ] = value;
+            if( value is IDisplay )
+            {
+               // var elem:Element = (value as IDisplay).element;
+              //  var node:Object = elem.current();
+             //   node["unique-key"] = uukey;
+                
+            }else{
+                value["unique-key"] = uukey;
+            }
+            return value;
+        }
+
          /**
          * 创建一个组件元素
          * @param childIndex 子级位于父级中的索引位置

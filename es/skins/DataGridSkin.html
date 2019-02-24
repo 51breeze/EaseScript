@@ -20,6 +20,8 @@
                 Element('tfoot > tr:last-child >td:first-child' , table).style('borderBottomLeftRadius',radius );
                 Element('tfoot > tr:last-child >td:last-child' , table).style('borderBottomRightRadius',radius );
                 Element('td',  (this.foot as Display).element ).height( hostComponent.footHeight );
+
+               
             }
 
             override protected function initializing()
@@ -52,36 +54,32 @@
         ]]>
     </s:Script>
     <style file="DataGridStyle.less" />
-    <s:Skin name="thead" id="@head">
-        <s:template>
-              <tr>
-                  <:foreach name="columns" value="name" >
-                      <th style="height:{headHeight}px;line-height:{headHeight}px;">{name}<span></span></th>
-                  </:foreach>
-              </tr>
-         </s:template>
-    </s:Skin>
-
-    <s:Skin name="tbody" id="@body">
-        <s:template>
-            <:foreach name="datalist" value="item">
-                <tr>
-                    <:foreach name="columns" value="val" key="field">
-                        <:switch condition="field">
-                            <:case condition="name" break="true">
-                                <td data-column="{field}" style="height:{rowHeight}px;line-height:{rowHeight}px;">
-                                    <input value="{item[field]}" style="height: 25px;" />
-                                </td>
-                            </:case>
-                            <:default>
-                                <td data-column="{field}" style="height:{rowHeight}px;line-height:{rowHeight}px;">{item[field]}</td>
-                            </:default>
-                        </:switch>
-                    </:foreach>
-                </tr>
+    <thead id="@head">
+        <tr>
+            <:foreach name="columns" value="name" >
+                <th style="height:{headHeight}px;line-height:{headHeight}px;">{name}<span></span></th>
             </:foreach>
-        </s:template>
-    </s:Skin>
+        </tr>
+    </thead>
+
+    <tbody id="@body">
+        <:foreach name="datalist" value="item">
+            <tr>
+                <:foreach name="columns" value="val" key="field">
+                    <:switch condition="field">
+                        <:case condition="name" break="true">
+                            <td data-column="{field}" style="height:{rowHeight}px;line-height:{rowHeight}px;">
+                                <input value="{item[field]}" style="height: 25px;" />
+                            </td>
+                        </:case>
+                        <:default>
+                            <td data-column="{field}" style="height:{rowHeight}px;line-height:{rowHeight}px;">{item[field]}</td>
+                        </:default>
+                    </:switch>
+                </:foreach>
+            </tr>
+        </:foreach>
+    </tbody>
 
     <tfoot id="@foot">
          <tr>

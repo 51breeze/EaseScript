@@ -135,7 +135,7 @@ package es.core
             {
                 throw new RangeError('The index out of range');
             }
-            var child:IDisplay = children[index].target as IDisplay;
+            var child:IDisplay = children[index] as IDisplay;
             children.splice(index, 1);
             if( child is SkinComponent )
             {

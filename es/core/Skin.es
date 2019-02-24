@@ -24,37 +24,23 @@ package es.core
 
     public class Skin extends Container implements IBindable
     {
-       
         /**
          * 皮肤类
          * @constructor
          */
         function Skin( name:*, attr:Object=null)
         {
-            var ele:Element = null;
-            if( Element.isHTMLContainer(name) )
+            var elem:Element = null;
+            if( typeof name === "string" )
             {
-                ele= new Element(name);
+                elem=new Element( document.createElement(name) );
+            }else if( name instanceof Element ){
+                elem=name as Element;
+            }else{
+                elem = new Element( name );
             }
-            else if( name instanceof Element )
-            {
-                ele=name as Element;
-
-            }else if( name is IDisplay )
-            {
-                ele=(name as IDisplay).element;
-
-            }else if( name instanceof String )
-            {
-                var id:String = (name as String).charAt(0);
-                ele = id === "#" || id==="." || id==="<" ? new Element(name) : new Element('<' + name +'/>');
-            }else
-            {
-                throw new Error( "Invalid parameter. in Skin" );
-            }
-            super( ele, attr );
+            super( elem , attr ); 
         }
-
 
         [RunPlatform(server)]
         public function generateId():String
@@ -67,6 +53,11 @@ package es.core
                 ele.property("id", id);
             }
             return id;
+        }
+
+        protected function render():Array
+        {
+            return [];
         }
 
         /**
@@ -429,39 +420,18 @@ package es.core
                 var child:IDisplay = null;
                 var parent:IDisplay = null;
                 var container:Element = this.element;
-                var render:IRender = this._render;
-                if( render )
+                var nodes:Array= this.render();
+                for(;i<len;i++)
                 {
-                    render.context = this;
-                    var nodes:Array= render.create() as Array;
-                    for(;i<len;i++)
+                    child = children[i].target as IDisplay;
+                    parent = child.parent;
+                    if( parent && parent !== this )
                     {
-                        child = children[i].target as IDisplay;
-                        parent = child.parent;
-                        if( parent && parent !== this )
-                        {
-                            (parent as Container).removeChild( child );
-                        }
-                        nodes.splice(children[i].index,0, child.display().current() );
+                        (parent as Container).removeChild( child );
                     }
-                    render.createChildren( this, nodes );
-
-                }else
-                {
-                    for(;i<len;i++)
-                    {
-                       child = children[i].target as IDisplay;
-                       parent = child.parent;
-                       if( parent !== this )
-                       {
-                            if( parent )
-                            {
-                                (parent as Container).removeChild( child );
-                            }
-                            container.addChildAt( (children[i].target as IDisplay).display(), children[i].index );
-                       }
-                    }
+                    nodes.splice(children[i].index,0, child.display().current() );
                 }
+                this.updateNodes(this, nodes);
                 this.updateDisplayList();
             }
         };
@@ -473,56 +443,6 @@ package es.core
          */
         protected function updateDisplayList()
         {
-        }
-
-         /**
-         * @private
-         */
-        private var _render:IRender=null;
-
-         /**
-         * 获取当前元素的渲染工厂
-         * @param name
-         * @param value
-         */
-        protected function get render():IRender
-        {
-             var render:IRender = this._render;
-             if( render===null )
-             {
-                render = new Render();
-                render.dataset = _dataset;
-                this._render = render;
-             }
-             return render;
-        }
-
-        protected function set render(value:IRender=null):void
-        {
-            if( value===null )
-            {
-                var children:Array = this._children.map(function(child:IDisplay){
-                    return child.element.current();
-                });
-                var eleChildren:Element = this.element.children();
-                var len:int = eleChildren.length;
-                var i:int = 0;
-                for(;i<len;i++)
-                {
-                    var childNode:Node =  eleChildren[i] as Node;
-                    //如果不是手动添加的元素移除
-                    if( children.indexOf( childNode ) < 0  )
-                    {
-                        this.element.removeChild( childNode );
-                    }
-                }
-            }
-            this._render = value;
-            invalidate = false;
-            if( initialized === true )
-            {
-                this.createChildren();
-            }
         }
 
         /**
@@ -538,11 +458,10 @@ package es.core
             {
                 return dataset[name];
             }
-
             if( dataset[name] !== value )
             {
+                dataset[name] = value;
                 invalidate=false;
-                this.render.assign(name,value);
                 if( initialized )
                 {
                     //this.createChildren();
@@ -570,11 +489,248 @@ package es.core
         public function set dataset(value:Object):void
         {
             _dataset = value;
-            this.render.dataset=value;
             invalidate=false;
             if( initialized === true )
             {
-                this.createChildren();
+                //this.createChildren();
+            }
+        }
+
+          /**
+        * @private
+        */
+        private var bindEventHash:Object={};
+
+        /**
+        * 绑定事件至指定的目标元素
+        */
+        protected function bindEvent(index:int,uniqueKey:*,target:Object,events:Object):void
+        {
+            var uukey:String = (index+""+uniqueKey) as String;
+            var data:Object = bindEventHash[uukey] as Object;
+            if( !data )
+            {
+                data = {items:{},origin:target};
+                bindEventHash[uukey] = data;
+                if( target instanceof EventDispatcher )
+                {
+                    data.eventTarget = target;
+                }else{
+                    data.eventTarget = new EventDispatcher(target);
+                }
+            }
+            for( var p:String in events)
+            {
+                if( data.items[ p ] !== events[p] )
+                {
+                    if( data.items[ p ] )
+                    {
+                        data.eventTarget.removeEventListener( p , data.items[ p ] );
+                    }
+                    if( events[p] )
+                    {
+                        data.items[ p ] = events[p];
+                        data.eventTarget.addEventListener(p,events[p],false,0,this);
+                    }
+                }
+            }
+        }
+
+        /**
+        * 设置一组指定的属性
+        * @param target
+        * @param attrs
+        */ 
+        public function attributes(target:Object, attrs:Object):void
+        {
+            var isElem:Boolean = target instanceof Element;
+            Object.forEach(attrs,function(value:*,name:String)
+            {
+                if( isElem )
+                {
+                    var elem:Element = target as Element;
+                    if( name ==="content" && elem.text() !== value )
+                    {
+                        elem.text( value );
+                          
+                    }else if( name ==="innerHTML" && target.innerHTML !== value)
+                    {
+                        elem.html( value as String );
+
+                    }else if( elem.property(name) != value )
+                    {
+                        elem.property(name, value );
+                    }
+
+                }else
+                {
+                    if( name ==="content" )
+                    {
+                        var prop:String = typeof target.textContent === "string" ? "textContent" : "innerText";
+                        if( target[prop] !== value )
+                        {
+                            target[prop] = value;
+                        }
+                          
+                    }else if( name ==="innerHTML" && target.innerHTML !== value)
+                    {
+                        target.innerHTML = value as String;
+
+                    }else if( target.getAttribute(name) != attrs[name] )
+                    {
+                        target.setAttribute(name, attrs[name] );
+                    }
+                }
+            });
+        }
+
+
+        /**
+        * @private
+        * 所有子级元素对象的集合
+        */
+        private var hashMapElements:Object={};
+
+          /**
+         * 创建一个节点元素
+         * @param index 当前节点元素的索引位置
+         * @param uniqueKey 当前元素位于当前域中的唯一键值
+         * @param name 元素的节点名
+         * @param attrs 元素的初始属性
+         * @param update 元素的动态属性
+         * @param binding 双向绑定元素属性
+         * @param event 绑定元素的事件
+         * @param context 指定当前上下文对象
+         * @returns {Object} 一个表示当前节点元素的对象
+         */ 
+        protected function createElement(index:int,uniqueKey:*, name:String, children:*=null, attrs:Object=null,update:Object=null,events:Object=null):Object
+        {
+            var uukey:String = (uniqueKey+''+index) as String;
+            var obj:Node = hashMapElements[ uukey ] as Node;
+            if( !obj )
+            {
+                obj = document.createElement( name );
+                obj["unique-key"] = uukey;
+                hashMapElements[ uukey ] = obj;
+                if( attrs )
+                {
+                    this.attributes(obj,attrs);
+                }
+            }
+
+            if( children )
+            {
+                if( children instanceof Array ){
+                    this.updateNodes(obj,children as Array);
+                }else{
+                    obj.textContent=children+"";
+                }
+            }
+            if( update)
+            {
+                this.attributes(obj,update);
+            }
+            if( events )
+            {
+                this.bindEvent(index,uniqueKey,obj,events);
+            }
+            return obj;
+        }
+
+        protected function getElement(index:int,uniqueKey:*):Object
+        {
+            var uukey:String = (uniqueKey+""+index) as String;
+            return hashMapElements[ uukey ]||null;
+        }
+
+        protected function setElement(index:int,uniqueKey:*,value:Object):Object
+        {
+            var uukey:String = (uniqueKey+""+index) as String;
+            hashMapElements[ uukey ] = value;
+            if( value is IDisplay )
+            {
+               // var elem:Element = (value as IDisplay).element;
+              //  var node:Object = elem.current();
+             //   node["unique-key"] = uukey;
+                
+            }else{
+                value["unique-key"] = uukey;
+            }
+            return value;
+        }
+
+
+        /**
+        * 更新一组应于父节点的子级元素。更新完后两边的子级节点会完全一致。
+        * 如果指定的children列表和parentNode的子级列表中的每一个元素不相等，则会做相应的添加和删除操作。
+        * @param parentNode 
+        * @param children
+        */
+        protected function updateNodes(parentNode:Object,children:Array):void
+        {
+            var parentDisplay:IDisplay=null;
+            if( parentNode is IDisplay )
+            {
+                parentDisplay = parentNode as IDisplay;
+                parentNode = (parentNode as IDisplay).element.current() as Object; 
+            }
+
+            var parent:Node = parentNode as Node;
+            var len:int = Math.max(children.length, parent.childNodes.length);
+            var i:int=0;
+            while( i<len )
+            {
+                var newNode:Node=null;
+                var isDisplay:Boolean = children[i] is IDisplay;
+                if( isDisplay )
+                {
+                    newNode =(children[i] as IDisplay).display().current() as Node;
+                }else
+                { 
+                    newNode = children[i] as Node;
+                }
+                
+                //两边节点不一致 
+                if( newNode !== parent.childNodes[i] )
+                {
+                    //替换元素
+                    if( newNode && parent.childNodes[i] )
+                    {
+                        parent.replaceChild(newNode, parent.childNodes[i] as Node);
+
+                    }else
+                    {
+                        //移除元素
+                        if( parent.childNodes[i] )
+                        {
+                            var oldNode:Node = parent.childNodes[i] as Node;
+                            (oldNode.parentNode as Node).removeChild( oldNode );
+                            children.splice(i,1);
+                            len--;
+                            continue;
+                        }
+
+                         //添加元素
+                        if( newNode )
+                        {
+                            parent.appendChild(newNode);
+                        }
+                    }
+
+                    //调度事件
+                    if( newNode && isDisplay )
+                    {
+                        var childDisplay:IDisplay = children[i] as IDisplay;
+                        if( parentDisplay ){
+                            childDisplay.es_internal::setParentDisplay( parentDisplay );
+                        }
+                        var e:ElementEvent=new ElementEvent( ElementEvent.ADD );
+                        e.parent = parentDisplay || parent;
+                        e.child = newNode;
+                        (childDisplay as EventDispatcher).dispatchEvent( e );
+                    }
+                }
+                i++;
             }
         }
     }

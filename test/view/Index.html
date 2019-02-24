@@ -22,7 +22,6 @@
                 count++;
                 //console.log("click=========", self.change );
 
-                console.log( self.skin1.currentState,"=========skin1 currentState====" );
 
 
                 this.addChildAt( new Display( new Element("<div>==== the add child "+count+"====</div>") ) , 2);
@@ -102,31 +101,21 @@
     <body>
 
         <div onClick.normal="{this.goto}" onClick.tips="{this.gototips}" >
-            <s:Container name="button" id="@button" type='button' class="btn btn-success" value="{this.change}" style="width: 100px;">
+            <s:Container name="button" onClick.normal="{this.goto}" id="@button" type='button' class="btn btn-success" value="{this.change}" style="width: 100px;">
                  <span>点 我 {name}</span>
                  <span includeIn="alert">===</span>
             </s:Container>
-            <s:Skin id="@skin1" onClick="{this.goto}" >
-               <s:currentState>{{this.change}}</s:currentState> 
-                <s:render excludeFrom="normal" >
-                    <s:Render>
-                         <div>
-                            <ul>99999999999999============9999999999999999</ul>
-                         </div>
-                    </s:Render>
-                </s:render>
-            </s:Skin>
         </div>
 
-        <div ooo="ssss" class.tips="navigate" data-api="{name}" >
+
+        <div ooo="ssss" class.tips="navigate" data-api="{name}" excludeFrom="normal" >
             dsfdsfdsfsdf
         </div>
 
-        <c:Navigate></c:Navigate>
 
         <input value="{{change}}" />
         <br />
-        <input value="{skin1.currentState}"  />
+        <input value="{change}"  />
 
         <table id="@table">
             <:foreach name="datalist" value="item">

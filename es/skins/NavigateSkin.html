@@ -31,7 +31,7 @@
     ]]>
     </s:Script>
     <style file="NavigateStyle.less" />
-    <s:Skin name="ul" class="nav nav-pills">
+    <ul class="nav nav-pills">
         <:foreach name="datalist" value="item" key="link">
             <:if condition="dataset.match(item,link)">
                 <li role="presentation" class="active"><a href="{item.link}" target="{openTarget? '_blank' : '_self'}">{item.label}</a></li>
@@ -39,5 +39,5 @@
                 <li role="presentation"><a href="{item.link}" target="{openTarget ? '_blank' : '_self'}">{item.label}</a></li>
             </:if>
         </:foreach>
-    </s:Skin>
+    </ul>
 </s:Skin>

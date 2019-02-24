@@ -39,24 +39,21 @@
     ]]>
     </s:Script>
   <style file="PaginationStyle.less" />
-  <s:template>
-      <li class="first">
-          <a href="{url(first,profile)}">第一页</a>
+  <li class="first">
+      <a href="{url(first,profile)}">第一页</a>
+  </li>
+  <li class="prev">
+      <a href="{url(prev,profile)}" class='{current===1?"disabled":""}'>上一页</a>
+  </li>
+  <:foreach name="link" value="val">
+      <li class="link {val==current?'current':''}">
+          <a href="{url(val,profile)}">{val}</a>
       </li>
-      <li class="prev">
-          <a href="{url(prev,profile)}" class='{current===1?"disabled":""}'>上一页</a>
-      </li>
-      <:foreach name="link" value="val">
-          <li class="link {val==current?'current':''}">
-              <a href="{url(val,profile)}">{val}</a>
-          </li>
-      </:foreach>
-      <li class="next">
-          <a href="{url(next,profile)}">下一页</a>
-      </li>
-      <li class="last">
-          <a href="{url(last,profile)}">最后页</a>
-      </li>
-  </s:template>
-
+  </:foreach>
+  <li class="next">
+      <a href="{url(next,profile)}">下一页</a>
+  </li>
+  <li class="last">
+      <a href="{url(last,profile)}">最后页</a>
+  </li>
 </s:Skin>
