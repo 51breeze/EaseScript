@@ -9,10 +9,8 @@
        override protected function createChildren()
        {
             var hostComponent:DataGrid = this.hostComponent as DataGrid;
-            var body:Skin = this.body as Skin;
-            var head:Skin = this.head as Skin;
-            body.variable('rowHeight', hostComponent.rowHeight );
-            head.variable('headHeight', hostComponent.headHeight );
+            this.assign('rowHeight', hostComponent.rowHeight );
+            this.assign('headHeight', hostComponent.headHeight );
             super.createChildren();
        }
 
@@ -34,24 +32,24 @@
     {
         var hostComponent:DataGrid = this.hostComponent as DataGrid;
         var dataSource:DataSource =  hostComponent.dataSource;
-        var body:Skin = this.body;
+       
         var dataProfile:String =  hostComponent.dataProfile;
-        body.variable('rowHeight', hostComponent.rowHeight );
-        head.variable('headHeight', hostComponent.headHeight );
-        body.variable( dataProfile, [] );
-        head.variable( hostComponent.columnProfile, hostComponent.columns );
+        this.assign('rowHeight', hostComponent.rowHeight );
+        this.assign('headHeight', hostComponent.headHeight );
+        this.assign( dataProfile, [] );
+        this.assign( hostComponent.columnProfile, hostComponent.columns );
         pagination.dataSource = dataSource;
+        var self:MyDataGridSkin = this;
         dataSource.addEventListener(DataSourceEvent.SELECT, function (event:DataSourceEvent)
         {
             if ( !event.waiting )
             {
-                body.variable( dataProfile , event.data );
-                body.display();
+                self.assign( dataProfile , event.data );
+                self.display();
             }
         });
         dataSource.select( pagination.current );
-
-        var self:MyDataGridSkin = this;
+        /*
         body.addEventListener( SkinEvent.CREATE_CHILDREN_COMPLETED , function(event:SkinEvent){
 
             Element("input",body.element).addEventListener(PropertyEvent.CHANGE,function(e:PropertyEvent){
@@ -68,7 +66,7 @@
                 self.childText = event.target.value as String;
            }
 
-        });
+        });*/
     }
 
         [Bindable]
@@ -183,19 +181,17 @@
         ]]>
     </style>
 
-    <s:Skin name="thead" id="@head">
-      <s:template>
+    <thead id="@head">
       <tr>
           <:foreach name="columns" value="name" >
               <th style="height:{headHeight}px;line-height:{headHeight}px;">{name}</th>
           </:foreach>
       </tr>
-      </s:template>
-    </Skin>
+    </thead>
 
     <tbody id="@body">
         <:foreach name="datalist" value="item">
-            <tr>
+            <tr> 
                 <:foreach name="item" value="val" key="ukey">
                     <:switch condition="ukey">
                         <:case condition="name" break="true">
@@ -205,8 +201,6 @@
                         </:case>
                         <:default>
                              <td data-column="{key}" style="height:{rowHeight}px;line-height:{rowHeight}px;">{val}</td>
-                             <c:DataGrid id="@dataGrid" radius="3">
-                             </c:DataGrid>
                         </:default>
                     </:switch>
                 </:foreach>
@@ -214,19 +208,19 @@
         </:foreach>
     </tbody>
 
-    <tfoot id="@foot">
+    <s:Container name="tfoot" id="@foot">
          <tr>
              <td colspan="3">
-                 <c:Pagination id="@pagination" radius="3" async="@hostComponent.async" wheelTarget="{@foot}" >
-                     <c:wheelTarget>{@foot}</c:wheelTarget>
+                 <c:Pagination id="@pagination" radius="3" async="@hostComponent.async">
+                     <c:wheelTarget>@foot</c:wheelTarget>
                  </c:Pagination>
              </td>
          </tr>
          <tr>
-             <td colspan="3" includeIn="success" html="{{childText}}" style="color:#ffffff">
+             <td colspan="3"  html="{{childText}}" style="color:#ffffff">
                  fdgdfgdf
              </td>
          </tr>
-    </tfoot>
+    </s:Container>
 
 </s:Skin>

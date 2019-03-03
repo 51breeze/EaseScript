@@ -77,7 +77,7 @@ package es.core
             var skin:Skin = this.skin;
             if( this.state && animation && animation.enabled )
             {
-                var container:Skin = this.getContainer();
+                var container:Container = this.getContainer();
                 var fadeOut:Object = animation.fadeOut as Object;
                 this.animationEnd = false;
                 container.style("animation", fadeOut.name+" "+fadeOut.duration+"s "+fadeOut.timing+" "+fadeOut.delay+"s "+fadeOut.fillMode);
@@ -97,9 +97,9 @@ package es.core
 
         /**
          * 获取弹框的容器
-         * @return Skin
+         * @return Object
          */
-        protected function getContainer():Skin
+        protected function getContainer():Container
         {
             return this.skin;
         }
@@ -112,7 +112,7 @@ package es.core
             var opt:Object =  this.options;
             var horizontal:String = opt.horizontal as String;
             var vertical:String = opt.vertical as String;
-            var skin:Skin = this.getContainer();
+            var skin:Container = this.getContainer();
 
             //设置弹框水平位置
             if( typeof opt.x ==="string" && opt.x.slice(-1) ==="%"  || !isNaN(opt.x) )
@@ -186,7 +186,8 @@ package es.core
                 var name:String = buttons[i] as String;
                 if( name in skin )
                 {
-                    var btn:Skin = skin[name] as Skin;
+                    var btn:EventDispatcher = new EventDispatcher( skin[name] );
+                    console.log( skin[name], name );
                     btn.addEventListener(MouseEvent.CLICK, (function (actionName:String) {
                         return function (e:MouseEvent) {
                             self.action(actionName);
@@ -248,7 +249,7 @@ package es.core
                 }
             });
 
-            var container:Skin = this.getContainer();
+            var container:Container = this.getContainer();
             var animation:Object = options.animation as Object;
             var timeout:Number   = options.timeout * 1000;
             var self:es.core.BasePopUp = this;

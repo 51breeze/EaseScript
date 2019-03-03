@@ -9,7 +9,7 @@
            if( _titleText != text)
            {
                 _titleText = text;
-               title.element.html( text );
+               title.innerHTML=text;
            }
         }
 
@@ -23,7 +23,7 @@
         {
            if( _cancelText != text){
                 _cancelText = text;
-                cancel.element.html( text );
+                cancel.innerHTML= text;
            }
         }
 
@@ -37,7 +37,7 @@
         {
            if( _submitText != text){
                  _submitText = text;
-                submit.element.html( text );
+                submit.innerHTML=text;
            }
         }
 
@@ -48,7 +48,7 @@
 
         public function set bodyContent( content:String ):void
         {
-            body.element.html( content );
+            body.element.html(content);
         }
 
         public function get bodyContent():String
@@ -67,7 +67,7 @@
             {
                  decrementY+=head.height;
             }
-            body.height = Math.max( val - decrementY, 100 );
+            body.height=Math.max( val - decrementY, 100 );
         }
 
         override public function get height():uint
@@ -155,16 +155,16 @@
         <s:State name="modality" stateGroup="normal" />
     </s:states>
     <s:currentState>alert</s:currentState>
-    <div class="popup-container fixed" id="@container" addClass.modality="popup-lg">
-        <div class="popup-head" id="@head" excludeFrom="tips">
+    <s:Container name="div" class="popup-container fixed" id="@container" class.modality="popup-container fixed popup-lg">
+        <s:Container class="popup-head" id="@head" excludeFrom="tips">
             <span class="popup-title" id="@title">title</span>
             <button type="button" class="close" id="@close" >×</button>
-        </div>
-        <div class="popup-body" id="@body">
-        </div>
-        <div class="popup-footer" id="@footer" excludeFrom="simple">
-            <button type="button" class="btn btn-sm btn-default" removeClass.modality="btn-sm" id="@cancel" excludeFrom="alert">取 消</button>
-            <button type="button" class="btn btn-sm btn-primary" removeClass.modality="btn-sm" id="@submit">确 定</button>
-        </div>
-    </div>
+        </s:Container>
+        <s:Container class="popup-body" id="@body">
+        </s:Container>
+        <s:Container class="popup-footer" id="@footer" excludeFrom="simple">
+            <button type="button" class="btn btn-sm btn-default" class.modality="btn btn-default" id="@cancel" excludeFrom="alert">取 消</button>
+            <button type="button" class="btn btn-sm btn-primary" class.modality="btn btn-sm btn-primary" id="@submit">确 定</button>
+        </s:Container>
+    </s:Container>
 </s:Skin>

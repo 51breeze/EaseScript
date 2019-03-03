@@ -3,32 +3,28 @@
     <s:Metadata>[HostComponent("IndexApplication")]</s:Metadata>
     <![CDATA[
 
-        public function get title():String
-        {
-             return this.assign("title");
-         }
-
-         public function set title(value:String):void
-         {
-               this.assign("title",value);
-               document.title = value;
-         }
+    
 
     ]]>
 
     <head>
-        <title>{title}</title>
+        <title>{this.title}</title>
     </head>
 
     <body>
          <input value="{{this.title}}" />
+         <button id="@popup">PopUp</button>
          <div>
              <h1>the is {message}</h1>
              <h1>这里是内容 Person</h1>
-             <c:DataGrid source="http://local.working.com/json.php" skinClass="MyDataGridSkin">
+            
+             <c:DataGrid>
+
+                 <c:source>http://local.working.com/json.php</c:source>
                  <c:dataSource>
                      <c:dataType>@Http.TYPE_JSONP</c:dataType>
                  </c:dataSource>
+                  
                  <c:columns>
                      <id>ID</id>
                      <name>名称</name>

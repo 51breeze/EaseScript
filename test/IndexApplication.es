@@ -5,13 +5,15 @@ package
     import view.Viewport;
     import es.core.es_internal;
     import es.interfaces.IListIterator;
-  //  import es.core.PopUp;
+    import es.core.PopUp;
+    import es.core.Display;
     import es.core.View;
-    /*import es.components.DataGrid;
-    import es.skins.DataGridSkin;*/
+    import view.Home;
+    import es.components.DataGrid;
+    import es.skins.DataGridSkin;
     import es.core.SystemManage;
 
-    [Router(default=index, alias=MyIndex)]
+    [Router(default=home, alias=MyIndex)]
 	public class IndexApplication extends BaseApplication implements IListIterator
 	{
 		public function IndexApplication()
@@ -33,10 +35,10 @@ package
         [Router(method="get,post,put", alias="home")]
         public function home()
         {
-            //var view:view.Home = new view.Home( this );
-           // this.title = "the is home page";
+            var view:view.Home = new view.Home( this );
+            this.title = "the is home page";
 
-            /*
+            
             var grid: DataGrid = new DataGrid();
             grid.source = "http://local.working.com/json.php";
             grid.dataSource.dataType( Http.TYPE_JSONP );
@@ -45,11 +47,21 @@ package
             grid.skinClass = DataGridSkin;
             grid.columns = {id: "IDsssss", name: "名称", phone: "电话"};
             var gridSkin:DataGridSkin = grid.skin as DataGridSkin;
-            gridSkin.pagination.wheelTarget = gridSkin.foot;
-              view.addChild(grid);
-            */
+            gridSkin.pagination.wheelTarget = new Display( new Element(gridSkin.foot) );
+            view.addChild(grid);
+
+
+            (new EventDispatcher(view.popup)).addEventListener( MouseEvent.CLICK, function(e:MouseEvent){
+
+                     PopUp.confirm("您有3条信息未处理2", function (type:String) {
+                       console.log( type );
+                    });
+
+            });
+           
+            
           
-           // return this.render( view );
+            return this.render( view );
         }
 
         [Router(method="get", alias="index")]

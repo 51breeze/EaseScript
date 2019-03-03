@@ -25,7 +25,7 @@ package es.components
             super();
             if( System.isDefined( componentIdHash[ componentId ] ) )
             {
-                throw new TypeError("Component id already exists. for '"+componentId+"'");
+               // throw new TypeError("Component id already exists. for '"+componentId+"'");
             }
             componentIdHash[ componentId ] = true;
             _componentId = componentId;
@@ -103,7 +103,7 @@ package es.components
                 var skinClass:Class = this.skinClass;
                 if( skinClass===null )
                 {
-                    throw new TypeError("skinClass is not assign");
+                    throw new TypeError( "the \""+ __CLASS__ + "\" skinClass is not defined." );
                 }
                 var skin:Skin = (Skin)new skinClass( this );
                 this._skin = skin;
@@ -407,7 +407,7 @@ package es.components
         public function get children():Array
         {
             if( this.initialized ){
-                return this.skin.getContainer().children;
+                return this.skin.container.children;
             }
             return childrenItems.slice(0);
         }
@@ -420,7 +420,7 @@ package es.components
         public function getChildAt( index:Number ):IDisplay
         {
             if( this.initialized ){
-                return this.skin.getContainer().getChildAt(index);
+                return this.skin.container.getChildAt(index);
             }
             if( index < 0 ){
                 index = index+childrenItems.length;
@@ -436,7 +436,7 @@ package es.components
         public function getChildIndex( child:IDisplay ):Number
         {
             if( this.initialized ){
-                return this.skin.getContainer().getChildIndex(child);
+                return this.skin.container.getChildIndex(child);
             }
             return childrenItems.indexOf(child);
         }
@@ -450,7 +450,7 @@ package es.components
         {
             if( this.initialized )
             {
-                return this.skin.getContainer().addChild(child);
+                return this.skin.container.addChild(child);
             }
             childrenItems.push( child );
             return child;
@@ -465,7 +465,7 @@ package es.components
         {
             if( this.initialized )
             {
-                return this.skin.getContainer().addChildAt(child,index);
+                return this.skin.container.addChildAt(child,index);
             }
             if( index < 0 ){
                 index = index+childrenItems.length;
@@ -482,7 +482,7 @@ package es.components
         {
             if( this.initialized )
             {
-                return this.skin.getContainer().removeChild(child);
+                return this.skin.container.removeChild(child);
             }
             var index:int = this.childrenItems.indexOf(child);
             if( index >= 0 ){
@@ -501,7 +501,7 @@ package es.components
         {
             if( this.initialized )
             {
-                return this.skin.getContainer().removeChildAt(index);
+                return this.skin.container.removeChildAt(index);
             }
             if( index < 0 ){
                 index = index+childrenItems.length;
@@ -520,7 +520,7 @@ package es.components
         {
             if( this.initialized )
             {
-                this.skin.getContainer().removeAllChild();
+                this.skin.container.removeAllChild();
             }else{
                 childrenItems = [];
             }
@@ -537,7 +537,7 @@ package es.components
             if( !this.initialized ){
                 return false;
             }
-            return this.skin.getContainer().contains(child);
+            return this.skin.container.contains(child);
         }
 
         /**
@@ -580,7 +580,7 @@ package es.components
         {
             var len:int = childrenItems.length;
             var index:int=0;
-            var container:IContainer=this.skin.getContainer();
+            var container:IContainer=this.skin.container;
             for(;index<len;index++)
             {
                 container.addChild( childrenItems[index] as IDisplay );
@@ -609,7 +609,10 @@ package es.components
          */
         protected function commitPropertyAndUpdateSkin()
         {
-            this.nowUpdateSkin();
+            if( this.initialized  )
+            {
+                this.nowUpdateSkin();
+            }
         }
 
         /**

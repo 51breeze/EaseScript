@@ -19,9 +19,7 @@
                 Element('thead > tr:first-child >th:last-child' , table).style('borderTopRightRadius',radius );
                 Element('tfoot > tr:last-child >td:first-child' , table).style('borderBottomLeftRadius',radius );
                 Element('tfoot > tr:last-child >td:last-child' , table).style('borderBottomRightRadius',radius );
-                Element('td',  (this.foot as Display).element ).height( hostComponent.footHeight );
-
-               
+                Element('td', this.foot).height( hostComponent.footHeight ); 
             }
 
             override protected function initializing()
@@ -31,26 +29,27 @@
                 if( hostComponent.isNeedCreateSkin() )
                 {
                     var dataSource:DataSource =  hostComponent.dataSource;
-                    var body:Skin = this.body;
+                    var body:Skin = this;
                     var dataProfile:String =  hostComponent.dataProfile;
-                    body.variable('rowHeight', hostComponent.rowHeight );
-                    head.variable('headHeight', hostComponent.headHeight );
-                    body.variable( dataProfile, [] );
-                    body.variable( hostComponent.columnProfile, hostComponent.columns);
-                    head.variable( hostComponent.columnProfile, hostComponent.columns );
+                    body.assign('rowHeight', hostComponent.rowHeight );
+                    body.assign('headHeight', hostComponent.headHeight );
+                    body.assign( dataProfile, [] );
+                    body.assign( hostComponent.columnProfile, hostComponent.columns);
+                    body.assign( hostComponent.columnProfile, hostComponent.columns );
                     pagination.dataSource = dataSource;
 
                     dataSource.addEventListener(DataSourceEvent.SELECT, function (event:DataSourceEvent)
                     {
                         if ( !event.waiting )
                         {
-                            body.variable( dataProfile , event.data   );
+                            body.assign( dataProfile , event.data);
                             body.display();
                         }
                     });
                     dataSource.select( pagination.current );
                }
             }
+
         ]]>
     </s:Script>
     <style file="DataGridStyle.less" />
@@ -69,7 +68,7 @@
                     <:switch condition="field">
                         <:case condition="name" break="true">
                             <td data-column="{field}" style="height:{rowHeight}px;line-height:{rowHeight}px;">
-                                <input value="{item[field]}" style="height: 25px;" />
+                                <input value="{{item[field]}}" style="height: 25px;" />
                             </td>
                         </:case>
                         <:default>
@@ -84,7 +83,7 @@
     <tfoot id="@foot">
          <tr>
              <td colspan="3">
-                 <c:Pagination id="@pagination"  radius="3" async="@hostComponent.async">
+                 <c:Pagination id="@pagination" radius="3" async="@hostComponent.async">
                  </c:Pagination>
              </td>
          </tr>

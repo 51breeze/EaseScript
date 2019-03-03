@@ -1912,26 +1912,24 @@ Element.prototype.removeChild=function removeChild( childElemnet )
     {
         throw new TypeError('is not HTMLElement in removeChild');
     }
+
     var parent = childElemnet.parentNode;
-    var nodeChild;
-    if( !parent )
+    if( !parent && Element.getNodeName(childElemnet)==="#document-fragment" )
     {
-        if( Element.getNodeName(childElemnet)==="#document-fragment" )
+        parent = childElemnet['parent-element'];
+        if( parent )
         {
-            parent = childElemnet['parent-element'];
-            if( parent )
+            var elem = new Element( parent )
+            while ( parent.childNodes.length > 0 )
             {
-                while ( parent.childNodes.length > 0 )
-                {
-                   nodeChild = this.removeChild( parent.childNodes[0] );
-                   nodeChild = null;
-                }
-                return childElemnet;
+               elem.removeChild( parent.childNodes[0] );
             }
         }
-    }else
+        return childElemnet;
+    }
+    if( parent === this.current() )
     {
-        nodeChild=parent.removeChild(childElemnet);
+        var nodeChild=parent.removeChild(childElemnet);
         dispatchEveryRemoveEvent(parent, childElemnet);
         dispatchEvent( new EventDispatcher( parent ) , ElementEvent.CHANGE, parent, childElemnet );
         nodeChild = null;

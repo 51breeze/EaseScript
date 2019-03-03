@@ -221,9 +221,9 @@ package es.core
 
         /**
          * 获取弹框的容器
-         * @return Skin
+         * @return Container
          */
-        override protected function getContainer():Skin
+        override protected function getContainer():Container
         {
             return (this.skin as PopUpSkin).container;
         }
@@ -238,7 +238,7 @@ package es.core
             var elem:Element = super.display();
             var opt:Object = this.options;
             var self:es.core.PopUp = this;
-            var skin:Skin = this.getContainer();
+            var skin:Container = this.getContainer();
 
             //如果是模态框添加鼠标在容器外点击时关闭窗口
             skin.removeEventListener(MouseEvent.MOUSE_OUTSIDE);

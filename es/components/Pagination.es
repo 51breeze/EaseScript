@@ -60,7 +60,10 @@ package es.components
                 var self:Pagination = this;
                 value.addEventListener( DataSourceEvent.SELECT,function (e:DataSourceEvent)
                 {
-                    if( !e.waiting )self.commitPropertyAndUpdateSkin();
+                    if( !e.waiting && self.initialized )
+                    {
+                        self.commitPropertyAndUpdateSkin();
+                    }
                 });
                 if( this.initialized )
                 {
@@ -371,6 +374,7 @@ package es.components
          */
         override protected function commitPropertyAndUpdateSkin()
         {
+            if( !this.initialized )return;
             var skin:Skin = this.skin;
             var current:int = this.current;
             var totalPage:int = this.totalPage;
@@ -389,17 +393,17 @@ package es.components
             }
 
             offset = (offset + link) > totalPage ? offset - ( offset + link - totalPage ) : offset;
-            skin.variable('totalPage', totalPage);
-            skin.variable('pageSize', pageSize );
-            skin.variable('offset',  (current - 1) * pageSize );
-            skin.variable('profile', this.profile );
-            skin.variable('url', url );
-            skin.variable('current', current);
-            skin.variable('first', 1);
-            skin.variable('prev', Math.max(current - 1, 1));
-            skin.variable('next', Math.min(current + 1, totalPage));
-            skin.variable('last', totalPage);
-            skin.variable('link', System.range( Math.max(1 + offset, 1 ), link + offset, 1) );
+            skin.assign('totalPage', totalPage);
+            skin.assign('pageSize', pageSize );
+            skin.assign('offset',  (current - 1) * pageSize );
+            skin.assign('profile', this.profile );
+            skin.assign('url', url );
+            skin.assign('current', current);
+            skin.assign('first', 1);
+            skin.assign('prev', Math.max(current - 1, 1));
+            skin.assign('next', Math.min(current + 1, totalPage));
+            skin.assign('last', totalPage);
+            skin.assign('link', System.range( Math.max(1 + offset, 1 ), link + offset, 1) );
             super.commitPropertyAndUpdateSkin();
         }
     }

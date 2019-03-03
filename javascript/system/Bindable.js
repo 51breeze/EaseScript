@@ -267,7 +267,6 @@ function removeItem( bind ,item, name )
     }
 }
 
-
 /**
  * 提交属性的值到绑定器。
  * 调用此方法成功后会传递当前改变的值到绑定的对象中。
