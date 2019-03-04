@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<s:View xmlns:s="es.core"  xmlns:c="es.components">
+<s:View xmlns:s="es.core"  xmlns:c="es.components" xmlns:ss="@">
     <s:Metadata>[HostComponent("IndexApplication")]</s:Metadata>
     <![CDATA[
 
@@ -20,10 +20,25 @@
             
              <c:DataGrid>
 
-                 <c:source>http://local.working.com/json.php</c:source>
+                 <!-- <c:source>http://local.working.com/json.php</c:source> -->
                  <c:dataSource>
                      <c:dataType>@Http.TYPE_JSONP</c:dataType>
                  </c:dataSource>
+
+                 <c:source>
+                     <ss:Array>
+                         <ss:Object>
+                             <id>ID</id>
+                             <name>名称</name>
+                             <phone>电话</phone>
+                         </ss:Object>
+                          <ss:Object>
+                             <id>uuuu</id>
+                             <name>yyyyy</name>
+                             <phone>kkkkk</phone>
+                         </ss:Object>
+                     </ss:Array>
+                 </c:source>
                   
                  <c:columns>
                      <id>ID</id>

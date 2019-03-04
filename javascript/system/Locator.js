@@ -152,11 +152,17 @@ Locator.toUrl=function toUrl( urlSegments )
 Locator.create=function create(url,name){
     if( typeof url !== "string" )return false;
     url = System.trim(url);
-    if( !/^https?\:\/\//.test(url) ){
+    if( !/^(https?|file)\:\/\//i.test(url) ){
        var http = location.protocol+"//"+location.hostname+(location.port ? ":"+location.port : "");
        url = url.charAt(0) === "/" || url.charAt(0) === "?" ? http+url : http+"/"+url;
     }
-    var match= url.match(/^((https?)\:\/\/)([\w\.\-]+)(\:(\d+))?(((\/([a-zA-Z]+[\w+](\.[a-zA-Z]+[\w+])?)*)+)?(\?(&?\w+\=?[^&#=]*)+)?([#\w+]*)?)?$/i);
+
+    var match= url.match(/^((https?)\:\/\/)([\w\.\-]+)(\:(\d+))?(((\/([a-zA-Z]+[\w+](\.[a-zA-Z]+[\w+])?)*)+)?(\?(&?\w+\=?[^&#=]*)+)?(#[\w\,\|\-\+]*)?)?$/i);
+    if( !match && /^file\:\/\//i.test(url) )
+    {
+        match= url.match(/^((file)\:\/\/\/)([a-zA-Z]+\:)(\:(\d+))?(((\/([a-zA-Z]+[\w+](\.[a-zA-Z]+[\w+])?)*)+)?(\?(&?\w+\=?[^&#=]*)+)?(#[\w\,\|\-\+]*)?)?$/i);
+    }
+
     if( !match )return null;
     var segments={
         "host":match[3],
@@ -176,7 +182,7 @@ Locator.create=function create(url,name){
     if( info[1] )
     {
         var query=info[1];
-        query = query.replace(/#(\w+)$/g, function (a, b) {
+        query = query.replace(/#([\w\,\|\-\+]+)$/g, function (a, b) {
             if (b) segments.fragment.push(b);
             return "";
         });
@@ -223,5 +229,15 @@ Locator.match = function match( name )
     }
     return null;
 }
-urlSegments = Locator.create(location.href);
+urlSegments = Locator.create(location.href)||{
+    "host":"",
+    "origin":"",
+    "scheme":"",
+    "port":"",
+    "uri":"",
+    "url":location.href,
+    "path":[],
+    "query":{},
+    "fragment":[]
+};
 System.Locator = Locator;

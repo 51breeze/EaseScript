@@ -6,19 +6,10 @@
  */
 package es.events
 {
-    import es.interfaces.IDisplay;
-    import es.core.State;
     public class SkinEvent extends Event
     {
-        static public const CREATE_CHILDREN_COMPLETED:String ='createChildrenCompleted';
-        static public const INTERNAL_UPDATE_STATE:String ='internalUpdateState';
-        static public const INTERNAL_CREATE_CHILDREN:String ='internalCreateChildren';
-        static public const MAKE_CLIENT_SKIN_FACTORY:String ='makeClientSkinFactory';
-        public var skinChildren:Object={};
-        public var parent:IDisplay;
-        public var child:IDisplay;
-        public var state:State;
-        public var content:String = '';
+        static public const UPDATE_DISPLAY_LIST:String ='skinUpdateDisplayList';
+        public var children:Array=null;
         public function SkinEvent(type:String, bubbles:Boolean=true, cancelable:Boolean=true)
         {
             super(type, bubbles, cancelable);

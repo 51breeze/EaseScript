@@ -9,6 +9,7 @@ package es.core
     import es.components.SkinComponent;
     import es.core.Container;
     import es.core.Skin;
+    import es.events.SkinEvent;
     import es.core.State;
     import es.interfaces.IDisplay;
     import es.core.Display;
@@ -169,6 +170,12 @@ package es.core
                 }
                 this.updateChildren(this, nodes);
                 this.updateDisplayList();
+                if( this.hasEventListener(SkinEvent.UPDATE_DISPLAY_LIST) )
+                {
+                    var e:SkinEvent = new SkinEvent( SkinEvent.UPDATE_DISPLAY_LIST );
+                    e.children = nodes;
+                    this.dispatchEvent( e );
+                }
             }
         };
 

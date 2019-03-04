@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<s:View xmlns:s="es.core"  xmlns:c="es.components">
+<s:View xmlns:s="es.core"  xmlns:c="es.components" xmlns:ss="@">
     <s:Metadata>[HostComponent("PersonApplication")]</s:Metadata>
     <![CDATA[
 
-        public function get title():String
+        override public function get title():String
         {
              return this.assign("title");
          }
 
-         public function set title(value:String):void
+         override public function set title(value:String):void
          {
                this.assign("title",value);
                document.title = value;
@@ -17,7 +17,7 @@
     ]]>
 
     <head>
-        <title>{title}</title>
+        <title>{this.title}</title>
     </head>
 
     <body>
@@ -25,15 +25,30 @@
          <div>
              <h1>the is {message}</h1>
              <h1>这里是内容 Person</h1>
-             <c:DataGrid source="http://local.working.com/json.php">
+             <c:DataGrid>
                  <c:dataSource>
                      <c:dataType>@Http.TYPE_JSONP</c:dataType>
                  </c:dataSource>
+              
                  <c:columns>
                      <id>ID</id>
                      <name>名称</name>
                      <phone>电话</phone>
                  </c:columns>
+                 <c:source>
+                     <ss:Array>
+                         <ss:Object>
+                             <id>ID</id>
+                             <name>名称</name>
+                             <phone>电话</phone>
+                         </ss:Object>
+                          <ss:Object>
+                             <id>uuuu</id>
+                             <name>yyyyy</name>
+                             <phone>kkkkk</phone>
+                         </ss:Object>
+                     </ss:Array>
+                 </c:source>
              </c:DataGrid>
          </div>
     </body>

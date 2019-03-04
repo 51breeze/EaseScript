@@ -187,7 +187,6 @@ package es.core
                 if( name in skin )
                 {
                     var btn:EventDispatcher = new EventDispatcher( skin[name] );
-                    console.log( skin[name], name );
                     btn.addEventListener(MouseEvent.CLICK, (function (actionName:String) {
                         return function (e:MouseEvent) {
                             self.action(actionName);
