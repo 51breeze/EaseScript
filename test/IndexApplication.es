@@ -1,4 +1,4 @@
-package
+package 
 {
     import BaseApplication;
     import view.Index;
@@ -7,6 +7,7 @@ package
     import es.interfaces.IListIterator;
     import es.core.PopUp;
     import es.core.Display;
+    import es.core.Container;
     import es.core.View;
     import view.Home;
     import es.components.DataGrid;
@@ -36,8 +37,16 @@ package
         public function home()
         {
             var view:view.Home = new view.Home( this );
+
             this.title = "the is home page";
 
+           // var view:View = new View(this);
+
+           // var container:Container = new Container( new Element( Element.createElement("div") ) ,{innerHTML:"=======home========="});
+
+           // view.addChild( container );
+
+        
             
             var grid: DataGrid = new DataGrid();
             grid.source = "http://local.working.com/json.php";

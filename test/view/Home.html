@@ -3,7 +3,23 @@
     <s:Metadata>[HostComponent("IndexApplication")]</s:Metadata>
     <![CDATA[
 
-    
+        override public function get title():String
+        {
+             var _title:String = super.title;
+             if( !_title ){
+                   return "No title";
+             }
+
+             return "My title="+_title;
+
+            // return this.assign("title");
+         }
+
+         override public function set title(value:String):void
+         {
+               this.assign("title",value);
+               document.title = value;
+         }
 
     ]]>
 
@@ -18,14 +34,14 @@
              <h1>the is {message}</h1>
              <h1>这里是内容 Person</h1>
             
-             <c:DataGrid>
+             <c:DataGrid id="@dataGrid">
 
-                 <!-- <c:source>http://local.working.com/json.php</c:source> -->
-                 <c:dataSource>
+                 <c:source>http://local.working.com/json.phpsss</c:source>
+                <!--  <c:dataSource>
                      <c:dataType>@Http.TYPE_JSONP</c:dataType>
-                 </c:dataSource>
+                 </c:dataSource> -->
 
-                 <c:source>
+                <!--  <c:source>
                      <ss:Array>
                          <ss:Object>
                              <id>ID</id>
@@ -38,7 +54,7 @@
                              <phone>kkkkk</phone>
                          </ss:Object>
                      </ss:Array>
-                 </c:source>
+                 </c:source> -->
                   
                  <c:columns>
                      <id>ID</id>

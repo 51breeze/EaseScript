@@ -10,19 +10,32 @@ var globals = Maker.globalDescriptions;
 //全局配置
 const defaultConfig = {
     'suffix': '.es',  //需要编译文件的后缀
-    'debug':'on', //是否需要开启调式
-    'blockScope':'enable',     //是否启用块级域
+    'debug':'enable', //是否需要开启调式
+    'blockScope':'disabled', //是否启用块级域
     'reserved':['let', 'of','System',"Context"],
-    'minify':'off', //是否需要压缩
-    'compat_version':'*',      //要兼容的平台 {'ie':8,'chrome':32.5}
+    'minify':'enable', //是否需要压缩
+    'animate':true,
+    'font':true,
+    'theme':"default",
+    'theme_file_path':null,
+    'source_file':"enable",
+    'compat_version':{ie:9},//要兼容的平台 {'ie':8,'chrome':32.5}
     'build_path':'./build',
-    'project_path':'./',
-    'skin_file_suffix': '.html',
+    'project_path':'./project',
+    'skin_file_suffix':'.html',
+    'skin_style_config':null,
     'project_file_suffix':'.es',
     'browser':'enable',
     'baseSkinClass':'es.core.Skin',
-    'config_file':'./configure.js',
-    'bootstrap':'Index',
+    'config_file':null,
+    'bootstrap':null,
+    'default_bootstrap_class':null,
+    'library':null,
+    'strictType':true,
+    'service_provider_syntax':"php",
+    'enable_webroot':false,
+    'command_switch':0,
+    'script_part_load':true,
     'context':{
         "public":"_public",
         "protected":"_protected",
@@ -31,10 +44,62 @@ const defaultConfig = {
         "defineModuleMethod":"define",
         "package":"Context",
     },
+    'clean':false,
     'mode': 1, //1 标准模式（开发时使用） 2 性能模式（生产环境使用）
 };
 
-var  requirements={};
+//构建目录配置
+const buildConfig = {
+    "build": {
+        "path": "./",
+        "name": "",
+        "child": {
+            "js": {
+                "path": "@webroot",
+                "name": "js",
+            },
+            "img": {
+                "path": "@webroot",
+                "name": "img",
+            },
+            "css": {
+                "path": "@webroot",
+                "name": "css",
+            },
+            "font": {
+                "path": "@webroot",
+                "name": "fonts",
+            },
+            "view": {
+                "path": "@application",
+                "name": "view",
+            },
+            "html":{
+                "path":"@webroot",
+                "name":"html",
+            },
+            "webroot":{
+                "path":"./",
+                "name":"webroot",
+            },
+            "bootstrap":{
+                "path":"@application",
+                "name":"bootstrap",
+            },
+            "application":{
+                "path":"./",
+                "name":"easescript",
+            }
+        },
+    },
+    //工作的主目录结构配置
+    "project":{
+        "path": "./",
+        "name": "project",
+    },
+};
+
+var requirements={};
 var syntaxMap={
     'js':'javascript',
     'php':'php'
@@ -404,8 +469,6 @@ function themeColor(color , base , name)
          return base;
     }
     return color;
-    console.log( name.value );
-    process.exit();
 }
 
 /**
@@ -488,30 +551,35 @@ function mergeThemeConfig( lesspath, theme_name, config )
         theme_base_config = base;
     }
 
-     var file = config.theme_file_path;
-     if (!PATH.isAbsolute(file))
-     {
-         file = PATH.resolve(config.project_path, file);
-     }
-     if( Utils.isFileExists(file) )
-     {
-         var stat = fs.statSync( file );
-         if( stat.isDirectory() )
+    //如果有指定主题
+    if( theme_name )
+    {
+         var file = config.theme_file_path;
+         if( file && !PATH.isAbsolute(file) )
          {
-             //以文件名来区分
-             file = PATH.resolve( file, theme_name+".less");
-             base = Utils.merge(base, parseConfigFile( Utils.getContents( file ) ) );
-
-         }else{
-
-             //以对象键名来区分
-             var object = parseConfigFile( Utils.getContents( file ) );
-             Utils.merge(base,  object[ theme_name ] || object );
+             file = PATH.resolve(config.project_path, file);
          }
 
-     }else
-     {
-         Utils.warn( " Not found theme file for '"+ file +"'" );
+         if( Utils.isFileExists(file) )
+         {
+             var stat = fs.statSync( file );
+             if( stat.isDirectory() )
+             {
+                 //以文件名来区分
+                 file = PATH.resolve( file, theme_name+".less");
+                 base = Utils.merge(base, parseConfigFile( Utils.getContents( file ) ) );
+
+             }else{
+
+                 //以对象键名来区分
+                 var object = parseConfigFile( Utils.getContents( file ) );
+                 Utils.merge(base,  object[ theme_name ] || object );
+             }
+
+         }else
+         {
+             Utils.warn( " Not found theme file for '"+ file +"'" );
+         }
      }
      return base;
 }
@@ -649,65 +717,67 @@ const less = require('less');
  */
 function buildStyle(skinModules, lessPath, options, outputname, config )
 {
-    //需要处理样内容
-    var importStyle = ["main.less"];
-    var loadedStyle = {};
-    var style = getAllStyleContent(skinModules, importStyle, loadedStyle,lessPath, config)
+   return new Promise(function (resovle, reject) 
+   {
+        //需要处理样内容
+        var importStyle = ["main.less"];
+        var loadedStyle = {};
+        var style = getAllStyleContent(skinModules, importStyle, loadedStyle,lessPath, config)
 
-    //需要加载字体样式
-    if (config.font)
-    {
-        importStyle.push('./less/glyphicons.less');
-    }
-
-    //需要加载的动画样式
-    var animatefiles = ["fadeIn.css","fadeOut.css"];
-    var animatepath = PATH.resolve(lessPath, "animate");
-
-    //需要加载所有的动画样式
-    if (config.animate)
-    {
-        animatefiles = Utils.getDirectoryFiles( animatepath );
-    }
-
-    //加载动画样式
-    animatefiles.forEach(function (a) {
-        a = PATH.resolve(animatepath, a);
-        if( loadedStyle[a] !== true )
+        //需要加载字体样式
+        if (config.font)
         {
-            loadedStyle[a] = true;
-            style.unshift( Utils.getContents( a ) );
+            importStyle.push('./less/glyphicons.less');
         }
-    });
 
-    //合并导入的样式
-    style.unshift( "\n@import '"+ importStyle.join("';\n@import '") +"';\n" );
+        //需要加载的动画样式
+        var animatefiles = ["fadeIn.css","fadeOut.css"];
+        var animatepath = PATH.resolve(lessPath, "animate");
 
-    //使用less处理样式文件
-    (function (style, options, outputname, config) {
+        //需要加载所有的动画样式
+        if (config.animate)
+        {
+            animatefiles = Utils.getDirectoryFiles( animatepath );
+        }
 
+        //加载动画样式
+        animatefiles.forEach(function (a) {
+            a = PATH.resolve(animatepath, a);
+            if( loadedStyle[a] !== true )
+            {
+                loadedStyle[a] = true;
+                style.unshift( Utils.getContents( a ) );
+            }
+        });
+
+        //合并导入的样式
+        style.unshift( "\n@import '"+ importStyle.join("';\n@import '") +"';\n" );
+
+        if( !font_builded )
+        {
+            font_builded = true;
+            var fontPath = Utils.getBuildPath(config, 'build.font');
+            var fontfiles = Utils.getDirectoryFiles(lessPath + '/fonts');
+            for (var i = 0; i < fontfiles.length; i++)
+            {
+                Utils.copyfile(lessPath + '/fonts/' + fontfiles[i], fontPath + "/" + fontfiles[i])
+            }
+        }
+
+        //使用less处理样式文件
         less.render(style.join("\n"), options, function (err, output) {
             if (err) {
                 Utils.error(err.message);
                 Utils.error(err.extract.join('\n'));
+                reject(err);
             } else {
                 var filename = PATH.resolve(Utils.getBuildPath(config, 'build.css'), outputname + '.css');
                 fs.writeFileSync(filename, output.css);
+                resovle(output);
             }
         });
 
-    })(style, options, outputname, config);
-
-
-    if( !font_builded )
-    {
-        font_builded = true;
-        var fontPath = Utils.getBuildPath(config, 'build.font');
-        var fontfiles = Utils.getDirectoryFiles(lessPath + '/fonts');
-        for (var i = 0; i < fontfiles.length; i++) {
-            Utils.copyfile(lessPath + '/fonts/' + fontfiles[i], fontPath + "/" + fontfiles[i])
-        }
-    }
+    });
 }
 var font_builded = false;
 
@@ -741,11 +811,9 @@ const SyntaxBuilder={
     'javascript':function(config, descriptions, onlyClient )
     {
         Utils.info("building javascript start...");
-
         var lessPath = PATH.resolve(config.root_path, './style/');
-        var theme_name = config.theme || "default";
-        var globalVars =  mergeThemeConfig( lessPath , theme_name, config );
-        var options = {
+        var globalVars = mergeThemeConfig( lessPath ,config.theme, config );
+        var options ={
             paths: [lessPath],
             globalVars: globalVars,
             compress: config.minify === 'enable',
@@ -778,7 +846,6 @@ const SyntaxBuilder={
         var builder = require( './javascript/builder.js');
         var buildBaseScript = function (config, scriptContent, requirements, hashMap , serverRoutes, bootstrap,loadRequirements )
         {
-            console.log( handle )
             return builder(config.build_path, config, scriptContent, requirements, {
                 "namespace": function (content) {
                     return content.replace(/var\s+codeMap=\{\};/, "var codeMap=" + JSON.stringify(hashMap) + ";");
@@ -794,7 +861,7 @@ const SyntaxBuilder={
                 "LOAD_REQUIREMENTS":loadRequirements||"{}",
                 "ORIGIN_SYNTAX": config.originMakeSyntax,
                 "STATIC_URL_PATH_NAME": config.static_url_path_name,
-                "DEFAULT_BOOTSTRAP_ROUTER_PROVIDER": bootstrap.fullclassname + "@" + bootstrap.defineMetaTypeList.Router.param.default,
+                "DEFAULT_BOOTSTRAP_ROUTER_PROVIDER": bootstrap ? bootstrap.fullclassname + "@" + bootstrap.defineMetaTypeList.Router.param.default : null,
                 "BOOTSTRAP_CLASS_PATH": Utils.getRelativePath(
                     Utils.getBuildPath(config, "build.webroot"),
                     Utils.getBuildPath(config, "build.bootstrap")
@@ -902,7 +969,9 @@ const SyntaxBuilder={
             }
 
             //需要处理样内容
-            buildStyle(skinModules, lessPath, options, outputname, config);
+            (async function(){
+               await buildStyle(skinModules, lessPath, options, outputname, config);
+            })();
 
             //压缩脚本
             if (scriptContent && config.minify === 'enable')
@@ -988,8 +1057,6 @@ const SyntaxBuilder={
 
             //如果服务不存在则生成
             createServiceProvider(config, serviceProviders );
-
-          //  console.log( serviceProviders )
 
             //加载服务类的描述信息
             Utils.forEach(serviceProviders,function (item,fullclassname)
@@ -1345,7 +1412,9 @@ function configToJson( config , depth )
  */
 function getConfigure(config)
 {
-    root_path = config.root_path || process.cwd();
+    var root_path = __dirname;
+    config.root_path = root_path;
+
     //生产环境模式启用压缩文件
     if( config.mode===3 && config.minify == null )
     {
@@ -1369,7 +1438,12 @@ function getConfigure(config)
         config.root_path = root_path;
 
         //合并默认配置文件
-        Utils.merge(config, require( config.config_file ) );
+        if( config.config_file )
+        {
+            Utils.merge(config, require( config.config_file ) );
+        }else {
+            Utils.merge(config, buildConfig);
+        }
 
         //当前工程项目路径
         config.project_path = project_path;
@@ -1377,19 +1451,12 @@ function getConfigure(config)
         config.project.name = PATH.basename(project_path);
 
         //构建项目路径
-        if( config.has_output_path )
-        {
-            config.build_path = PATH.resolve(config.build_path);
-            config.build.path = config.build_path;
-            config.build.name = '';
-        }
+        config.build_path = PATH.resolve(config.build_path);
+        config.build.path = config.build_path;
 
         //构建输出目录
         buildProject(config.build, config.project_path );
         config.build_path = config.build.path;
-
-        //构建工程目录
-        //buildProject(config.project, config.project_path);
 
         //生成一个默认的配置文件
         Utils.setContents(makefile, configToJson( config , 1 ) );
@@ -1398,27 +1465,6 @@ function getConfigure(config)
     {
         config = JSON.parse( Utils.getContents(makefile) );
     }
-
-    /*  var bootstrap_file = PATH.resolve( config.project.path , config.bootstrap.replace(/\./g,"/")+config.suffix );
-     Utils.mkdir( PATH.dirname( bootstrap_file ) );
-     if( !Utils.isFileExists(bootstrap_file) )
-     {
-     var defaultFile = [
-     'package\n{\n',
-     '\tpublic class '+config.bootstrap,
-     ' extends EventDispatcher\n\t{\n',
-     '\t\tpublic function '+config.bootstrap,
-     '()\n',
-     '\t\t{\n',
-     '\t\t\tsuper(document);\n',
-     '\t\t\t\tvar body = new Element("body");\n',
-     '\t\t\t\tbody.addChild( Element.createElement("<h1>Hello world!</h1>") );\n',
-     '\t\t}\n',
-     '\t}\n',
-     '}',
-     ];
-     Utils.setContents(bootstrap_file, defaultFile.join("") );
-     }*/
 
     //将上下文中引用的变量设为受保护的关键字
     for (var c in config.context )
@@ -1525,7 +1571,6 @@ function make( config, isGlobalConfig )
         config.globals=globals;
         //编译版本号
         config.makeVersion = (new Date()).getTime();
-
         if( config.library )
         {
             Utils.forEach(config.library, function (name)
@@ -1542,31 +1587,30 @@ function make( config, isGlobalConfig )
         var project_path = config.project_path;
         var makedir = project_path;
         var makefiles = [];
-        var file = PATH.resolve( project_path ,  config.bootstrap || "./" ).replace(/\\/g,'/');
+        var file = PATH.resolve( project_path , config.bootstrap ? config.bootstrap.replace(".","/") : "./" ).replace(/\\/g,'/');
 
+        //是否支持指定的语法
         if( syntax_supported[ config.syntax ] !== true )
         {
             Utils.error("Syntax "+config.syntax +" is not supported.");
         }
 
-        //Maker
-        Compile.Maker = Maker;
-
         //如果定要编译的目录下的文件
-        if( !Utils.isFileExists( file+config.suffix ) )
+        if( Utils.isDir( file ) )
         {
-            if( Utils.isDir( file ) )
+            makedir = file;
+            makefiles = Utils.getDirectoryFiles( file );
+            makefiles = makefiles.filter(function (a) {
+                return PATH.extname(a) === config.suffix;
+            });
+
+        }else
+        {
+            //如果是指定文件
+            if( !Utils.isFileExists( file ) )
             {
-                makedir = file;
-                makefiles = Utils.getDirectoryFiles( file );
-                makefiles = makefiles.filter(function (a) {
-                    return PATH.extname(a) === config.suffix;
-                });
+                file+=config.suffix;
             }
-        }
-        //指定的编译文件
-        else
-        {
             makefiles = [ file ];
         }
 
@@ -1579,7 +1623,8 @@ function make( config, isGlobalConfig )
         for(;i<len;i++)
         {
             var classfile =PATH.basename( makefiles[i] , config.suffix );
-            var _filepath = filepath(classfile, makedir );
+            var basedir = PATH.dirname(makefiles[i]);
+            var _filepath = filepath(classfile, basedir !== "." ? basedir : project_path );
             var classname = PATH.relative(project_path, _filepath ).replace(/\\/g,'/');
             if( inheritClass.indexOf(classname) < 0 )
             {
@@ -1593,7 +1638,6 @@ function make( config, isGlobalConfig )
             }
         }
 
-
         //默认入口类优先级 ==> 手动指定，类文件名为index, 第一个类
         var bootstrap_class=[null,null,null];
 
@@ -1604,6 +1648,7 @@ function make( config, isGlobalConfig )
             {
                 return false;
             }
+            //是否属性于应用入口类
             var flag = Maker.checkInstanceOf(a,"es.core.Application");
             if( flag )
             {
@@ -1639,12 +1684,16 @@ function make( config, isGlobalConfig )
             return !!a;
         })[0];
 
-        var bootstrapClassModule = Maker.localDescriptions[  config.default_bootstrap_class ];
-        if( !bootstrapClassModule.defineMetaTypeList.Router || !bootstrapClassModule.defineMetaTypeList.Router.param.default )
+        //如果指定默认的入口类
+        if( config.default_bootstrap_class && Maker.localDescriptions[  config.default_bootstrap_class ] )
         {
-            throw new ReferenceError("Default bootstrap router method is not define '"+ config.default_bootstrap_class+"'");
+            var bootstrapClassModule = Maker.localDescriptions[  config.default_bootstrap_class ];
+            if( !bootstrapClassModule.defineMetaTypeList.Router || !bootstrapClassModule.defineMetaTypeList.Router.param.default )
+            {
+                throw new ReferenceError("Default bootstrap router method is not define '"+ config.default_bootstrap_class+"'");
+            }
+            config.default_bootstrap_router_provider=config.default_bootstrap_class+"@"+bootstrapClassModule.defineMetaTypeList.Router.param.default;
         }
-        config.default_bootstrap_router_provider=config.default_bootstrap_class+"@"+bootstrapClassModule.defineMetaTypeList.Router.param.default;
 
         //开始构建
         Utils.info('Making starting ...');

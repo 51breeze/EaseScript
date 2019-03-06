@@ -25,15 +25,14 @@ function keyValue(val) {
     return item;
 }
 
-
 program
 .version( 'EaseScript '+require('../package.json').version )
 .option('-p, --path [dir]', '项目路径', cmd===cwd || cwd===root_path ? './project' : cwd )
-.option('-c, --config [file]', '指定配置文件', PATH.resolve(root_path, 'configure.js') )
+.option('-c, --config [file]', '指定配置文件',null)
 .option('-M, --minify [enable|disabled]', '是否需要压缩代码', null )
 .option('-A, --animate [enable|disabled]', '是否需要加载所有的CSS3动画库', 'disabled' )
 .option('-F, --font [enable|disabled]', '是否需要启用CSS字体库', 'enable' )
-.option('-o, --output [dir]', '输出路径')
+.option('-o, --output [dir]', '输出路径','./build')
 .option('-s, --syntax [js|php]', '要构建的语法','js')
 .option('-S, --suffix [value]', '源文件的后缀名','es')
 .option('-B, --browser [enable|disabled]', '是否需要支持浏览器','enable')
@@ -70,7 +69,6 @@ program
 
 program.parse(process.argv);
 
-var has_output_path = !!program.output;
 //输出路径
 if( !program.output )
 {
@@ -87,7 +85,6 @@ var config = {
     'animate': program.animate=="enable", //是否需要启用CSS3动画库
     'font': program.font=="enable", //是否需要启用CSS字体库
     'compat_version':program.compatVersion || {ie:9},      //要兼容的平台 {'ie':8,'chrome':32.5}
-    'has_output_path': has_output_path,
     'build_path': program.output,
     'project_path':program.path,
     'skin_file_suffix': '.'+program.skinFileSuffix,
@@ -111,7 +108,6 @@ var config = {
 };
 
 config.clean = program.clean
-config.root_path = root_path;
 config.syntax = program.syntax;
 
 if( config.syntax )
