@@ -250,6 +250,18 @@ function Context( name )
     return current;
 }
 
+const exclude = {
+    'int':true,
+    'uint':true,
+    'Integer':true,
+    'float':true,
+    'Float':true,
+    'double':true,
+    'Double':true,
+    'arguments':true,
+    "NodeList":true
+};
+
 /**
  * 合并代码
  * @param config
@@ -275,18 +287,6 @@ function builder(main, config , code, requirements , replacements)
         }
         if(is)utils.merge(libs, library[prop] );
     }
-
-    var exclude = {
-        'int':true,
-        'uint':true,
-        'Integer':true,
-        'float':true,
-        'Float':true,
-        'double':true,
-        'Double':true,
-        'arguments':true,
-        "NodeList":true
-    };
 
     /**
      * 引用全局对象模块
@@ -399,7 +399,7 @@ function builder(main, config , code, requirements , replacements)
  * @param requirements
  * @return {*|string}
  */
-function segment( content, requirements, handle, classname )
+function segment( config,content, requirements, handle, classname )
 {
     var requires = ['System','Class','Namespace','Interface','ListIterator','EventDispatcher','Event'].concat( globals.slice(0) );
     for (var p in requirements )
@@ -409,6 +409,16 @@ function segment( content, requirements, handle, classname )
             requires.push( requirements[p] );
         }
     }
+
+    requires = requires.filter(function (a) 
+    {
+        if( config.globals.hasOwnProperty(a) && config.globals[a].notLoadFile===true)
+        {
+            return false;
+        }
+        return exclude[a] !== true;
+    });
+
     return [
         'window["'+handle+'"]["Load"]["'+classname+'"]=function(Internal,System,undefined){',
         '(function(define,'+requires.join(',')+'){',

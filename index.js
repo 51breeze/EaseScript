@@ -30,6 +30,7 @@ const defaultConfig = {
     'config_file':null,
     'bootstrap':null,
     'default_bootstrap_class':null,
+    'script_part_load':true,
     'library':null,
     'strictType':true,
     'service_provider_syntax':"php",
@@ -954,7 +955,7 @@ const SyntaxBuilder={
             //如果需要把基础类与本地类分开加载
             if( doPart === true )
             {
-                scriptContent = builder.segment( scriptContent.join("") , requirements, handle,  bootstrap.fullclassname );
+                scriptContent = builder.segment( config, scriptContent.join("") , requirements, handle,  bootstrap.fullclassname );
             }else{
                 loadRequire.push( scriptFile );
                 scriptContent =  buildBaseScript(
@@ -1543,8 +1544,7 @@ function make( config, isGlobalConfig )
         {
             globalConfig  = config;
         }
-        //脚本文件分开加载
-        config.script_part_load = true;
+
         //构建应用的目录名
         config.build_application_name = Utils.getBuildPath(config,"build.application","name");
         //主库目录名
@@ -1584,35 +1584,42 @@ function make( config, isGlobalConfig )
             });
         }
 
-        var project_path = config.project_path;
-        var makedir = project_path;
-        var makefiles = [];
-        var file = PATH.resolve( project_path , config.bootstrap ? config.bootstrap.replace(".","/") : "./" ).replace(/\\/g,'/');
-
         //是否支持指定的语法
         if( syntax_supported[ config.syntax ] !== true )
         {
             Utils.error("Syntax "+config.syntax +" is not supported.");
         }
 
-        //如果定要编译的目录下的文件
-        if( Utils.isDir( file ) )
+        var project_path = config.project_path;
+        var makefiles = [];
+        var bootstrap_files= config.bootstrap ? config.bootstrap : project_path;
+        if( typeof bootstrap_files === "string" )
         {
-            makedir = file;
-            makefiles = Utils.getDirectoryFiles( file );
-            makefiles = makefiles.filter(function (a) {
-                return PATH.extname(a) === config.suffix;
-            });
-
-        }else
-        {
-            //如果是指定文件
-            if( !Utils.isFileExists( file ) )
-            {
-                file+=config.suffix;
-            }
-            makefiles = [ file ];
+            bootstrap_files=[ bootstrap_files ];
         }
+
+        bootstrap_files.forEach(function(file)
+        {
+            file = (PATH.isAbsolute( file ) ? file : PATH.resolve( project_path , file.replace(".","/") ) ).replace(/\\/g,'/');
+            //如果定要编译的目录下的文件
+            if( Utils.isDir( file ) )
+            {
+                makefiles = makefiles.concat( Utils.getDirectoryFiles( file ).filter(function (a) {
+                    return PATH.extname(a) === config.suffix;
+                }));
+
+            }else
+            {
+                //如果是指定文件
+                if( !Utils.isFileExists( file ) )
+                {
+                    file+=config.suffix;
+                }
+                makefiles.push( file );
+            }
+
+         });
+
 
         var i = 0;
         var len = makefiles.length;

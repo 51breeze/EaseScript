@@ -10,7 +10,7 @@
   "scripts": {
     "test": "node ./bin/es.js -V",
     "dev":"npm run development",
-    "development":"node ./bin/es.js -p ./test -C -m test -s javascript -b IndexApplication -o E:\\webroot\\working"
+    "development":"node ./bin/es.js -p ./test -C -m test -s javascript -o E:\\webroot\\working"
   },
   "repository": {
     "type": "git",
