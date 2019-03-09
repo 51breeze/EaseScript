@@ -34,6 +34,7 @@ const defaultConfig = {
     'library':null,
     'strictType':true,
     'service_provider_syntax':"php",
+    'static_url_path_name':"PATH",
     'enable_webroot':false,
     'command_switch':0,
     'script_part_load':true,
@@ -992,6 +993,8 @@ const SyntaxBuilder={
         //需要生成系统脚本
         if( doPart === true )
         {
+            var default_bootstrap = config.default_bootstrap_class ? Maker.localDescriptions[  config.default_bootstrap_class ] : null;
+
             //构建脚本内容
             scriptContent = buildBaseScript(
                 config,
@@ -999,7 +1002,7 @@ const SyntaxBuilder={
                 getRequirementsAllGlobalClass( baseModule ),
                 allHashMap ,
                 allServerRoutes,
-                Maker.localDescriptions[  config.default_bootstrap_class ],
+                default_bootstrap,
                 JSON.stringify(loadRequiremnets)
             );
 
@@ -1018,37 +1021,40 @@ const SyntaxBuilder={
                 scriptContent
             );
 
-            var default_bootstrap = Maker.localDescriptions[  config.default_bootstrap_class ].fullclassname;
+            if( default_bootstrap )
+            {
+                var default_bootstrap_name = default_bootstrap.fullclassname;
 
-            //生成入口视图
-            Utils.setContents(
-                PATH.resolve(Utils.getBuildPath(config, 'build.webroot'),'index.html'),
-                builder.getBootstrapView(config, {
-                    META_CHARSET:"UTF-8",
-                    META_HTTP_EQUIV:"X-UA-Compatible",
-                    META_CONTENT:"IE=edge",
-                    META_KEYWORD_HTTP_EQUIV:"es,easescript",
-                    BASE_STYLE_FILE:"",
-                    COMMAND_SWITCH:config.command_switch,
-                    VERSION:config.makeVersion,
-                    APP_STYLE_FILE: getLoadFileRelativePath(
-                        config,
-                        PATH.resolve(
-                            Utils.getBuildPath(config, 'build.css'),
-                            default_bootstrap+".css"
-                        )
-                    ),
-                    BASE_SCRIPT_FILE:getLoadFileRelativePath( config, baseScriptFile )+"?v="+config.makeVersion,
-                    APP_SCRIPT_FILE:getLoadFileRelativePath(
-                        config,
-                        PATH.resolve(
-                            Utils.getBuildPath(config, 'build.js'),
-                            default_bootstrap+".js"
-                        )
-                    ),
-                    VIEW_TITLE:"Welcome to the EaseScript world!",
-                })
-            );
+                //生成入口视图
+                Utils.setContents(
+                    PATH.resolve(Utils.getBuildPath(config, 'build.webroot'),'index.html'),
+                    builder.getBootstrapView(config, {
+                        META_CHARSET:"UTF-8",
+                        META_HTTP_EQUIV:"X-UA-Compatible",
+                        META_CONTENT:"IE=edge",
+                        META_KEYWORD_HTTP_EQUIV:"es,easescript",
+                        BASE_STYLE_FILE:"",
+                        COMMAND_SWITCH:config.command_switch,
+                        VERSION:config.makeVersion,
+                        APP_STYLE_FILE: getLoadFileRelativePath(
+                            config,
+                            PATH.resolve(
+                                Utils.getBuildPath(config, 'build.css'),
+                                default_bootstrap_name+".css"
+                            )
+                        ),
+                        BASE_SCRIPT_FILE:getLoadFileRelativePath( config, baseScriptFile )+"?v="+config.makeVersion,
+                        APP_SCRIPT_FILE:getLoadFileRelativePath(
+                            config,
+                            PATH.resolve(
+                                Utils.getBuildPath(config, 'build.js'),
+                                default_bootstrap_name+".js"
+                            )
+                        ),
+                        VIEW_TITLE:"Welcome to the EaseScript world!",
+                    })
+                );
+            }
         }
 
         //需要构建服务类
@@ -1406,6 +1412,8 @@ function configToJson( config , depth )
     return '{\n'+item.join(",\n")+'\n'+tab+'}';
 }
 
+var mergeConfig = false;
+
 /**
  * 获取配置信息
  * @param config
@@ -1413,6 +1421,15 @@ function configToJson( config , depth )
  */
 function getConfigure(config)
 {
+    if( mergeConfig )
+    {
+        return globalConfig;
+    }
+
+    mergeConfig = true;
+
+    //合并默认属性
+    config = globalConfig = Utils.merge(globalConfig, config || {});
     var root_path = __dirname;
     config.root_path = root_path;
 
@@ -1432,7 +1449,7 @@ function getConfigure(config)
     }
 
     //默认配置文件
-    var makefile = PATH.resolve(project_path,'project.conf');
+    var makefile = PATH.resolve(project_path,'.esconf');
     if( !Utils.isFileExists( makefile ) || config.clean===true )
     {
         //程序的路径
@@ -1524,72 +1541,71 @@ function getConfigure(config)
         "iteratorClass":"es.interfaces.IListIterator",
     };
 
+
+    //系统必需要加载的类
     var system_main_class = [];
-    for( var scc in config.system_core_class ){
+    for( var scc in config.system_core_class )
+    {
         system_main_class.push( config.system_core_class[scc] );
     }
     config.system_require_main_class = system_main_class;
-    return config;
+
+
+     //构建应用的目录名
+     config.build_application_name = Utils.getBuildPath(config,"build.application","name");
+     //主库目录名
+     config.build_libaray_name = "es";
+     //生成系统类目录
+     config.build_system_path = "es.system";
+     //当前支持构建的语法
+     config.syntax_supported = syntax_supported;
+     //需要引用的全局类
+     requirements = config.requirements || (config.requirements = {});
+     //默认构建的语法
+     config.syntax = syntaxMap[ config.syntax ] || 'javascript';
+     config.originMakeSyntax = config.syntax;
+     //服务提供者
+     config.ServiceProviderList = {};
+     //浏览器中的全局模块
+     if( config.browser === 'enable' )
+     {
+         var browser = require('./lib/browser.js');
+         Utils.merge(globals,browser);
+     }
+     config.globals=globals;
+     
+     //编译版本号
+     config.makeVersion = (new Date()).getTime();
+     if( config.library )
+     {
+         Utils.forEach(config.library, function (name)
+         {
+             config.globals[ name ] = {
+                 "id":"class",
+                 "type":name,
+                 "notCheckType":true,
+                 "notLoadFile":true
+             }
+         });
+     }
+
+     //是否支持指定的语法
+     if( syntax_supported[ config.syntax ] !== true )
+     {
+         Utils.error("Syntax "+config.syntax +" is not supported.");
+     }
+     return config;
 }
 
 /**
  * 开始生成代码片段
  */
-function make( config, isGlobalConfig )
+function make( config )
 {
+    
     try
     {
-        config = getConfigure( Utils.merge(globalConfig, config || {}) );
-        if( isGlobalConfig===true )
-        {
-            globalConfig  = config;
-        }
-
-        //构建应用的目录名
-        config.build_application_name = Utils.getBuildPath(config,"build.application","name");
-        //主库目录名
-        config.build_libaray_name = "es";
-        //生成系统类目录
-        config.build_system_path = "es.system";
-        //当前支持构建的语法
-        config.syntax_supported = syntax_supported;
-        //需要引用的全局类
-        requirements = config.requirements || (config.requirements = {});
-        //默认构建的语法
-        config.syntax = syntaxMap[ config.syntax ] || 'javascript';
-        config.originMakeSyntax = config.syntax;
-        //服务提供者
-        config.ServiceProviderList = {};
-        //静态页面需要模拟path信息的接收名
-        config.static_url_path_name = "PATH";
-        //浏览器中的全局模块
-        if( config.browser === 'enable' )
-        {
-            var browser = require('./lib/browser.js');
-            Utils.merge(globals,browser);
-        }
-        config.globals=globals;
-        //编译版本号
-        config.makeVersion = (new Date()).getTime();
-        if( config.library )
-        {
-            Utils.forEach(config.library, function (name)
-            {
-                config.globals[ name ] = {
-                    "id":"class",
-                    "type":name,
-                    "notCheckType":true,
-                    "notLoadFile":true
-                }
-            });
-        }
-
-        //是否支持指定的语法
-        if( syntax_supported[ config.syntax ] !== true )
-        {
-            Utils.error("Syntax "+config.syntax +" is not supported.");
-        }
-
+        config = getConfigure( config );
         var project_path = config.project_path;
         var makefiles = [];
         var bootstrap_files= config.bootstrap ? config.bootstrap : project_path;
@@ -1598,6 +1614,8 @@ function make( config, isGlobalConfig )
             bootstrap_files=[ bootstrap_files ];
         }
 
+
+        //获取需要编译的文件,支持目录或者文件路径
         bootstrap_files.forEach(function(file)
         {
             file = (PATH.isAbsolute( file ) ? file : PATH.resolve( project_path , file.replace(".","/") ) ).replace(/\\/g,'/');
@@ -1625,7 +1643,8 @@ function make( config, isGlobalConfig )
         var len = makefiles.length;
         var descriptions=[];
         var inheritClass=[];
-        //入口文件列表
+
+        //入口文件列表,获取源码信息
         var bootstrapClassList = config.bootstrap_class_list = [];
         for(;i<len;i++)
         {
@@ -1649,7 +1668,8 @@ function make( config, isGlobalConfig )
         var bootstrap_class=[null,null,null];
 
         //继承 es.core.Application 的属于入口文件
-        descriptions = descriptions.filter(function (a) {
+        descriptions = descriptions.filter(function (a)
+        {
             //如果这个类被子类继承过证明也不是入口文件
             if( inheritClass.indexOf( a.fullclassname ) >=0 )
             {
@@ -1712,8 +1732,7 @@ function make( config, isGlobalConfig )
     }catch (e)
     {
         Utils.error(e.message);
-       // if( config.debug=='on')
-            console.log( e );
+        console.log( e  );
     }
 }
 

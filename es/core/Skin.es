@@ -399,7 +399,8 @@ package es.core
                 invalidate=false;
                 if( initialized )
                 {
-                    //this.createChildren();
+
+                    this.createChildren();
                 }
             }
             return value;

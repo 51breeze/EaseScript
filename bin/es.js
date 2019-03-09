@@ -121,4 +121,4 @@ if( !config.service_provider_syntax )
 }
 
 //开始
-require('../index.js')(config, true);
+require('../index.js')(config);

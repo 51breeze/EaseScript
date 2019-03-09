@@ -24,19 +24,22 @@
 
             override protected function initializing()
             {
-                super.initializing();
+               
                 var hostComponent:DataGrid = this.hostComponent;
+                console.log( "===datagrid==", hostComponent.isNeedCreateSkin(), hostComponent );
                 if( hostComponent.isNeedCreateSkin() )
                 {
+
                     var dataSource:DataSource =  hostComponent.dataSource;
                     var body:Skin = this;
                     var dataProfile:String =  hostComponent.dataProfile;
+                    pagination.dataSource = dataSource;
+
                     body.assign('rowHeight', hostComponent.rowHeight );
                     body.assign('headHeight', hostComponent.headHeight );
                     body.assign( dataProfile, [] );
                     body.assign( hostComponent.columnProfile, hostComponent.columns);
                     body.assign( hostComponent.columnProfile, hostComponent.columns );
-                    pagination.dataSource = dataSource;
 
                     dataSource.addEventListener(DataSourceEvent.SELECT, function (event:DataSourceEvent)
                     {
@@ -48,6 +51,8 @@
                     });
                     dataSource.select( pagination.current );
                }
+
+               super.initializing();
             }
 
         ]]>
