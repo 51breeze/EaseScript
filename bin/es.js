@@ -1,6 +1,7 @@
 #!/usr/bin/env node  
 const program = require('commander');
 const PATH = require('path');
+const ES = require('../lib/index.js');
 
 //当前命令脚本路径
 var cmd = PATH.dirname( process.argv[1] );
@@ -8,7 +9,8 @@ var cwd = process.cwd();
 cmd = cmd.replace(/\\/g, '/').replace(/\/$/,'');
 cwd = cwd.replace(/\\/g, '/').replace(/\/$/,'');
 var root_path = PATH.dirname( cmd );
-
+//指定需要执行的动作
+var action = process.argv[2];
 function keyValue(val) {
     val = val.split(',');
     var item={};
@@ -34,7 +36,7 @@ program
 .option('-F, --font [enable|disabled]', '是否需要启用CSS字体库', 'enable' )
 .option('-o, --output [dir]', '输出路径','./build')
 .option('-s, --syntax [js|php]', '要构建的语法','js')
-.option('-S, --suffix [value]', '源文件的后缀名','es')
+.option('-S, --suffix [value]', '源文件的后缀名','.es')
 .option('-B, --browser [enable|disabled]', '是否需要支持浏览器','enable')
 .option('-b, --bootstrap [file|dir]', '指定需要编译的文件或者一个目录')
 .option('-d, --debug [enable|disabled]', '是否需要开启调试','enable')
@@ -62,63 +64,72 @@ program
 .option('--bs, --block-scope [enable|disabled]', '是否需要启用块级域','disabled')
 .option('--switch, --command-switch [value]', '需要编译到程序中的指令开关，通常的值为N^2用作模式值',0)
 .option('--bsc, --base-skin-class [value]', '指定皮肤文件的基础类','es.core.Skin')
-.option('--sfs, --skin-file-suffix [value]', '皮肤文件的后缀','html')
+.option('--sfs, --skin-file-suffix [value]', '皮肤文件的后缀','.html')
 //.option('--gh, --global-handle [variable name]', '全局引用EaseScript对象的变量名','EaseScript')
 .option('--src, --source-file [enable|disabled]', '是否需要生成源文件','enable')
 .option('--sps, --service-provider-syntax [php]', '服务提供者的语法');
-
 program.parse(process.argv);
 
-//输出路径
-if( !program.output )
-{
-    program.output= program.path.replace(/\/$/,'')+'/build';
+var mapKeys={
+    "suffix":"suffix",
+    "debug":"debug",
+    "blockScope":"blockScope",
+    "reserved":"reserved",
+    "minify":"minify",
+    "animate":"animate",
+    "font":"font",
+    "compatVersion":"compatVersion",
+    "build_path":"output",
+    "project_path":"path",
+    "skin_file_suffix":"skinFileSuffix",
+    "project_file_suffix":"suffix",
+    "browser":"browser",
+    "baseSkinClass":"baseSkinClass",
+    "config_file":"config",
+    "bootstrap":"bootstrap",
+    "theme":"theme",
+    "source_file":"sourceFile",
+    "library":"library",
+    "strictType":"strictType",
+    "theme_file_path":"themeFilePath",
+    "skin_style_config":"skinStyleConfig",
+    "service_provider_syntax":"serviceProviderSyntax",
+    "default_bootstrap_class":"defaultBootstrapClass",
+    "enable_webroot":"webroot",
+    "command_switch":"commandSwitch",
+    "mode":"mode",
+    "clean":"clean",
+    "syntax":"syntax",
 }
 
 //全局配置
-var config = {
-    'suffix': '.'+(program.suffix||'es'),            //需要编译文件的后缀
-    'debug': program.debug, //是否需要开启调式
-    'blockScope': program.blockScope,     //是否启用块级域
-    'reserved': ['let', 'of','System',"Context"],
-    'minify': program.minify==null && program.mode=="production" ? "enable" : program.minify, //是否需要压缩 minify
-    'animate': program.animate=="enable", //是否需要启用CSS3动画库
-    'font': program.font=="enable", //是否需要启用CSS字体库
-    'compat_version':program.compatVersion || {ie:9},      //要兼容的平台 {'ie':8,'chrome':32.5}
-    'build_path': program.output,
-    'project_path':program.path,
-    'skin_file_suffix': '.'+program.skinFileSuffix,
-    'project_file_suffix':'.'+program.suffix,
-    'browser':program.browser,
-    'baseSkinClass':program.baseSkinClass,
-    'config_file':program.config,
-    'bootstrap':program.bootstrap,
-    'theme':program.theme,
-    'source_file':program.sourceFile,
-   //'global_handle':program.globalHandle,
-    'library':program.library,
-    'strictType':program.strictType === 'enable',
-    'theme_file_path':program.themeFilePath,
-    'skin_style_config':program.skinStyleConfig,
-    'service_provider_syntax':program.serviceProviderSyntax,
-    "default_bootstrap_class":program.defaultBootstrapClass,
-    "enable_webroot":!!program.webroot,
-    "command_switch":program.commandSwitch,
-    'mode': program.mode=='dev' ? 1 : program.mode=='test' ? 2 : 3, //1 标准模式（开发时使用） 2 测试  3 性能模式（生产环境使用）
-};
-
-config.clean = program.clean
-config.syntax = program.syntax;
-
-if( config.syntax )
+var config = {};
+for( var key in mapKeys )
 {
-    config.syntax = config.syntax.toLowerCase();
-}
-
-if( !config.service_provider_syntax )
-{
-    config.service_provider_syntax = config.syntax && config.syntax !== "javascript" ? config.syntax : 'php';
+    var name = mapKeys[ key ];
+    var val =  program[ name ];
+    if(  typeof val !== "undefined" )
+    {
+        switch( name ){
+            case "syntax" :
+                val =  val.toLowerCase();
+            break;
+            case "mode" :
+                val =  val=='dev' ? 1 : val=='test' ? 2 : 3;
+            break;
+            case "strictType" :
+            case "animate" :
+            case "font" :
+                val = val === 'enable';
+            break;
+        }
+        config[ key ] = val;
+    }
 }
 
 //开始
-require('../index.js')(config);
+if( action && action.toLowerCase() === "create" ){
+   ES.create( config );
+}else{
+   ES.make( config );
+}

@@ -400,7 +400,7 @@ package es.core
                 if( initialized )
                 {
 
-                    this.createChildren();
+                    //this.createChildren();
                 }
             }
             return value;

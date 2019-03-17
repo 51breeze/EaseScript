@@ -1,13 +1,13 @@
 {
 "suffix":".es",
-"debug":"on",
+"debug":"enable",
 "blockScope":"disabled",
-"reserved":["let","of","System","Context"],
+"reserved":[],
 "minify":"null",
 "animate":"false",
 "font":"true",
 "theme":"default",
-"theme_file_path":"themes",
+"theme_file_path":"E:/EaseScript/test/themes",
 "source_file":"enable",
 "compat_version":{
 	"ie":"9"
@@ -15,32 +15,30 @@
 "build_path":"E:/webroot/working",
 "project_path":"E:/EaseScript/test",
 "skin_file_suffix":".html",
-"skin_style_config":"undefined",
+"skin_style_config":"null",
 "project_file_suffix":".es",
 "browser":"enable",
 "baseSkinClass":"es.core.Skin",
 "config_file":"null",
-"bootstrap":"undefined",
-"default_bootstrap_class":"undefined",
-"script_part_load":"true",
-"library":"undefined",
+"bootstrap":"null",
+"default_bootstrap_class":"null",
+"library":"null",
 "strictType":"true",
 "service_provider_syntax":"php",
 "static_url_path_name":"PATH",
 "enable_webroot":"false",
 "command_switch":"0",
-"context":{
-	"public":"_public",
-	"protected":"_protected",
-	"private":"_private",
-	"internal":"_internal",
-	"defineModuleMethod":"define",
-	"package":"Context"
-},
+"script_part_load":"true",
+"system_lib_path_name":"es",
+"system_lib_path":"E:/EaseScript/",
+"system_style_name":"style",
+"system_style_path":"E:/EaseScript/",
+"build_libaray_name":"es",
+"build_system_path":"es.system",
 "clean":"true",
 "mode":"2",
 "syntax":"javascript",
-"root_path":"E:/EaseScript",
+"root_path":"E:/EaseScript/",
 "build":{
 	"path":"E:/webroot/working",
 	"name":"working",
@@ -95,6 +93,57 @@
 },
 "project":{
 	"path":"E:/EaseScript/test",
-	"name":"test"
+	"name":"test",
+	"child":{
+		"src":{
+			"path":"E:/EaseScript/test/src",
+			"name":"src",
+			"__build":"true"
+		},
+		"image":{
+			"path":"E:/EaseScript/test/src/image",
+			"name":"image",
+			"__build":"true"
+		},
+		"style":{
+			"path":"E:/EaseScript/test/src/style",
+			"name":"style",
+			"__build":"true"
+		},
+		"theme":{
+			"path":"E:/EaseScript/test/src/theme",
+			"name":"theme",
+			"__build":"true"
+		},
+		"app":{
+			"path":"E:/EaseScript/test/src/app",
+			"name":"app",
+			"__build":"true"
+		},
+		"view":{
+			"path":"E:/EaseScript/test/src/view",
+			"name":"view",
+			"__build":"true"
+		},
+		"component":{
+			"path":"E:/EaseScript/test/src/component",
+			"name":"component",
+			"__build":"true"
+		},
+		"skin":{
+			"path":"E:/EaseScript/test/src/skin",
+			"name":"skin",
+			"__build":"true"
+		}
+	},
+	"__build":"true"
+},
+"system_core_class":{
+	"iteratorClass":"es.interfaces.IListIterator"
+},
+"system_require_main_class":["es.interfaces.IListIterator"],
+"build_application_name":"easescript",
+"requirements":{
+
 }
 }

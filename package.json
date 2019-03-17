@@ -2,7 +2,7 @@
   "name": "easescript",
   "version": "1.1.12-Beta",
   "description": "EaseScript Beta",
-  "main": "./bin/es.js",
+  "main": "lib/index.js",
   "bin": {
     "easescript": "./bin/es.js",
     "es": "./bin/es.js"
@@ -11,7 +11,8 @@
     "test": "node ./bin/es.js -V",
     "dev":"npm run development",
     "development":"node ./bin/es.js -p ./test -C -m test -s javascript -o E:\\webroot\\working",
-    "debug":"node ./bin/es.js -p ./test -C -m test -s javascript -o ./debug -b Test"
+    "debug":"node ./bin/es.js -p ./test -C -m test -s javascript -o ./debug -b Test",
+    "create":"node ./bin/es.js create -p ./test -m test -s javascript -o E:\\webroot\\working"
   },
   "repository": {
     "type": "git",

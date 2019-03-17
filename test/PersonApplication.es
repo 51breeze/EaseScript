@@ -2,6 +2,7 @@ package
 {
     import BaseApplication;
     import view.Person;
+    import IndexApplication;
 
     [Router(default=index,method=get,alias="/Person")]
 	public class PersonApplication extends BaseApplication

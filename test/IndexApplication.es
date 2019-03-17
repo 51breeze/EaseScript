@@ -27,7 +27,6 @@ package
         [Router(method="get")]
         public function viewport()
         {
-           
             console.log(" ====enter viewport====");
             var view:view.Viewport = new view.Viewport( this );
             return this.render(view);
