@@ -3,26 +3,21 @@
 "debug":"enable",
 "blockScope":"disabled",
 "reserved":[],
-"minify":"null",
 "animate":"false",
 "font":"true",
 "theme":"default",
-"theme_file_path":"E:/EaseScript/test/themes",
+"theme_file_path":"E:/EaseScript/test/src/theme",
 "source_file":"enable",
 "compat_version":{
 	"ie":"9"
 },
-"build_path":"E:/webroot/working",
+"build_path":"E:/EaseScript/test/build",
 "project_path":"E:/EaseScript/test",
+"workspace":"E:/EaseScript/test/src",
 "skin_file_suffix":".html",
-"skin_style_config":"null",
 "project_file_suffix":".es",
 "browser":"enable",
 "baseSkinClass":"es.core.Skin",
-"config_file":"null",
-"bootstrap":"null",
-"default_bootstrap_class":"null",
-"library":"null",
 "strictType":"true",
 "service_provider_syntax":"php",
 "static_url_path_name":"PATH",
@@ -37,59 +32,50 @@
 "build_system_path":"es.system",
 "clean":"true",
 "mode":"2",
+"build_mode":"app",
 "syntax":"javascript",
-"root_path":"E:/EaseScript/",
+"root_path":"E:/EaseScript",
 "build":{
-	"path":"E:/webroot/working",
-	"name":"working",
+	"path":"E:/EaseScript/test/build",
+	"name":"build",
 	"child":{
 		"js":{
-			"path":"E:/webroot/working/webroot/js",
-			"name":"js",
-			"__build":"true"
+			"path":"E:/EaseScript/test/build/webroot/js",
+			"name":"js"
 		},
 		"img":{
-			"path":"E:/webroot/working/webroot/img",
-			"name":"img",
-			"__build":"true"
+			"path":"E:/EaseScript/test/build/webroot/img",
+			"name":"img"
 		},
 		"css":{
-			"path":"E:/webroot/working/webroot/css",
-			"name":"css",
-			"__build":"true"
+			"path":"E:/EaseScript/test/build/webroot/css",
+			"name":"css"
 		},
 		"font":{
-			"path":"E:/webroot/working/webroot/fonts",
-			"name":"fonts",
-			"__build":"true"
+			"path":"E:/EaseScript/test/build/webroot/fonts",
+			"name":"fonts"
 		},
 		"view":{
-			"path":"E:/webroot/working/easescript/view",
-			"name":"view",
-			"__build":"true"
+			"path":"E:/EaseScript/test/build/easescript/view",
+			"name":"view"
 		},
 		"html":{
-			"path":"E:/webroot/working/webroot/html",
-			"name":"html",
-			"__build":"true"
+			"path":"E:/EaseScript/test/build/webroot/html",
+			"name":"html"
 		},
 		"webroot":{
-			"path":"E:/webroot/working/webroot",
-			"name":"webroot",
-			"__build":"true"
+			"path":"E:/EaseScript/test/build/webroot",
+			"name":"webroot"
 		},
 		"bootstrap":{
-			"path":"E:/webroot/working/easescript/bootstrap",
-			"name":"bootstrap",
-			"__build":"true"
+			"path":"E:/EaseScript/test/build/easescript/bootstrap",
+			"name":"bootstrap"
 		},
 		"application":{
-			"path":"E:/webroot/working/easescript",
-			"name":"easescript",
-			"__build":"true"
+			"path":"E:/EaseScript/test/build/easescript",
+			"name":"easescript"
 		}
-	},
-	"__build":"true"
+	}
 },
 "project":{
 	"path":"E:/EaseScript/test",
@@ -97,53 +83,41 @@
 	"child":{
 		"src":{
 			"path":"E:/EaseScript/test/src",
-			"name":"src",
-			"__build":"true"
+			"name":"src"
 		},
 		"image":{
 			"path":"E:/EaseScript/test/src/image",
-			"name":"image",
-			"__build":"true"
+			"name":"image"
 		},
 		"style":{
 			"path":"E:/EaseScript/test/src/style",
-			"name":"style",
-			"__build":"true"
+			"name":"style"
 		},
 		"theme":{
 			"path":"E:/EaseScript/test/src/theme",
-			"name":"theme",
-			"__build":"true"
+			"name":"theme"
 		},
 		"app":{
 			"path":"E:/EaseScript/test/src/app",
-			"name":"app",
-			"__build":"true"
+			"name":"app"
 		},
 		"view":{
 			"path":"E:/EaseScript/test/src/view",
-			"name":"view",
-			"__build":"true"
+			"name":"view"
 		},
 		"component":{
 			"path":"E:/EaseScript/test/src/component",
-			"name":"component",
-			"__build":"true"
+			"name":"component"
 		},
 		"skin":{
 			"path":"E:/EaseScript/test/src/skin",
-			"name":"skin",
-			"__build":"true"
+			"name":"skin"
 		}
-	},
-	"__build":"true"
+	}
 },
 "system_core_class":{
 	"iteratorClass":"es.interfaces.IListIterator"
 },
 "system_require_main_class":["es.interfaces.IListIterator"],
-"build_application_name":"easescript",
-"requirements":{
-
-}
+"build_application_name":"easescript"
 }

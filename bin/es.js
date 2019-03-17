@@ -1,7 +1,6 @@
 #!/usr/bin/env node  
 const program = require('commander');
 const PATH = require('path');
-const ES = require('../lib/index.js');
 
 //当前命令脚本路径
 var cmd = PATH.dirname( process.argv[1] );
@@ -9,8 +8,6 @@ var cwd = process.cwd();
 cmd = cmd.replace(/\\/g, '/').replace(/\/$/,'');
 cwd = cwd.replace(/\\/g, '/').replace(/\/$/,'');
 var root_path = PATH.dirname( cmd );
-//指定需要执行的动作
-var action = process.argv[2];
 function keyValue(val) {
     val = val.split(',');
     var item={};
@@ -41,7 +38,7 @@ program
 .option('-b, --bootstrap [file|dir]', '指定需要编译的文件或者一个目录')
 .option('-d, --debug [enable|disabled]', '是否需要开启调试','enable')
 .option('-t, --theme [default,blue,...]', '指定使用的主题颜色','default')
-.option('--tfp, --theme-file-path [project_path/themes]', '指定主题配置文件的目录,默认为当前工程目录,每一个配置文件名必须与主题名一致','themes')
+.option('--tfp, --theme-file-path [project_path/theme]', '指定主题配置文件的目录,默认为当前工程目录,每一个配置文件名必须与主题名一致',"./theme")
 .option('-r, --reserved [keyword1,keyword2,...]', '指定需要保护的关键字', function (val) {
     return val.split(',');
 }).option('--webroot', '指示项目是部署在webroot下运行,否则为构建目录下运行',"enable")
@@ -49,7 +46,8 @@ program
 .option('--ssc, --skin-style-config [style.conf,skinClassName:style.less,...]', '皮肤样式配置文件或者指定具体组件名称键对样式名文件', keyValue)
 .option('-L, --library [name,name:alias,...]', '指定使用第三方组件库',keyValue)
 .option('-m, --mode [dev|test|production]', '构建模式是用于生产环境还是测试环境','production')
-.option('-C, --clean', '清除编译配置文件,并重新生成')
+.option('--clean', '清除编译配置文件,并重新生成')
+.option('--bm, --build-mode [app|other]', '构建文件模式', "app")
 .option('--st, --strict-type [enable|disabled]', '启用强类型模式,对于声明的变量、属性、函数的返回值必须指定类型', 'enable')
 .option('--cv, --compat-version [ie:number,chrome:number,...]', '需要兼容的浏览器版本,默认为所有(*)',function (val) {
    val = val.split(',');
@@ -100,6 +98,7 @@ var mapKeys={
     "mode":"mode",
     "clean":"clean",
     "syntax":"syntax",
+    "build_mode":"buildMode",
 }
 
 //全局配置
@@ -127,9 +126,4 @@ for( var key in mapKeys )
     }
 }
 
-//开始
-if( action && action.toLowerCase() === "create" ){
-   ES.create( config );
-}else{
-   ES.make( config );
-}
+require('../lib/index.js')( config );

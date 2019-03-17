@@ -364,7 +364,8 @@ function builder(main, config , code, requirements , replacements)
     }
 
     //系统引导器
-    var bootstrap = utils.getContents( rootPath+'/bootstrap.js' );
+    var bootstrap = config.build_mode ==="app" ? rootPath+'/bootstrap.js' : rootPath+'/boot.js';
+    bootstrap = utils.getContents( bootstrap );
     bootstrap = replaceContent(bootstrap, replacements, config);
 
     //开发业务代码
