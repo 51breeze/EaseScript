@@ -439,6 +439,7 @@ package es.core
         */ 
         public function attributes(target:Object, attrs:Object):void
         {
+            if( target == null )return;
             var isElem:Boolean = target instanceof Element;
             Object.forEach(attrs,function(value:*,name:String)
             {
@@ -472,6 +473,13 @@ package es.core
                     {
                         target.innerHTML = value as String;
 
+                    }else if( name ==="class" || name==="className")
+                    {
+                        if( target.className !== attrs[name] )
+                        {
+                            target.className=attrs[name];
+                        }
+    
                     }else if( target.getAttribute(name) != attrs[name] )
                     {
                         target.setAttribute(name, attrs[name] );
