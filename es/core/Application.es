@@ -59,7 +59,7 @@ package es.core
            {
                var elem:Element = (value as Skin).element;
                if(  elem.isNodeInDocumentChain() ) {
-                   return '#' + (value as Skin).generateId();
+                  // return '#' + (value as Skin).generateId();
                }else{
                    return null;
                }

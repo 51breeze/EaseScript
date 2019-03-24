@@ -69,7 +69,7 @@ package es.interfaces
          * @param child
          * @return Boolean
          */
-        public function contains( child:IDisplay ):Boolean
+        public function contains( child:IDisplay ):Boolean;
 
     }
 }

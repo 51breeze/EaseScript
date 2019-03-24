@@ -175,7 +175,7 @@ final class System
         return $high > $low ? range($low, $high, $step) : array($low);
     }
 
-    public static function bind($thisArg, $callback )
+    public static function bind($callback,$thisArg)
     {
         if( is_array($callback) )
         {

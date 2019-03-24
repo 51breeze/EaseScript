@@ -2,6 +2,7 @@ package{
 
     public class Index extends EventDispatcher{
 
+        
         public function Index()
         {
 
@@ -9,7 +10,14 @@ package{
 
                this.name;
 
-           }).bind(this);
+           }).apply(this, [1,2,3,5]);
+
+
+           var fn:Function = function(){
+                 this.name;
+           };
+
+           fn.call(this,1,2,3,6);
 
            Object.forEach([],function(){
 
@@ -34,16 +42,28 @@ package{
 
 
         }
+        
+        override public addEventListener(type:String, callback:Function, flag:Boolean, pri:int, thisavrg:Object=null ):EventDispatcher
+        {
 
-        public function get name():String
+            super.addEventListener(type, callback, flag, pri, thisavrg);
+            return this;
+
+        }
+        public get name():String
         {
             return "sssss";
         }
-
-        public function address(...names:Array ){
+        address(...names:Array ){
 
              console.log( names );
         }
+        
+
+         public function assign(name:String, value:*=null)
+         {
+
+         }
 
     }
 

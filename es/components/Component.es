@@ -34,6 +34,6 @@ package es.components
                     this.dispatchEvent(new ComponentEvent(ComponentEvent.INITIALIZING));
                 }
             }
-        };
+        }
     }
 }

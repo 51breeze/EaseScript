@@ -15,7 +15,7 @@ package es.events
         public function ComponentEvent(type:String, bubbles:Boolean=true, cancelable:Boolean=true)
         {
             super(type, bubbles, cancelable);
-        };
+        }
     }
 }
 

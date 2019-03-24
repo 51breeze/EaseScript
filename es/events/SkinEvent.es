@@ -13,7 +13,7 @@ package es.events
         public function SkinEvent(type:String, bubbles:Boolean=true, cancelable:Boolean=true)
         {
             super(type, bubbles, cancelable);
-        };
+        }
     }
 }
 

@@ -792,6 +792,6 @@ package es.core
             }
             this.createChildren();
             return super.display();
-        };
+        }
     }
 }

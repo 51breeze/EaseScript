@@ -442,7 +442,7 @@ builder.segment = segment;
  */
 function getBootstrapView( config, replacements )
 {
-    return replaceContent( utils.getContents( rootPath+'/index.html' ), replacements, config);
+    return replaceContent( utils.getContents( config.view_template_path || (rootPath+'/index.html') ), replacements, config);
 }
 builder.getBootstrapView = getBootstrapView;
 
