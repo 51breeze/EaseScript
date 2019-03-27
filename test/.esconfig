@@ -11,13 +11,14 @@
 	"compat_version":{
 		"ie":9
 },
-	"build_path":"E:/webroot/working",
+	"build_path":"E:/EaseScript/test/build",
 	"project_path":"E:/EaseScript/test",
 	"workspace":"E:/EaseScript/test/src",
 	"skin_file_suffix":".html",
 	"project_file_suffix":".es",
 	"browser":"enable",
 	"baseSkinClass":"es.core.Skin",
+	"bootstrap":"IndexApplication",
 	"strictType":true,
 	"service_provider_syntax":"php",
 	"static_url_path_name":"PATH",
@@ -36,43 +37,43 @@
 	"syntax":"javascript",
 	"root_path":"E:/EaseScript",
 	"build":{
-		"path":"E:/webroot/working",
-		"name":"working",
+		"path":"E:/EaseScript/test/build",
+		"name":"build",
 		"child":{
 			"js":{
-				"path":"E:/webroot/working/webroot/js",
+				"path":"E:/EaseScript/test/build/webroot/js",
 				"name":"js"
 		},
 			"img":{
-				"path":"E:/webroot/working/webroot/img",
+				"path":"E:/EaseScript/test/build/webroot/img",
 				"name":"img"
 		},
 			"css":{
-				"path":"E:/webroot/working/webroot/css",
+				"path":"E:/EaseScript/test/build/webroot/css",
 				"name":"css"
 		},
 			"font":{
-				"path":"E:/webroot/working/webroot/fonts",
+				"path":"E:/EaseScript/test/build/webroot/fonts",
 				"name":"fonts"
 		},
 			"view":{
-				"path":"E:/webroot/working/easescript/view",
+				"path":"E:/EaseScript/test/build/easescript/view",
 				"name":"view"
 		},
 			"html":{
-				"path":"E:/webroot/working/webroot/html",
+				"path":"E:/EaseScript/test/build/webroot/html",
 				"name":"html"
 		},
 			"webroot":{
-				"path":"E:/webroot/working/webroot",
+				"path":"E:/EaseScript/test/build/webroot",
 				"name":"webroot"
 		},
 			"bootstrap":{
-				"path":"E:/webroot/working/easescript/bootstrap",
+				"path":"E:/EaseScript/test/build/easescript/bootstrap",
 				"name":"bootstrap"
 		},
 			"application":{
-				"path":"E:/webroot/working/easescript",
+				"path":"E:/EaseScript/test/build/easescript",
 				"name":"easescript"
 		}
 	}

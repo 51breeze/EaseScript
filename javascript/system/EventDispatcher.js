@@ -297,7 +297,7 @@ function $dispatchEvent(e, currentTarget )
     var target = e.currentTarget;
     var events = storage(target,'events');
     if( !events || !Object.prototype.hasOwnProperty.call(events, e.type) )return true;
-    events = events[e.type];
+    events = events[e.type].slice(0);
     var length= 0,listener,thisArg,count=events.length;
     while( length < count )
     {

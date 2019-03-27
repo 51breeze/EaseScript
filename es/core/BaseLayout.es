@@ -150,11 +150,17 @@ package es.core
             var parent:BaseLayout = findParentLayout(rootLayouts, layout.target.element );
             if( parent ){
                 assignParentForLayoutChildren(parent._children,layout);
-                parent._children.push( layout );
-                layout._parent = parent;
-            }else{
+                if(  parent._children.indexOf(layout)<0 )
+                {
+                    parent._children.push( layout );
+                    layout._parent = parent;
+                }
+            }else
+            {
                 assignParentForLayoutChildren(rootLayouts , layout );
-                rootLayouts.push( layout );
+                if( rootLayouts.indexOf(layout) < 0 ){
+                    rootLayouts.push( layout );
+                }
             }
             initRootLayout();
         }
@@ -254,8 +260,7 @@ package es.core
                     }
                 }
                 var self:BaseLayout = this;
-                value.element.addEventListener( ElementEvent.ADD_TO_DOCUMENT , function (e:ElementEvent) {
-                     this.removeEventListener(ElementEvent.ADD_TO_DOCUMENT);
+                value.element.addEventListener( ElementEvent.ADD , function (e:ElementEvent) {
                      if( this.style('position') === "static" )
                      {
                         this.style('position','relative');

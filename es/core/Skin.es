@@ -229,18 +229,16 @@ package es.core
         */
         private var elementMaps:Object={};
 
-          /**
-         * 创建一个节点元素
-         * @param index 当前节点元素的索引位置
-         * @param uniqueKey 当前元素位于当前域中的唯一键值
-         * @param name 元素的节点名
-         * @param attrs 元素的初始属性
-         * @param update 元素的动态属性
-         * @param binding 双向绑定元素属性
-         * @param event 绑定元素的事件
-         * @param context 指定当前上下文对象
-         * @returns {Object} 一个表示当前节点元素的对象
-         */ 
+        /**
+        * 创建一个节点元素
+        * @param index 当前节点元素的索引位置
+        * @param uniqueKey 当前元素位于当前域中的唯一键值
+        * @param name 元素的节点名
+        * @param attrs 元素的初始属性
+        * @param update 元素的动态属性
+        * @param events 绑定元素的事件
+        * @returns {Object} 一个表示当前节点元素的对象
+        */ 
         protected function createElement(index:int,uniqueKey:*, name:String, children:*=null, attrs:Object=null,update:Object=null,events:Object=null):Object
         {
             var uukey:String = (uniqueKey+''+index) as String;
@@ -271,6 +269,56 @@ package es.core
             {
                 this.bindEvent(index,uniqueKey,obj,events);
             }
+            return obj;
+        }
+
+        /**
+        * 创建一个组件实例
+        * @param index 当前节点元素的索引位置
+        * @param uniqueKey 当前元素位于当前域中的唯一键值
+        * @param classTarget 组件类名
+        * @param attrs 元素的初始属性
+        * @param update 元素的动态属性
+        * @param events 绑定元素的事件
+        * @returns {Object} 一个表示当前节点元素的对象
+        */ 
+        protected function createComponent(index:int,uniqueKey:*, classTarget:Class, children:*=null, attrs:Object=null,update:Object=null,events:Object=null):Object
+        {
+            var uukey:String = (uniqueKey+''+index) as String;
+            var obj:Object = elementMaps[ uukey ] as Object;
+            if( !obj )
+            {
+                obj = new classTarget( uukey ) as Object;
+                elementMaps[ uukey ] = obj;
+                if( attrs )
+                {
+                    this.attributes( (obj as IDisplay).element,attrs);
+                }
+            }
+
+            /*if( children )
+            {
+                if( children instanceof Array )
+                {
+                    if( obj is SkinComponent ){
+                       (obj as SkinComponent).skin.updateChildren( (obj as SkinComponent).skin.getContainer(), children );
+                    }else{
+                       this.updateChildren(obj,children as Array);
+                    }
+
+                }else
+                {
+                    obj.textContent=children+"";
+                }
+            }
+            if( update)
+            {
+                this.attributes(obj,update);
+            }
+            if( events )
+            {
+                this.bindEvent(index,uniqueKey,obj,events);
+            }*/
             return obj;
         }
 
@@ -373,7 +421,7 @@ package es.core
                         var e:ElementEvent=new ElementEvent( ElementEvent.ADD );
                         e.parent = parentDisplay || parent;
                         e.child = newNode;
-                        (childDisplay as EventDispatcher).dispatchEvent( e );
+                        childDisplay.element.dispatchEvent( e );
                     }
                 }
                 i++;
@@ -550,31 +598,6 @@ package es.core
                var bindable:Bindable= this.bindable;
                bindable.unbind(target, propName);
            }
-        }
-
-         /**
-         * @private
-         */
-        private var _layout:BaseLayout=null;
-
-        /**
-         * 设置一个指定布局对象
-         * @param value
-         */
-        [RunPlatform(client)]
-        public function set layout( value:BaseLayout )
-        {
-            value.target = this;
-            _layout = value;
-        }
-
-        /**
-         * 获取一个指定的布局对象
-         * @return {BaseLayout}
-         */
-        public function get layout():BaseLayout
-        {
-            return _layout;
         }
 
         /**
