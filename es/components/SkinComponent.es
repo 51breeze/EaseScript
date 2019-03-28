@@ -406,10 +406,24 @@ package es.components
          */
         public function get children():Array
         {
-            if( this.initialized ){
-                return this.skin.container.children;
+            if( this.initialized )
+            {
+                return this.skin.children;
             }
-            return childrenItems.slice(0);
+            return childrenItems;
+        }
+
+        /**
+         * 设置子级元素
+         * @returns {Array}
+         */
+        public function set children( value:Array ):void
+        {
+            if( this.initialized )
+            {
+                this.skin.children=value;
+            }
+            childrenItems = value.slice(0);
         }
 
         /**

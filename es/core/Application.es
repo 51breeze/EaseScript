@@ -87,11 +87,6 @@ package es.core
        }
 
        /**
-        * @private
-        */
-       private var _assignments:Object={};
-
-       /**
         * 获取或者指定数据
         * @param name
         * @param value
@@ -99,11 +94,33 @@ package es.core
         */
        public function assign(name:String, value:*=null)
        {
-           if( value==null ){
-               return _assignments[ name ];
+           if( value==null )
+           {
+               return _dataset[ name ];
            }
-           return _assignments[ name ] = value;
+           return _dataset[ name ] = value;
        }
+
+       /**
+        *@private
+        */  
+        private var _dataset:Object={};
+
+        /**
+        * 获取数据集
+        */
+        public function get dataset():Object
+        {
+            return _dataset;
+        }
+
+        /**
+        * 设置数据集
+        */
+        public function set dataset(value:Object):void
+        {
+            _dataset = value;
+        }
 
        /**
         * 设置此视图的标题
@@ -111,7 +128,7 @@ package es.core
         */
        public function set title( value:String ):void
        {
-           _assignments.title = value;
+           _dataset.title = value;
            document.title = value;
        }
 
@@ -122,16 +139,7 @@ package es.core
         */
        public function get title():String
        {
-          return _assignments.title as String;
-       }
-
-       /**
-        * 获取所有已分配的数据
-        * @returns {Object}
-        */
-       public function getAssignments():Object
-       {
-           return _assignments;
+          return _dataset.title as String;
        }
 
        /**

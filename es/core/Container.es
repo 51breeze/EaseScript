@@ -45,6 +45,15 @@ package es.core
         };
 
         /**
+         * 设置子级元素
+         * @returns {Array}
+         */
+        public function set children( value:Array ):void
+        {
+            this._children = value.slice(0);
+        };
+
+        /**
          * 获取指定索引处的子级元素
          * @param index
          * @returns {IDisplay}

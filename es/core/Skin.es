@@ -282,43 +282,43 @@ package es.core
         * @param events 绑定元素的事件
         * @returns {Object} 一个表示当前节点元素的对象
         */ 
-        protected function createComponent(index:int,uniqueKey:*, classTarget:Class, children:*=null, attrs:Object=null,update:Object=null,events:Object=null):Object
+        protected function createComponent(index:int,uniqueKey:*, classTarget:Class, children:*=null, attrs:Object=null,update:Object=null,events:Object=null):IDisplay
         {
             var uukey:String = (uniqueKey+''+index) as String;
-            var obj:Object = elementMaps[ uukey ] as Object;
+            var obj:IDisplay = elementMaps[ uukey ] as IDisplay;
             if( !obj )
             {
-                obj = new classTarget( uukey ) as Object;
+                obj = new classTarget( uukey ) as IDisplay;
                 elementMaps[ uukey ] = obj;
                 if( attrs )
                 {
-                    this.attributes( (obj as IDisplay).element,attrs);
+                    this.attributes( obj.element, attrs);
                 }
             }
 
-            /*if( children )
+            if( children )
             {
                 if( children instanceof Array )
                 {
-                    if( obj is SkinComponent ){
-                       (obj as SkinComponent).skin.updateChildren( (obj as SkinComponent).skin.getContainer(), children );
+                    if( obj is IContainer ){
+                        (obj is IContainer).children = children;
                     }else{
-                       this.updateChildren(obj,children as Array);
+                        this.updateChildren(obj.element.current() as Object,children as Array);
                     }
 
                 }else
                 {
-                    obj.textContent=children+"";
+                    obj.element.text( children+"" );
                 }
             }
             if( update)
             {
-                this.attributes(obj,update);
+                this.attributes(obj.element,update);
             }
             if( events )
             {
-                this.bindEvent(index,uniqueKey,obj,events);
-            }*/
+                this.bindEvent(index,uniqueKey,obj.element,events);
+            }
             return obj;
         }
 

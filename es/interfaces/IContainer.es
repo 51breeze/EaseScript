@@ -17,6 +17,12 @@ package es.interfaces
         public function get children():Array;
 
         /**
+         * 设置子级元素
+         * @returns {Array}
+         */
+        public function set children( value:Array ):void;
+
+        /**
          * 获取指定索引处的子级元素
          * @param index
          * @returns {IDisplay}

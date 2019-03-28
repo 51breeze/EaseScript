@@ -68,11 +68,23 @@ package es.core
          */
         override public function assign(name:String, value:*=null):*
         {
-           if( value===null )
-           {
-               return _context.assign(name);
-           }
-           return super.assign(name,value);
+           return _context.assign(name,value);
+        }
+
+        /**
+        * 获取数据集
+        */
+        override public function get dataset():Object
+        {
+            return _context.dataset;
+        }
+
+        /**
+        * 设置数据集
+        */
+        override public function set dataset(value:Object):void
+        {
+            _context.dataset = value;
         }
 
         /**
