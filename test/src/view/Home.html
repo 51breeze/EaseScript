@@ -3,6 +3,9 @@
     <s:Metadata>[HostComponent("IndexApplication")]</s:Metadata>
     <![CDATA[
 
+       
+        import es.core.Display;
+
         override public function get title():String
         {
              var _title:String = super.title;
@@ -21,6 +24,16 @@
                document.title = value;
          }
 
+         public get child():Array
+         {
+
+            return  [
+            new Display( new Element(Element.createElement("div")),  {jjj:999,innerHTML:"=======createElement======="} ),
+            new Display( new Element(Element.createElement("div")),  {jjj:7777,innerHTML:"<span style='color:red;'>=======createElement===66666666====</span>"} )
+            ];
+             
+         }
+
     ]]>
 
     <head>
@@ -30,6 +43,7 @@
     <body>
          <input value="{{this.title}}" />
          <button id="@popup">PopUp</button>
+         <div>{this.child}</div>
          <div>
              <h1>the is {message}</h1>
              <h1>这里是内容 Person</h1>
@@ -41,7 +55,7 @@
                      <c:dataType>@Http.TYPE_JSONP</c:dataType>
                  </c:dataSource>
 
-                <!--  <c:source>
+                 <!-- <c:source>
                      <ss:Array>
                          <ss:Object>
                              <id>ID</id>

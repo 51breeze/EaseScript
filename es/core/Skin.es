@@ -255,10 +255,17 @@ package es.core
 
             if( children )
             {
-                if( children instanceof Array ){
+                if( children instanceof Array )
+                {
                     this.updateChildren(obj,children as Array);
-                }else{
-                    obj.textContent=children+"";
+
+                }else if( children is IDisplay )
+                {
+                    this.updateChildren(obj, [children]);
+
+                }else
+                {
+                   obj.textContent=children+"";
                 }
             }
             if( update)
@@ -282,7 +289,7 @@ package es.core
         * @param events 绑定元素的事件
         * @returns {Object} 一个表示当前节点元素的对象
         */ 
-        protected function createComponent(index:int,uniqueKey:*, classTarget:Class, children:*=null, attrs:Object=null,update:Object=null,events:Object=null):IDisplay
+        protected function createComponent(index:int,uniqueKey:*, classTarget:Class, tagName:String=null, children:*=null, attrs:Object=null,update:Object=null,events:Object=null):IDisplay
         {
             var uukey:String = (uniqueKey+''+index) as String;
             var obj:IDisplay = elementMaps[ uukey ] as IDisplay;
@@ -300,11 +307,11 @@ package es.core
             {
                 if( children instanceof Array )
                 {
-                    if( obj is IContainer ){
-                        (obj is IContainer).children = children;
-                    }else{
-                        this.updateChildren(obj.element.current() as Object,children as Array);
-                    }
+                    this.updateChildren(obj,children as Array);
+
+                }else if( children is IDisplay )
+                {
+                    this.updateChildren(obj, [children]);
 
                 }else
                 {
@@ -353,8 +360,10 @@ package es.core
         * 如果指定的children列表和parentNode的子级列表中的每一个元素不相等，则会做相应的添加和删除操作。
         * @param parentNode 
         * @param children 
+        * @param index
+        * @param total
         */
-        protected function updateChildren(parentNode:Object,children:Array):void
+        protected function updateChildren(parentNode:Object,children:Array,index:int=0,total:int=NaN ):void
         {
             var parentDisplay:IDisplay=null;
             if( parentNode instanceof SkinComponent )
@@ -370,19 +379,58 @@ package es.core
             }
 
             var parent:Node = parentNode as Node;
-            var len:int = Math.max(children.length, parent.childNodes.length);
-            var i:int=0;
-            while( i<len )
+            var totalNodes:int = parent.childNodes.length;
+            var totalChilds:int = children.length;
+            var len:int = isNaN( total ) ? Math.max(totalChilds, totalNodes) : total;
+            var i:int=index;
+            while( i<len && (i-index < totalChilds || i < totalNodes) )
             {
                 var newNode:Node=null;
                 var oldNode:Node=parent.childNodes[i] as Node;
-                var isDisplay:Boolean = children[i] is IDisplay;
+                var childItem:* = children[i-index];
+                var isDisplay:Boolean = childItem is IDisplay;
+                if( index > 0 )
+                {
+                    console.log( childItem , i, index);
+                }
+
                 if( isDisplay )
                 {
-                    newNode =(children[i] as IDisplay).display().current() as Node;
+                    newNode =(childItem as IDisplay).display().current() as Node;
+
                 }else
                 { 
-                    newNode = children[i] as Node;
+                    if( typeof childItem === "string" )
+                    {
+                        if( Element.getNodeName(oldNode) === "text" )
+                        {
+                            if( oldNode.textContent !== childItem )
+                            {
+                                oldNode.textContent = childItem as String;
+                            }
+                            i++;
+                            continue;
+
+                        }else
+                        {
+                           newNode = Element.createElement("text") as Node;
+                           newNode.textContent = childItem as String;
+                        }
+
+                    }else if( childItem instanceof Array )
+                    {
+                        var childItems:Array =  childItem as Array;
+                        this.updateChildren(parentNode,childItems,i,childItems.length+len);
+                        i+=childItems.length;
+                        len+=childItems.length;
+                        index = childItems.length;
+                        i++;
+                        continue;
+
+                    }else
+                    {
+                        newNode = childItem as Node;
+                    }
                 }
                 
                 //两边节点不一致 
@@ -404,9 +452,9 @@ package es.core
                             continue;
                         }
 
-                         //添加元素
+                        //添加元素
                         if( newNode )
-                        {
+                        {  
                             parent.appendChild(newNode);
                         }
                     }
@@ -414,7 +462,7 @@ package es.core
                     //调度事件
                     if( newNode && isDisplay )
                     {
-                        var childDisplay:IDisplay = children[i] as IDisplay;
+                        var childDisplay:IDisplay = childItem as IDisplay;
                         if( parentDisplay ){
                             childDisplay.es_internal::setParentDisplay( parentDisplay );
                         }
