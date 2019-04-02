@@ -39,6 +39,11 @@
     ]]>
     </s:Script>
   <style file="PaginationStyle.less" />
+
+  <s:Declare>
+      const {url:Function,first:int,prev:int,next:int,last:int,profile:*,current:int=1,link:Array} = dataset;
+  </s:Declare>
+
   <li class="first">
       <a href="{url(first,profile)}">第一页</a>
   </li>

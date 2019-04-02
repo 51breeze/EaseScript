@@ -45,6 +45,15 @@ package
 
            // view.addChild( container );
 
+           if( this ){
+
+                var object:Object = {names:"ppppp",address:"sssss"};
+
+                var {name:*="1232",address:*} =  {names:"ppppp",address:"sssss"};
+           }
+
+           console.log( name , "=====", address);
+
         
             
             var grid: DataGrid = new DataGrid();

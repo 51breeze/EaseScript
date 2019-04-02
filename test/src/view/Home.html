@@ -40,15 +40,25 @@
         <title>{this.title}</title>
     </head>
 
+    <s:states>
+
+       <s:State name="show" stateGroup="fail,success"></s:State>
+       <s:State name="hide" stateGroup="hide"></s:State>
+
+    </s:states>
+
+    <s:currentState>fail</s:currentState>
+
     <body>
          <input value="{{this.title}}" />
          <button id="@popup">PopUp</button>
          <div>{this.child}</div>
+         {this.child as Array}
          <div>
-             <h1>the is {message}</h1>
+             <h1>the is {dataset.message}</h1>
              <h1>这里是内容 Person</h1>
             
-             <c:DataGrid id="@dataGrid">
+             <c:DataGrid id="@dataGrid"  includeIn="success">
 
                  <c:source>http://local.working.com/json.php</c:source>
                  <c:dataSource>

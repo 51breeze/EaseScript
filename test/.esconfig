@@ -31,7 +31,7 @@
 	"build_libaray_name":"es",
 	"build_system_path":"es.system",
 	"clean":true,
-	"mode":3,
+	"mode":2,
 	"build_mode":"app",
 	"syntax":"javascript",
 	"root_path":"E:/EaseScript",

@@ -59,24 +59,24 @@
     <style file="DataGridStyle.less" />
     <thead id="@head">
         <tr>
-            <:foreach name="columns" value="name" >
-                <th style="height:{headHeight}px;line-height:{headHeight}px;">{name}<span></span></th>
+            <:foreach name="dataset.columns" value="name" >
+                <th style="height:{dataset.headHeight}px;line-height:{dataset.headHeight}px;">{name}<span></span></th>
             </:foreach>
         </tr>
     </thead>
 
     <tbody id="@body">
-        <:foreach name="datalist" value="item">
+        <:foreach name="dataset.datalist" value="item">
             <tr>
-                <:foreach name="columns" value="val" key="field">
+                <:foreach name="dataset.columns" value="val" key="field">
                     <:switch condition="field">
                         <:case condition="name" break="true">
-                            <td data-column="{field}" style="height:{rowHeight}px;line-height:{rowHeight}px;">
+                            <td data-column="{field}" style="height:{dataset.rowHeight}px;line-height:{dataset.rowHeight}px;">
                                 <input value="{{item[field]}}" style="height: 25px;" />
                             </td>
                         </:case>
                         <:default>
-                            <td data-column="{field}" style="height:{rowHeight}px;line-height:{rowHeight}px;">{item[field]}</td>
+                            <td data-column="{field}" style="height:{dataset.rowHeight}px;line-height:{dataset.rowHeight}px;">{item[field]}</td>
                         </:default>
                     </:switch>
                 </:foreach>

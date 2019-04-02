@@ -389,11 +389,6 @@ package es.core
                 var oldNode:Node=parent.childNodes[i] as Node;
                 var childItem:* = children[i-index];
                 var isDisplay:Boolean = childItem is IDisplay;
-                if( index > 0 )
-                {
-                    console.log( childItem , i, index);
-                }
-
                 if( isDisplay )
                 {
                     newNode =(childItem as IDisplay).display().current() as Node;
