@@ -6,24 +6,6 @@
        
         import es.core.Display;
 
-        override public function get title():String
-        {
-             var _title:String = super.title;
-             if( !_title ){
-                   return "No title";
-             }
-
-             return "My title="+_title;
-
-            // return this.assign("title");
-         }
-
-         override public function set title(value:String):void
-         {
-               this.assign("title",value);
-               document.title = value;
-         }
-
          public get child():Array
          {
 
@@ -32,6 +14,11 @@
             new Display( new Element(Element.createElement("div")),  {jjj:7777,innerHTML:"<span style='color:red;'>=======createElement===66666666====</span>"} )
             ];
              
+         }
+
+         private click()
+         {
+             console.log("=====");
          }
 
     ]]>
@@ -47,18 +34,28 @@
 
     </s:states>
 
-    <s:currentState>fail</s:currentState>
+    <s:currentState>show</s:currentState>
 
     <body>
+
+        <div>sssss</div>
+
+         {this.children}
          <input value="{{this.title}}" />
+
          <button id="@popup">PopUp</button>
          <div>{this.child}</div>
          {this.child as Array}
-         <div>
+         <div dd="sssss">
              <h1>the is {dataset.message}</h1>
-             <h1>这里是内容 Person</h1>
+             <h1>这里是内容 Person {dataset.uuuu}</h1>
+
+             <s:Container>
+                 <div>ssssss</div>
+                 <div>666666</div>
+             </s:Container>
             
-             <c:DataGrid id="@dataGrid"  includeIn="success">
+             <c:DataGrid id="@dataGrid"  includeIn="success" onClick="{click}">
 
                  <c:source>http://local.working.com/json.php</c:source>
                  <c:dataSource>
@@ -85,6 +82,17 @@
                      <name>名称</name>
                      <phone>电话</phone>
                  </c:columns>
+
+            
+
+                 <s:Container name="ul" >
+                     <div>========columns========</div>
+                </s:Container>
+
+             
+
+
+
              </c:DataGrid>
          </div>
     </body>

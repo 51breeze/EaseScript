@@ -16,11 +16,10 @@ package es.core
     import es.skins.PopUpSkin;
     import es.core.SystemManage;
     import es.core.PopUpManage;
-    import es.interfaces.IPopUp;
     import es.skins.PopUpSkin;
 
     [RunPlatform("client")]
-    public class PopUp extends BasePopUp  implements IPopUp
+    public class PopUp extends BasePopUp
     {
         public function PopUp(componentId:String = UIDInstance())
         {
@@ -259,31 +258,8 @@ package es.core
                     }
                 }
             });
-
-            if( !flag )
-            {
-                 //使用排列位置
-                 SystemManage.getWindow().addEventListener( Event.RESIZE, this.position, false, 0, this);
-            }
             this.position();
             return elem;
-        }
-
-        /**
-         * 获取标题
-         */
-        public function get title():String
-        {
-            return (this.skin as PopUpSkin).titleText;
-        }
-
-        /**
-         * 设置标题
-         * @param value
-         */
-        public function set title(value:String):void
-        {
-            (this.skin as PopUpSkin).titleText = value;
         }
 
         /**

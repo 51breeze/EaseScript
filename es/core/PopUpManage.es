@@ -11,8 +11,8 @@ package es.core
     import es.core.Container;
     import es.interfaces.IContainer;
     import es.interfaces.IDisplay;
-    import es.interfaces.IPopUp;
     import es.core.SystemManage;
+    import es.core.BasePopUp;
 
     [RunPlatform("client")]
     public class PopUpManage
@@ -76,7 +76,7 @@ package es.core
         static private var maskInstance:MaskDisplay = null;
 
         //系统级弹框实例对象
-        static private var systemPopUpInstance:IPopUp=null;
+        static private var systemPopUpInstance:BasePopUp=null;
 
         //模态窗口实例对象
         static private var modalityInstances:Array=[];
@@ -120,7 +120,7 @@ package es.core
          * @param instance
          * @param options
          */
-        static public function show(target:IPopUp, isModalWindow:Boolean = false, viewport:Element=null )
+        static public function show(target:BasePopUp, isModalWindow:Boolean = false, viewport:Element=null )
         {
             if( viewport === null )
             {
@@ -151,28 +151,25 @@ package es.core
             }
 
             //如果没有添加则添加到视口中
-            if( target.element.parent().isEmpty() )
+            if( target.display().parent().isEmpty() )
             {
                 target.element.style("zIndex", level );
                 viewport.addChild( target.element );
             }
-
-            //显示皮肤对象
-            target.display();
         }
 
         /**
          * 激活指定的模态窗口实例
          * @param instance
          */
-        static public function active( target:IPopUp )
+        static public function active( target:BasePopUp )
         {
             var index:int=0;
             var len:int = modalityInstances.length;
             var at:int = 0;
             for(;index<len;index++)
             {
-                 var obj:IPopUp = modalityInstances[index] as IPopUp;
+                 var obj:BasePopUp = modalityInstances[index] as BasePopUp;
                  if( target === obj)
                  {
                      at = index;
@@ -197,7 +194,7 @@ package es.core
          * 关闭指定的模态窗口
          * @param target
          */
-        static public function close( target:IPopUp )
+        static public function close( target:BasePopUp )
         {
             if( count > 0 )
             {
@@ -219,7 +216,7 @@ package es.core
                 modalityInstances.splice(index,1);
                 if( modalityInstances.length > 0 )
                 {
-                    active( modalityInstances[modalityInstances.length-1] as IPopUp );
+                    active( modalityInstances[modalityInstances.length-1] as BasePopUp );
                 }
                 return target;
             }

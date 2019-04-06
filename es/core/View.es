@@ -61,33 +61,6 @@ package es.core
         }
 
         /**
-         * 获取或者指定数据
-         * @param name
-         * @param value
-         * @return
-         */
-        override public function assign(name:String, value:*=null):*
-        {
-           return _context.assign(name,value);
-        }
-
-        /**
-        * 获取数据集
-        */
-        override public function get dataset():Object
-        {
-            return _context.dataset;
-        }
-
-        /**
-        * 设置数据集
-        */
-        override public function set dataset(value:Object):void
-        {
-            _context.dataset = value;
-        }
-
-        /**
          * 执行此视图，并初始化相关属性
          */
         override public function display():Element

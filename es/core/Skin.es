@@ -49,7 +49,7 @@ package es.core
         */
         protected function render():Array
         {
-            return [];
+            return this.children.slice(0);
         }
 
         /**
@@ -150,24 +150,16 @@ package es.core
         {
             if( invalidate === false )
             {
-                invalidate = true;
-                var children:Array = this._children;
-                var i:int = 0;
-                var len:int = children.length;
-                var child:IDisplay = null;
-                var parent:IDisplay = null;
-                var container:Element = this.element;
-                var nodes:Array= this.render();
-                for(;i<len;i++)
+                if( timeoutId )
                 {
-                    child = children[i].target as IDisplay;
-                    parent = child.parent;
-                    if( parent && parent !== this )
-                    {
-                        (parent as Container).removeChild( child );
-                    }
-                    nodes.splice(children[i].index,0, child.display().current() );
+                    clearTimeout( timeoutId as Number );
+                    timeoutId = null;
                 }
+
+                 console.log("===============createChildren=============",  __CLASS__);
+
+                invalidate = true;
+                var nodes:Array= this.render();
                 this.updateChildren(this, nodes);
                 this.updateDisplayList();
                 if( this.hasEventListener(SkinEvent.UPDATE_DISPLAY_LIST) )
@@ -255,18 +247,18 @@ package es.core
 
             if( children )
             {
-                if( children instanceof Array )
+                if( typeof children === "object" )
                 {
+                    if( !(children instanceof Array) )
+                    {
+                        children = [children];
+                    }
                     this.updateChildren(obj,children as Array);
-
-                }else if( children is IDisplay )
-                {
-                    this.updateChildren(obj, [children]);
 
                 }else
                 {
-                   obj.textContent=children+"";
-                }
+                    obj.textContent = children+"";
+                }  
             }
             if( update)
             {
@@ -295,7 +287,13 @@ package es.core
             var obj:IDisplay = elementMaps[ uukey ] as IDisplay;
             if( !obj )
             {
-                obj = new classTarget( uukey ) as IDisplay;
+                if( tagName )
+                {
+                    obj = new classTarget( new Element( Element.createElement(tagName) ) ) as IDisplay;
+
+                }else{
+                    obj = new classTarget( uukey ) as IDisplay;
+                }
                 elementMaps[ uukey ] = obj;
                 if( attrs )
                 {
@@ -305,54 +303,30 @@ package es.core
 
             if( children )
             {
-                if( children instanceof Array )
+                if( !(children instanceof Array) )
                 {
-                    this.updateChildren(obj,children as Array);
-
-                }else if( children is IDisplay )
+                    children = [ typeof children === "object" ? children : children+""];
+                }
+                if( obj instanceof SkinComponent )
                 {
-                    this.updateChildren(obj, [children]);
+                    (obj as SkinComponent).children = children as Array;
 
                 }else
                 {
-                    obj.element.text( children+"" );
+                    this.updateChildren(obj,children as Array);
                 }
             }
-            if( update)
+
+            if( update )
             {
                 this.attributes(obj.element,update);
             }
+
             if( events )
             {
-                this.bindEvent(index,uniqueKey,obj.element,events);
+                this.bindEvent(index,uniqueKey,obj,events);
             }
             return obj;
-        }
-
-        /**
-        * 根据索引和元素的唯一key获取元素对象
-        * @param index
-        * @param uniqueKey
-        * @return Object
-        */  
-        protected function getElement(index:int,uniqueKey:*):Object
-        {
-            var uukey:String = (uniqueKey+""+index) as String;
-            return elementMaps[ uukey ]||null;
-        }
-
-        /**
-        * 根据索引和元素的唯一key设置指定的元素对象
-        * @param index
-        * @param uniqueKey
-        * @param value
-        * @return Object
-        */  
-        protected function setElement(index:int,uniqueKey:*,value:Object):Object
-        {
-            var uukey:String = (uniqueKey+""+index) as String;
-            elementMaps[ uukey ] = value;
-            return value;
         }
 
         /**
@@ -368,8 +342,7 @@ package es.core
             var parentDisplay:IDisplay=null;
             if( parentNode instanceof SkinComponent )
             {
-                var skin:Skin = (parentNode as SkinComponent).skin as Skin;
-                skin.updateChildren(skin.container, children);
+                (parentNode as SkinComponent).children = children;
                 return;
 
             }else if( parentNode is IDisplay )
@@ -418,7 +391,7 @@ package es.core
                         this.updateChildren(parentNode,childItems,i,childItems.length+len);
                         i+=childItems.length;
                         len+=childItems.length;
-                        index = childItems.length;
+                        index+=childItems.length;
                         i++;
                         continue;
 
@@ -435,15 +408,16 @@ package es.core
                     if( newNode && oldNode )
                     {
                         parent.replaceChild(newNode,oldNode);
+                        removeEvent(parent,oldNode);
 
                     }else
                     {
                         //移除元素
                         if( oldNode )
                         {
-                            (oldNode.parentNode as Node).removeChild( oldNode );
-                            children.splice(i,1);
-                            len--;
+                            parent.removeChild( oldNode );
+                            removeEvent(parent,oldNode);
+                            i++;
                             continue;
                         }
 
@@ -472,6 +446,45 @@ package es.core
         }
 
         /**
+        * @private
+        */
+        private removeEvent(parentNode:Object,childNode:Object):void
+        {
+            var e:ElementEvent=new ElementEvent( ElementEvent.REMOVE );
+            e.parent = parentNode;
+            e.child = childNode;
+            (new EventDispatcher(childNode)).dispatchEvent( e );
+        }
+
+        /**
+        * @private
+        */
+        private var timeoutId:* = null;
+        private var callback:Function = null;
+
+        /**
+        * 标记组件需要立即刷新子级。
+        * 每一次调用此方法都会延迟执行来解决重复刷新的问题
+        * @private
+        */
+        protected function nowUpdate(delay:int=20):void
+        {
+             invalidate=false;
+             if( timeoutId )
+             {
+                  clearTimeout( timeoutId as Number );
+             }
+             var callback:Function = this.callback;
+             if( !callback ){
+                callback = this.createChildren.bind(this);
+                this.callback = callback;
+             }
+             var _this:Skin = this;
+             timeoutId = setTimeout(callback,delay);
+        }
+
+
+        /**
          * 分配指定名称的值到模板数据集中
          * @param name
          * @param value
@@ -487,11 +500,9 @@ package es.core
             if( dataset[name] !== value )
             {
                 dataset[name] = value;
-                invalidate=false;
                 if( initialized )
                 {
-
-                    //this.createChildren();
+                    this.nowUpdate();
                 }
             }
             return value;
@@ -516,10 +527,9 @@ package es.core
         public function set dataset(value:Object):void
         {
             _dataset = value;
-            invalidate=false;
-            if( initialized === true )
+            if( initialized  )
             {
-                //this.createChildren();
+                this.nowUpdate();
             }
         }
 
@@ -644,16 +654,6 @@ package es.core
         }
 
         /**
-         * 获取一个承载子级对象的容器
-         * 如果需要改变此默认容器，请在子类中覆盖此方法
-         * @return {es.interfaces.IContainer}
-         */
-        public function get container():IContainer
-        {
-            return this;
-        }
-
-        /**
         * @private
         */
         private var _children:Array=[];
@@ -665,6 +665,18 @@ package es.core
         override public function get children():Array
         {
             return this._children.slice(0);
+        };
+
+        /**
+         * 设置子级元素
+         * @returns {Array}
+         */
+        override public function set children( value:Array ):void
+        {
+            this._children = value.slice(0);
+            if( initialized  ){
+                this.nowUpdate();
+            }
         };
 
         /**
@@ -717,12 +729,12 @@ package es.core
                 (parent as Container).removeChild( child );
             }
             var children:Array = this._children;
-            children.push({target:child,index:index < 0 ? index+children.length+1 : index});
-            if( child is SkinComponent )
-            {
-                child = (child as SkinComponent).skin as IDisplay;
-            }
+            index = index < 0 ? index+children.length+1 : index;
+            children.splice(index,0,child);
             child.es_internal::setParentDisplay(this);
+            if( initialized  ){
+                this.nowUpdate();
+            }
             return child;
         };
 
@@ -757,17 +769,17 @@ package es.core
                 throw new RangeError('The index out of range');
             }
 
-            var child:IDisplay = children[index].target as IDisplay;
+            var child:IDisplay = children[index] as IDisplay;
             children.splice(index, 1);
-            if( child is SkinComponent )
-            {
-                child = (child as SkinComponent).skin as IDisplay;
-            }
             if( child.parent )
             {
                 child.element.parent().removeChild( child.element );
             }
             child.es_internal::setParentDisplay(null);
+            if( initialized  )
+            {
+                this.nowUpdate();
+            }
             return child;
         };
 
@@ -830,8 +842,7 @@ package es.core
                 this._currentStateGroup = null;
                 if( this.initialized )
                 {
-                    this.invalidate = false;
-                    this.createChildren();
+                    this.nowUpdate();
                 }
             }
         };
@@ -856,8 +867,9 @@ package es.core
                 initialized = true;
                 this.initializing();
             }
-            this.createChildren();
-            return super.display();
+            super.display();
+            this.nowUpdate(0);
+            return this.element;
         }
     }
 }

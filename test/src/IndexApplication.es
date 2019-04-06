@@ -67,11 +67,23 @@ package
             gridSkin.pagination.wheelTarget = new Display( new Element(gridSkin.foot) );
             view.addChild(grid);
 
+            //view.children = [ "=======" ];
+
 
             (new EventDispatcher(view.popup)).addEventListener( MouseEvent.CLICK, function(e:MouseEvent){
 
-                     PopUp.confirm("您有3条信息未处理2", function (type:String) {
-                       console.log( type );
+                    PopUp.confirm("您有3条信息未处理2", function (type:String) {
+
+                             view.assign("uuuu", 6666);    
+                             view.assign("yy", 555);    
+                             view.assign("kk", 666);    
+                             view.assign("rr", 444);    
+                             view.assign("www", 888);    
+                             view.assign("qqq", 999); 
+
+                             console.log("====PopUp===");   
+        
+                       
                     });
 
             });

@@ -195,6 +195,11 @@ package es.core
                     })(name));
                 }
             }
+
+            //使用排列位置
+            SystemManage.getWindow().addEventListener( Event.RESIZE, this.position, false, 0, this);
+            skin.addEventListener(ElementEvent.ADD, this.position,false, 0, this);
+
         }
 
         /**

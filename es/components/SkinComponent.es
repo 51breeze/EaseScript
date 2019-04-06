@@ -163,6 +163,9 @@ package es.components
                 {
                     var skin:Skin = (Skin)new value( this );
                     this._skin = skin;
+                    this.installChildren();
+                    this.commitProperty();
+                    this.commitPropertyAndUpdateSkin();
                     if( this.hasEventListener(PropertyEvent.CHANGE) )
                     {
                         var event:PropertyEvent = new PropertyEvent(PropertyEvent.CHANGE);
@@ -174,17 +177,6 @@ package es.components
                 }
             }
         }
-
-        private var _position:Position=null;
-        public function set newPosition(value:Position):void
-        {
-            _position = value;
-        }
-        public function get newPosition():Position
-        {
-           return _position;
-        }
-
 
         /**
          * 此组件的属性集
@@ -245,7 +237,11 @@ package es.components
          */
         public function get element():Element
         {
-            return this.skin.element;
+            if( this.initialized )
+            {
+               return this.skin.element;
+            }
+            return null;
         }
 
         /**
@@ -375,11 +371,20 @@ package es.components
         };
 
         /**
+        * @private
+        */
+        private var _parent:IDisplay=null;
+
+        /**
         * @es_internal
         */
         es_internal function setParentDisplay(value:IDisplay=null):void
         {
-            this.skin.es_internal::setParentDisplay(value);
+            if( this.initialized )
+            {
+                this.skin.es_internal::setParentDisplay(value);
+            }
+            _parent = value;
         }
 
         /**
@@ -389,10 +394,11 @@ package es.components
          */
         public function get parent():IDisplay
         {
-            if( this.initialized ) {
+            if( this.initialized )
+            {
                 return this.skin.parent;
             }
-            return null;
+            return _parent;
         }
 
         /**
@@ -409,8 +415,9 @@ package es.components
             if( this.initialized )
             {
                 return this.skin.children;
+            }else{
+                return childrenItems.slice(0);
             }
-            return childrenItems;
         }
 
         /**
@@ -422,8 +429,9 @@ package es.components
             if( this.initialized )
             {
                 this.skin.children=value;
+            }else{
+               childrenItems = value.slice(0);
             }
-            childrenItems = value.slice(0);
         }
 
         /**
@@ -434,12 +442,14 @@ package es.components
         public function getChildAt( index:Number ):IDisplay
         {
             if( this.initialized ){
-                return this.skin.container.getChildAt(index);
+                return this.skin.getChildAt(index);
+            }else
+            {
+                if( index < 0 ){
+                    index = index+childrenItems.length;
+                }
+                return childrenItems[ index ] as IDisplay;
             }
-            if( index < 0 ){
-                index = index+childrenItems.length;
-            }
-            return childrenItems[ index ] as IDisplay;
         }
 
         /**
@@ -450,9 +460,10 @@ package es.components
         public function getChildIndex( child:IDisplay ):Number
         {
             if( this.initialized ){
-                return this.skin.container.getChildIndex(child);
+                return this.skin.getChildIndex(child);
+            }else{
+                return childrenItems.indexOf(child);
             }
-            return childrenItems.indexOf(child);
         }
 
         /**
@@ -464,11 +475,13 @@ package es.components
         {
             if( this.initialized )
             {
-                return this.skin.container.addChild(child);
+                return this.skin.addChild(child);
+            }else{
+                childrenItems.push( child );
+                return child;
             }
-            childrenItems.push( child );
-            return child;
         }
+        
         /**
          * 在指定索引位置添加元素
          * @param child
@@ -479,14 +492,17 @@ package es.components
         {
             if( this.initialized )
             {
-                return this.skin.container.addChildAt(child,index);
+                return this.skin.addChildAt(child,index);
+            }else
+            {
+                if( index < 0 ){
+                    index = index+childrenItems.length;
+                }
+                childrenItems.splice(index,0,child);
+                return child;
             }
-            if( index < 0 ){
-                index = index+childrenItems.length;
-            }
-            childrenItems.splice(index,0,child);
-            return child;
         }
+
         /**
          * 移除指定的子级元素
          * @param child
@@ -496,13 +512,16 @@ package es.components
         {
             if( this.initialized )
             {
-                return this.skin.container.removeChild(child);
-            }
-            var index:int = this.childrenItems.indexOf(child);
-            if( index >= 0 ){
-                this.removeChildAt( index );
-            }else{
-                throw new ReferenceError("child is not exists.");
+                return this.skin.removeChild(child);
+
+            }else
+            {
+                var index:int = this.childrenItems.indexOf(child);
+                if( index >= 0 ){
+                    this.removeChildAt( index );
+                }else{
+                    throw new ReferenceError("child is not exists.");
+                }
             }
         }
 
@@ -515,15 +534,17 @@ package es.components
         {
             if( this.initialized )
             {
-                return this.skin.container.removeChildAt(index);
+                return this.skin.removeChildAt(index);
+            }else
+            {
+                if( index < 0 ){
+                    index = index+childrenItems.length;
+                }
+                if( childrenItems[index] ){
+                    return childrenItems.splice(index,1) as IDisplay;
+                }
+                throw new ReferenceError("Index is out of range");
             }
-            if( index < 0 ){
-                index = index+childrenItems.length;
-            }
-            if( childrenItems[index] ){
-                return childrenItems.splice(index,1) as IDisplay;
-            }
-            throw new ReferenceError("Index is out of range");
         }
 
         /**
@@ -534,7 +555,7 @@ package es.components
         {
             if( this.initialized )
             {
-                this.skin.container.removeAllChild();
+                this.skin.removeAllChild();
             }else{
                 childrenItems = [];
             }
@@ -550,8 +571,113 @@ package es.components
         {
             if( !this.initialized ){
                 return false;
+            }else{
+                return this.skin.contains(child);
             }
-            return this.skin.container.contains(child);
+        }
+
+        //@private
+        private var events:Object={};
+
+       /**
+        * 添加侦听器
+        * @param type
+        * @param listener
+        * @param priority
+        * @param reference
+        * @returns {EventDispatcher}
+        */
+        override public function addEventListener(type:String,callback:Function,useCapture:Boolean,priority:int,reference:Object):EventDispatcher
+        {
+            if( this.initialized ){
+                this.skin.addEventListener(type,callback,useCapture,priority,reference);
+            }else{
+                super.addEventListener(type,callback,useCapture,priority,reference);
+            }
+
+            if( !events.hasOwnProperty(type) )
+            {
+                events[ type ] = [];
+            }
+
+            events[type].push({
+                "callback":callback,
+                "useCapture":useCapture,
+                "priority":priority,
+                "reference":reference
+            });
+            return this;
+        }
+
+        /**
+        * 移除指定类型的侦听器
+        * @param type
+        * @param listener
+        * @returns {boolean}
+        */
+        override public function removeEventListener(type:String,listener:Function=null):Boolean
+        {
+             if( this.initialized )
+             {
+                 return this.skin.removeEventListener(type,listener);
+             }else
+             {
+                 super.removeEventListener(type,listener);
+             }
+
+            if( !events.hasOwnProperty(type) )
+            {
+                return false;
+            }
+
+            if( !listener )
+            {
+                delete events[type];
+                return true;
+            }
+
+            var map:Array = events[type] as Array;
+            var len:int = map.length;
+            for(;len>0;)
+            {
+                if( map[--len].callback===listener )
+                {
+                    map.splice(len,1);
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /**
+        * 调度指定事件
+        * @param event
+        * @returns {boolean}
+        */
+        override public function dispatchEvent( event:Event ):Boolean
+        {
+            if( this.initialized )
+            {
+                return this.skin.dispatchEvent(event);
+            }else{
+                return super.dispatchEvent(event);
+            }
+        }
+
+        /**
+        * 判断是否有指定类型的侦听器
+        * @param type
+        * @param listener
+        * @returns {boolean}
+        */
+        override public function hasEventListener( type:String , listener:Function=null):Boolean
+        {
+            if( this.initialized )
+            {
+               return this.skin.hasEventListener(type,listener);
+            }else{
+               return super.hasEventListener(type,listener);
+            }
         }
 
         /**
@@ -578,10 +704,6 @@ package es.components
         override protected function initializing()
         {
             super.initializing();
-            if( _position )
-            {
-                _position.target = this.skin.element;
-            }
             this.installChildren();
             this.commitProperty();
         }
@@ -592,13 +714,14 @@ package es.components
          */
         private function installChildren()
         {
-            var len:int = childrenItems.length;
+            this.skin.children = childrenItems;
+            /*var len:int = childrenItems.length;
             var index:int=0;
-            var container:IContainer=this.skin.container;
+            var container:IContainer=this.skin;
             for(;index<len;index++)
             {
                 container.addChild( childrenItems[index] as IDisplay );
-            }
+            }*/
         }
 
         /**
@@ -613,6 +736,21 @@ package es.components
                     skin[name] = value;
                 }
             });
+
+            Object.forEach(this.events,function(listener:Array,type:String)
+            {
+                var len:int = listener.length;
+                var index:int = 0;
+                for(;index<len;index++)
+                {
+                    var item:Object= listener[index] as Object;
+                    skin.removeEventListener(type, item.callback);
+                    skin.addEventListener(type, item.callback, item.useCapture, item.priority, item.reference);
+                    super.removeEventListener(type, item.callback);
+                }
+            },this);
+
+            skin.es_internal::setParentDisplay(_parent);
         }
 
         /**
