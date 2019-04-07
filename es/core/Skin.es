@@ -155,9 +155,6 @@ package es.core
                     clearTimeout( timeoutId as Number );
                     timeoutId = null;
                 }
-
-                 console.log("===============createChildren=============",  __CLASS__);
-
                 invalidate = true;
                 var nodes:Array= this.render();
                 this.updateChildren(this, nodes);
@@ -364,7 +361,15 @@ package es.core
                 var isDisplay:Boolean = childItem is IDisplay;
                 if( isDisplay )
                 {
-                    newNode =(childItem as IDisplay).display().current() as Node;
+                    var elem:Element = (childItem as IDisplay).display();
+                    var owner:IContainer = (childItem as IDisplay).owner;
+                    if( owner )
+                    {
+                        owner.addChild( childItem as  IDisplay );
+                        i++;
+                        continue;
+                    }
+                    newNode =elem.current() as Node;
 
                 }else
                 { 
@@ -385,7 +390,9 @@ package es.core
                            newNode.textContent = childItem as String;
                         }
 
-                    }else if( childItem instanceof Array )
+                    }
+                    //将一组子级元素合并到当前的子级元素中
+                    else if( childItem instanceof Array )
                     {
                         var childItems:Array =  childItem as Array;
                         this.updateChildren(parentNode,childItems,i,childItems.length+len);

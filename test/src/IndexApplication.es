@@ -72,19 +72,19 @@ package
 
             (new EventDispatcher(view.popup)).addEventListener( MouseEvent.CLICK, function(e:MouseEvent){
 
-                    PopUp.confirm("您有3条信息未处理2", function (type:String) {
+                    PopUp.modality("您有3条信息未处理2","这里是内容", {callback:function (type:String) {
 
                              view.assign("uuuu", 6666);    
                              view.assign("yy", 555);    
                              view.assign("kk", 666);    
                              view.assign("rr", 444);    
                              view.assign("www", 888);    
-                             view.assign("qqq", 999); 
+                             view.assign("qqq", 999);
 
-                             console.log("====PopUp===");   
+                             console.log("====PopUp===", type );   
         
                        
-                    });
+                    }});
 
             });
            

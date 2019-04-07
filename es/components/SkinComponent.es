@@ -715,6 +715,7 @@ package es.components
         private function installChildren()
         {
             this.skin.children = childrenItems;
+            
             /*var len:int = childrenItems.length;
             var index:int=0;
             var container:IContainer=this.skin;
@@ -805,6 +806,29 @@ package es.components
         protected function pull(name:String):*
         {
             return properties[name];
+        }
+
+        /**
+        * @private
+        */
+        private var _owner:IContainer=null;
+
+        /**
+        * 获取一个承载此元素的容器
+        * 默认返回null在当前节点中添加
+        */
+        public function get owner():IContainer
+        {
+            return _owner;
+        }
+
+        /**
+        * 设置一个承载此元素的容器
+        * 可以是任何元素节点对象
+        */
+        public function set owner(value:IContainer):void
+        {
+            _owner = value;
         }
     }
 }

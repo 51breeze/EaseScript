@@ -38,6 +38,7 @@ package es.core
         static public var defaultOptions:Object={
             "profile":{"titleText":"提示"},
             "disableScroll":false,
+            "isModalWindow":true,
             "callback":null,
             "timeout":0,
             "maskStyle":null,
@@ -120,12 +121,8 @@ package es.core
          * @param instance
          * @param options
          */
-        static public function show(target:BasePopUp, isModalWindow:Boolean = false, viewport:Element=null )
+        static public function show(target:BasePopUp, isModalWindow:Boolean = false, viewport:IContainer=null )
         {
-            if( viewport === null )
-            {
-                viewport = SystemManage.getBody();
-            }
             count++;
             var level:int = WINDOW_LEVEL;
             if( isModalWindow === true )
@@ -151,10 +148,10 @@ package es.core
             }
 
             //如果没有添加则添加到视口中
-            if( target.display().parent().isEmpty() )
+            if( target.element.parent().isEmpty() )
             {
                 target.element.style("zIndex", level );
-                viewport.addChild( target.element );
+                viewport.addChild( target );
             }
         }
 
@@ -170,15 +167,16 @@ package es.core
             for(;index<len;index++)
             {
                  var obj:BasePopUp = modalityInstances[index] as BasePopUp;
+                 var skin:IDisplay = target.skin;
                  if( target === obj)
                  {
                      at = index;
-                     target.element.style('zIndex', WINDOW_LEVEL );
-                     target.element.addClass("active");
+                     skin.element.style('zIndex', WINDOW_LEVEL );
+                     skin.element.addClass("active");
 
                  }else{
-                     obj.element.style('zIndex', WINDOW_LEVEL - 1 );
-                     obj.element.removeClass("active");
+                     skin.element.style('zIndex', WINDOW_LEVEL - 1 );
+                     skin.element.removeClass("active");
                  }
             }
 

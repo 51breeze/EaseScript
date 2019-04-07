@@ -9,6 +9,8 @@ package es.core
      import Element;
      import es.interfaces.IDisplay;
      import es.core.es_internal;
+     import es.interfaces.IContainer;
+
     public class Display extends EventDispatcher implements IDisplay
     {
         /**
@@ -77,8 +79,11 @@ package es.core
          */
         public function set width(value:uint):void
         {
-            _width = value;
-            _element.width(value);
+            if( !isNaN(value) )
+            {
+                _width = value;
+                _element.width(value);
+            }
         }
 
         /**
@@ -101,8 +106,11 @@ package es.core
          */
         public function set height(value:uint):void
         {
-            _height = value;
-            _element.height(value);
+            if( !isNaN(value) )
+            {
+                _height = value;
+                _element.height(value);
+            }
         }
 
         /**
@@ -172,7 +180,10 @@ package es.core
          */
         public function set scrollTop(value:int):void
         {
-             _element.scrollTop(value);
+            if( !isNaN(value) )
+            {
+               _element.scrollTop(value);
+            }
         }
 
         /**
@@ -190,7 +201,10 @@ package es.core
          */
         public function set scrollLeft(value:int):void
         {
-             _element.scrollTop(value);
+            if( !isNaN(value) )
+            {
+               _element.scrollTop(value);
+            }
         }
 
         /**
@@ -237,7 +251,10 @@ package es.core
          */
         public function set left( value:int ):void
         {
-            _element.left( value );
+            if( !isNaN(value) )
+            {
+                _element.left( value );
+            }
         }
 
         /**
@@ -254,7 +271,10 @@ package es.core
          */
         public function set top( value:int ):void
         {
-            _element.top( value );
+            if( !isNaN(value) )
+            {
+                _element.top( value );
+            }
         }
 
         /**
@@ -271,7 +291,10 @@ package es.core
          */
         public function set right( value:int ):void
         {
-            _element.right( value );
+            if( !isNaN(value) )
+            {
+                _element.right( value );
+            }
         }
 
         /**
@@ -288,7 +311,10 @@ package es.core
          */
         public function set bottom( value:int ):void
         {
-            _element.bottom( value );
+            if( !isNaN(value) )
+            {
+                _element.bottom( value );
+            }
         }
 
         /**
@@ -353,5 +379,28 @@ package es.core
         {
             return this._element;
         };
+
+        /**
+        * @private
+        */
+        private var _owner:IContainer=null;
+
+        /**
+        * 获取一个承载此元素的容器
+        * 默认返回null在当前节点中添加
+        */
+        public function get owner():IContainer
+        {
+            return _owner;
+        }
+
+        /**
+        * 设置一个承载此元素的容器
+        * 可以是任何元素节点对象
+        */
+        public function set owner(value:IContainer):void
+        {
+            _owner = value;
+        }
     }
 }

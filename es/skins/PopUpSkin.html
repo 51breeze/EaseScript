@@ -3,147 +3,17 @@
     <s:Metadata>[HostComponent("es.core.PopUp")]</s:Metadata>
     <s:Script>
     <![CDATA[
-        private var _titleText:String="title";
-        public function set titleText( text:String ):void
+        private var _makeMap:Object={};
+        private makeAction(name:String):Function
         {
-           if( _titleText != text)
-           {
-                _titleText = text;
-               title.innerHTML=text;
-           }
-        }
-
-        public function get titleText():String
-        {
-            return _titleText;
-        }
-
-        private var _cancelText:String="取 消";
-        public function set cancelText( text:String ):void
-        {
-           if( _cancelText != text){
-                _cancelText = text;
-                cancel.innerHTML= text;
-           }
-        }
-
-        public function get cancelText():String
-        {
-            return _cancelText;
-        }
-
-        private var _submitText:String="确 定";
-        public function set submitText( text:String ):void
-        {
-           if( _submitText != text){
-                 _submitText = text;
-                submit.innerHTML=text;
-           }
-        }
-
-        public function get submitText():String
-        {
-            return _submitText;
-        }
-
-        public function set bodyContent( content:String ):void
-        {
-            body.element.html(content);
-        }
-
-        public function get bodyContent():String
-        {
-            return body.element.html();
-        }
-
-        override public function set height(val:uint):void
-        {
-            var decrementY:int = 0;
-            if( footer.visible )
+            if( _makeMap.hasOwnProperty(name) )
             {
-                decrementY+=footer.height;
+                return _makeMap[name] as Function;
             }
-            if( head.visible )
-            {
-                 decrementY+=head.height;
-            }
-            body.height=Math.max( val - decrementY, 100 );
+            var fn:Function = hostComponent.action.bind(hostComponent, name);
+            _makeMap[name] = fn;
+            return fn;
         }
-
-        override public function get height():uint
-        {
-            return container.height;
-        }
-
-        override public function set width(val:uint):void
-        {
-            container.width=val;
-        }
-        override public function get width():uint
-        {
-             return container.width;
-        }
-
-        override public function set left(val:int):void
-        {
-           container.left=val;
-        }
-
-        override public function get left():int
-        {
-           return container.left;
-        }
-
-        override public function set top(val:int):void
-        {
-            container.top=val;
-        }
-
-        override public function get top():int
-        {
-           return container.top;
-        }
-
-        override public function set right(val:int):void
-        {
-           container.right=val;
-        }
-
-        override public function get right():int
-        {
-           return container.right;
-        }
-
-        override public function set bottom(val:int):void
-        {
-            container.bottom=val;
-        }
-
-        override public function get bottom():int
-        {
-           return container.bottom;
-        }
-
-        public function set footerHeight(val:uint):void
-        {
-            footer.height = val;
-        }
-
-        public function get footerHeight():uint
-        {
-            return footer.height;
-        } 
-
-        public function set headHeight(val:uint):void
-        {
-            head.height = val;
-        }
-
-        public function get headHeight():uint
-        {
-            return head.height;
-        }
-
     ]]>
     </s:Script>
     <style file="PopUpStyle.less" />
@@ -155,16 +25,64 @@
         <s:State name="modality" stateGroup="normal" />
     </s:states>
     <s:currentState>alert</s:currentState>
-    <s:Container name="div" class="popup-container fixed" id="@container" class.modality="popup-container fixed popup-lg">
-        <s:Container class="popup-head" id="@head" excludeFrom="tips">
-            <span class="popup-title" id="@title">title</span>
-            <button type="button" class="close" id="@close" >×</button>
-        </s:Container>
-        <s:Container class="popup-body" id="@body">
-        </s:Container>
-        <s:Container class="popup-footer" id="@footer" excludeFrom="simple">
-            <button type="button" class="btn btn-sm btn-default" class.modality="btn btn-default" id="@cancel" excludeFrom="alert">取 消</button>
-            <button type="button" class="btn btn-sm btn-primary" class.modality="btn btn-sm btn-primary" id="@submit">确 定</button>
-        </s:Container>
+    <s:Declare>
+       const {
+           titleText:*="title",
+           closeText:*="×",
+           submitText:*="确 定",
+           cancelText:*="取 消",
+           headHeight:uint=NaN,
+           footerHeight:uint=NaN,
+           bodyHeight:uint=NaN,
+           bodyWidth:uint=NaN,
+           height:uint=NaN,
+           width:uint=NaN,
+           left:uint=NaN,
+           top:uint=NaN,
+           right:uint=NaN,
+           bottom:uint=NaN
+           } = dataset;
+    </s:Declare>
+
+    <s:Container
+         name="div" 
+         class="popup-container fixed"
+         id="@mainContainer"
+         left="{left}" 
+         top="{top}" 
+         right="{right}" 
+         bottom="{bottom}" 
+         width="{width}"
+         height="{height}"
+        class.modality="popup-container fixed popup-lg">
+
+            <s:Container class="popup-head" id="@head" height="{headHeight}" excludeFrom="tips">
+                <span class="popup-title">{titleText}</span>
+                <button type="button" class="close" excludeFrom="title" onClick="{makeAction('close')}">{closeText}</button>
+            </s:Container>
+
+            <s:Container class="popup-body" id="@body" width="{bodyWidth}" height="{bodyHeight}" >
+                {children}
+            </s:Container>
+
+            <s:Container class="popup-footer" id="@footer" heigth="{footerHeight}" excludeFrom="simple">
+
+                <button type="button" 
+                    class="btn btn-sm btn-default" 
+                    class.modality="btn btn-default" 
+                    onClick="{makeAction('cancel')}"
+                    excludeFrom="alert">
+                    {cancelText}
+                </button>
+
+                <button type="button" 
+                    class="btn btn-sm btn-primary" 
+                    onClick="{makeAction('submit')}"
+                    class.modality="btn btn-sm btn-primary">
+                    {submitText}
+                </button>
+
+            </s:Container>
+
     </s:Container>
 </s:Skin>

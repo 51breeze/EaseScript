@@ -73,6 +73,18 @@ package es.interfaces
          * 调用此方法会重新创建子级对象，在非必要情况下请谨慎使用，可以节省资源。
          */
         public function display():Element;
+
+        /**
+        * 获取一个承载此元素的容器
+        * 默认返回null在当前节点中添加
+        */
+        public function get owner():IContainer;
+
+        /**
+        * 设置一个承载此元素的容器
+        * 可以是任何元素节点对象
+        */
+        public function set owner(value:IContainer):void;
     }
 }
 

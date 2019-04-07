@@ -36,64 +36,60 @@
 
     <s:currentState>show</s:currentState>
 
-    <body>
+    <div>sssss</div>
 
-        <div>sssss</div>
+   
+    {this.children}
+    <input value="{{this.title}}" />
 
-         {this.children}
-         <input value="{{this.title}}" />
+    <!-- <s:PopUp title="弹框">
+            {this.children}
+    </s:PopUp> -->
 
-         <button id="@popup">PopUp</button>
-         <div>{this.child}</div>
-         {this.child as Array}
-         <div dd="sssss">
-             <h1>the is {dataset.message}</h1>
-             <h1>这里是内容 Person {dataset.uuuu}</h1>
+    <button id="@popup">PopUp</button>
+    <div>{this.child}</div>
+    {this.child as Array}
+    <div dd="sssss">
+        <h1>the is {dataset.message}</h1>
+        <h1>这里是内容 Person {dataset.uuuu}</h1>
 
-             <s:Container>
-                 <div>ssssss</div>
-                 <div>666666</div>
-             </s:Container>
+        <s:Container>
+            <div>ssssss</div>
+            <div>666666</div>
+        </s:Container>
+    
+        <c:DataGrid id="@dataGrid"  includeIn="success" onClick="{click}">
+
+            <c:source>http://local.working.com/json.php</c:source>
+            <c:dataSource>
+                <c:dataType>@Http.TYPE_JSONP</c:dataType>
+            </c:dataSource>
+
+            <!-- <c:source>
+                <ss:Array>
+                    <ss:Object>
+                        <id>ID</id>
+                        <name>名称</name>
+                        <phone>电话</phone>
+                    </ss:Object>
+                    <ss:Object>
+                        <id>uuuu</id>
+                        <name>yyyyy</name>
+                        <phone>kkkkk</phone>
+                    </ss:Object>
+                </ss:Array>
+            </c:source> -->
             
-             <c:DataGrid id="@dataGrid"  includeIn="success" onClick="{click}">
+            <c:columns>
+                <id>ID</id>
+                <name>名称</name>
+                <phone>电话</phone>
+            </c:columns>
 
-                 <c:source>http://local.working.com/json.php</c:source>
-                 <c:dataSource>
-                     <c:dataType>@Http.TYPE_JSONP</c:dataType>
-                 </c:dataSource>
+            <s:Container name="ul" >
+                <div>========columns========</div>
+        </s:Container>
+        </c:DataGrid>
+    </div>
 
-                 <!-- <c:source>
-                     <ss:Array>
-                         <ss:Object>
-                             <id>ID</id>
-                             <name>名称</name>
-                             <phone>电话</phone>
-                         </ss:Object>
-                          <ss:Object>
-                             <id>uuuu</id>
-                             <name>yyyyy</name>
-                             <phone>kkkkk</phone>
-                         </ss:Object>
-                     </ss:Array>
-                 </c:source> -->
-                  
-                 <c:columns>
-                     <id>ID</id>
-                     <name>名称</name>
-                     <phone>电话</phone>
-                 </c:columns>
-
-            
-
-                 <s:Container name="ul" >
-                     <div>========columns========</div>
-                </s:Container>
-
-             
-
-
-
-             </c:DataGrid>
-         </div>
-    </body>
 </s:View>

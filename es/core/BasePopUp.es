@@ -27,7 +27,23 @@ package es.core
         /**
          * @private
          */
-        protected var options:Object={};
+        protected var _option:Object={};
+
+        /**
+         * 获取弹框选项配置
+         */
+        public get option():Object
+        {
+            return _option;
+        }
+
+        /**
+         * 设置弹框选项配置
+         */
+        public set option(value:Object):void
+        {
+            _option=value;
+        }
 
         /**
          * 当前窗体是否在显示状态, true 已显示，反之已关闭
@@ -49,11 +65,13 @@ package es.core
          */
         public function action( type:String ):Boolean
         {
-            var options:Object = this.options;
+            var options:Object = this.option;
             if( options.callback )
             {
-                if( options.callback( type ) === false ) return false;
-                options.callback = null;
+                if( options.callback( type ) === false )
+                {
+                    return false;
+                }
             }
 
             if( this.maskIntance )
@@ -109,7 +127,7 @@ package es.core
          */
         protected function position()
         {
-            var opt:Object =  this.options;
+            var opt:Object =  this.option;
             var horizontal:String = opt.horizontal as String;
             var vertical:String = opt.vertical as String;
             var skin:Container = this.getContainer();
@@ -177,28 +195,37 @@ package es.core
         {
             super.initializing();
             var skin:Skin = this.skin;
-            var buttons:Array = this.actionButtons;
-            var i:int=0;
-            var len:int = buttons.length;
-            var self:es.core.BasePopUp = this;
-            for(;i<len;i++)
-            {
-                var name:String = buttons[i] as String;
-                if( name in skin )
-                {
-                    var btn:EventDispatcher = new EventDispatcher( skin[name] );
-                    btn.addEventListener(MouseEvent.CLICK, (function (actionName:String) {
-                        return function (e:MouseEvent) {
-                            self.action(actionName);
-                            e.stopPropagation();
-                        };
-                    })(name));
-                }
-            }
 
             //使用排列位置
             SystemManage.getWindow().addEventListener( Event.RESIZE, this.position, false, 0, this);
-            skin.addEventListener(ElementEvent.ADD, this.position,false, 0, this);
+            this.getContainer().addEventListener(ElementEvent.ADD, this.position,false, 0, this);
+
+            var main:Container = this.getContainer();
+            var opt:Object = this.option;
+
+            //如果是模态框添加鼠标在容器外点击时关闭窗口
+            main.removeEventListener(MouseEvent.MOUSE_OUTSIDE);
+            main.addEventListener(MouseEvent.MOUSE_OUTSIDE, function (e:MouseEvent)
+            {
+                if( this.state )
+                {
+                    if (opt.isModalWindow)
+                    {
+                        if (opt.clickOutsideClose === true)
+                        {
+                            this.close();
+                        }
+
+                    } else if( this.animationEnd )
+                    {
+                        this.animationEnd = false;
+                        skin.element.animation("shake", 0.2);
+                        setTimeout(function () {
+                            this.animationEnd = true;
+                        },300);
+                    }
+                }
+            },false,0,this);
 
         }
 
@@ -207,10 +234,9 @@ package es.core
          * @param options
          * @returns {PopUp}
          */
-        protected function show( options:Object={} , isModalWindow:Boolean=false):es.core.BasePopUp
+        protected function show( options:Object={}):es.core.BasePopUp
         {
-            options.isModalWindow = isModalWindow;
-            this.options  = options;
+            this.option  = options;
             this.state    = true;
 
             //禁用滚动条
@@ -227,31 +253,54 @@ package es.core
             return this;
         }
 
+        private var _owner:IContainer = null;
+
+        override public function get owner():IContainer
+        {
+            if( _owner === null )
+            {
+                _owner = new Container( SystemManage.getBody() );
+            }
+            return _owner;
+        }
+
+        override public function set owner(value:IContainer):void
+        {
+            _owner=value;
+        }
+
         /**
          * @inherit
          * @return
          */
         override public function display():Element
         {
-            var elem:Element = super.display();
-            var options:Object = this.options;
             var skin:Skin    = this.skin;
+            var options:Object = this.option;
             var profile:Object = options.profile as Object;
             if( System.env.platform('IE', 8) )
             {
                 skin.style('position','absolute');
             }
 
-            //应用效果
-            elem.show();
-
-            //设置皮肤元素属性
+             //设置皮肤元素属性
             Object.forEach(profile,function(value:*,prop:String)
             {
-                if( prop in skin ){
-                    skin[ prop ] = value;
+                switch(prop){
+                    case "currentState" :
+                       skin.currentState = value as String;
+                       break;
+                    case "content" :
+                       this.children = value instanceof Array ? value : [value];
+                    default :
+                       skin.assign(prop, value);
                 }
-            });
+            },this);
+
+            var elem:Element = super.display();
+           
+            //应用效果
+            elem.show();
 
             var container:Container = this.getContainer();
             var animation:Object = options.animation as Object;

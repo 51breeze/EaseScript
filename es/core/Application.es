@@ -6,9 +6,13 @@ package es.core
    import es.events.ApplicationEvent;
    public class Application extends EventDispatcher
    {
+       private var appContainer:Node=null;
        public function Application()
        {
            super( document );
+           appContainer = Element.createElement("div");
+           appContainer.className="application";
+           (document.body as Node).appendChild( appContainer );
        }
 
        /**
@@ -18,7 +22,7 @@ package es.core
        public function getContainer()
        {
            var event:ApplicationEvent = new ApplicationEvent( ApplicationEvent.FETCH_ROOT_CONTAINER );
-           event.container = document.body;
+           event.container = appContainer;
            this.dispatchEvent( event );
            return event.container;
        }

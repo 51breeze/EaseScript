@@ -18,6 +18,7 @@ package es.core
     import es.core.PopUpManage;
     import es.skins.PopUpSkin;
 
+    [Skin(es.skins.PopUpSkin)]
     [RunPlatform("client")]
     public class PopUp extends BasePopUp
     {
@@ -93,7 +94,7 @@ package es.core
                 "disableScroll":false,
                 "profile":{
                     "currentState":"tips",
-                    "bodyContent":message
+                    "content":message
                 },
                 "skinStyle":{
                     "background":"none",
@@ -116,7 +117,7 @@ package es.core
                 "vertical":"top",
                 "profile":{
                     "currentState":"tips",
-                    "bodyContent":message
+                    "content":message
                 },
                 "disableScroll":false
             },options));
@@ -134,7 +135,7 @@ package es.core
                 "vertical":"top",
                 "profile":{
                     "currentState":"title",
-                    "bodyContent":message
+                    "content":message
                 },
                 "disableScroll":false
             },options));
@@ -152,7 +153,7 @@ package es.core
                 "vertical":"top",
                 "profile":{
                     "currentState":"alert",
-                    "bodyContent":message
+                    "content":message
                 }
             } ,options));
         }
@@ -172,7 +173,7 @@ package es.core
                 "vertical":"top",
                 "profile":{
                     "currentState":"confirm",
-                    "bodyContent":message
+                    "content":message
                 },"offsetY":2
             },options));
         }
@@ -184,14 +185,15 @@ package es.core
          * @param options
          * @returns {PopUp}
          */
-        static public function modality(title:String,content:String,options:Object={}):BasePopUp
+        static public function modality(title:*,content:*,options:Object={}):BasePopUp
         {
             return getModalityInstance(options.skinClass).show(Object.merge(true,{
                 "mask":true,
+                "isModalWindow":true,
                 "profile":{
                     "currentState":"modality",
                     "titleText":title,
-                    "bodyContent":content,
+                    "content":content,
                 }, "animation":{
                     "fadeIn": {
                         "name":"fadeIn",
@@ -200,7 +202,48 @@ package es.core
                         "name":"fadeOut",
                     }
                 },
-            },options), true);
+            },options));
+        }
+
+        private var _title:* = "标题";
+        public function set title(value:*):void
+        {
+            _title = value;
+        }
+
+        public function get title():*
+        {
+            return _title;
+        }
+
+        public function set onSubmit(value:Function):void
+        {
+            this.option.onSubmit = value;
+        }
+
+        public function get onSubmit():Function
+        {
+            return this.option.onSubmit;
+        }
+
+        public function set onCancel(value:Function):void
+        {
+            this.option.onCancel = value;
+        }
+
+        public function get onCancel():Function
+        {
+            return this.option.onCancel;
+        }
+
+        public function set onClose(value:Function):void
+        {
+            this.option.onClose = value;
+        }
+
+        public function get onClose():Function
+        {
+            return this.option.onClose;
         }
 
         /**
@@ -208,12 +251,12 @@ package es.core
          * @param options
          * @returns {PopUp}
          */
-        override protected function show( options:Object={} , isModalWindow:Boolean=false ):BasePopUp
+        override protected function show(options:Object={}):BasePopUp
         {
             if( !this.state )
             {
-                super.show(Object.merge(true, {}, PopUpManage.defaultOptions, options), isModalWindow);
-                PopUpManage.show(this, isModalWindow);
+                this.option = options;
+                this.display();
             }
             return this;
         }
@@ -224,7 +267,7 @@ package es.core
          */
         override protected function getContainer():Container
         {
-            return (this.skin as PopUpSkin).container;
+            return (this.skin as PopUpSkin).mainContainer;
         }
 
         /**
@@ -233,33 +276,15 @@ package es.core
          */
         override public function display():Element
         {
-            var flag:Boolean = this.initialized;
-            var elem:Element = super.display();
-            var opt:Object = this.options;
-            var self:es.core.PopUp = this;
-            var skin:Container = this.getContainer();
-
-            //如果是模态框添加鼠标在容器外点击时关闭窗口
-            skin.removeEventListener(MouseEvent.MOUSE_OUTSIDE);
-            skin.addEventListener(MouseEvent.MOUSE_OUTSIDE, function (e:MouseEvent)
-            {
-                if( self.state )
-                {
-                    if (opt.isModalWindow)
-                    {
-                        if (opt.clickOutsideClose === true)self.close();
-                    } else if( self.animationEnd )
-                    {
-                        self.animationEnd = false;
-                        skin.element.animation("shake", 0.2);
-                        setTimeout(function () {
-                            self.animationEnd = true;
-                        },300);
-                    }
-                }
-            });
-            this.position();
-            return elem;
+            var opt:Object = this.option;
+            if( !this.state ){
+                opt = Object.merge(true,PopUpManage.defaultOptions, opt);
+                opt.profile.titleText = _title;
+                super.show(opt);
+                super.display();
+                PopUpManage.show(this, opt.isModalWindow as Boolean, this.owner );
+            }
+            return this.element;
         }
 
         /**
