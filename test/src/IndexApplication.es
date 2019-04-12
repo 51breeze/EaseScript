@@ -49,7 +49,7 @@ package
 
                 var object:Object = {names:"ppppp",address:"sssss"};
 
-                var {name:*="1232",address:*} =  {names:"ppppp",address:"sssss"};
+                var {name:*="1232||ssss",address:*} =  object;
            }
 
            console.log( name , "=====", address);
@@ -132,7 +132,7 @@ package
             //grid.source = ServiceProvider("/getNews/{id:int}","server.News@one",'get',2);
            // grid.dataSource.dataType( Http.TYPE_JSONP );
 
-           // ServiceProvider("/Person/list","server.Person@all",'get');
+            ServiceProvider("/Person/list","server.Person@all",'get');
            // ServiceProvider("/Person/save/{id}","server.Person@set",'post',6);
 
 

@@ -174,6 +174,16 @@ class HTMLElement extends Node
         return $this->addChildAt($child, -1 );
     }
 
+     /**
+     * 添加一个子级元素
+     * @param Node $child
+     * @return Node
+     * @throws ReferenceError
+     */
+    public function appendChild( Node $child )
+    {
+        return $this->addChildAt($child, -1 );
+    }
 
     /**
      * 添加一个子级元素到指定的索引位置

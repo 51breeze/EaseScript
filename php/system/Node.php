@@ -67,6 +67,8 @@ class Node extends EventDispatcher
                 throw new ReferenceError('parentNode is not writable.');
             case 'text' :
                 return $this->content = $value;
+            case 'textContent' :
+                return $this->content = $value;
         }
         $this->attr->$name = $value;
         return $value;
