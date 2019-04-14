@@ -51,18 +51,33 @@ package
 
                 var {name:*="1232||ssss",address:*} =  object;
            }
-
-           console.log( name , "=====", address);
-
-        
             
             var grid: DataGrid = new DataGrid();
-            grid.source = "http://local.working.com/json.php";
-            grid.dataSource.dataType( Http.TYPE_JSONP );
+            //grid.source = "http://local.working.com/json.php";
+            //grid.dataSource.dataType( Http.TYPE_JSONP );
 
-            grid.width = 800;
+            grid.source = ServiceProvider("/getNews","server.News@all");
+
+            grid.dataSource.options({responseProfile:function (response:Object,name:String) {
+                    switch (name){
+                        case "data":
+                            return response["data"];
+                            break;
+                        case "total":
+                            return response["data"]['length'];
+                            break;
+                        case "status":
+                            return response["status"];
+                            break;
+                        case "successCode":
+                            return 200;
+                            break;
+                    }
+            }});
+
+            grid.width = 400;
             grid.skinClass = DataGridSkin;
-            grid.columns = {id: "IDsssss", name: "名称", phone: "电话"};
+            grid.columns = {id: "ID", title: "名称", content: "内容"};
             var gridSkin:DataGridSkin = grid.skin as DataGridSkin;
             gridSkin.pagination.wheelTarget = new Display( new Element(gridSkin.foot) );
             view.addChild(grid);
@@ -72,19 +87,16 @@ package
 
             (new EventDispatcher(view.popup)).addEventListener( MouseEvent.CLICK, function(e:MouseEvent){
 
-                    PopUp.modality("您有3条信息未处理2","这里是内容", {callback:function (type:String) {
+                    PopUp.confirm("您有3条信息未处理2",function (type:String) {
 
                              view.assign("uuuu", 6666);    
                              view.assign("yy", 555);    
                              view.assign("kk", 666);    
                              view.assign("rr", 444);    
                              view.assign("www", 888);    
-                             view.assign("qqq", 999);
-
-                             console.log("====PopUp===", type );   
+                             view.assign("qqq", 999); 
         
-                       
-                    }});
+                    });
 
             });
            
@@ -133,6 +145,9 @@ package
            // grid.dataSource.dataType( Http.TYPE_JSONP );
 
             ServiceProvider("/Person/list","server.Person@all",'get');
+            ServiceProvider("/getNews","server.News@all");
+
+
            // ServiceProvider("/Person/save/{id}","server.Person@set",'post',6);
 
 

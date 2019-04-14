@@ -27,13 +27,17 @@ package es.core
         /**
          * @private
          */
-        protected var _option:Object={};
+        protected var _option:Object=null;
 
         /**
          * 获取弹框选项配置
          */
         public get option():Object
         {
+            if( _option === null )
+            {
+                _option = Object.merge(true,{},PopUpManage.defaultOptions);
+            }
             return _option;
         }
 
@@ -42,7 +46,7 @@ package es.core
          */
         public set option(value:Object):void
         {
-            _option=value;
+            _option=Object.merge(true,PopUpManage.defaultOptions, value);
         }
 
         /**
@@ -66,6 +70,16 @@ package es.core
         public function action( type:String ):Boolean
         {
             var options:Object = this.option;
+
+            if( typeof options["on"+type] === "function" )
+            {
+               var fn:Function =  options["on"+type] as Function;
+               if( fn() === false )
+               {
+                   return false;
+               }
+            }
+            
             if( options.callback )
             {
                 if( options.callback( type ) === false )
@@ -90,7 +104,7 @@ package es.core
             {
                 SystemManage.enableScroll();
             }
-            
+
             var animation:Object = options.animation as Object;
             var skin:Skin = this.skin;
             if( this.state && animation && animation.enabled )
@@ -103,12 +117,14 @@ package es.core
                     skin.visible=false;
                     obj.state = false;
                     obj.animationEnd = true;
+                    PopUpManage.close( obj );
                 }, (fadeOut.delay+fadeOut.duration)*1000, this );
 
             }else
             {
                 this.state = false;
                 skin.visible=false;
+                PopUpManage.close( this );
             }
             return true;
         }
@@ -219,11 +235,11 @@ package es.core
                     } else if( this.animationEnd )
                     {
                         this.animationEnd = false;
-                        skin.element.animation("shake", 0.2);
-                        setTimeout(function () {
-                            this.animationEnd = true;
-                        },300);
-                    }
+                        main.element.animation("shake", 0.2);
+                        setTimeout(function (target:BasePopUp) {
+                            target.animationEnd = true;
+                        },300,this);
+                    } 
                 }
             },false,0,this);
 
@@ -234,9 +250,8 @@ package es.core
          * @param options
          * @returns {PopUp}
          */
-        protected function show( options:Object={}):es.core.BasePopUp
+        protected function show(options:Object={}):es.core.BasePopUp
         {
-            this.option  = options;
             this.state    = true;
 
             //禁用滚动条
@@ -253,8 +268,15 @@ package es.core
             return this;
         }
 
+        /**
+        * @private
+        */
         private var _owner:IContainer = null;
 
+        /**
+        * 获取一个所属容器
+        * @return IContainer
+        */
         override public function get owner():IContainer
         {
             if( _owner === null )
@@ -264,6 +286,10 @@ package es.core
             return _owner;
         }
 
+        /**
+        * 设置一个所属容器
+        * @return IContainer
+        */
         override public function set owner(value:IContainer):void
         {
             _owner=value;
@@ -297,6 +323,16 @@ package es.core
                 }
             },this);
 
+            if( options.width > 0 )
+            {
+                skin.width = options.width as uint;
+            }
+
+            if( options.height > 0 )
+            {
+                skin.height = options.height as uint;
+            }
+
             var elem:Element = super.display();
            
             //应用效果
@@ -305,7 +341,6 @@ package es.core
             var container:Container = this.getContainer();
             var animation:Object = options.animation as Object;
             var timeout:Number   = options.timeout * 1000;
-            var self:es.core.BasePopUp = this;
             if( animation.enabled && !animation.running )
             {
                 this.animationEnd = false;
@@ -320,9 +355,9 @@ package es.core
             //定时关闭窗体
             if( options.timeout > 0 )
             {
-                timeoutId = setTimeout(function () {
-                    self.action("close");
-                }, timeout );
+                timeoutId = setTimeout(function (obj:BasePopUp) {
+                    obj.action("close");
+                }, timeout ,this);
             }
             return elem;
         }

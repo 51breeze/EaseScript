@@ -33,7 +33,7 @@
 	"clean":true,
 	"mode":2,
 	"build_mode":"app",
-	"syntax":"php",
+	"syntax":"javascript",
 	"root_path":"E:/EaseScript",
 	"build":{
 		"path":"E:/webroot/working",

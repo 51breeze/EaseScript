@@ -346,7 +346,7 @@ class HTMLElement extends Node
             case 'head' :
                 return System::document()->__get( $name );
             case 'childNodes':
-                return array_slice($this->children,0);
+                return new ArrayList( array_slice($this->children,0) );
         }
         return parent::__get($name);
     }

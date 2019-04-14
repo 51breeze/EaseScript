@@ -82,7 +82,12 @@ final class System
             switch ( strtolower($class) )
             {
                 case 'class' :
-                    return is_string($obj) ? class_exists($obj, true) : false;
+                   try{
+                       return is_string($obj) ? class_exists($obj, true) : false;
+                   }catch( \Exception $e)
+                   {
+                       return false;
+                   }
                 case 'array' :
                     return static::isArray( $obj );
                 case 'string' :
@@ -92,14 +97,14 @@ final class System
                 case "int" :
                 case 'integer' :
                 case 'number' :
-                    return is_numeric($obj);
+                    return static::isNumber( $obj );
                 case 'uint' :
-                    return is_numeric($obj) && $obj >= 0;
+                    return static::isNumber( $obj ) && $obj >= 0;
                 case "double" :
                 case "float" :
-                    return is_float($obj);
+                    return $obj === NaN || is_float($obj);
                 case 'object' :
-                    return $obj===null ? true : System::isObject($obj);
+                    return $obj===null ? true : is_object($obj);
             }
             return is_string($obj) ? false : ( $flag === true ?  is_a($obj, $class) : $obj instanceof $class );
         }catch (\Exception $e)
@@ -158,7 +163,7 @@ final class System
 
     public static function isNumber( $obj )
     {
-        return is_numeric($obj);
+        return $obj === NaN || is_numeric($obj);
     }
 
     public static function isFunction($obj){
@@ -167,7 +172,7 @@ final class System
 
     public static function isNaN($value)
     {
-        return $value === NaN || !is_numeric($value);
+        return $value === NaN;
     }
 
     public static function range($low, $high, $step=1)
@@ -336,5 +341,15 @@ final class System
             return static::$environmentMap[ $name ];
         }
         return static::$environmentMap;
+    }
+
+    static public function setTimeout($callback, $timeout=0)
+    {
+        call_user_func( $callback );
+    }
+
+    static public function clearTimeout($id)
+    {
+        
     }
 }

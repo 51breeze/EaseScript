@@ -36,9 +36,13 @@ package es.core
          * 默认配置选项
          */
         static public var defaultOptions:Object={
-            "profile":{"titleText":"提示"},
+            "profile":{
+                "titleText":"提示",
+                "currentState":"modality"
+            },
             "disableScroll":false,
             "isModalWindow":true,
+            "mask":true,
             "callback":null,
             "timeout":0,
             "maskStyle":null,
@@ -140,17 +144,21 @@ package es.core
                 if( systemPopUpInstance && target !== systemPopUpInstance )
                 {
                     var elem:Element = systemPopUpInstance.element;
-                    elem.parent().removeChild( elem );
+                    if( systemPopUpInstance.parent )
+                    {
+                        (systemPopUpInstance.parent as IContainer).removeChild( systemPopUpInstance );
+                    }
                 }
                 //记录当前指定的实例
                 systemPopUpInstance = target;
                 level = TOP_LEVEL;
             }
 
+            target.element.style("zIndex", level );
+
             //如果没有添加则添加到视口中
             if( target.element.parent().isEmpty() )
             {
-                target.element.style("zIndex", level );
                 viewport.addChild( target );
             }
         }
@@ -174,7 +182,8 @@ package es.core
                      skin.element.style('zIndex', WINDOW_LEVEL );
                      skin.element.addClass("active");
 
-                 }else{
+                 }else
+                 {
                      skin.element.style('zIndex', WINDOW_LEVEL - 1 );
                      skin.element.removeClass("active");
                  }

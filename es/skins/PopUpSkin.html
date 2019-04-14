@@ -3,6 +3,9 @@
     <s:Metadata>[HostComponent("es.core.PopUp")]</s:Metadata>
     <s:Script>
     <![CDATA[
+
+        import es.core.State;
+
         private var _makeMap:Object={};
         private makeAction(name:String):Function
         {
@@ -14,6 +17,46 @@
             _makeMap[name] = fn;
             return fn;
         }
+
+        override public set width(val:uint):void
+        {
+            this.popupContainer.width = val;
+        }
+
+        override public get width():uint
+        {
+            return this.popupContainer.width;
+        }
+
+        private var hasSetHeight:Boolean = false;
+        override public set height(val:uint):void
+        {
+            this.popupContainer.height = val;
+            hasSetHeight = true;
+        }
+
+        override public get height():uint
+        {
+            return this.popupContainer.height;
+        }
+
+        override protected updateDisplayList()
+        {
+            super.updateDisplayList();
+            var h:uint = this.popupContainer.height;
+            var stateGroup:State = this.getCurrentStateGroup();
+            if( !stateGroup.includeIn("tips") )
+            {
+                h-=head.height;
+            }
+
+            if( !stateGroup.includeIn("simple") )
+            {
+                h-=footer.height;
+            }
+            this.body.height = h;
+        }
+
     ]]>
     </s:Script>
     <style file="PopUpStyle.less" />
@@ -33,10 +76,6 @@
            cancelText:*="取 消",
            headHeight:uint=NaN,
            footerHeight:uint=NaN,
-           bodyHeight:uint=NaN,
-           bodyWidth:uint=NaN,
-           height:uint=NaN,
-           width:uint=NaN,
            left:uint=NaN,
            top:uint=NaN,
            right:uint=NaN,
@@ -47,13 +86,11 @@
     <s:Container
          name="div" 
          class="popup-container fixed"
-         id="@mainContainer"
+         id="@popupContainer"
          left="{left}" 
          top="{top}" 
          right="{right}" 
-         bottom="{bottom}" 
-         width="{width}"
-         height="{height}"
+         bottom="{bottom}"
         class.modality="popup-container fixed popup-lg">
 
             <s:Container class="popup-head" id="@head" height="{headHeight}" excludeFrom="tips">
@@ -61,11 +98,11 @@
                 <button type="button" class="close" excludeFrom="title" onClick="{makeAction('close')}">{closeText}</button>
             </s:Container>
 
-            <s:Container class="popup-body" id="@body" width="{bodyWidth}" height="{bodyHeight}" >
+            <s:Container class="popup-body" id="@body">
                 {children}
             </s:Container>
 
-            <s:Container class="popup-footer" id="@footer" heigth="{footerHeight}" excludeFrom="simple">
+            <s:Container class="popup-footer" id="@footer" height="{footerHeight}" excludeFrom="simple">
 
                 <button type="button" 
                     class="btn btn-sm btn-default" 

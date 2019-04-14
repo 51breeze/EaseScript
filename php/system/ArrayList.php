@@ -83,18 +83,24 @@ class ArrayList extends BaseObject implements \Countable
         return new ArrayList( array_map( $callback , $this->dataItems ) );
     }
 
-    public function each( $callback , $thisArg = null )
+    public function __call($name, $avrg)
     {
-        if( $thisArg == null )$thisArg=$this;
-        $callback = System::bind($thisArg,$callback);
-        $this->rewind();
-        while ( $this->valid() )
-        {
-            $callback($this->current(), $this->key() );
-            $this->next();
-        }
-        $this->rewind();
+           
+
     }
+
+    // public function each( $callback , $thisArg = null )
+    // {
+    //     if( $thisArg == null )$thisArg=$this;
+    //     $callback = System::bind($thisArg,$callback);
+    //     $this->rewind();
+    //     while ( $this->valid() )
+    //     {
+    //         $callback($this->current(), $this->key() );
+    //         $this->next();
+    //     }
+    //     $this->rewind();
+    // }
 
     public function filter($callback = null, $flag = 0 )
     {

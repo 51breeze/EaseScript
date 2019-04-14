@@ -260,7 +260,7 @@ function builder(path , config , localModules, requirements , replacements )
         'arguments':true,
     };
 
-    var requires = ['System','Namespace','document','window','HTMLElement','Node','Element'].concat( globals.slice(0), requirements );
+    var requires = ['System','Namespace','document','window','HTMLElement','Node','Element','RouteEvent'].concat( globals.slice(0), requirements );
     var loaded = {};
     var name;
     while ( name= requires.pop() )

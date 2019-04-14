@@ -587,7 +587,7 @@ package es.components
         * @param reference
         * @returns {EventDispatcher}
         */
-        override public function addEventListener(type:String,callback:Function,useCapture:Boolean,priority:int,reference:Object):EventDispatcher
+        override public function addEventListener(type:String,callback:Function,useCapture:Boolean=false,priority:int=0,reference:Object=null):EventDispatcher
         {
             if( this.initialized ){
                 this.skin.addEventListener(type,callback,useCapture,priority,reference);

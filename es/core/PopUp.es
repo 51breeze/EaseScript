@@ -115,6 +115,8 @@ package es.core
             return getInstance(options.skinClass).show(Object.merge(true,{
                 "timeout":2,
                 "vertical":"top",
+                "mask":false,
+                "isModalWindow":false,
                 "profile":{
                     "currentState":"tips",
                     "content":message
@@ -133,6 +135,8 @@ package es.core
             return getInstance(options.skinClass).show(Object.merge(true,{
                 "timeout":2,
                 "vertical":"top",
+                "mask":false,
+                "isModalWindow":false,
                 "profile":{
                     "currentState":"title",
                     "content":message
@@ -150,6 +154,7 @@ package es.core
         {
             return getInstance(options.skinClass).show(Object.merge(true,{
                 "mask":true,
+                "isModalWindow":false,
                 "vertical":"top",
                 "profile":{
                     "currentState":"alert",
@@ -171,6 +176,7 @@ package es.core
                 "mask":true,
                 "callback":callback,
                 "vertical":"top",
+                "isModalWindow":false,
                 "profile":{
                     "currentState":"confirm",
                     "content":message
@@ -205,45 +211,74 @@ package es.core
             },options));
         }
 
-        private var _title:* = "标题";
+        /**
+        * @private
+        */
+        private var _title:* = null;
+
+        /**
+        * 设置标题,元素对象或者字符串
+        */
         public function set title(value:*):void
         {
             _title = value;
         }
 
+        /**
+        * 获取标题
+        * @return 元素对象或者字符串
+        */
         public function get title():*
         {
             return _title;
         }
 
+        /**
+        * 设置一个提交按扭的回调函数。
+        */
         public function set onSubmit(value:Function):void
         {
-            this.option.onSubmit = value;
+            this.option.onsubmit = value;
         }
 
+        /**
+        * 获取一个提交按扭的回调函数。
+        */
         public function get onSubmit():Function
         {
-            return this.option.onSubmit;
+            return this.option.onsubmit;
         }
 
+        /**
+        * 设置一个取消按扭的回调函数。
+        */
         public function set onCancel(value:Function):void
         {
-            this.option.onCancel = value;
+            this.option.oncancel = value;
         }
 
+        /**
+        * 获取一个取消按扭的回调函数。
+        */
         public function get onCancel():Function
         {
-            return this.option.onCancel;
+            return this.option.oncancel;
         }
 
+        /**
+        * 设置一个关闭按扭的回调函数。
+        */
         public function set onClose(value:Function):void
         {
-            this.option.onClose = value;
+            this.option.onclose = value;
         }
 
+        /**
+        * 获取一个关闭按扭的回调函数。
+        */
         public function get onClose():Function
         {
-            return this.option.onClose;
+            return this.option.onclose;
         }
 
         /**
@@ -253,11 +288,8 @@ package es.core
          */
         override protected function show(options:Object={}):BasePopUp
         {
-            if( !this.state )
-            {
-                this.option = options;
-                this.display();
-            }
+            this.option = options;
+            this.display();
             return this;
         }
 
@@ -267,7 +299,7 @@ package es.core
          */
         override protected function getContainer():Container
         {
-            return (this.skin as PopUpSkin).mainContainer;
+            return (this.skin as PopUpSkin).popupContainer;
         }
 
         /**
@@ -276,10 +308,13 @@ package es.core
          */
         override public function display():Element
         {
-            var opt:Object = this.option;
-            if( !this.state ){
-                opt = Object.merge(true,PopUpManage.defaultOptions, opt);
-                opt.profile.titleText = _title;
+            if( !this.state )
+            {
+                var opt:Object = this.option;
+                if( _title != null )
+                {
+                   opt.profile.titleText = _title;
+                }
                 super.show(opt);
                 super.display();
                 PopUpManage.show(this, opt.isModalWindow as Boolean, this.owner );
@@ -287,18 +322,5 @@ package es.core
             return this.element;
         }
 
-        /**
-         * 点击按扭时或者关闭窗口时触发
-         * @param type
-         * @return
-         */
-        override public function action(type:String):Boolean
-        {
-            if( type === "close" )
-            {
-                PopUpManage.close( this );
-            }
-            return super.action( type );
-        }
     }
 }

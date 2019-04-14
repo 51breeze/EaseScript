@@ -53,6 +53,11 @@ class Document extends HTMLElement
         $this->nodeName = 'document';
     }
 
+    public function createElement( $name ):Node
+    {
+        return new HTMLElement( $name );
+    }
+
     public function __get($name)
     {
          if( $name ==="outerHTML" )

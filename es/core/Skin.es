@@ -158,6 +158,7 @@ package es.core
                 invalidate = true;
                 var nodes:Array= this.render();
                 this.updateChildren(this, nodes);
+                this.updateInstallState();
                 this.updateDisplayList();
                 if( this.hasEventListener(SkinEvent.UPDATE_DISPLAY_LIST) )
                 {
@@ -353,10 +354,11 @@ package es.core
             var totalChilds:int = children.length;
             var len:int = isNaN( total ) ? Math.max(totalChilds, totalNodes) : total;
             var i:int=index;
+            var offset:int = 0;
             while( i<len && (i-index < totalChilds || i < totalNodes) )
             {
                 var newNode:Node=null;
-                var oldNode:Node=parent.childNodes[i] as Node;
+                var oldNode:Node=parent.childNodes[i-offset] as Node;
                 var childItem:* = children[i-index];
                 var isDisplay:Boolean = childItem is IDisplay;
                 if( isDisplay )
@@ -365,11 +367,15 @@ package es.core
                     var owner:IContainer = (childItem as IDisplay).owner;
                     if( owner )
                     {
-                        owner.addChild( childItem as  IDisplay );
+                        this.installer(childItem as IDisplay, owner);
+                        offset++;
                         i++;
                         continue;
+
+                    }else
+                    {
+                        newNode =elem.current() as Node;
                     }
-                    newNode =elem.current() as Node;
 
                 }else
                 { 
@@ -407,7 +413,7 @@ package es.core
                         newNode = childItem as Node;
                     }
                 }
-                
+
                 //两边节点不一致 
                 if( newNode !== oldNode )
                 {
@@ -486,7 +492,6 @@ package es.core
                 callback = this.createChildren.bind(this);
                 this.callback = callback;
              }
-             var _this:Skin = this;
              timeoutId = setTimeout(callback,delay);
         }
 
@@ -595,6 +600,56 @@ package es.core
                 }
             });
         }
+
+        /*
+        * @private
+        */
+        private var _installer:Dictionary=null;
+
+        /*
+        * @private
+        */
+        private function installer(child:IDisplay, viewport:IContainer):void
+        {
+            var map:Dictionary = this._installer;
+            if( map === null ){
+                map = new Dictionary();
+                this._installer = map;
+            }
+            var install:Object = map.get(child);
+            if( !install )
+            {
+                install = {
+                    "viewport":viewport
+                };
+                map.set(child , install);
+            }
+            if( !install.state )
+            {
+                viewport.addChild( child );
+            }
+            install.state = true;
+        }
+
+        /*
+        * @private
+        */
+        private function updateInstallState():void
+        {
+            var map:Dictionary = this._installer;
+            if( map )
+            {
+                Object.forEach( map.getAll() , function(item:Object)
+                {
+                    if( item.value.state !== true && (item.key as IDisplay).parent )
+                    {
+                        (item.value.viewport as IContainer).removeChild( item.key as IDisplay);
+                    }
+                    item.value.state = false;
+                });
+            }
+        }
+
 
         /*
         * @private

@@ -21,7 +21,7 @@ class EventDispatcher extends BaseObject
         $this->target = $target ? $target : $this;
     }
 
-    final function hasEventListener( $type )
+    function hasEventListener( $type )
     {
         if( !is_string($type) )
         {
@@ -30,7 +30,7 @@ class EventDispatcher extends BaseObject
         return isset($this->target->listener[$type]);
     }
 
-    final public function addEventListener($type, $listener, $useCapture=false, $priority=0, $reference=null)
+    public function addEventListener($type, $listener, $useCapture=false, $priority=0, $reference=null)
     {
         if( !is_string($type) )
         {
@@ -77,7 +77,7 @@ class EventDispatcher extends BaseObject
         return $this;
     }
 
-    final public function removeEventListener($type,$listener=null)
+    public function removeEventListener($type,$listener=null)
     {
         if( isset($this->target->listener[$type]) )
         {
@@ -103,7 +103,7 @@ class EventDispatcher extends BaseObject
         return false;
     }
 
-    final public function dispatchEvent( Event $event )
+    public function dispatchEvent( Event $event )
     {
         $type = $event->type;
         if( isset($this->target->listener[$type]) )

@@ -107,10 +107,6 @@ package es.core
             var children:Array = this._children;
             var at:Number = index < 0 ? index+children.length+1 : index;
             children.splice(at, 0, child);
-            if( child is SkinComponent )
-            {
-                child = (child as SkinComponent).skin as IDisplay;
-            }
             child.es_internal::setParentDisplay(this);
             this.element.addChildAt(child.element,index);
             return child;
