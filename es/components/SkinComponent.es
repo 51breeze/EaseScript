@@ -404,7 +404,7 @@ package es.components
         /**
          * @private
          */
-        private var childrenItems:Array=[];
+        private var _children:Array=[];
 
         /**
          * 获取所有的子级元素
@@ -416,7 +416,7 @@ package es.components
             {
                 return this.skin.children;
             }else{
-                return childrenItems.slice(0);
+                return _children.slice(0);
             }
         }
 
@@ -430,7 +430,7 @@ package es.components
             {
                 this.skin.children=value;
             }else{
-               childrenItems = value.slice(0);
+               _children = value.slice(0);
             }
         }
 
@@ -446,9 +446,9 @@ package es.components
             }else
             {
                 if( index < 0 ){
-                    index = index+childrenItems.length;
+                    index = index+_children.length;
                 }
-                return childrenItems[ index ] as IDisplay;
+                return _children[ index ] as IDisplay;
             }
         }
 
@@ -462,7 +462,7 @@ package es.components
             if( this.initialized ){
                 return this.skin.getChildIndex(child);
             }else{
-                return childrenItems.indexOf(child);
+                return _children.indexOf(child);
             }
         }
 
@@ -477,7 +477,7 @@ package es.components
             {
                 return this.skin.addChild(child);
             }else{
-                childrenItems.push( child );
+                _children.push( child );
                 return child;
             }
         }
@@ -496,9 +496,9 @@ package es.components
             }else
             {
                 if( index < 0 ){
-                    index = index+childrenItems.length;
+                    index = index+_children.length;
                 }
-                childrenItems.splice(index,0,child);
+                _children.splice(index,0,child);
                 return child;
             }
         }
@@ -516,7 +516,7 @@ package es.components
 
             }else
             {
-                var index:int = this.childrenItems.indexOf(child);
+                var index:int = this._children.indexOf(child);
                 if( index >= 0 ){
                     this.removeChildAt( index );
                 }else{
@@ -538,10 +538,10 @@ package es.components
             }else
             {
                 if( index < 0 ){
-                    index = index+childrenItems.length;
+                    index = index+_children.length;
                 }
-                if( childrenItems[index] ){
-                    return childrenItems.splice(index,1) as IDisplay;
+                if( _children[index] ){
+                    return _children.splice(index,1) as IDisplay;
                 }
                 throw new ReferenceError("Index is out of range");
             }
@@ -557,7 +557,7 @@ package es.components
             {
                 this.skin.removeAllChild();
             }else{
-                childrenItems = [];
+                _children = [];
             }
         }
 
@@ -714,15 +714,10 @@ package es.components
          */
         private function installChildren()
         {
-            this.skin.children = childrenItems;
-            
-            /*var len:int = childrenItems.length;
-            var index:int=0;
-            var container:IContainer=this.skin;
-            for(;index<len;index++)
+            if( _children.length > 0 )
             {
-                container.addChild( childrenItems[index] as IDisplay );
-            }*/
+                this.skin.children = _children;
+            }
         }
 
         /**
@@ -751,7 +746,10 @@ package es.components
                 }
             },this);
 
-            skin.es_internal::setParentDisplay(_parent);
+            if( _parent )
+            {
+                skin.es_internal::setParentDisplay(_parent);
+            }  
         }
 
         /**

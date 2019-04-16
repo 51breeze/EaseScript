@@ -11,9 +11,10 @@ class BaseObject extends \stdClass implements \Iterator, \ArrayAccess
 {
     static public function each($target, $callback, $thisArg=null)
     {
+        if( $target==null )return;
         if( $thisArg && $thisArg !== null )
         {
-            $callback = System::bind($thisArg, $callback);
+            $callback = System::bind($callback,$thisArg);
         }
 
         if( System::isIterator($target) )
@@ -124,7 +125,12 @@ class BaseObject extends \stdClass implements \Iterator, \ArrayAccess
                  $this->_originValue = $object;
                  $this->_originType = 'object';
 
-             }else
+             }else if( System::isArray($object) )
+             {
+                 $this->_originType = "array";
+                 $this->_originValue = $object;
+
+             }else 
              {
                  $this->_originType = System::typeOf( $object );
                  $this->_originValue = $object;
@@ -226,6 +232,7 @@ class BaseObject extends \stdClass implements \Iterator, \ArrayAccess
 
     public function current()
     {
+       
         return current($this->_originValue);
     }
 

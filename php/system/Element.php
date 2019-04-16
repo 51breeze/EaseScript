@@ -80,6 +80,11 @@ class Element extends EventDispatcher implements \ArrayAccess,\Countable
         return $element instanceof HTMLElement;
     }
 
+    static function getNodeName( $element )
+    {
+        return $element ? $element->nodeName : '';
+    }
+
     public $length = 0;
     private $items=array();
     public function __construct( $selector, $context=null )
@@ -219,12 +224,13 @@ class Element extends EventDispatcher implements \ArrayAccess,\Countable
         return $this;
     }
 
-    public function setProperties( $object )
+    public function properties( $object )
     {
         $item = $this->items[0];
         $item->attr = $object;
         return $this;
     }
+
 
     public function hasProperty($prop){}
     public function data($name, $value ){}

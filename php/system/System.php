@@ -103,6 +103,8 @@ final class System
                 case "double" :
                 case "float" :
                     return $obj === NaN || is_float($obj);
+                case 'function' :
+                    return is_callable($obj);
                 case 'object' :
                     return $obj===null ? true : is_object($obj);
             }
@@ -122,11 +124,9 @@ final class System
     {
         if( is_callable( $obj ) ){
             return 'function';
-        }else if( static::isArray( $obj ) ) {
-            return 'array';
         }else if( is_bool($obj) ){
             return 'boolean';
-        }else if( is_numeric($obj) ){
+        }else if( is_numeric($obj) || $obj === NaN ){
             return 'number';
         }else if( is_string($obj) ){
             return 'string';
@@ -180,16 +180,33 @@ final class System
         return $high > $low ? range($low, $high, $step) : array($low);
     }
 
-    public static function bind($callback,$thisArg)
+    public static function bind($callback,$thisArg=null)
     {
         if( is_array($callback) )
         {
             if( count($callback) === 2 )
             {
-                $reflect = is_string($callback[0]) ? new \ReflectionClass($callback[0]) : new \ReflectionObject($callback[0]);
-                if ($reflect->hasMethod($callback[1])) {
+                $reflect = null;
+                if( is_string($callback[0]) )
+                {
+                    $reflect = new \ReflectionClass($callback[0]);
+                }else
+                {
+                    $reflect = new \ReflectionObject($callback[0]);
+                    if( !$thisArg )
+                    {
+                        $thisArg  = $callback[0];
+                    }
+                }
+
+                if ($reflect->hasMethod($callback[1])) 
+                {
                     $method = $reflect->getMethod($callback[1]);
-                    $method = \Closure::bind(is_string($callback[0]) ? $method->getClosure() : $method->getClosure($callback[0]), $thisArg);
+                    $method = is_string($callback[0]) ? $method->getClosure() : $method->getClosure($callback[0]);
+                    if( $thisArg )
+                    {
+                        $method = \Closure::bind($method, $thisArg);
+                    }
                     return $method;
                 }
             }else
@@ -200,7 +217,7 @@ final class System
         if( is_callable($callback) )
         {
             $reflect = new \ReflectionFunction($callback);
-            return \Closure::bind( $reflect->getClosure() , $thisArg);
+            return $thisArg ? \Closure::bind( $reflect->getClosure() , $thisArg) : $reflect->getClosure();
         }
         throw new TypeError('callback is not callable');
     }

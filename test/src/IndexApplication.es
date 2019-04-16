@@ -95,6 +95,7 @@ package
                              view.assign("rr", 444);    
                              view.assign("www", 888);    
                              view.assign("qqq", 999); 
+                             view.currentState = "show";
         
                     });
 

@@ -11,7 +11,12 @@ class ArrayList extends BaseObject implements \Countable
     private $dataItems=array();
     public function __construct()
     {
-        $this->dataItems=func_get_args();
+        if( func_num_args() === 1 && System::isArray( func_get_arg(0) ) )
+        {
+            call_user_func_array("array_splice", array_merge( array(&$this->dataItems,0,0), array( func_get_arg(0) ) ) );
+        }else{
+            $this->dataItems=func_get_args();
+        }
     }
 
     public function slice($offset, $length = null, $preserve_keys = null)

@@ -211,76 +211,7 @@ package es.core
             },options));
         }
 
-        /**
-        * @private
-        */
-        private var _title:* = null;
-
-        /**
-        * 设置标题,元素对象或者字符串
-        */
-        public function set title(value:*):void
-        {
-            _title = value;
-        }
-
-        /**
-        * 获取标题
-        * @return 元素对象或者字符串
-        */
-        public function get title():*
-        {
-            return _title;
-        }
-
-        /**
-        * 设置一个提交按扭的回调函数。
-        */
-        public function set onSubmit(value:Function):void
-        {
-            this.option.onsubmit = value;
-        }
-
-        /**
-        * 获取一个提交按扭的回调函数。
-        */
-        public function get onSubmit():Function
-        {
-            return this.option.onsubmit;
-        }
-
-        /**
-        * 设置一个取消按扭的回调函数。
-        */
-        public function set onCancel(value:Function):void
-        {
-            this.option.oncancel = value;
-        }
-
-        /**
-        * 获取一个取消按扭的回调函数。
-        */
-        public function get onCancel():Function
-        {
-            return this.option.oncancel;
-        }
-
-        /**
-        * 设置一个关闭按扭的回调函数。
-        */
-        public function set onClose(value:Function):void
-        {
-            this.option.onclose = value;
-        }
-
-        /**
-        * 获取一个关闭按扭的回调函数。
-        */
-        public function get onClose():Function
-        {
-            return this.option.onclose;
-        }
-
+        
         /**
          * 显示弹窗
          * @param options
@@ -311,16 +242,11 @@ package es.core
             if( !this.state )
             {
                 var opt:Object = this.option;
-                if( _title != null )
-                {
-                   opt.profile.titleText = _title;
-                }
                 super.show(opt);
                 super.display();
                 PopUpManage.show(this, opt.isModalWindow as Boolean, this.owner );
             }
             return this.element;
         }
-
     }
 }

@@ -296,6 +296,76 @@ package es.core
         }
 
         /**
+        * @private
+        */
+        private var _title:* = null;
+
+        /**
+        * 设置标题,元素对象或者字符串
+        */
+        public function set title(value:*):void
+        {
+            _title = value;
+        }
+
+        /**
+        * 获取标题
+        * @return 元素对象或者字符串
+        */
+        public function get title():*
+        {
+            return _title;
+        }
+
+        /**
+        * 设置一个提交按扭的回调函数。
+        */
+        public function set onSubmit(value:Function):void
+        {
+            this.option.onsubmit = value;
+        }
+
+        /**
+        * 获取一个提交按扭的回调函数。
+        */
+        public function get onSubmit():Function
+        {
+            return this.option.onsubmit;
+        }
+
+        /**
+        * 设置一个取消按扭的回调函数。
+        */
+        public function set onCancel(value:Function):void
+        {
+            this.option.oncancel = value;
+        }
+
+        /**
+        * 获取一个取消按扭的回调函数。
+        */
+        public function get onCancel():Function
+        {
+            return this.option.oncancel;
+        }
+
+        /**
+        * 设置一个关闭按扭的回调函数。
+        */
+        public function set onClose(value:Function):void
+        {
+            this.option.onclose = value;
+        }
+
+        /**
+        * 获取一个关闭按扭的回调函数。
+        */
+        public function get onClose():Function
+        {
+            return this.option.onclose;
+        }
+
+        /**
          * @inherit
          * @return
          */
@@ -309,7 +379,12 @@ package es.core
                 skin.style('position','absolute');
             }
 
-             //设置皮肤元素属性
+            if( _title != null )
+            {
+                profile.titleText=_title;
+            }
+
+            //设置皮肤元素属性
             Object.forEach(profile,function(value:*,prop:String)
             {
                 switch(prop){
@@ -317,10 +392,13 @@ package es.core
                        skin.currentState = value as String;
                        break;
                     case "content" :
-                       this.children = value instanceof Array ? value : [value];
+                       if( value ){
+                          skin.children = value instanceof Array ? value : [value];
+                       }
                     default :
                        skin.assign(prop, value);
                 }
+
             },this);
 
             if( options.width > 0 )

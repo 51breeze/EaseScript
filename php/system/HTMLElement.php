@@ -270,6 +270,16 @@ class HTMLElement extends Node
         return count( $this->children )>0;
     }
 
+    public function getAttribute($name)
+    {
+        return isset($this->attr->{$name}) ? $this->attr->{$name} : null;
+    }
+
+    public function setAttribute($name, $value)
+    {
+        $this->attr->{$name}=$value;
+    }
+
     /**
      * 将元素对象转成html的字符串
      * @return array|null|string

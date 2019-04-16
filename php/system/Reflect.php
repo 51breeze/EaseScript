@@ -9,6 +9,11 @@
  */
 final class Reflect
 {
+    final static private function map($type, $name)
+    {
+       
+    }
+
     final static private function getReflectionMethodOrProperty( $target, $name, $accessor='',$scope=null, $ns=null)
     {
         if( $target==null )
@@ -167,6 +172,14 @@ final class Reflect
                 case "charAt" :
                     return $target[ $args[0] ];
                 break;
+            }
+
+        }else if( is_array($target) && $name )
+        {
+            switch( $name )
+            {
+                case "push" :
+                  return array_push($target, $args ? $args[0] : null );
             }
         }
 
