@@ -27,7 +27,7 @@ package es.core
         /**
          * @private
          */
-        protected var _option:Object=null;
+        private var _option:Object=null;
 
         /**
          * 获取弹框选项配置
@@ -46,7 +46,7 @@ package es.core
          */
         public set option(value:Object):void
         {
-            _option=Object.merge(true,PopUpManage.defaultOptions, value);
+            _option=Object.merge(true,{},PopUpManage.defaultOptions, value);
         }
 
         /**
@@ -87,11 +87,10 @@ package es.core
                     return false;
                 }
             }
-
+            
             if( this.maskIntance )
             {
                 PopUpManage.mask( this.maskIntance );
-                this.maskIntance = null;
             }
 
             if( !isNaN( timeoutId ) )

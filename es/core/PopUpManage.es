@@ -86,6 +86,9 @@ package es.core
         //模态窗口实例对象
         static private var modalityInstances:Array=[];
 
+        //当前遮罩层的活动数    
+        static private var maskActiveCount:int = 0;
+
         /**
          * 显示一个遮罩层
          * @param style
@@ -95,10 +98,12 @@ package es.core
             //有指定目标遮罩层就关闭
             if( target )
             {
-                if( target.visible )
+                maskActiveCount--;
+                if( maskActiveCount < 1 )
                 {
-                    (target as MaskDisplay).fadeOut();
-                }
+                    (target as MaskDisplay).fadeOut(); 
+                    maskActiveCount = 0;
+                }  
                 return target;
             }
             var obj:MaskDisplay = maskInstance;
@@ -112,12 +117,9 @@ package es.core
             {
                 obj.options( options );
             }
-            if( !obj.visible )
-            {
-                obj.fadeIn();
-                return obj;
-            }
-            return null;
+            maskActiveCount++;
+            obj.fadeIn();
+            return obj;
         }
 
         /**
@@ -163,6 +165,7 @@ package es.core
             }
         }
 
+
         /**
          * 激活指定的模态窗口实例
          * @param instance
@@ -206,10 +209,6 @@ package es.core
             if( count > 0 )
             {
                 count--;
-                if( count < 1 && maskInstance && maskInstance.visible)
-                {
-                    maskInstance.fadeOut();
-                }
             }
 
             var index:int = modalityInstances.indexOf(target);
@@ -259,6 +258,9 @@ class MaskDisplay extends Display
     //显示时使用的样式及动画配置
     private var _options:Object=null;
 
+    //private
+    private var _state:Boolean = false;
+
     /**
      * 遮罩层构造函数
      */
@@ -280,26 +282,52 @@ class MaskDisplay extends Display
     //淡入遮罩层
     public function fadeIn()
     {
-        var animation:Object = defaultOptions.animation as Object;
-        if ( animation.fadeIn > 0 )
+        if( !isNaN(this.timeoutId) )
         {
-            this.element.fadeIn( animation.fadeIn, this._options.style.opacity as float );
+            clearTimeout(this.timeoutId);
+            this.timeoutId = NaN;
+
+        }else if( !_state  )
+        {
+            var animation:Object = defaultOptions.animation as Object;
+            if ( animation.fadeIn > 0 )
+            {
+                this.element.fadeIn( animation.fadeIn, this._options.style.opacity as float );
+            }
+
+        }else
+        {
+            this.element.style("opacity", this._options.style.opacity );
+            this.element.style("animation", "none");
         }
+         _state = true;
         this.visible = true;
     }
+
+    private var timeoutId:Number = NaN;
 
     //淡出遮罩层
     public function fadeOut()
     {
-        var animation:Object = defaultOptions.animation as Object;
-        var fadeOut:float = animation.fadeOut as float;
-        if( animation.fadeOut > 0 )
+        if( _state )
         {
-            this.element.fadeOut( animation.fadeOut as float, this._options.style.opacity as float);
+            this._state = false;
+            this.timeoutId = setTimeout(function(target:MaskDisplay)
+            {
+                var animation:Object = defaultOptions.animation as Object;
+                var fadeOut:float = animation.fadeOut as float;
+                if( animation.fadeOut > 0 )
+                {
+                    target.element.fadeOut( animation.fadeOut as float, target._options.style.opacity as float);
+                }
+                setTimeout(function () {
+                    target.visible=false;
+                    target.element.style("animation", "none");
+                }, (fadeOut) * 1000);
+                clearTimeout(target.timeoutId);
+
+            },100, this);
         }
-        setTimeout(function (target:MaskDisplay) {
-            target.visible=false;
-        }, (fadeOut) * 1000, this);
     }
 
 }

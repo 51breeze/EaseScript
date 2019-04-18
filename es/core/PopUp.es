@@ -244,7 +244,7 @@ package es.core
                 var opt:Object = this.option;
                 super.show(opt);
                 super.display();
-                PopUpManage.show(this, opt.isModalWindow as Boolean, this.owner );
+                PopUpManage.show(this, opt.isModalWindow as Boolean, this.owner);
             }
             return this.element;
         }
