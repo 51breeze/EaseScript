@@ -8,6 +8,8 @@ package
 			super();
 		}
 
+		
+
 		[RunPlatform(server)]
 		public function get menus():Array
 		{

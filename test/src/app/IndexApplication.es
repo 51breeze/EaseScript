@@ -1,4 +1,4 @@
-package 
+package app
 {
     import BaseApplication;
     import view.Index;
@@ -9,13 +9,11 @@ package
     import es.core.Display;
     import es.core.Container;
     import es.core.View;
-    import view.Home;
+    import view.AppHome;
     import es.components.DataGrid;
     import es.skins.DataGridSkin;
     import es.core.SystemManage;
-    import app.*;
-
-    [Router(default=home, alias=MyIndex)]
+    [Router(default=home, alias=MyIndexApp)]
 	public class IndexApplication extends BaseApplication implements IListIterator
 	{
 		public function IndexApplication()
@@ -23,32 +21,14 @@ package
             super();
             this.assign("message","Hello word!");
             this.title="Index page";
-
-            new Database();
         }
 
-        [Router(method="get")]
-        public function viewport()
-        {
-            console.log(" ====enter viewport====");
-            var view:view.Viewport = new view.Viewport( this );
-            return this.render(view);
-        }
-
-        [Router(method="get")]
-        public function list()
-        {
-            console.log(" ====enter list====");
-            var view:view.Viewport = new view.Viewport( this );
-            return this.render(view);
-        }
-        
-
+      
 
         [Router(method="get,post,put", alias="home")]
         public function home()
         {
-            var view:view.Home = new view.Home( this );
+            var view:view.AppHome = new view.AppHome( this );
 
             this.title = "the is home page";
 
@@ -113,93 +93,13 @@ package
                     });
 
             });
-
-            var iis:String = " the is template";
-            var bb:int = 99999;
-            var tem:String = `ssss {iis} ===== {{bb}} 66666=====33333 `;
-            console.log( tem );
+           
+            
           
             return this.render( view );
         }
 
-        [Router(method="get", alias="index")]
-        public function index()
-        {
-            console.log(" ====enter index====");
-
-            this.title = "the is index page";
-
-            var view:view.Index = new view.Index( this );
-
-            view.assign("address","<span style='color:red'>sssssss</span>");
-            view.assign("rowHeight",40);
-            view.assign("maxHeight",40);
-            view.assign("title","Hello world!!");
-            view.assign("name","Hello world!!");
-
-            var datalist:Array=[];
-
-            var len:int = Math.abs( Math.random() * 100 );
-            len = 100;
-
-            for(var i:int=0;i<len;i++)
-            {
-
-                datalist.push({"name":i,"id":i,"address":i});
-
-            }
-            view.assign("datalist",datalist);
-
-
-
-            //var view:View =  new View(this);
-
-          //  view.navigate.current=1;
-
-           // var grid: DataGrid = new DataGrid();
-          //  grid.source = ServiceProvider("/getNews/","server.News@index");
-            //grid.source = ServiceProvider("/getNews/{id:int}","server.News@one",'get',2);
-           // grid.dataSource.dataType( Http.TYPE_JSONP );
-
-            ServiceProvider("/Person/list","server.Person@all",'get');
-            ServiceProvider("/getNews","server.News@all");
-
-
-           // ServiceProvider("/Person/save/{id}","server.Person@set",'post',6);
-
-
-            /*grid.dataSource.options({responseProfile:function (response:Object,name:String) {
-                    switch (name){
-                        case "data":
-                            return response["data"];
-                            break;
-                        case "total":
-                            return response["data"]['length'];
-                            break;
-                        case "status":
-                            return response["status"];
-                            break;
-                        case "successCode":
-                            return 200;
-                            break;
-                    }
-            }});
-
-            grid.width = 800;
-            grid.skinClass = DataGridSkin;
-            grid.columns = {id: "编号", title: "标题", content: "内容"};
-            var gridSkin:DataGridSkin = grid.skin as DataGridSkin;
-            gridSkin.pagination.wheelTarget = gridSkin.foot;
-
-            grid.async = true;
-            */
-           // gridSkin.pagination.async = true;
-
-
-           // view.addChild(grid);
-
-            return this.render( view );
-        }
+      
 
         [Router(post)]
         public function add(){

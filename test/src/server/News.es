@@ -12,5 +12,12 @@ package server{
 			var result:* = this.query('select * from news limit 100');
 			return this.success(result);
 		}
+
+		[Router(method='get',alias='/two')]
+		public function two()
+		{
+            var result:* = this.query('select * from news limit 100');
+			return this.success(result);
+		}
 	}
 }

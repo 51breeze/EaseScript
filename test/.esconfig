@@ -33,6 +33,8 @@
 	"clean":true,
 	"mode":2,
 	"build_mode":"app",
+	"on_error_exit":true,
+	"watching":true,
 	"syntax":"javascript",
 	"root_path":"E:/EaseScript",
 	"build":{

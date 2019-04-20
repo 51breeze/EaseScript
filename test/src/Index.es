@@ -2,8 +2,6 @@ package{
 
     public class Index extends EventDispatcher{
 
-
-       
         
         public function Index()
         {
@@ -13,6 +11,13 @@ package{
                 post:"iiiii",
                 uuuu:"hhhh"
             };
+
+            //12666373952403956,  2019-04-20T11:09:19.862Z  1555758599131.6384
+
+
+
+
+
 
             if(true){ 
                  var co:String='333', bb:*, jjj:*;
