@@ -10,14 +10,12 @@
         <title>title</title>
         <meta charset="UTF-8" http-equiv="X-UA-Compatible" />
         <meta name="keyword" http-equiv="es,easescript" />
-        <script src="jquery-1.11.2.js" ></script>
     </head>
 
-    <body>
-        <!-- <c:Navigate id="@navigate" width="120" viewport="@content" >
-            <c:source>@hostComponent.menus</c:source>
-        </c:Navigate>
-        <s:Container id="@content">
-        </s:Container> -->
-    </body>
+    <c:Navigate id="@navigate" width="120" viewport="@content" current="0" >
+        <c:source>@hostComponent.menus</c:source>
+    </c:Navigate>
+    <s:Container id="@content">
+    </s:Container>
+ 
 </s:View>

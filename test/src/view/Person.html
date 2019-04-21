@@ -16,40 +16,36 @@
 
     ]]>
 
-    <head>
-        <title>{this.title}</title>
-    </head>
 
-    <body>
-        <input value="{{this.title}}" />
-         <div>
-             <h1>the is {dataset.message}</h1>
-             <h1>这里是内容 Person</h1>
-             <c:DataGrid>
-                 <c:dataSource>
-                     <c:dataType>@Http.TYPE_JSONP</c:dataType>
-                 </c:dataSource>
-              
-                 <c:columns>
-                     <id>ID</id>
-                     <name>名称</name>
-                     <phone>电话</phone>
-                 </c:columns>
-                 <c:source>
-                     <ss:Array>
-                         <ss:Object>
-                             <id>ID</id>
-                             <name>名称</name>
-                             <phone>电话</phone>
-                         </ss:Object>
-                          <ss:Object>
-                             <id>uuuu</id>
-                             <name>yyyyy</name>
-                             <phone>kkkkk</phone>
-                         </ss:Object>
-                     </ss:Array>
-                 </c:source>
-             </c:DataGrid>
-         </div>
-    </body>
+<input value="{{this.title}}" />
+    <div>
+        <h1>the is {dataset.message}</h1>
+        <h1>这里是内容 Person</h1>
+        <c:DataGrid>
+            <c:dataSource>
+                <c:dataType>@Http.TYPE_JSONP</c:dataType>
+            </c:dataSource>
+        
+            <c:columns>
+                <id>ID</id>
+                <name>名称</name>
+                <phone>电话</phone>
+            </c:columns>
+            <c:source>
+                <ss:Array>
+                    <ss:Object>
+                        <id>ID</id>
+                        <name>名称</name>
+                        <phone>电话</phone>
+                    </ss:Object>
+                    <ss:Object>
+                        <id>uuuu</id>
+                        <name>yyyyy</name>
+                        <phone>kkkkk</phone>
+                    </ss:Object>
+                </ss:Array>
+            </c:source>
+        </c:DataGrid>
+    </div>
+
 </s:View>

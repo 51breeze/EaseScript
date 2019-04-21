@@ -24,7 +24,7 @@ package
 		{
              return [
 				 {"link":"?PATH=/MyIndex/index","label":"首页","content":"<div>ssssss</div>"},
-				 {"link":"?PATH=/Person","label":"个人","content":"/webroot/index.html?PATH=/Person"},
+				 {"link":"/Person","label":"个人","content":"?PATH=/Person"},
 			 ];
         }
 	}

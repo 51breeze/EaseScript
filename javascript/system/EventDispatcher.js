@@ -304,9 +304,10 @@ function $dispatchEvent(e, currentTarget )
         listener = events[ length++ ];
         thisArg = listener.reference || listener.dispatcher;
         //如果是一个元素对象，设置当前元素为事件元素
-        if( thisArg.setCurrentElementTarget===true && e.target && (e.target.nodeType === 1 || e.target.nodeType === 9 || e.target.window) ){
-            thisArg.current( e.target );
-        }
+        // bug 在Display 组件中使用事件后
+        //if( thisArg.setCurrentElementTarget===true && e.target && (e.target.nodeType === 1 || e.target.nodeType === 9 || e.target.window) ){
+            //thisArg.current( e.target );
+        //}
         //调度侦听项
         listener.callback.call( thisArg , e );
         if( e.immediatePropagationStopped===true )

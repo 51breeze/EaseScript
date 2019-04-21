@@ -5,39 +5,55 @@
     <![CDATA[
 
         import es.events.NavigateEvent;
-        override protected function initializing()
+        private onClick(e:MouseEvent)
         {
             var hostComponent:Navigate = this.hostComponent;
+            var target:Element = new Element( e.target );
+            var href:String = target.property("href") as String;
+            if( href === hostComponent.current )
+            {
+                e.preventDefault();
+                return false; 
+            }
+           
             var dataProfile:String =  hostComponent.dataProfile;
-            var self:Skin = this;
-            this.element.addEventListener( MouseEvent.CLICK, function(e:MouseEvent){
-                if( Element.getNodeName(e.target) === "a" && Element.getNodeName(e.target.parentNode)==="li"  )
+            var event:NavigateEvent = new NavigateEvent( NavigateEvent.URL_JUMP_BEFORE );
+            event.content = href;
+            event.originalEvent = e;
+            var datalist:Array = this.assign( dataProfile ) as Array;
+            for(var i:int in datalist)
+            {
+                if(datalist[i].link===event.content)
                 {
-                    var event:NavigateEvent = new NavigateEvent( NavigateEvent.URL_JUMP_BEFORE );
-                    event.content = this.property("href");
-                    event.originalEvent = e;
-                    var datalist:Array = self.assign( dataProfile ) as Array;
-                    for(var i:int in datalist){
-                        if(datalist[i].link===event.content)
-                        {
-                           event.item=datalist[i];
-                           break;
-                        }
-                    }
-                    hostComponent.dispatchEvent(event);
+                    event.item=datalist[i];
+                    break;
                 }
-            });
+            }
+            hostComponent.dispatchEvent(event);
         }
 
     ]]>
     </s:Script>
     <style file="NavigateStyle.less" />
+
+    <s:Declare>
+       const {
+           datalist:Array=[],
+           openTarget:Boolean=false,
+           match:Function
+        } = dataset;
+    </s:Declare>
+
     <ul class="nav nav-pills">
         <:foreach name="datalist" value="item" key="link">
-            <:if condition="dataset.match(item,link)">
-                <li role="presentation" class="active"><a href="{item.link}" target="{openTarget? '_blank' : '_self'}">{item.label}</a></li>
+            <:if condition="match(item,link)">
+                <li role="presentation" class="active">
+                    <a href="{item.link}" onClick="{this.onClick}" target="{openTarget? '_blank' : '_self'}">{item.label}</a>
+                </li>
             <:else />
-                <li role="presentation"><a href="{item.link}" target="{openTarget ? '_blank' : '_self'}">{item.label}</a></li>
+                <li role="presentation">
+                    <a href="{item.link}" onClick="{this.onClick}" target="{openTarget ? '_blank' : '_self'}">{item.label}</a>
+                </li>
             </:if>
         </:foreach>
     </ul>

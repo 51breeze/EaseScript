@@ -51,6 +51,13 @@ package es.core
         public function set children( value:Array ):void
         {
             this._children = value.slice(0);
+            this.removeAllChild();
+            var len:int = value.length;
+            var index:int = 0;
+            for(;index<len;index++)
+            {
+                this.addChild( value[0] as IDisplay );
+            }
         };
 
         /**
@@ -167,6 +174,7 @@ package es.core
             {
                 this.removeChildAt( --len );
             }
+            this.element.html('');
         }
 
         /**

@@ -166,7 +166,6 @@ package es.components
                 _current = value;
                 if( this.initialized )
                 {
-                    loadContent(value);
                     commitPropertyAndUpdateSkin();
                 }
             }
@@ -247,6 +246,7 @@ package es.components
             var viewport:IContainer = event.viewport;
             var child:IDisplay=null;
             content = event.content;
+
             if( content instanceof Class  )
             {
                 child = new (content as Class)( this ) as IDisplay;
@@ -278,20 +278,17 @@ package es.components
                         var controller: Array = provider.split("@");
                         HTTP_DISPATCHER(controller[0], controller[1]);
                         viewport.addChild(child);
-                    }
-                    for( var p:String in loadContentMap)
-                    {
-                        (loadContentMap[p] as Display).visible=false;
-                    }
-                    (loadContentMap[provider] as Display).visible=true;
-                    return true;
 
+                    }else
+                    {
+                       child = loadContentMap[ provider ] as IDisplay;
+                    }
+                   
                 }else{
                     child = new Display( new Element( Element.createElement(content) ) ) as IDisplay;
                 }
             }
-            viewport.removeAllChild();
-            viewport.addChild( child );
+            viewport.children= [ child ];
             return true;
         }
 
@@ -315,8 +312,9 @@ package es.components
                 } else if (current == key || current===item.link || item["label"] === current ) {
                     matched = true;
                 } else if (current) {
-                    matched = new RegExp( current ).test( (String)item.link );
-                }
+                    var str:String = (String)current;
+                    matched = new RegExp( str.replace(/([\/\?\:\.])/g,'\\$1') ).test( (String)item.link );
+                };
                 if (matched && System.isDefined(item.content) )
                 {
                     hostComponent.loadContent( item.content );
@@ -346,10 +344,9 @@ package es.components
         {
             if( _viewport===null )
             {
-                var self:Navigate = this;
                 this.addEventListener(NavigateEvent.URL_JUMP_BEFORE, function (e:NavigateEvent)
                 {
-                    var content:*= e.item.content || e.content;
+                    var content:*= e.content || (e.item && e.item.link);
                     if( typeof content === "string" )
                     {
                         var isUrl:Boolean = /^https?/i.test(content);
@@ -359,9 +356,10 @@ package es.components
                             return;
                         }
                     }
-                    self.current = content;
+                    this.current = content;
                     e.preventDefault();
-                });
+
+                },false,0,this);
             }
             _viewport = value;
         }
