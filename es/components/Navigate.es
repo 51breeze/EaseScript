@@ -269,22 +269,24 @@ package es.components
                 {
                     if( !loadContentMap[ provider ] )
                     {
-                        child = new Display(new Element("<div style='width:100%' />")) as IDisplay;
+                        //viewport.removeAllChild();
                         (new EventDispatcher(document)).addEventListener(ApplicationEvent.FETCH_ROOT_CONTAINER, function (e: ApplicationEvent) {
-                            e.container = child;
+                            e.preventDefault();
+                            e.container = viewport;
                         });
                         loadContentMap[ provider ] = child;
                         var HTTP_DISPATCHER: Function = System.environments("HTTP_DISPATCHER") as Function;
-                        var controller: Array = provider.split("@");
+                        var controller:Array = provider.split("@");
                         HTTP_DISPATCHER(controller[0], controller[1]);
-                        viewport.addChild(child);
+                        return true;
 
                     }else
                     {
                        child = loadContentMap[ provider ] as IDisplay;
                     }
                    
-                }else{
+                }else
+                {
                     child = new Display( new Element( Element.createElement(content) ) ) as IDisplay;
                 }
             }

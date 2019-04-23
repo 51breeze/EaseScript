@@ -50,13 +50,15 @@ package es.core
          */
         public function set children( value:Array ):void
         {
-            this._children = value.slice(0);
             this.removeAllChild();
             var len:int = value.length;
             var index:int = 0;
             for(;index<len;index++)
             {
-                this.addChild( value[0] as IDisplay );
+                if( value[0] is IDisplay )
+                {
+                   this.addChild( value[0] as IDisplay );
+                }
             }
         };
 
@@ -106,10 +108,10 @@ package es.core
          */
         public function addChildAt( child:IDisplay , index:Number ):IDisplay
         {
-            var parent:IDisplay = child.parent;
+            var parent:IContainer = child.parent;
             if( parent )
             {
-                (parent as Container).removeChild( child );
+                parent.removeChild( child );
             }
             var children:Array = this._children;
             var at:Number = index < 0 ? index+children.length+1 : index;
@@ -150,18 +152,9 @@ package es.core
             }
             var child:IDisplay = children[index] as IDisplay;
             children.splice(index, 1);
-            if( child is SkinComponent )
-            {
-                child = (child as SkinComponent).skin as IDisplay;
-            }
-
-            if( child.parent )
-            {
-                child.element.parent().removeChild( child.element );
-            }
+            this.element.removeChild( child.element );
             child.es_internal::setParentDisplay(null);
             return child;
-            
         };
 
         /**

@@ -373,12 +373,12 @@ package es.components
         /**
         * @private
         */
-        private var _parent:IDisplay=null;
+        private var _parent:IContainer=null;
 
         /**
         * @es_internal
         */
-        es_internal function setParentDisplay(value:IDisplay=null):void
+        es_internal function setParentDisplay(value:IContainer=null):void
         {
             if( this.initialized )
             {
@@ -392,7 +392,7 @@ package es.components
          * 只有已经添加到父级元素中才会返回父级皮肤元素，否则返回 null
          * @returns {Display}
          */
-        public function get parent():IDisplay
+        public function get parent():IContainer
         {
             if( this.initialized )
             {

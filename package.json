@@ -9,9 +9,9 @@
   },
   "scripts": {
     "version": "node ./bin/es.js -V",
-    "dev":"node ./bin/es.js -p ./test -m test -s javascript --clean -b app",
-    "test":"node ./bin/es.js -p ./test -m test -s javascript --clean -b IndexApplication",
-    "create":"node ./bin/es.js -p ./test -m test -s javascript --clean -o E:\\webroot\\working"
+    "dev": "node ./bin/es.js -p ./test -m test -s javascript --clean -b app",
+    "test": "node ./bin/es.js -p ./test -m test -s javascript --clean -b IndexApplication",
+    "create": "node ./bin/es.js -p ./test -m test -s javascript --clean -o E:\\webroot\\working"
   },
   "repository": {
     "type": "git",
@@ -31,15 +31,18 @@
   },
   "homepage": "https://github.com/51breeze/EaseScript#readme",
   "dependencies": {
-    "uglify-js": "~3.1.1",
+    "colors": "~1.1.2",
     "commander": "~2.11.0",
+    "express": "^4.16.4",
     "less": "~2.7.2",
-    "colors": "~1.1.2"
+    "socket.io": "^2.2.0",
+    "uglify-js": "~3.1.1"
   },
-  "devDependencies":{
+  "devDependencies": {
     "uglify-js": "~3.1.1",
     "commander": "~2.11.0",
     "less": "~2.7.2",
+    "socket.io": "^2.2.0",
     "colors": "~1.1.2"
   }
 }

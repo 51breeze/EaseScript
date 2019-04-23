@@ -59,14 +59,14 @@ package es.interfaces
          * 此方法公提供组件开发人员使用
          * @returns {Boolean}
          */
-        es_internal function setParentDisplay(parent:IDisplay):void;
+        es_internal function setParentDisplay(parent:IContainer):void;
 
         /**
          * 获取父级皮肤元素
          * 只有已经添加到父级元素中才会返回父级皮肤元素，否则返回 null
          * @returns {Display}
          */
-        public function get parent():IDisplay;
+        public function get parent():IContainer;
 
         /**
          * 渲染显示皮肤对象。

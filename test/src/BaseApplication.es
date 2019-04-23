@@ -23,7 +23,7 @@ package
 		public function get menus():Array
 		{
              return [
-				 {"link":"?PATH=/MyIndex/index","label":"首页","content":"<div>ssssss</div>"},
+				 {"link":"?PATH=/MyIndex/home","label":"首页","content":"/MyIndex/home"},
 				 {"link":"/Person","label":"个人","content":"?PATH=/Person"},
 			 ];
         }

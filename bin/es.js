@@ -66,7 +66,9 @@ program
 .option('--sfs, --skin-file-suffix [value]', '皮肤文件的后缀','.html')
 //.option('--gh, --global-handle [variable name]', '全局引用EaseScript对象的变量名','EaseScript')
 .option('--src, --source-file [enable|disabled]', '是否需要生成源文件','enable')
-.option('--sps, --service-provider-syntax [php]', '服务提供者的语法');
+.option('--sps, --service-provider-syntax [php]', '服务提供者的语法')
+.option('--server, --server [enable|disabled]', '服务提供者的语法','enable')
+.option('--watch', '启用监听文件如有变动自动编译');
 program.parse(process.argv);
 
 var mapKeys={
@@ -101,6 +103,8 @@ var mapKeys={
     "syntax":"syntax",
     "build_mode":"buildMode",
     "script_part_load":"partLoadApp",
+    "watching":"watch",
+    "serverEnable":"server",
 }
 
 //全局配置
@@ -120,6 +124,7 @@ for( var key in mapKeys )
             break;
             case "strictType" :
             case "animate" :
+            case "server" :
             case "font" :
                 val = val === 'enable';
             break;

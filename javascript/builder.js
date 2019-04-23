@@ -466,14 +466,15 @@ function makeServiceRouteList( serviceRouteList )
     var items = {};
     utils.forEach(serviceRouteList,function (item) {
         var obj = items[ item.method ] || (items[ item.method ] = []);
-        obj.push("\t\t'"+item.alias+"':'"+item.provider+"'");
+        obj.push("\t\t\""+item.alias+"\":\""+item.provider+"\"");
     });
 
     var bind=[];
     utils.forEach(items,function (item,method) {
-        bind.push( "\n\t'"+method+"':{\n"+item.join(",\n")+'\n\t}' );
+        bind.push( "\n\t\""+method+"\":{\n"+item.join(",\n")+'\n\t}' );
     });
     return '{' + bind.join(",") +'\n}';
 }
+builder.makeServiceRouteList = makeServiceRouteList;
 
 module.exports = builder;

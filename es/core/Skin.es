@@ -446,7 +446,7 @@ package es.core
                     {
                         var childDisplay:IDisplay = childItem as IDisplay;
                         if( parentDisplay ){
-                            childDisplay.es_internal::setParentDisplay( parentDisplay );
+                            childDisplay.es_internal::setParentDisplay( parentDisplay as IContainer );
                         }
                         var e:ElementEvent=new ElementEvent( ElementEvent.ADD );
                         e.parent = parentDisplay || parent;
@@ -785,10 +785,10 @@ package es.core
          */
         override public function addChildAt( child:IDisplay , index:Number ):IDisplay
         {
-            var parent:IDisplay = child.parent;
+            var parent:IContainer = child.parent;
             if( parent )
             {
-                (parent as Container).removeChild( child );
+                parent.removeChild( child );
             }
             var children:Array = this._children;
             index = index < 0 ? index+children.length+1 : index;
@@ -835,7 +835,7 @@ package es.core
             children.splice(index, 1);
             if( child.parent )
             {
-                child.element.parent().removeChild( child.element );
+                child.parent.removeChild( child );
             }
             child.es_internal::setParentDisplay(null);
             if( initialized  )

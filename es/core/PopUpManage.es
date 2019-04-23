@@ -214,10 +214,10 @@ package es.core
             var index:int = modalityInstances.indexOf(target);
             if( index >= 0 )
             {
-                var parent:IDisplay = target.parent;
+                var parent:IContainer = target.parent;
                 if( parent )
                 {
-                    (parent as IContainer).removeChild( target );
+                    parent.removeChild( target );
                 }
                 modalityInstances.splice(index,1);
                 if( modalityInstances.length > 0 )

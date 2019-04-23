@@ -6,25 +6,41 @@ package es.core
    import es.events.ApplicationEvent;
    public class Application extends EventDispatcher
    {
-       private var appContainer:Node=null;
+       static private var lastApp:Node=null;
+       private var appContainer:*=null;
+       private var initiated:Boolean = false;
        public function Application()
        {
            super( document );
-           appContainer = Element.createElement("div");
-           appContainer.className="application";
-           (document.body as Node).appendChild( appContainer );
+           this.appContainer = Element.createElement("div");
+           (this.appContainer as Node).className="application";
        }
 
        /**
         * 视图的根容器
         * @return {*}
         */
-       public function getContainer()
+       public function getContainer():*
        {
-           var event:ApplicationEvent = new ApplicationEvent( ApplicationEvent.FETCH_ROOT_CONTAINER );
-           event.container = appContainer;
-           this.dispatchEvent( event );
-           return event.container;
+           var container:* = this.appContainer;
+           if( initiated === false )
+           {
+                var event:ApplicationEvent = new ApplicationEvent( ApplicationEvent.FETCH_ROOT_CONTAINER );
+                event.container = container;
+                if( this.dispatchEvent( event ) && !event.defaultPrevented )
+                {
+                    if( lastApp )
+                    {
+                        document.body.removeChild( lastApp );
+                    }
+                    (document.body as Node).appendChild( container as Node );
+                    lastApp = container;
+                }
+                initiated = true;
+                container =  event.container;
+                this.appContainer = container;
+           }
+           return container;
        }
 
        /**

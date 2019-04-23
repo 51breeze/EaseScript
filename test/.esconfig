@@ -21,7 +21,7 @@
 	"strictType":true,
 	"service_provider_syntax":"php",
 	"static_url_path_name":"PATH",
-	"enable_webroot":false,
+	"enable_webroot":true,
 	"command_switch":0,
 	"script_part_load":true,
 	"system_lib_path_name":"es",
@@ -35,6 +35,7 @@
 	"build_mode":"app",
 	"on_error_exit":true,
 	"watching":true,
+	"serverEnable":true,
 	"syntax":"javascript",
 	"root_path":"E:/EaseScript",
 	"build":{
