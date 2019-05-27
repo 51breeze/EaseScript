@@ -337,6 +337,7 @@ package es.core
         */
         protected function updateChildren(parentNode:Object,children:Array,index:int=0,total:int=NaN ):void
         {
+            if(!parentNode)return;
             var parentDisplay:IDisplay=null;
             if( parentNode instanceof SkinComponent )
             {

@@ -25,6 +25,7 @@ package
             this.title="Index page";
 
             new Database();
+            console.log("===index==123");
         }
 
     

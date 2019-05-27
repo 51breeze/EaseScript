@@ -1,6 +1,6 @@
 {
   "name": "easescript",
-  "version": "1.1.18-beta",
+  "version": "1.1.19-beta",
   "description": "EaseScript Beta",
   "main": "lib/index.js",
   "bin": {
