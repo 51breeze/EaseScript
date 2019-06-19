@@ -125,6 +125,7 @@ for( var key in mapKeys )
             case "strictType" :
             case "animate" :
             case "server" :
+            case "webroot" :
             case "font" :
                 val = val === 'enable';
             break;

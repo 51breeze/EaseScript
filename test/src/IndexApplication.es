@@ -56,9 +56,9 @@ package
 
            // var view:View = new View(this);
 
-           // var container:Container = new Container( new Element( Element.createElement("div") ) ,{innerHTML:"=======home========="});
+            var container:Container = new Container( new Element( Element.createElement("div") ) ,{innerHTML:"=======home========="});
 
-           // view.addChild( container );
+            view.addChild( container );
 
            if( this ){
 
@@ -71,7 +71,7 @@ package
             //grid.source = "http://local.working.com/json.php";
             //grid.dataSource.dataType( Http.TYPE_JSONP );
 
-            grid.source = ServiceProvider("/getNews","server.News@all");
+            grid.source = ServiceProvider("/match","server.News@match");
 
             grid.dataSource.options({responseProfile:function (response:Object,name:String) {
                     switch (name){
@@ -97,7 +97,7 @@ package
             gridSkin.pagination.wheelTarget = new Display( new Element(gridSkin.foot) );
             view.addChild(grid);
 
-            //view.children = [ "=======" ];
+            //view.children = [ "======sss=" ];
 
 
             (new EventDispatcher(view.popup)).addEventListener( MouseEvent.CLICK, function(e:MouseEvent){
@@ -120,6 +120,10 @@ package
             var bb:int = 99999;
             var tem:String = `ssss {iis} ===== {{bb}} 66666=====33333 `;
             console.log( tem );
+
+            console.log( new Date().getTime() );
+
+
           
             return this.render( view );
         }

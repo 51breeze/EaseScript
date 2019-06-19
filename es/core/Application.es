@@ -1,3 +1,10 @@
+/*
+ * Copyright © 2017 EaseScript All rights reserved.
+ * Released under the MIT license
+ * https://github.com/51breeze/EaseScript
+ * @author Jun Ye <664371281@qq.com>
+ */
+
 package es.core
 {
    import es.core.View;
@@ -7,37 +14,37 @@ package es.core
    public class Application extends EventDispatcher
    {
        static private var lastApp:Node=null;
-       private var appContainer:*=null;
+       private var appContainer:Node=null;
        private var initiated:Boolean = false;
        public function Application()
        {
            super( document );
            this.appContainer = Element.createElement("div");
-           (this.appContainer as Node).className="application";
+           this.appContainer.className="application";
        }
 
        /**
-        * 视图的根容器
-        * @return {*}
+        * 视图的根节点容器
+        * @return {Node}
         */
-       public function getContainer():*
+       public function getContainer():Node
        {
-           var container:* = this.appContainer;
+           var container:Node = this.appContainer;
            if( initiated === false )
            {
                 var event:ApplicationEvent = new ApplicationEvent( ApplicationEvent.FETCH_ROOT_CONTAINER );
                 event.container = container;
                 if( this.dispatchEvent( event ) && !event.defaultPrevented )
                 {
+                    container =  event.container as Node;
                     if( lastApp )
                     {
                         document.body.removeChild( lastApp );
                     }
-                    (document.body as Node).appendChild( container as Node );
+                    (document.body as Node).appendChild( container );
                     lastApp = container;
                 }
                 initiated = true;
-                container =  event.container;
                 this.appContainer = container;
            }
            return container;

@@ -1,3 +1,10 @@
+/*
+ * Copyright © 2017 EaseScript All rights reserved.
+ * Released under the MIT license
+ * https://github.com/51breeze/EaseScript
+ * @author Jun Ye <664371281@qq.com>
+ */
+
 package es.core
 {
    import es.events.PipelineEvent;
@@ -81,10 +88,16 @@ package es.core
         */
        protected function success( data:* )
        {
-           if( data instanceof Array ){
-               data = (data as Array).map(function (item:*) {
-                    return (Array)item;
+           if( data instanceof Array )
+           {
+               data = (data as Array).map(function (item:*) 
+               {
+                    return System.isObject(item) ? (item as Object).valueOf() : item;
                });
+
+           }else if( System.isObject(data) )
+           {
+               data = (data as Object).valueOf();
            }
            return {"data":data, "status":200};
        }
