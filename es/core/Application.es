@@ -11,6 +11,7 @@ package es.core
    import es.core.Skin;
    import es.core.Interaction;
    import es.events.ApplicationEvent;
+   import es.interfaces.IDisplay;
    public class Application extends EventDispatcher
    {
        static private var lastApp:Node=null;
@@ -25,6 +26,8 @@ package es.core
 
        /**
         * 视图的根节点容器
+        * 每一个视图在初始化时都会调用方法来获取一个装载的容器
+        * 如果想改变默认容器可以通过 ApplicationEvent.FETCH_ROOT_CONTAINER 事件来传递。
         * @return {Node}
         */
        public function getContainer():Node
@@ -34,15 +37,24 @@ package es.core
            {
                 var event:ApplicationEvent = new ApplicationEvent( ApplicationEvent.FETCH_ROOT_CONTAINER );
                 event.container = container;
-                if( this.dispatchEvent( event ) && !event.defaultPrevented )
+                if( this.dispatchEvent( event ) )
                 {
-                    container =  event.container as Node;
-                    if( lastApp )
-                    {
-                        document.body.removeChild( lastApp );
+                    if( event.container is IDisplay){
+                        container = (event.container as IDisplay).element[0] as Node;
+                    }else{
+                        container = event.container as Node;
                     }
-                    (document.body as Node).appendChild( container );
-                    lastApp = container;
+
+                    //如果不想替换根容器，需要在侦听器中添加 e.preventDefault(); 来阻止这一行为。
+                    if( !event.defaultPrevented )
+                    {
+                        if( lastApp )
+                        {
+                            document.body.removeChild( lastApp );
+                        }
+                        (document.body as Node).appendChild( container );
+                        lastApp = container;
+                    }
                 }
                 initiated = true;
                 this.appContainer = container;

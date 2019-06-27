@@ -28,13 +28,6 @@ function define(requires , callback )
     var name = requires[0];
     var context=getContext( name );
     var name = getClassName( name );
-    return context[name] || (context[name]={
-        name:name,
-        factory:callback,
-        exports:null,
-    });
-
-
     if( context.hasOwnProperty(name) && context[name].__T__ )
     {
         return;
@@ -67,21 +60,6 @@ function define(requires , callback )
 }
 Internal.define = define;
 
-define.create=function(module,classFactory)
-{
-    module.exports = classFactory;
-    require.d(module, "exports", { enumerable: false,value:factory,configurable:false });
-    Object.defineProperty(factory, "name", { enumerable: false, value: name,configurable:false });
-    Object.defineProperty(factory, "valueOf", { enumerable: false, value:function valueOf(){
-        return "[Class "+name+"]";
-    },configurable:false});
-    Object.defineProperty(factory, "toString", { enumerable: false, value:function toString(){
-        return "[Class "+name+"]";
-    },configurable:false});
-    return factory;
-    
-}
-
 /**
  * 获取类的全名
  * @private
@@ -93,24 +71,6 @@ function getFullname(classModule)
     return classModule.__T__.package ? classModule.__T__.package + '.' + classModule.__T__.classname : classModule.__T__.classname;
 }
 
-
-function installer(module)
-{
-    if( module.installed )return module;
-    module.installed = true;
-    var requires = Array.prototype.map.call(module.requires, function(item)
-    {
-        return System.getDefinitionByName( item );
-    });
-
-    if(fix)requires = requires.slice(0);
-    module._private=Symbol(name).valueOf();
-    module.factory.apply(module, requires);
-    return module;
-
-}
-
-
 /**
  * 根据指定的类名获取类的对象
  * @param name
@@ -120,9 +80,7 @@ System.getDefinitionByName = function getDefinitionByName(name) {
 
     var context = getContext(name);
     name = getClassName(name);
-    if( has.call(context,name) ){
-        return installer(context[name]).exports;
-    }
+    if( has.call(context,name) )return context[name];
     if( has.call(System, name))return System[name];
     throw new TypeError('"' + name + '" is not define');
 };

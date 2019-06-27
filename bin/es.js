@@ -2,6 +2,186 @@
 const program = require('commander');
 const PATH = require('path');
 
+
+// (function(modules,installed){
+
+//     function require(name)
+//     {
+//         if(installed[name])
+//         {
+//  			return installed[name].exports;
+// 		}
+//  		var module = installed[name] = {
+//             name: name,
+//             exports:{},
+// 			i: false
+//         };
+//         modules[ name ].call(module, module.exports,require);
+//         module.l = true;
+
+//         //console.log( module.exports.default )
+
+        
+
+// 		return module.exports;
+//     }
+
+//     require.d=function(exports, name, getter)
+//     {
+
+//         if( !Object.prototype.hasOwnProperty.call(exports, name) )
+//         {
+//             Object.defineProperty(exports, name, { enumerable: true, get: getter });
+//         }
+//     }
+
+//     var main = require("Speak");
+//     //console.log( main.default )
+//     var person = new main.default();
+//      person.canSpeak();
+//      person.name();
+
+// }({
+
+//  "Person":function(exports,require){
+
+
+
+
+
+
+//     require.d(exports, "default", function(){return Person});
+//     var Speak = require("Speak");
+//     var Person = function Person()
+//     {
+//         console.log("Person");
+//     }
+//     Person.prototype.canSpeak=function()
+//     {
+//          console.log( this instanceof Speak.default ?  "Yes" : "No");
+//     }
+//     return Person;
+// },
+
+// "Speak":function(exports,require)
+// {
+//     require.d(exports, "default", function(){return Speak});
+//     var Person = require('Person').default;
+//     var Speak = function Speak()
+//     {
+       
+//     }
+
+//      Speak.prototype = Object.create( Person.prototype, {"name":{value:function(){
+//          console.log("zhang shan");
+//      }}} )
+//     return Speak;
+// }
+
+// },{}));
+
+
+
+
+
+
+// (function(modules,installed){
+
+//     function require(name)
+//     {
+//         if(installed[name])
+//         {
+//  			return installed[name].exports;
+//         }
+
+//  		var module = installed[name] = {
+//             name: name,
+// 			i: false
+//         };
+      
+//         modules[ name ].call(module, module, require);
+//         module.l = true;
+// 		return module.exports;
+//     }
+
+//     require.d=function(object, name, value)
+//     {
+//         if( !Object.prototype.hasOwnProperty.call(object, name) )
+//         {
+//             Object.defineProperty(object, name, value );
+//         }
+//     }
+
+//     require.create=function(module,name,factory)
+//     {
+//         require.d(module, "exports", { enumerable: false,value:factory,configurable:false });
+//         Object.defineProperty(factory, "name", { enumerable: false, value: name,configurable:false });
+//         Object.defineProperty(factory, "valueOf", { enumerable: false, value:function valueOf(){
+//             return "[Class "+name+"]";
+//         },configurable:false});
+//         Object.defineProperty(factory, "toString", { enumerable: false, value:function toString(){
+//             return "[Class "+name+"]";
+//         },configurable:false});
+//         return factory;
+//     }
+
+
+
+//     var Speak = require("Speak");
+//     //console.log( main.default )
+//     var speak = new Speak("li shi");
+//     speak.canSpeak();
+//     speak.name();
+
+// }({
+
+//  "Person":function(module,require){
+
+//     var Person = require.create(module,"Person",function(){
+//         construct.apply(this, arguments);
+//     });
+
+//     var construct = function(){
+//         console.log(this, "this is Person", arguments );
+//     }
+
+//     var Speak = require("Speak");
+//     Person.prototype = Object.create( Object.prototype, {
+//         "canSpeak":{enumerable:false,configurable:false,value:function(){
+//             console.log( this instanceof Speak ?  "Yes" : "No");
+//         }}
+//     });
+//     return Person;
+// },
+
+// "Speak":function(module,require)
+// {
+//     var Speak = require.create(module,"Speak",function(){
+//         construct.apply(this, arguments);
+//     });
+
+//     var Person = require("Person");
+//     var construct = function(name){
+//         this._name = name;
+//         Person.call(this,name);
+//         console.log(this, "this is Speak", arguments );
+//     }
+
+//     Speak.prototype = Object.create( Person.prototype, {
+//         "name":{enumerable:false,configurable:false,value:function(){
+//             console.log( this._name  );
+//         }}
+//     });
+    
+//     return Speak;
+// }
+
+// },{}));
+
+
+
+// process.exit(1);
+
 //当前命令脚本路径
 var cmd = PATH.dirname( process.argv[1] );
 var cwd = process.cwd();

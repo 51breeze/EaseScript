@@ -7,6 +7,14 @@
  * @require Class,Object,Namespace,Error,TypeError,ReferenceError,SyntaxError
  */
 var $has = $Object.prototype.hasOwnProperty;
+var ATTR_TYPE={
+    1:"function",
+    2:"get",
+    4:"set",
+    8:"var",
+    16:"const",
+    32:"namespace"
+};
 var _construct = $Reflect ? $Reflect.construct : function (theClass,args)
 {
     if( !System.isFunction( theClass ) )
@@ -44,94 +52,118 @@ var _apply = $Reflect ? $Reflect.apply : function(target, thisArgument, argument
     return target();
 };
 
+function fetchAccessorName(name,accessor)
+{
+    return accessor+(name.substr(0,1).toUpperCase()+name.substr(1));
+}
+
+function fetchDescObject(target, prop, value, desc, accessor )
+{
+    if( accessor && ATTR_TYPE[ desc.type ] === accessor )
+    {
+        var def = {"prop": prop, "desc": desc};
+        def[ accessor ] = desc.value;
+        return def;
+    }
+    return {"target":target,"prop": prop,"value":value, "desc": desc};
+}
+
+function fetchMethodAndAttributeDesc(context,proto,target,name,isstatic,accessor,ns)
+{
+    var prop = accessor ? fetchAccessorName(name,accessor) : name;
+    prop = ns ? ns+'_'+prop : prop;
+    if( $has.call(proto,prop) )
+    {
+        var desc = proto[prop];
+
+        //静态成员
+        if( isstatic )
+        {
+            return fetchDescObject(target, prop, target[prop], desc, accessor );
+        }
+        //实例成员
+        else
+        {
+            //私有实例属性
+            if( context && context.__T__.uri[0]===ns )
+            {
+                var _private = context.__T__.privateSymbol.valueOf();
+                if( $has.call( target[_private], name ) )
+                {
+                    return fetchDescObject(target[_private], name, target[_private][name], desc, accessor);
+                }
+            }
+            return fetchDescObject(proto, prop, desc.value, desc, accessor);
+        }
+    }
+    if( accessor )
+    {
+       return fetchMethodAndAttributeDesc(context,proto,target, name,isstatic,'',ns);
+    }
+    return null;
+}
+
+function getNamespaceUri(context, ns)
+{
+    if( !ns || !(ns.length > 0) )
+    {
+        return context ? context.__T__.uri : [];
+    }
+    var uri = context.__T__.uri.slice(0);
+    var len = ns.length;
+    for(;i<len;i++)
+    {
+        var item = ns[i];
+        if( item instanceof Namespace )
+        {
+            uri.push( Namespace.getCodeByUri( item.valueOf() ) );
+        }
+    }
+    return uri;
+}
+
 var description = function(scope, target, name , receiver , ns, accessor)
 {
     //表示获取一个类中的属性或者方法（静态属性或者静态方法）
-    var isstatic = target instanceof Class;
+    var isstatic = System.isClass(target);
     var objClass = target.constructor;
-    if( isstatic || objClass instanceof Class )
+    if( isstatic || System.isClass(objClass) )
     {
         var objClass = isstatic ? target : objClass;
         isstatic = isstatic && ( !receiver || receiver === target );
-        var uri = ['_'];
-        var prop;
-        var obj;
-        var proto;
-        var i=0;
-        var context = scope instanceof Class ? scope : null;
 
-        //指定作用域
-        if ( context )
+        var context = System.isClass(scope) ? scope : null;
+        var proto = isstatic ? objClass.__T__.method : objClass.__T__.proto;
+        var desc = fetchMethodAndAttributeDesc( context, proto, target, name, isstatic, accessor, '');
+        if( desc )
         {
-            uri = context.__T__.uri;
+            return desc;
         }
 
-        //自定义命名空间
-        if (ns && ns.length > 0)
-        {
-            var nsitem;
-            var len = ns.length;
-            uri = uri.splice(1,-1);
-            uri.unshift("_");
-            for(;i<len;i++)
-            {
-                nsitem = ns[i];
-                if(nsitem instanceof Namespace)uri.push( Namespace.getCodeByUri( nsitem.valueOf() ) );
-            }
-        }
-
-        do{
+        var uri = getNamespaceUri( context, ns);
+        do{ 
+            var i = uri.length;
             proto = isstatic ? objClass.__T__.method : objClass.__T__.proto;
-            i = uri.length;
             while ( proto && (i--) > 0)
             {
-                prop = uri[i] + name;
-                obj = proto[prop];
-                if( obj ){
-                    //静态成员
-                    if( isstatic )
-                    {
-                        return {"target": target, "prop": prop,"value":target[prop],  "desc": obj};
-                    }
-                    //实例成员
-                    else
-                    {
-                        //实例属性
-                        if( context && context.__T__.uri[0]===uri[i] )
-                        {
-                            var _private = context.__T__._private.valueOf();
-                            if( $has.call(target[_private],name) )
-                            {
-                                return {
-                                    "target": target[_private],
-                                    "prop": name,
-                                    "value": target[_private][name],
-                                    "desc": proto[prop]
-                                };
-                            }
-                        }
-                        return {"target": proto, "prop": prop,"value":obj.value,  "desc": obj};
-                    }
-                }
-                if ( accessor )
+                desc = fetchMethodAndAttributeDesc( context, proto, target, name, isstatic, accessor, uri[i]);
+                if ( desc )
                 {
-                    obj = proto[ accessor + prop ];
-                    if (obj)
-                    {
-                        prop=accessor + prop;
-                        return accessor === "Set_" ? {"set": obj.value, "prop": prop, "desc": obj} : {"get":obj.value, "prop": prop, "desc": obj};
-                    }
-                    if( accessor === "Set_" && proto[ "Get_"+prop ] )
-                    {
-                        throw new ReferenceError( '"'+name +'" is not writable');
-                    }
+                    return desc;
                 }
             }
 
-        }while ( !isstatic && (objClass = objClass.__T__["extends"]) instanceof Class );
+        }while( !isstatic && System.isClass(objClass = objClass.__T__["extends"]) );
+
+        if( accessor && accessor==="set" )
+        {
+           return {"writable":false};
+        }
+
         objClass = (objClass || Object).prototype;
-        obj = objClass[name];
-        if( obj ){
+        var obj = objClass[name];
+        if( obj )
+        {
             return {"target":objClass, "prop": name, "value":obj, "desc": {value:obj} };
         }
     }
@@ -195,13 +227,12 @@ Reflect.call=function call(scope, target, propertyKey,argumentsList,thisArgument
  */
 Reflect.construct=function construct(scope, target , args )
 {
-    if( target instanceof Class )
+    if( System.isClass(target) )
     {
-        if( target.abstract )
+        if( target.__T__.abstract )
         {
             throw new TypeError('Abstract class cannot be instantiated');
         }
-        target = target.constructor;
     }
     return _construct(target, args || []);
 };
@@ -216,9 +247,9 @@ Reflect.deleteProperty=function deleteProperty(target, propertyKey)
 {
     if( !target || propertyKey==null )return false;
     if( propertyKey==="__proto__")return false;
-    if( target instanceof Class ){
+    if( System.isClass(target) ){
         if( target.__T__.dynamic !==true )return false;
-        if( target.__T__._private === propertyKey)return false;
+        if( target.__T__.privateSymbol === propertyKey)return false;
     }
     if( $has.call(target,propertyKey) )
     {
@@ -238,24 +269,11 @@ Reflect.has=function has(scope, target, propertyKey)
 {
     if( propertyKey==null || target == null )return false;
     if( propertyKey==="__proto__")return false;
-    if( propertyKey in target )return true;
-    if( target instanceof Class || target.constructor instanceof Class  )
+    if( System.isClass(target) || System.isClass(target.constructor) )
     {
-        var uri=['_'];
-        if( scope && scope instanceof Class )
-        {
-            uri = scope.__T__.uri;
-        }
-        var i=0;
-        var len = uri.length;
-        for(;i<len;i++)
-        {
-            if( (uri[i]+propertyKey) in target )return true;
-            if( ('Get_'+uri[i]+propertyKey) in target )return true;
-            if( ('Set_'+uri[i]+propertyKey) in target )return true;
-        }
+        return !!description(scope,target,propertyKey,null,null,"get");
     }
-    return false;
+    return propertyKey in target;
 };
 
 Reflect.type=function type(value, typeClass)
@@ -264,7 +282,7 @@ Reflect.type=function type(value, typeClass)
     {
         var original = value;
         var flag = false;
-        switch (typeClass.toLowerCase())
+        switch (typeClass)
         {
             case "integer" :
             case "int" :
@@ -282,6 +300,13 @@ Reflect.type=function type(value, typeClass)
                 flag = true;
                 value = parseFloat(value);
                 break;
+            case "class" :
+               if( !System.instanceOf(value, typeClass) )
+               {
+                   throw new System.TypeError(original + " is not Class.");
+               }
+               break;
+
         }
         return value;
     }
@@ -303,7 +328,7 @@ Reflect.get=function(scope,target, propertyKey, receiver , ns )
 {
     if( propertyKey==null )return target;
     if( target == null )throw new ReferenceError('target is null or undefined');
-    var desc = description(scope,target,propertyKey,receiver,ns,"Get_");
+    var desc = description(scope,target,propertyKey,receiver,ns,"get");
     receiver = receiver || target;
     if( !desc )
     {
@@ -311,7 +336,7 @@ Reflect.get=function(scope,target, propertyKey, receiver , ns )
         if( propertyKey === '__proto__' )return undefined;
         return target[propertyKey];
     }
-    if( desc.get )return desc.get.call( receiver instanceof Class ? null : receiver);
+    if( desc.get )return desc.get.call( System.isClass(receiver) ? null : receiver);
     return desc.value;
 };
 
@@ -326,16 +351,16 @@ Reflect.set=function(scope,target, propertyKey, value , receiver ,ns )
 {
     if( propertyKey==null )return target;
     if( target == null )throw new ReferenceError('target is null or undefined');
-    var desc = description(scope,target,propertyKey,receiver,ns,"Set_");
+    var desc = description(scope,target,propertyKey,receiver,ns,"set");
     receiver = receiver || target;
-    var isstatic = receiver instanceof Class;
+    var isstatic = System.isClass(receiver);
     if( !desc )
     {
         //内置对象属性外部不可访问
         if( propertyKey === '__proto__' )throw new ReferenceError('__proto__ is not writable');
         if( isstatic )throw new ReferenceError(propertyKey+' is not exists');
         var objClass = target.constructor;
-        if( objClass instanceof Class )
+        if( System.isClass(objClass) ) 
         {
             if( objClass.__T__.dynamic !==true ){
                 throw new ReferenceError(propertyKey+' is not exists');
@@ -357,11 +382,15 @@ Reflect.set=function(scope,target, propertyKey, value , receiver ,ns )
     {
         return desc.set.call( isstatic ? null : receiver, value);
     }
-    if( desc.desc &&  desc.desc.writable !==true  )
+    if( desc && desc.writable === false  )
     {
         throw new ReferenceError(propertyKey+' is not writable');
     }
-    return desc.target[ desc.prop ] = value;
+    if( typeof desc.target === "object" || typeof desc.target === "function" )
+    {
+        return desc.target[ desc.prop ] = value;
+    }
+    throw new ReferenceError(propertyKey+' is not writable');
 };
 
 Reflect.incre=function incre(scope,target, propertyKey, flag , ns)

@@ -26,6 +26,15 @@ var EaseScript = {
 };
 
 /**
+ * 分块时加载文件的安装器
+ */
+EaseScript.installer=function(classname, factory)
+{
+    EaseScript.Load[ classname ]= factory;
+    factory.call( EaseScript , Internal, System );
+}
+
+/**
  * 加载指定的脚本文件
  * @param filename
  * @param callback
@@ -43,8 +52,8 @@ function loadScript(filename,callback){
         return loadMap[filename];
     }
     var script = null;
-    var match = filename.match(/\.(css|js)$/i);
-    switch ( match[1].toLowerCase() ){
+    var match = filename.match(/\.(css|js)[$|\?]/i);
+    switch ( match && match[1].toLowerCase() ){
         case "js" :
             script = document.createElement('script');
             script.setAttribute('type', 'text/javascript');
@@ -91,8 +100,8 @@ function loadScript(filename,callback){
 function start(module, method)
 {
     try {
-        var main = System.getDefinitionByName(module);
-        var obj = Reflect.construct(null, main);
+        var main = Internal.require( module );
+        var obj = new main();
         var Event = System.Event;
         var response = Reflect.call(main, obj, method);
         if (global.hasEventListener(Event.INITIALIZE_COMPLETED)) {

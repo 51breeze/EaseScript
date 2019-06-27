@@ -6,6 +6,10 @@ package
 		public function BaseApplication()
 		{
 			super();
+
+			var aa:int = 1;
+
+			aa is uint;
 		}
 
 		
@@ -24,7 +28,7 @@ package
 		{
              return [
 				 {"link":"?PATH=/MyIndex/home","label":"首页","content":"/MyIndex/home"},
-				 {"link":"/Person","label":"个人","content":"?PATH=/Person"},
+				 {"link":"?PATH=/Person","label":"个人","content":"/Person"},
 			 ];
         }
 	}

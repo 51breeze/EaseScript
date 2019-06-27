@@ -269,11 +269,14 @@ package es.components
                 {
                     if( !loadContentMap[ provider ] )
                     {
-                        //viewport.removeAllChild();
-                        (new EventDispatcher(document)).addEventListener(ApplicationEvent.FETCH_ROOT_CONTAINER, function (e: ApplicationEvent) {
+                        var doc:EventDispatcher = new EventDispatcher(document);
+                        var fn:Function = function(e: ApplicationEvent) {
+                            //阻止替换根容器
                             e.preventDefault();
                             e.container = viewport;
-                        });
+                            doc.removeEventListener(ApplicationEvent.FETCH_ROOT_CONTAINER, fn);
+                        };
+                        doc.addEventListener(ApplicationEvent.FETCH_ROOT_CONTAINER, fn);
                         loadContentMap[ provider ] = child;
                         var HTTP_DISPATCHER: Function = System.environments("HTTP_DISPATCHER") as Function;
                         var controller:Array = provider.split("@");
@@ -358,8 +361,11 @@ package es.components
                             return;
                         }
                     }
-                    this.current = content;
-                    e.preventDefault();
+                    if( e.item.content )
+                    {
+                        e.preventDefault();
+                        this.current = content;
+                    }
 
                 },false,0,this);
             }

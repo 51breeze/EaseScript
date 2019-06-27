@@ -34,7 +34,7 @@
 	"mode":2,
 	"build_mode":"app",
 	"on_error_exit":true,
-	"watching":true,
+	"watching":false,
 	"serverEnable":false,
 	"syntax":"javascript",
 	"root_path":"E:/EaseScript",

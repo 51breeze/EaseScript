@@ -132,9 +132,9 @@ System.typeOf = function typeOf(instanceObj)
     {
         return instanceObj===null ? 'object' : 'undefined';
     }
-    if (instanceObj instanceof System.Class )return 'class';
-    if (instanceObj instanceof System.Interface)return 'interface';
-    if (instanceObj instanceof System.Namespace)return 'namespace';
+    if ( System.isClass( instanceObj ) )return 'class';
+    if ( System.isInterface( instanceObj ) )return 'interface';
+    if ( System.isNamespace( instanceObj ) )return 'namespace';
     return typeof instanceObj;
 };
 
@@ -151,21 +151,21 @@ System.instanceOf = function instanceOf(instanceObj, theClass)
         return theClass === System.Object || theClass===$Object  ? true : false;
     }
 
-    if (theClass === System.Class)
+    if (theClass === 'class')
     {
-        return instanceObj instanceof System.Class;
+        return System.isClass( instanceObj );
     }
 
     if( theClass === System.JSON )
     {
-        return System.isObject(instanceObj);
+        return System.isObject( instanceObj );
     }
 
-    if( theClass instanceof System.Class )
+    if( System.isClass( theClass ) )
     {
-        theClass = theClass.constructor;
         return theClass && instanceObj instanceof theClass;
     }
+
     if ( theClass === System.Array )
     {
         return System.isArray( instanceObj );
@@ -193,17 +193,19 @@ System.is=function is(instanceObj, theClass)
     {
         return theClass === System.Object || theClass===$Object  ? true : false;
     }
-    if (theClass === System.Class)
+   
+    if (theClass === 'class')
     {
-        return instanceObj instanceof System.Class;
+        return System.isClass( instanceObj );
     }
-    var isClass = instanceObj.constructor instanceof System.Class;
-    var isInterfaceClass = theClass instanceof System.Interface;
+
+    var isClass = System.isClass( instanceObj.constructor );
+    var isInterfaceClass = System.isInterface(theClass);
     if( instanceObj && isClass && isInterfaceClass )
     {
         var objClass =instanceObj.constructor;
         if (objClass === theClass)return true;
-        while ( objClass instanceof System.Class )
+        while ( System.isClass(objClass) )
         {
             var impls = objClass.__T__.implements;
             if (impls && impls.length > 0)
@@ -226,6 +228,24 @@ System.is=function is(instanceObj, theClass)
     if( isInterfaceClass )return false;
     return System.instanceOf(instanceObj, theClass);
 };
+
+/**
+ * 判断指定的对象是否为一个类
+ */
+System.isClass=function isClass( target )
+{
+   return target && typeof target === "function" && target.__CLASS__ && target.__RESOURCETYPE__ === 1;
+}
+
+System.isInterface=function isInterface( target )
+{
+   return target && typeof target === "function" && target.__CLASS__ && target.__RESOURCETYPE__ === 2;
+}
+
+System.isNamespace=function isNamespace( target )
+{
+   return target && typeof target === "function" && target.__CLASS__ && target.__RESOURCETYPE__ === 3;
+}
 
 /**
 * 判断接口模块是否有继承指定的接口类
@@ -595,31 +615,105 @@ System.environments=function environments( name )
     return System.Object.merge({},System.environmentMap);
 }
 
-Internal.createSymbolStorage=function(symbol)
-{
-    return function(target, name, value )
+
+/**
+ * 根据指定的类名获取类的对象
+ * @param name
+ * @returns {Object}
+ */
+System.getDefinitionByName = function getDefinitionByName(name) {
+
+    var module = Internal.getClassModule(name);
+    if( module && module.exports )
     {
-        if( name === true )
-        {
-            target[ symbol ]=value;
-            return value;
-        }
-        var data = target[ symbol ];
-        if( !data )
-        {
-            data={};
-            target[ symbol ]=data;
-        }
-        if( typeof value !== "undefined" )
-        {
-            if( typeof data[ name ] === "number" )
-            {
-                if (value === "increment")return data[name]++;
-                if (value === "decrement")return data[name]--;
-            }
-            data[ name ]=value;
-            return value;
-        }
-        return name==null ? data : data[ name ];
+        return module.exports;
     }
+    if( has.call(System, name) )return System[name];
+    throw new TypeError('"' + name + '" is not defined.');
+};
+
+System.hasClass = function hasClass(name) 
+{
+    return !!Internal.getClassModule(name);
+};
+
+var map=['System','Class','Interface','Namespace','Reflect','Object','JSON','Array','String','EventDispatcher','TypeError','Error','Symbol','Element'];
+
+/**
+ * 返回类的完全限定类名
+ * @param value 需要完全限定类名称的对象。
+ * 可以将任何类型、对象实例、原始类型和类对象
+ * @returns {string}
+ */
+System.getQualifiedClassName = function getQualifiedClassName( target )
+{
+    if( target == null )throw new ReferenceError( 'target is null or undefined' );
+    if( target===System )return 'System';
+    if( target===JSON )return 'JSON';
+    if( target===Reflect )return 'Reflect';
+    if( typeof target === "function" && target.prototype)
+    {
+        var valueof = target.valueOf();
+        if( valueof.indexOf("[Class") === 0 )
+        {
+           return valueof.slice(7,-1);
+
+        }else if( valueof.indexOf("[Namespace") === 0 )
+        {
+            return valueof.slice(11,-1);
+        }else if( valueof.indexOf("[Interface") === 0 )
+        {
+            return valueof.slice(11,-1);
+        }
+
+        var con  = target;
+        if( con )
+        {
+            var str = con.toString();
+            if( str.indexOf('[native code]')>0 )
+            {
+                str = str.substr(0, str.indexOf('(') );
+                return str.substr(str.lastIndexOf(' ')+1);
+            }
+            for (var b in map)
+            {
+                var obj = System[ map[b] ];
+                if (con === obj) {
+                    return map[b];
+                }
+            }
+        }
+    }
+    throw new ReferenceError( 'target is not Class' );
+};
+
+/**
+ * 返回对象的完全限定类名
+ * @param value 需要完全限定类名称的对象。
+ * 可以将任何类型、对象实例、原始类型和类对象
+ * @returns {string}
+ */
+System.getQualifiedObjectName = function getQualifiedObjectName( target )
+{
+    if( target == null || typeof target !== "object")
+    {
+        throw new ReferenceError( 'target is not object or is null' );
+    }
+    return System.getQualifiedClassName( Object.getPrototypeOf( target ).constructor );
+};
+/**
+ * 获取指定实例对象的超类名称
+ * @param value
+ * @returns {string}
+ */
+System.getQualifiedSuperclassName =function getQualifiedSuperclassName(target)
+{
+    if( target == null )throw new ReferenceError( 'target is null or undefined' );
+    var classname = System.getQualifiedClassName( Object.getPrototypeOf( target ).constructor );
+    var module = Internal.getClassModule( classname );
+    if( module )
+    {
+        return System.getQualifiedClassName( module["extends"] || Object );
+    }
+    return null;
 };

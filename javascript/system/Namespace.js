@@ -4,7 +4,7 @@
  * Released under the MIT license
  * https://github.com/51breeze/EaseScript
  * @author Jun Ye <664371281@qq.com>
- * @require System,Object,Symbol;
+ * @require System,Object,Symbol,Internal;
  */
 var storage=Internal.createSymbolStorage( Symbol('namespace') );
 var codeMap={};
@@ -18,16 +18,16 @@ Namespace.getCodeByUri=function getCodeByUri(uri){
 };
 
 Namespace.valueOf=function valueOf(){
-    return '[object Namespace]';
+    return '[Namespace object]';
 };
 
 Namespace.toString=function toString(){
-    return '[object Namespace]';
+    return '[Namespace object]';
 };
 Namespace.prototype = Object.create( Object.prototype );
 Namespace.prototype.constructor=Namespace;
 Namespace.prototype.toString=function toString(){
-    return '[object Namespace]';
+    return this.valueOf();
 };
 Namespace.prototype.valueOf=function valueOf(){
     var data = storage(this);

@@ -321,7 +321,7 @@ function builder(main, config , code, requirements , replacements)
     }
 
     //模块定义器
-    include(contents, 'define' , rootPath+'/define.js', fix , libs);
+    //include(contents, 'define' , rootPath+'/define.js', fix , libs);
 
      //模块描述
     //contents.unshift('var descriptions = '+JSON.stringify(descriptions)+';\n');
@@ -352,10 +352,10 @@ function builder(main, config , code, requirements , replacements)
     {
         internal.push("Internal."+scc+'="'+config.system_core_class[scc]+'";' );
     }
-    if( config.mode==1  )
-    {
+    //if( config.mode==1  )
+    //{
         internal.push( utils.getContents( rootPath+'/internal.js' ) );
-    }
+    //}
     internal = replaceContent(internal.join("\n"), replacements, config);
 
     var run='';
@@ -369,14 +369,14 @@ function builder(main, config , code, requirements , replacements)
     bootstrap = replaceContent(bootstrap, replacements, config);
 
     //开发业务代码
-    var business = ['(function(define,'+requires.join(',')+'){',
-        code,
+    var business = ['(function('+requires.join(',')+'){',
+        'Internal.initiator('+code+');',
         bootstrap,
-        '})(Internal.define,'+requires.map(function (a){
+        '})('+requires.map(function (a){
             a = mapname[a] || a;
             if(a==='System')return a;
             return 'System.'+a;
-        }).join(',')+');'];
+        }).join(',')+');\n'];
 
     //框架代码
     var framework = [
@@ -385,8 +385,8 @@ function builder(main, config , code, requirements , replacements)
             internal,
             //系统全局模块域
             '(function(System,$'+globals.join(',$')+'){',
-                contents,
-                run,
+            contents,
+            run,
             '}(System,' + g.join(',') + '));',
             business.join('\n'),
         '}({},{}));'
@@ -421,15 +421,19 @@ function segment( config,content, requirements, handle, classname )
     });
 
     return [
-        'window["'+handle+'"]["Load"]["'+classname+'"]=function(Internal,System,undefined){',
-        '(function(define,'+requires.join(',')+'){',
+        '(function(installer,undefined){',
         '"use strict";',
-            content,
-        '})(Internal.define,'+requires.map(function (a){
+        'installer("'+classname+'",function(Internal,System){',
+        '(function('+requires.join(',')+'){',
+        '"use strict";',
+        'Internal.register('+content+');',
+        '})('+requires.map(function (a){
             a = mapname[a] || a;
             if(a==='System')return a;
             return 'System.'+a;
-        }).join(',')+');}',
+        }).join(',')+');',
+        '});',
+        '}( window["'+handle+'"]["installer"] ));',
      ].join('\n');
 }
 builder.segment = segment;

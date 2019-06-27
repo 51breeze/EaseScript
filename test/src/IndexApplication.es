@@ -123,10 +123,13 @@ package
 
             console.log( new Date().getTime() );
 
+            this.es_internal::test();
+
 
           
             return this.render( view );
         }
+        
 
         [Router(method="get", alias="index")]
         public function index()
