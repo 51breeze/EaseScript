@@ -12,9 +12,14 @@ function KeyboardEvent( type, bubbles,cancelable  )
     Event.call(this, type, bubbles,cancelable );
     return this;
 };
-System.KeyboardEvent=KeyboardEvent;
-KeyboardEvent.prototype=Object.create( Event.prototype );
-KeyboardEvent.prototype.constructor=KeyboardEvent;
+
+module.exports = KeyboardEvent;
+var Object = require("./Object.js");
+var Event = require("./Event.js");
+
+KeyboardEvent.prototype=Object.create( Event.prototype,{
+    "constructor":{value:KeyboardEvent}
+});
 KeyboardEvent.prototype.keycode=null;
 KeyboardEvent.KEY_PRESS='keypress';
 KeyboardEvent.KEY_UP='keyup';

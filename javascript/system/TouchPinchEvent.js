@@ -4,7 +4,7 @@
  * Released under the MIT license
  * https://github.com/51breeze/EaseScript
  * @author Jun Ye <664371281@qq.com>
-* @require Event,TouchEvent,Math,EventDispatcher,Object;
+* @require Event,TouchEvent,Object;
 */
 function TouchPinchEvent(type, bubbles, cancelable)
 {
@@ -12,9 +12,15 @@ function TouchPinchEvent(type, bubbles, cancelable)
     TouchEvent.call(this, type, bubbles,cancelable );
     return this;
 };
-System.TouchPinchEvent=TouchPinchEvent;
-TouchPinchEvent.prototype.constructor=TouchPinchEvent ;
-TouchPinchEvent.prototype=Object.create( TouchEvent.prototype );
+
+module.exports =TouchPinchEvent;
+var Object = require("./Object.js");
+var TouchEvent = require("./TouchEvent.js");
+var Event = require("./Event.js");
+
+TouchPinchEvent.prototype=Object.create( TouchEvent.prototype ,{
+    "constructor":{value:TouchPinchEvent}
+});
 TouchPinchEvent.prototype.moveX=NaN;
 TouchPinchEvent.prototype.moveY=NaN;
 TouchPinchEvent.prototype.startX=NaN;

@@ -12,7 +12,12 @@ function Event( type, bubbles, cancelable )
     this.bubbles = !(bubbles===false);
     this.cancelable = !(cancelable===false);
 }
-System.Event = Event;
+
+module.exports = Event;
+var Object = require("./Object.js");
+var System = require("./System.js");
+
+
 /**
  * 一组事件名的常量
  * @type {string}
@@ -48,8 +53,16 @@ Event.TRANSITION_END="transitionend";
  * 事件原型
  * @type {Object}
  */
-Event.prototype = Object.create( Object.prototype );
-Event.prototype.constructor=Event;
+Event.prototype = Object.create( Object.prototype,{
+    "constructor":{value:Event},
+    "toString":function toString(){
+        return '[object Event]';
+    },
+    "valueOf":function valueOf(){
+        return '[object Event]';
+    }
+});
+
 //true 只触发冒泡阶段的事件 , false 只触发捕获阶段的事件
 Event.prototype.bubbles = true;
 //是否可以取消浏览器默认关联的事件
@@ -66,12 +79,6 @@ Event.prototype.button = false;
 Event.prototype.ctrlKey = false;
 Event.prototype.shiftKey = false;
 Event.prototype.metaKey = false;
-Event.prototype.toString=function toString(){
-    return '[object Event]';
-};
-Event.prototype.valueOf=function valueOf(){
-    return '[object Event]';
-};
 
 /**
  * 阻止事件的默认行为
@@ -264,5 +271,3 @@ Event.fix.hooks[ Event.READY ]=function (listener, dispatcher)
     id = window.setInterval(handle,50);
     return true;
 }
-
-

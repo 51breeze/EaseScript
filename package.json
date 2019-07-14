@@ -10,8 +10,8 @@
   "scripts": {
     "version": "node ./bin/es.js -V",
     "dev": "node ./bin/es.js -p ./test -m test -s javascript --clean -b app",
-    "test": "node ./bin/es.js -p ./test -m test -s javascript --clean -b IndexApplication",
-    "create": "node ./bin/es.js -p ./test -m test -s javascript --clean --server disabled -o E:\\webroot\\working"
+    "test": "node ./bin/es.js -p ./test -m production -s javascript -M disabled --clean -b Test --bm norm  --server disabled -o E:\\webroot\\working",
+    "create": "node ./bin/es.js -p ./test -m production -M disabled -s javascript --clean --server disabled -o E:\\webroot\\working"
   },
   "repository": {
     "type": "git",
@@ -31,18 +31,26 @@
   },
   "homepage": "https://github.com/51breeze/EaseScript#readme",
   "dependencies": {
+    "@babel/core": "^7.0.0",
+    "babel": "^6.23.0",
+    "babel-loader": "^8.0.6",
+    "babel-preset-es2015": "^6.24.1",
     "colors": "~1.1.2",
     "commander": "~2.11.0",
     "express": "^4.16.4",
     "less": "~2.7.2",
     "socket.io": "^2.2.0",
-    "uglify-js": "~3.1.1"
+    "source-map": "^0.7.3",
+    "uglify-js": "~3.1.1",
+    "webpack": "^4.35.2"
   },
   "devDependencies": {
-    "uglify-js": "~3.1.1",
+    "colors": "~1.1.2",
     "commander": "~2.11.0",
     "less": "~2.7.2",
     "socket.io": "^2.2.0",
-    "colors": "~1.1.2"
+    "source-map": "^0.7.3",
+    "uglify-js": "~3.1.1",
+    "webpack-cli": "^3.3.5"
   }
 }

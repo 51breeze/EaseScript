@@ -1,13 +1,17 @@
 if(!window.console)
 {
-    (function (System)
+    (function ()
     {
         var __container__ = null;
+        var Element = require("./Element.js");
+        var EventDispatcher = require("./EventDispatcher.js");
+        var Event = require("./Event.js");
+        var Array = require("./Array.js");
         function panel()
         {
-            if (System.Element && !__container__)
+            if( Element && !__container__ )
             {
-                var container = System.Element('<div />');
+                var container = Element('<div />');
                 container.style('border', 'solid 1px #ccc');
                 container.width('100%');
                 container.height(200);
@@ -19,49 +23,50 @@ if(!window.console)
                 // container.bottom(0);
                 // container.left(0);
                 __container__ = container;
-                System.EventDispatcher(document).addEventListener(System.Event.READY, function (e) {
-                    System.Element(document.body).addChild(container);
+                EventDispatcher(document).addEventListener( Event.READY, function (e) 
+                {
+                    Element(document.body).addChild(container);
                 })
             }
             return __container__;
         }
 
-        System.Console.log=function log()
+        Console.log=function log()
         {
             var container = panel();
             if (container) {
-               var p = System.Element.createElement('<p style="line-height: 12px; font-size:12px;color:#333333; font-family: Arial; padding: 5px 0px;margin: 0px;">' + System.Array.prototype.slice.call(arguments, 0).join(' ') + '</p>')
+               var p = Element.createElement('<p style="line-height: 12px; font-size:12px;color:#333333; font-family: Arial; padding: 5px 0px;margin: 0px;">' + Array.prototype.slice.call(arguments, 0).join(' ') + '</p>')
                 container.addChild( p );
             }
         }
 
-        System.Console.info=function info()
+        Console.info=function info()
         {
-            System.console.log.apply(this, arguments);
+            Console.log.apply(this, arguments);
         }
-        System.Console.trace=function trace()
+        Console.trace=function trace()
         {
-            System.console.log.apply(this, arguments);
+            Console.log.apply(this, arguments);
         }
-        System.Console.warn=function warn()
+        Console.warn=function warn()
         {
-            System.console.log.apply(this, arguments);
+            Console.log.apply(this, arguments);
         }
-        System.Console.error=function error()
+        Console.error=function error()
         {
-            System.console.log.apply(this, arguments);
+            Console.log.apply(this, arguments);
         }
-        System.Console.dir=function dir()
-        {
-        }
-        System.Console.assert=function assert()
+        Console.dir=function dir()
         {
         }
-        System.Console.time=function time()
+        Console.assert=function assert()
         {
         }
-        System.Console.timeEnd=function timeEnd()
+        Console.time=function time()
         {
         }
-    }(System));
+        Console.timeEnd=function timeEnd()
+        {
+        }
+    }());
 }

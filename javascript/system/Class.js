@@ -5,37 +5,42 @@
  * @author Jun Ye <664371281@qq.com>
  * @require System,Object,SyntaxError,ReferenceError
  */
-function Class() {
-}
+function Class() {}
+
+module.exports = Class;
+var System = require("./System.js");
+var Object = require("./Object.js");
+var SyntaxError = require("./SyntaxError.js");
+var ReferenceError = require("./ReferenceError.js");
+
 Class.valueOf=Class.toString=function () {return '[object Class]'};
-Class.prototype = Object.create( Object.prototype );
-Class.prototype.constructor=Class;
-Class.prototype.valueOf=function valueOf()
-{
-    if(this==null)return this===null ? 'null' : 'undefined';
-    if( this instanceof Class )
+Class.prototype=Object.create( Object.prototype,{
+    "constructor":{value:Class},
+    "valueOf":{value:function valueOf()
     {
-        var t = this.__T__;
-        if( t["package"] ){
-            return '[class '+t["package"]+'.'+t.classname+']';
+        if(this==null)return this===null ? 'null' : 'undefined';
+        if( this instanceof Class )
+        {
+            var t = this.__T__;
+            if( t["package"] ){
+                return '[class '+t["package"]+'.'+t.classname+']';
+            }
+            return '[class '+t.classname+']';
         }
-        return '[class '+t.classname+']';
-    }
-    return Object.prototype.valueOf.call( this );
-};
+        return Object.prototype.valueOf.call( this );
+    }},
 
-/**
- * 返回指定对象的字符串表示形式。
- * @returns {String}
- */
-Class.prototype.toString=function toString()
-{
-    if(this==null)return this===null ? 'null' : 'undefined';
-    if( this instanceof Class )
+    /**
+     * 返回指定对象的字符串表示形式。
+     * @returns {String}
+     */
+    "toString":{value:function toString()
     {
-        return '[object Class]';
-    }
-    return Object.prototype.toString.call( this );
-};
-System.Class = Class;
-
+        if(this==null)return this===null ? 'null' : 'undefined';
+        if( this instanceof Class )
+        {
+            return '[object Class]';
+        }
+        return Object.prototype.toString.call( this );
+    }}
+});

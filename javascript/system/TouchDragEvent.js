@@ -4,7 +4,7 @@
  * Released under the MIT license
  * https://github.com/51breeze/EaseScript
  * @author Jun Ye <664371281@qq.com>
-* @require Event,TouchEvent,Math,EventDispatcher,Object;
+* @require Event,TouchEvent,EventDispatcher,Object;
 */
 function TouchDragEvent(type, bubbles, cancelable)
 {
@@ -12,9 +12,15 @@ function TouchDragEvent(type, bubbles, cancelable)
     TouchEvent.call(this, type, bubbles,cancelable );
     return this;
 };
-System.TouchDragEvent=TouchDragEvent;
-TouchDragEvent.prototype.constructor=TouchDragEvent;
-TouchDragEvent.prototype=Object.create( TouchEvent.prototype );
+
+module.exports =TouchDragEvent;
+var Object = require("./Object.js");
+var TouchEvent = require("./TouchEvent.js");
+var Event = require("./Event.js");
+
+TouchDragEvent.prototype=Object.create( TouchEvent.prototype ,{
+    "constructor":{value:TouchDragEvent}
+});
 TouchDragEvent.prototype.startX=NaN;
 TouchDragEvent.prototype.startY=NaN;
 TouchDragEvent.prototype.moveX=NaN;

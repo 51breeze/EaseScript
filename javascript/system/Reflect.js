@@ -4,9 +4,21 @@
  * Released under the MIT license
  * https://github.com/51breeze/EaseScript
  * @author Jun Ye <664371281@qq.com>
- * @require Class,Object,Namespace,Error,TypeError,ReferenceError,SyntaxError
+ * @require Object,System,Namespace,Error,TypeError,ReferenceError,SyntaxError
  */
-var $has = $Object.prototype.hasOwnProperty;
+
+function Reflect()
+{ 
+    throw new SyntaxError('Reflect is not constructor.');
+}
+module.exports =Reflect;
+var Object = require("./Object.js");
+var ReferenceError = require("./ReferenceError.js");
+var Namespace = require("./Namespace.js");
+var TypeError = require("./TypeError.js");
+var SyntaxError = require("./SyntaxError.js");
+var Object = require("./Object.js");
+var $has = Object.prototype.hasOwnProperty;
 var ATTR_TYPE={
     1:"function",
     2:"get",
@@ -15,7 +27,7 @@ var ATTR_TYPE={
     16:"const",
     32:"namespace"
 };
-var _construct = $Reflect ? $Reflect.construct : function (theClass,args)
+var _construct = $Reflect ? $Reflect.construct : function construct(theClass,args)
 {
     if( !System.isFunction( theClass ) )
     {
@@ -36,7 +48,7 @@ var _construct = $Reflect ? $Reflect.construct : function (theClass,args)
     }
 };
 
-var _apply = $Reflect ? $Reflect.apply : function(target, thisArgument, argumentsList)
+var _apply = $Reflect ? $Reflect.apply : function apply(target, thisArgument, argumentsList)
 {
     if( System.typeOf(target) !== "function" )
     {
@@ -122,24 +134,24 @@ function getNamespaceUri(context, ns)
     return uri;
 }
 
-var description = function(scope, target, name , receiver , ns, accessor)
+function description(scope, target, name , receiver , ns, accessor)
 {
     //表示获取一个类中的属性或者方法（静态属性或者静态方法）
-    var isstatic = System.isClass(target);
-    var objClass = target.constructor;
-    if( isstatic || System.isClass(objClass) )
+    if( System.isClass(target.constructor) )
     {
-        var objClass = isstatic ? target : objClass;
-        isstatic = isstatic && ( !receiver || receiver === target );
-
+        var isstatic = ( !receiver || receiver === target ) && System.isClass(target);
+        var objClass = isstatic ? target : target.constructor;
         var context = System.isClass(scope) ? scope : null;
         var proto = isstatic ? objClass.__T__.method : objClass.__T__.proto;
+
+        //获取公开的属性
         var desc = fetchMethodAndAttributeDesc( context, proto, target, name, isstatic, accessor, '');
         if( desc )
         {
             return desc;
         }
 
+        //获取带有命名空间的属性
         var uri = getNamespaceUri( context, ns);
         do{ 
             var i = uri.length;
@@ -171,8 +183,6 @@ var description = function(scope, target, name , receiver , ns, accessor)
 };
 
 
-function Reflect(){ if(this instanceof Reflect)throw new SyntaxError('Reflect is not constructor.'); }
-System.Reflect=Reflect;
 /**
  * 静态方法 Reflect.apply() 通过指定的参数列表发起对目标(target)函数的调用
  * @param theClass
@@ -180,19 +190,16 @@ System.Reflect=Reflect;
  * @param argumentsList
  * @returns {*}
  */
-Reflect.apply=function apply( target, thisArgument, argumentsList )
+Reflect.apply=function apply(target, thisArgument, argumentsList )
 {
-    if( target instanceof Class )
+    if( !System.isFunction( target ) || System.isClass(target) )
     {
-        target = target.constructor;
+        throw new TypeError('target is not function');
     }
+
     if( !System.isArray(argumentsList) )
     {
         argumentsList = typeof argumentsList !== "undefined" ? [argumentsList] : [];
-    }
-    if( !System.isFunction( target ) )
-    {
-        throw new TypeError('target is not function');
     }
     return _apply(target, thisArgument, argumentsList);
 };
@@ -225,7 +232,7 @@ Reflect.call=function call(scope, target, propertyKey,argumentsList,thisArgument
  * @param argumentsList
  * @returns {*}
  */
-Reflect.construct=function construct(scope, target , args )
+Reflect.construct=function construct(target , args)
 {
     if( System.isClass(target) )
     {
@@ -253,8 +260,7 @@ Reflect.deleteProperty=function deleteProperty(target, propertyKey)
     }
     if( $has.call(target,propertyKey) )
     {
-        delete target[propertyKey];
-        return true;
+        return (delete target[propertyKey]);
     }
     return false;
 };
@@ -269,7 +275,7 @@ Reflect.has=function has(scope, target, propertyKey)
 {
     if( propertyKey==null || target == null )return false;
     if( propertyKey==="__proto__")return false;
-    if( System.isClass(target) || System.isClass(target.constructor) )
+    if( System.isClass(target.constructor) )
     {
         return !!description(scope,target,propertyKey,null,null,"get");
     }
@@ -281,39 +287,48 @@ Reflect.type=function type(value, typeClass)
     if( typeof typeClass === "string" )
     {
         var original = value;
-        var flag = false;
-        switch (typeClass)
+        typeClass = typeClass.toLowerCase();
+        switch ( typeClass )
         {
             case "integer" :
             case "int" :
             case "number":
             case "uint":
-                flag = true;
                 value = parseInt(value);
-                if (typeClass.toLowerCase() !== "number") {
-                    if (typeClass === "uint" && value < 0)throw new System.RangeError(original + " convert failed. can only be an unsigned Integer");
-                    if (value > 2147483647 || value < -2147483648)throw new System.RangeError(original + " convert failed. the length of overflow Integer");
+                if (typeClass !== "number")
+                 {
+                    if (typeClass === "uint" && value < 0)
+                    {
+                        throw new System.RangeError(original + " convert failed. can only be an unsigned Integer");
+                    }
+                    if (value > 2147483647 || value < -2147483648)
+                    {
+                        throw new System.RangeError(original + " convert failed. the length of overflow Integer");
+                    }
                 }
                 break;
             case "double":
             case "float":
-                flag = true;
                 value = parseFloat(value);
                 break;
             case "class" :
-               if( !System.instanceOf(value, typeClass) )
+               if( !System.isClass(value) )
                {
                    throw new System.TypeError(original + " is not Class.");
                }
                break;
-
         }
         return value;
     }
-    if( value == null || typeClass === System.Object )return value;
-    if ( typeClass && !System.is(value, typeClass) )
+    if( value == null || typeClass === Object )return value;
+    if( typeClass && !System.is(value, typeClass) )
     {
-        throw new System.TypeError( value+' can not be convert for ' + typeClass)
+        var classname = System.isClass(typeClass.constructor) ? typeClass.constructor.__CLASS__ :  System.typeOf( typeClass );
+        var up = System.ucfirst( System.typeOf( typeClass ) );
+        if( System[ up ] ){
+            classname = up;
+        }
+        throw new System.TypeError( value+' can not be convert for ' + classname );
     }
     return value;
 };
@@ -336,7 +351,10 @@ Reflect.get=function(scope,target, propertyKey, receiver , ns )
         if( propertyKey === '__proto__' )return undefined;
         return target[propertyKey];
     }
-    if( desc.get )return desc.get.call( System.isClass(receiver) ? null : receiver);
+    if( desc.get )
+    {
+        return desc.get.call( System.isClass(receiver) ? null : receiver);
+    }
     return desc.value;
 };
 
@@ -352,17 +370,24 @@ Reflect.set=function(scope,target, propertyKey, value , receiver ,ns )
     if( propertyKey==null )return target;
     if( target == null )throw new ReferenceError('target is null or undefined');
     var desc = description(scope,target,propertyKey,receiver,ns,"set");
+    var isstatic = System.isClass(target);
     receiver = receiver || target;
-    var isstatic = System.isClass(receiver);
     if( !desc )
     {
         //内置对象属性外部不可访问
-        if( propertyKey === '__proto__' )throw new ReferenceError('__proto__ is not writable');
-        if( isstatic )throw new ReferenceError(propertyKey+' is not exists');
+        if( propertyKey === '__proto__' )
+        {
+            throw new ReferenceError('__proto__ is not writable');
+        }
+        if( isstatic )
+        {
+            throw new ReferenceError(propertyKey+' is not exists');
+        }
         var objClass = target.constructor;
         if( System.isClass(objClass) ) 
         {
-            if( objClass.__T__.dynamic !==true ){
+            if( objClass.__T__.dynamic !==true )
+            {
                 throw new ReferenceError(propertyKey+' is not exists');
             }
             var obj = target[propertyKey];
@@ -372,7 +397,9 @@ Reflect.set=function(scope,target, propertyKey, value , receiver ,ns )
                 throw new TypeError(propertyKey+' is not configurable');
             }
 
-        }else if( typeof target ==="function" )
+        }
+        //如果是一个静态类不能赋值。
+        else if( typeof target ==="function" )
         {
             throw new TypeError(propertyKey+' is not configurable');
         }
@@ -382,7 +409,7 @@ Reflect.set=function(scope,target, propertyKey, value , receiver ,ns )
     {
         return desc.set.call( isstatic ? null : receiver, value);
     }
-    if( desc && desc.writable === false  )
+    if( desc.writable === false  )
     {
         throw new ReferenceError(propertyKey+' is not writable');
     }

@@ -4,7 +4,7 @@
  * Released under the MIT license
  * https://github.com/51breeze/EaseScript
  * @author Jun Ye <664371281@qq.com>
-* @require MouseEvent,Object;
+* @require MouseEvent,Object,Event;
 */
 function TouchEvent(type, bubbles, cancelable)
 {
@@ -12,9 +12,15 @@ function TouchEvent(type, bubbles, cancelable)
     MouseEvent.call(this, type, bubbles,cancelable );
     return this;
 };
-System.TouchEvent=TouchEvent;
-TouchEvent.prototype.constructor=TouchEvent ;
-TouchEvent.prototype=Object.create( MouseEvent.prototype );
+
+module.exports =TouchEvent;
+var Object = require("./Object.js");
+var MouseEvent = require("./MouseEvent.js");
+var Event = require("./Event.js");
+
+TouchEvent.prototype=Object.create( MouseEvent.prototype ,{
+    "constructor":{value:TouchEvent}
+});
 TouchEvent.TOUCH_START='touchstart';
 TouchEvent.TOUCH_MOVE='touchmove';
 TouchEvent.TOUCH_END='touchend';

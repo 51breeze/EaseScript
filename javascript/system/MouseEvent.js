@@ -4,16 +4,22 @@
  * Released under the MIT license
  * https://github.com/51breeze/EaseScript
  * @author Jun Ye <664371281@qq.com>
- * @require System,Event,Math,Object;
+ * @require System,Event,Object;
  */
 function MouseEvent( type, bubbles,cancelable  )
 {
     if( !(this instanceof MouseEvent) )return new MouseEvent(type, bubbles,cancelable);
     Event.call(this, type, bubbles,cancelable );
 }
-System.MouseEvent=MouseEvent;
-MouseEvent.prototype=Object.create( Event.prototype );
-MouseEvent.prototype.constructor=MouseEvent;
+
+module.exports = MouseEvent;
+var Object = require("./Object.js");
+var Event = require("./Event.js");
+var System = require("./System.js");
+
+MouseEvent.prototype=Object.create( Event.prototype,{
+    "constructor":{value:MouseEvent}
+});
 MouseEvent.prototype.wheelDelta= null;
 MouseEvent.prototype.pageX= NaN;
 MouseEvent.prototype.pageY= NaN;

@@ -6,8 +6,6 @@
  * @require System,Object,TypeError
  */
 
-var urlSegments={}
-
 /**
  * 资源定位器
  * @constructor
@@ -16,6 +14,12 @@ function Locator()
 {
     throw new TypeError("Locator is not constructor");
 }
+
+module.exports = Locator;
+var Object = require("./Object.js");
+var TypeError = require("./TypeError.js");
+var System = require("./System.js");
+var urlSegments={};
 
 /**
  * 返回地址栏中的URL
@@ -240,4 +244,3 @@ urlSegments = Locator.create(location.href)||{
     "query":{},
     "fragment":[]
 };
-System.Locator = Locator;

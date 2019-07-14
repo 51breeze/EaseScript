@@ -229,7 +229,7 @@ package es.core
            {
                var script:Node = new HTMLElement('script') as Node;
                script.content='window["'+Interaction.key+'"]='+ propertiesToJson();
-               document.head.addChild( script );
+               document.head.appendChild( script );
            }
            return view;
        }

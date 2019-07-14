@@ -10,7 +10,12 @@ function RangeError( message , filename, line)
 {
     Error.call(this,  message , filename, line);
 };
-System.RangeError=RangeError;
-RangeError.prototype = Object.create( Error.prototype) ;
-RangeError.prototype.constructor=RangeError;
+
+module.exports =RangeError;
+var Error = require("./Error.js");
+var Object = require("./Object.js");
+
+RangeError.prototype = Object.create( Error.prototype ,{
+    "constructor":{value:RangeError}
+});
 RangeError.prototype.name='RangeError';

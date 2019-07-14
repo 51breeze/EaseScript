@@ -11,9 +11,15 @@ function ScrollEvent( type, bubbles,cancelable ){
     PropertyEvent.call(this, type, bubbles,cancelable );
     return this;
 };
-System.ScrollEvent =ScrollEvent;
-ScrollEvent.prototype=Object.create( PropertyEvent.prototype );
-ScrollEvent.prototype.constructor=ScrollEvent;
+
+module.exports =ScrollEvent;
+var Object = require("./Object.js");
+var PropertyEvent = require("./PropertyEvent.js");
+var Event = require("./Event.js");
+
+ScrollEvent.prototype=Object.create( PropertyEvent.prototype ,{
+    "constructor":{value:ScrollEvent}
+});
 ScrollEvent.CHANGE='scrollChange';
 
 //属性事件

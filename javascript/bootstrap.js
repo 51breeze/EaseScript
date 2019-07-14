@@ -110,8 +110,7 @@ function start(module, method)
         return response;
     }catch(e)
     {
-        window.console.log(e);
-        throw new Error( e.message );
+        throw e.valueOf();
     }
 }
 

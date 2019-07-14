@@ -12,11 +12,17 @@ function ElementEvent( type, bubbles,cancelable )
     Event.call(this, type, bubbles,cancelable );
     return this;
 };
-System.ElementEvent = ElementEvent;
-ElementEvent.prototype=Object.create( Event.prototype );
+
+module.exports = ElementEvent;
+var Object = require("./Object.js");
+var Event = require("./Event.js");
+var System = require("./System.js");
+
+ElementEvent.prototype=Object.create( Event.prototype,{
+    "constructor":{value:ElementEvent}
+});
 ElementEvent.prototype.parent=null;
 ElementEvent.prototype.child=null;
-ElementEvent.prototype.constructor=ElementEvent;
 ElementEvent.ADD='elementAdd';
 ElementEvent.ADD_TO_DOCUMENT='elementAddToDocument';
 ElementEvent.REMOVE='elementRemove';

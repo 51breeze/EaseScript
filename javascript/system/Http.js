@@ -4,9 +4,37 @@
  * Released under the MIT license
  * https://github.com/51breeze/EaseScript
  * @author Jun Ye <664371281@qq.com>
-* @require System,Object,EventDispatcher,JSON,HttpEvent,Math,Window,Event
+* @require System,Object,EventDispatcher,JSON,HttpEvent
 */
 
+/**
+ * HTTP 请求类
+ * @param options
+ * @returns {Http}
+ * @constructor
+ */
+function Http( options )
+{
+    if( !isSupported )throw new Error('Http the client does not support');
+    if ( !(this instanceof Http) )return new Http(options);
+    EventDispatcher.call(this);
+    Object.defineProperty(this,"__options__", {value:Object.merge(true,{},setting, options)});
+    options = this.__options__;
+    options.xhr = null;
+    options.loading = false;
+    options.setHeader = false;
+    options.queues = [];
+    options.param = null;
+    options.responseHeaders = {};
+    options.timeoutTimer = null;
+}
+
+module.exports = Http;
+var Object = require("./Object.js");
+var EventDispatcher = require("./EventDispatcher.js");
+var System = require("./System.js");
+var JSON = require("./JSON.js");
+var HttpEvent = require("./HttpEvent.js");
 var isSupported=false;
 var XHR=null;
 var localUrl='';
@@ -124,29 +152,6 @@ function getXHR( target )
 }
 
 /**
- * HTTP 请求类
- * @param options
- * @returns {Http}
- * @constructor
- */
-function Http( options )
-{
-    if( !isSupported )throw new Error('Http the client does not support');
-    if ( !(this instanceof Http) )return new Http(options);
-    EventDispatcher.call(this);
-    Object.defineProperty(this,"__options__", {value:Object.merge(true,{},setting, options)});
-    options = this.__options__;
-    options.xhr = null;
-    options.loading = false;
-    options.setHeader = false;
-    options.queues = [];
-    options.param = null;
-    options.responseHeaders = {};
-    options.timeoutTimer = null;
-}
-System.Http=Http;
-
-/**
  * Difine constan Http accept type
  */
 Http.ACCEPT_XML= "application/xml,text/xml";
@@ -183,8 +188,9 @@ Http.METHOD_DELETE='DELETE';
  * 继承事件类
  * @type {Object|Function}
  */
-Http.prototype = Object.create( EventDispatcher.prototype );
-Http.prototype.constructor=Http;
+Http.prototype = Object.create( EventDispatcher.prototype,{
+    "constructor":{value:Http}
+});
 
 /**
  * 取消请求
@@ -387,8 +393,9 @@ function ScriptRequest( async )
     this.__async__ = !!async;
 }
 
-ScriptRequest.prototype = Object.create(EventDispatcher.prototype);
-ScriptRequest.prototype.constructor=ScriptRequest;
+ScriptRequest.prototype = Object.create(EventDispatcher.prototype,{
+    "constructor":{value:ScriptRequest}
+});
 ScriptRequest.prototype.__key__ = null;
 ScriptRequest.prototype.__target__ = null;
 ScriptRequest.prototype.__async__ = null;

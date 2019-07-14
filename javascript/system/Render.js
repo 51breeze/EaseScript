@@ -4,8 +4,38 @@
  * Released under the MIT license
  * https://github.com/51breeze/EaseScript
  * @author Jun Ye <664371281@qq.com>
+ * @require RegExp,Object,EventDispatcher,RenderEvent,System
  */
 
+
+/**
+ * 模板编译器
+ * @param target
+ * @returns {Render}
+ * @constructor
+ */
+function Render( options )
+{
+    if( !(this instanceof Render) )
+    {
+        return new Render( options );
+    }
+    if( typeof options !=="undefined" && System.isObject(options) )
+    {
+        var o = Object.merge({}, _options,options);
+        // _split=new RegExp(o.left+'([^'+o.right+']+)'+o.right+'|'+o.shortLeft+'([^'+o.shortRight+']+)'+o.shortRight,'gi');
+        this.__split__=new RegExp(o.left+'(.*?)'+o.right+'|'+o.shortLeft+'(.*?)'+o.shortRight,'gi');
+    }
+    this.__variable__ = new Variable();
+    this.__variable__.__render__= this;
+    EventDispatcher.call(this);
+}
+
+module.exports =Render;
+var Object = require("./Object.js");
+var EventDispatcher = require("./EventDispatcher.js");
+var SyntaxError = require("./SyntaxError.js");
+var System = require("./System.js");
 var syntax_regexp = /^\s*(if|foreach|for|else|do|switch|case|default|break|var|function|while|{|})(.*)?/,
 call_regexp = /^([\w\.]+)\s*\(/,
 foreach_regexp  = /(\w+)\s+as\s+(\w+)(\s+(\w+))?/i;
@@ -145,32 +175,9 @@ var _options={
     'shortRight':"\\}(?!=\\})"
 };
 
-/**
- * 模板编译器
- * @param target
- * @returns {Render}
- * @constructor
- * @require RegExp,Object,EventDispatcher,RenderEvent
- */
-function Render( options )
-{
-    if( !(this instanceof Render) )
-    {
-        return new Render( options );
-    }
-    if( typeof options !=="undefined" && System.isObject(options) )
-    {
-        var o = Object.merge({}, _options,options);
-        // _split=new RegExp(o.left+'([^'+o.right+']+)'+o.right+'|'+o.shortLeft+'([^'+o.shortRight+']+)'+o.shortRight,'gi');
-        this.__split__=new RegExp(o.left+'(.*?)'+o.right+'|'+o.shortLeft+'(.*?)'+o.shortRight,'gi');
-    }
-    this.__variable__ = new Variable();
-    this.__variable__.__render__= this;
-    EventDispatcher.call(this);
-}
-
-Render.prototype = Object.create(EventDispatcher.prototype);
-Render.prototype.constructor=Render;
+Render.prototype = Object.create(EventDispatcher.prototype,{
+    "constructor":{value:Render}
+});
 Render.prototype.__variable__=null;
 Render.prototype.__split__=  new RegExp(_options.left+'(.*?)'+_options.right+'|'+_options.shortLeft+'(.*?)'+_options.shortRight,'gi');
 
@@ -325,5 +332,3 @@ Variable.prototype.forEach=function (target,callback)
  * @returns {string}
  */
 Variable.prototype.error=function(){return '';};
-
-System.Render=Render;

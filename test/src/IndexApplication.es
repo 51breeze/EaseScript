@@ -15,6 +15,13 @@ package
     import es.core.SystemManage;
     import app.*;
 
+
+   // [Embed('./jquery-1.11.2.js')];
+
+
+   // [Import( file='./jquery-1.11.2.js', alias=JQ, export=jQuery )];
+
+
     [Router(default=home, alias=MyIndex)]
 	public class IndexApplication extends BaseApplication implements IListIterator
 	{
@@ -28,11 +35,17 @@ package
             console.log("===index==123");
         }
 
+        private window(container:View)
+        {
+            console.log( (View)container  );
+
+             console.log( this ,1, true, view.Viewport );
+        }
+
     
         [Router(method="get")]
         public function viewport()
         {
-            console.log(" ====enter viewport====");
             var view:view.Viewport = new view.Viewport( this );
             return this.render(view);
         }
@@ -125,7 +138,9 @@ package
 
             this.es_internal::test();
 
+            var tt:Class = PopUp as Class;
 
+            new tt('dfdsf');
           
             return this.render( view );
         }

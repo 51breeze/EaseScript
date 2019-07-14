@@ -9,7 +9,11 @@
 function Function() {
     return $Function.apply(this, Array.prototype.slice.call(arguments,0) );
 };
-System.Function = Function;
+
+module.exports = Function;
+var Object = require("./Object.js");
+var Array = require("./Array.js");
+
 Function.prototype = Object.create( Object.prototype );
 Function.prototype.apply = $Function.prototype.apply;
 Function.prototype.call = $Function.prototype.call;

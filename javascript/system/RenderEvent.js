@@ -11,14 +11,21 @@ function RenderEvent(type, bubbles, cancelable  ){
     Event.call(this, type, bubbles,cancelable );
     return this;
 }
-RenderEvent.prototype= Object.create(Event.prototype);
+
+
+module.exports =RenderEvent;
+var Object = require("./Object.js");
+var Event = require("./Event.js");
+
+RenderEvent.prototype= Object.create(Event.prototype,{
+    "constructor":{value:RenderEvent}
+});
 RenderEvent.prototype.view=null;
 RenderEvent.prototype.variable=null;
 RenderEvent.prototype.html='';
-RenderEvent.prototype.constructor=RenderEvent;
 RenderEvent.START='templateStart';
 RenderEvent.DONE='templateDone';
-System.RenderEvent=RenderEvent;
+
 
 //触摸拖动事件
 Event.registerEvent(function ( type ,target, originalEvent )

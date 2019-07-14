@@ -5,4 +5,4 @@
  * https://github.com/51breeze/EaseScript
  * @author Jun Ye <664371281@qq.com>
  */
-System.Window = window || {};
+module.exports =window || {};

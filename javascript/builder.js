@@ -1,6 +1,8 @@
 const utils = require('../lib/utils.js');
-const globals=['Object','Function','Array','String','Number','Boolean','Math','Date','RegExp','Error','ReferenceError','TypeError','SyntaxError','JSON','Reflect','Symbol','console'];
+const globals=utils.globals;
 const rootPath =  utils.getResolvePath( __dirname );
+const path = require("path");
+
 /**
  *  已加载的模块
  */
@@ -169,6 +171,71 @@ function include(contents, name , filepath, fix, libs, callback )
     throw new Error(name+' does exists ('+filepath+')');
 }
 
+
+
+/**
+ * 获取指定的文件模块
+ * @param filepath
+ */
+function include_module(contents, name , filepath, fix, libs, callback )
+{
+    var orign = name;
+    name = mapname[name] || name;
+    if( loaded[name] === true )return;
+    loaded[name]=true;
+    if( !filepath )
+    {
+        filepath = rootPath + '/system/' + name + '.js';
+        //if( !utils.isFileExists(filepath) )filepath = rootPath + '/components/' + name + '.js';
+    }
+
+    //加载的模块有依赖的第三方库
+    if( libs && libs[name] )
+    {
+        contents[ name ]= utils.getContents( rootPath+'/vendor/'+libs[name] ) +"\nmodule.exports = "+name+";\n";
+    }
+
+    if( utils.isFileExists(filepath) )
+    {
+        var str = utils.getContents( filepath );
+        if( callback && typeof callback === "function" )
+        {
+            str = callback( str );
+        }
+
+        str = str.replace(/\=\s*require\s*\(\s*([\"\'])(.*?)\1\s*\)/g,function(a,b,c){
+             var info = path.parse(c);
+             var filepath = path.resolve(rootPath,'system', c).replace(/\\/g,'/');
+             include_module(contents, info.name , filepath, fix, libs, callback )
+             return '=require("'+filepath+'")';
+        });
+
+        //加载对应模块的兼容策略文件
+        if( fix && fix[name] )
+        {
+            str+='\n';
+            for( var f in fix[name] )
+            {
+                str+= utils.getContents( fix[name][f] );
+            }
+        }
+       
+        if( globals.indexOf( orign ) >=0 )
+        {
+            str = "(function($"+orign+"){\n"+str+"\nreturn "+name+";\n}("+orign+"));";
+        }
+        contents[ name ]=str;
+        return true;
+
+    }else if( globals.indexOf(name) >=0 )
+    {
+        //contents.push('System.' + name + '=' + name + ';\n');
+        return true;
+    }
+    throw new Error(name+' does exists ('+filepath+')');
+}
+
+
 /**
  * 解析内部属性
  * @param str
@@ -259,8 +326,75 @@ const exclude = {
     'double':true,
     'Double':true,
     'arguments':true,
-    "NodeList":true
+    "NodeList":true,
+    'Class':true,
+    'Interface':true,
 };
+
+/**
+ * 加载系统模板所有需要的类
+ * @param config
+ * @returns {string}
+ */
+function loadRequireSystemModuleContents(config,requirements)
+{
+    loaded = {'HTMLElement':true,'Node':true};
+    var contents = {};
+    var fix = polyfill( config );
+
+    /**
+     * 需要支持的第三方库文件
+     */
+    var libs={};
+    for(var prop in library)
+    {
+        var is=config.compat_version==='*' || prop==='*';
+        var info = prop.split('-', 2);
+        if( !is && config.compat_version && typeof config.compat_version === 'object' && config.compat_version.hasOwnProperty( info[0] ) )
+        {
+            is = parseFloat( info[1] ) > parseFloat( config.compat_version[ info[0] ] );
+        }
+        if(is)utils.merge(libs, library[prop] );
+    }
+
+    /**
+     * 引用全局对象模块
+     */
+    var requires = ['System','Class','Namespace','Interface','ListIterator','EventDispatcher','Event','Locator'].concat( globals.slice(0) );
+    if( requirements )
+    {
+        for ( var p in requirements )
+        {
+            var name = requirements[p];
+            if( requires.indexOf( name ) < 0 && ( globals.hasOwnProperty( name ) || config.globals.hasOwnProperty(name) ) )
+            {
+                if( exclude[p] !==true )
+                {
+                    requires.push( name );
+                }
+            }
+        }
+    }
+
+    requires = requires.filter(function (a) {
+        if( config.globals.hasOwnProperty(a) && config.globals[a].notLoadFile===true)
+        {
+            return false;
+        }
+        return exclude[a] !== true;
+    });
+
+    for(var prop in requires)
+    {
+        include_module(contents, requires[prop], null, fix, libs );
+    }
+
+    return contents;
+
+}
+
+
+
 
 /**
  * 合并代码
@@ -352,10 +486,9 @@ function builder(main, config , code, requirements , replacements)
     {
         internal.push("Internal."+scc+'="'+config.system_core_class[scc]+'";' );
     }
-    //if( config.mode==1  )
-    //{
-        internal.push( utils.getContents( rootPath+'/internal.js' ) );
-    //}
+   
+    internal.push( utils.getContents( rootPath+'/internal.js' ) );
+    
     internal = replaceContent(internal.join("\n"), replacements, config);
 
     var run='';
@@ -438,6 +571,7 @@ function segment( config,content, requirements, handle, classname )
 }
 builder.segment = segment;
 
+
 /**
  * 生成入口视图
  * @param content
@@ -479,6 +613,7 @@ function makeServiceRouteList( serviceRouteList )
     });
     return '{' + bind.join(",") +'\n}';
 }
-builder.makeServiceRouteList = makeServiceRouteList;
 
+builder.makeServiceRouteList = makeServiceRouteList;
+builder.loadRequireSystemModuleContents = loadRequireSystemModuleContents;
 module.exports = builder;

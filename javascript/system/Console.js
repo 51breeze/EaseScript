@@ -3,63 +3,60 @@
  * Released under the MIT license
  * https://github.com/51breeze/EaseScript
  * @author Jun Ye <664371281@qq.com>
- * @require System,Object,SyntaxError,Array
+ * @require System,SyntaxError
  */
-function Console() {
+function Console()
+{
    throw new SyntaxError('console object is not constructor or function');
 }
-System.Console=Console;
-/**
- * @private
- * @param items
- * @returns {string}
- */
-function toString(items)
-{
-    var str=[];
-    for(var i=0; i<items.length; i++)
-    {
-        if( items[i] != null && items[i].constructor instanceof System.Class )
-        {
-            var item  = items[i];
-            var name = (items[i]._toString||items[i].toString).call(items[i]);
-            if( !(System.isArray(item,Array) || System.isObject(item)) ){
-                item = Object.prototype.getEnumerableProperties.call(item,2);
-            }
-            str = item ? str.concat(name,item) : str.concat(name);
 
+module.exports = Console;
+var System = require("./System.js");
+var SyntaxError = require("./SyntaxError.js");
+var Function = require("./Function.js");
+var call = Function.prototype.call;
+var output = $console;
+
+function toString( args )
+{
+    var str=[ output ];
+    for(var i=0; i<args.length; i++)
+    {
+        if( args[i] && ( System.isObject(args[i],true) || typeof args[i] ==="function" ) )
+        {
+            str.push( args[i].valueOf() );
         }else
         {
-            str.push( items[i] );
+            str.push( args[i] );
         }
     }
     return str;
 }
-var $call = System.Function.prototype.call;
+
 Console.log=function log(){
-    $call.apply($console.log, [$console].concat( toString( arguments ) ) );
+    call.apply(output.log, toString( arguments ) );
 };
 Console.info =function info(){
-    $call.apply($console.info, [$console].concat( toString( arguments ) ) );
+    call.apply(output.info, toString( arguments ) );
 };
 Console.trace = function trace(){
-    $call.apply($console.trace, [$console].concat( toString( arguments ) ) );
+    call.apply(output.trace, toString( arguments ) );
 };
 Console.warn = function warn(){
-    $call.apply($console.warn, [$console].concat( toString( arguments ) ) );
+    call.apply(output.warn, toString( arguments ) );
 };
 Console.error = function error(){
-    $call.apply($console.error, [$console].concat( toString( arguments ) ) );
+    call.apply(output.error, toString( arguments ) );
 };
 Console.dir = function dir(){
-    $call.apply($console.dir, [$console].concat( toString( arguments ) ) );
+    call.apply(output.dir, toString( arguments ) );
 };
 Console.assert = function assert(){
-    $call.apply($console.assert, [$console].concat( toString( arguments ) ) );
+    call.apply(output.assert, toString( arguments ) );
 };
-Console.time = function time( name ){
-    $console.time( name );
+Console.time = function time(){
+    call.apply(output.time, toString( arguments ) );
 };
-Console.timeEnd = function timeEnd( name ){
-    $console.timeEnd( name );
+Console.timeEnd = function timeEnd(){
+    call.apply(output.timeEnd, toString( arguments ) );
 };

@@ -13,9 +13,16 @@ function DataSourceEvent(type, bubbles,cancelable)
     Event.call(this, type, bubbles,cancelable );
     return this;
 }
-System.DataSourceEvent=DataSourceEvent;
-DataSourceEvent.prototype= Object.create(Event.prototype);
-DataSourceEvent.prototype.constructor=DataSourceEvent;
+
+module.exports = DataSourceEvent;
+var System = require("./System.js");
+var Object = require("./Object.js");
+var Event = require("./Event.js");
+
+
+DataSourceEvent.prototype= Object.create(Event.prototype,{
+    "constructor":{value:DataSourceEvent}
+});
 DataSourceEvent.prototype.condition=null;
 DataSourceEvent.prototype.index=NaN;
 DataSourceEvent.prototype.data=null;
@@ -47,6 +54,3 @@ Event.registerEvent(function ( type , target, originalEvent )
             return new DataSourceEvent( type );
     }
 });
-
-
-

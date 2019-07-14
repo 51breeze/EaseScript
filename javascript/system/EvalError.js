@@ -9,7 +9,9 @@
 function EvalError( message , filename, line) {
     Error.call(this, message , filename, line);
 };
-System.EvalError = EvalError;
-EvalError.prototype = Object.create( Error.prototype );
-EvalError.prototype.constructor=EvalError;
+module.exports = EvalError;
+var Object = require("./Object.js");
+EvalError.prototype = Object.create( Error.prototype,{
+    "constructor":{value:EvalError}
+});
 EvalError.prototype.name='EvalError';

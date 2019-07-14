@@ -4,10 +4,9 @@
  * Released under the MIT license
  * https://github.com/51breeze/EaseScript
  * @author Jun Ye <664371281@qq.com>
- * @require System,Object,Event,Internal,Reflect,Symbol
+ * @require System,Object,Event,Internal,Symbol
  */
 
-var storage=Internal.createSymbolStorage( Symbol('EventDispatcher') );
 function EventDispatcher( target )
 {
     if( !(this instanceof EventDispatcher) )
@@ -23,9 +22,19 @@ function EventDispatcher( target )
     }
     storage(this, true, {target:target||this, events:{}});
 }
-System.EventDispatcher=EventDispatcher;
-EventDispatcher.prototype=Object.create( Object.prototype );
-EventDispatcher.prototype.constructor=EventDispatcher;
+
+module.exports = EventDispatcher;
+var Object = require("./Object.js");
+var System = require("./System.js");
+var Internal = require("./Internal.js");
+var Symbol = require("./Symbol.js");
+var Event = require("./Event.js");
+var storage=Internal.createSymbolStorage( Symbol('EventDispatcher') );
+
+EventDispatcher.prototype=Object.create( Object.prototype,{
+    "constructor":{value:EventDispatcher}
+});
+
 
 /**
  * 判断是否有指定类型的侦听器

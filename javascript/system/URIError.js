@@ -9,7 +9,12 @@
 function URIError( message , filename, line) {
     Error.call(this, message , filename, line);
 };
-System.URIError=URIError;
-URIError.prototype = Object.create( Error.prototype );
+
+module.exports =URIError;
+var Object = require("./Object.js");
+var Error = require("./Error.js");
+
+URIError.prototype = Object.create( Error.prototype ,{
+    "constructor":{value:URIError}
+});
 URIError.prototype.name = 'URIError';
-URIError.prototype.constructor=URIError;

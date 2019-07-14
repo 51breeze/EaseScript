@@ -4,8 +4,84 @@
  * Released under the MIT license
  * https://github.com/51breeze/EaseScript
  * @author Jun Ye <664371281@qq.com>
- * @require System,Object,Array,EventDispatcher,Document,Window,StyleEvent,PropertyEvent,ScrollEvent,ElementEvent,Math,TypeError,Error,SyntaxError,ReferenceError,Symbol
+ * @require System,Object,Array,EventDispatcher,Internal,StyleEvent,PropertyEvent,ScrollEvent,ElementEvent,Math,TypeError,Error,Symbol
  */
+
+
+/**
+ * Element class
+ * @param selector
+ * @param context
+ * @returns {Element}
+ * @constructor
+ */
+function Element(selector, context)
+{
+    if( !(this instanceof Element) )
+    {
+        return new Element( selector, context );
+    }
+    if( context )context= context instanceof Element ? context[0] : context;
+    storage(this,true,{
+        'context':context,
+        'forEachCurrentItem':null,
+        'forEachCurrentIndex':NaN
+    });
+    var result=null;
+    if( selector )
+    {
+        //复制Element的结果到当前对象
+         if( selector instanceof Element )
+        {
+            result = Array.prototype.slice.call(selector,0);
+        }
+        //指定的选择器是一组元素
+        else if ( System.isArray(selector) )
+        {
+            result = filters( selector );
+        }
+        //是一个选择器或者指定一个需要创建的html标签
+        else if (typeof selector === "string")
+        {
+            selector = System.trim( selector );
+            //创建一个指定标签的新元素
+            if( selector.charAt(0) === '<' && selector.charAt(selector.length - 1) === '>' )
+            {
+                result=[createElement(selector)];
+            }
+            //查询指定选择器的元素
+            else
+            {
+                result = querySelector(selector, context);
+            }
+        }
+        //指定的选择器为元素对象
+        else if ( Element.isNodeElement(selector) || Element.isWindow(selector) )
+        {
+            result = [selector];
+        }
+    }
+    Object.defineProperty(this,"length", {value:0,writable:true});
+    if( result )makeElement( this, result);
+    EventDispatcher.call(this);
+}
+
+module.exports = Element;
+var Object = require("./Object.js");
+var Internal = require("./Internal.js");
+var Symbol = require("./Symbol.js");
+var System = require("./System.js");
+var Array = require("./Array.js");
+var EventDispatcher = require("./EventDispatcher.js");
+var StyleEvent = require("./StyleEvent.js");
+var PropertyEvent = require("./PropertyEvent.js");
+var ScrollEvent = require("./ScrollEvent.js");
+var ElementEvent = require("./ElementEvent.js");
+var TypeError = require("./TypeError.js");
+var Error = require("./Error.js");
+var Event = require("./Event.js");
+var storage=Internal.createSymbolStorage( Symbol('Element') );
+var accessor={};
 var fix={
     attrMap:{
         'tabindex'       : 'tabIndex',
@@ -117,12 +193,6 @@ var fix={
         return val;
     }
 };
-
-/**
- * @private
- */
-var accessor={};
-var storage=Internal.createSymbolStorage( Symbol('Element') );
 
 /**
  * @private
@@ -435,29 +505,14 @@ function formatStyleValue(name, value, node, elem, apply )
     }
 }
 
-//获取并设置id
-function getIdSelector( elem )
-{
-    if( !Element.isNodeElement(elem) )return null;
-    var id = elem.getAttribute('id');
-    var has = false;
-    if( !id )
-    {
-        has = true;
-        id = 'sq_' + Math.ceil(Math.random() * 1000000);
-        elem.setAttribute('id', id);
-    }
-    return {id:'#' + id,has:has,elem:elem};
-}
+
 /**
  * 选择元素
  * @param mixed selector CSS3选择器
  * @param mixed context  上下文
  * @returns []
  */
-var querySelector = typeof Sizzle === "function" ?  function(selector, context, results, seed) {
-    return Sizzle( selector, context, results, seed);
-} : function(selector, context, results, seed )
+var querySelector = typeof Sizzle === "function" ? Sizzle : function(selector, context, results, seed )
 {
     if( !results || !System.isArray(results) )
     {
@@ -729,91 +784,36 @@ function filters(results) {
     });
 }
 
-/**
- * Element class
- * @param selector
- * @param context
- * @returns {Element}
- * @constructor
- */
-function Element(selector, context)
-{
-    if( !(this instanceof Element) )
-    {
-        return new Element( selector, context );
-    }
-    if( context )context= context instanceof Element ? context[0] : context;
-    storage(this,true,{
-        'context':context,
-        'forEachCurrentItem':null,
-        'forEachCurrentIndex':NaN
-    });
-    var result=null;
-    if( selector )
-    {
-        //复制Element的结果到当前对象
-         if( selector instanceof Element )
-        {
-            result = Array.prototype.slice.call(selector,0);
-        }
-        //指定的选择器是一组元素
-        else if ( System.isArray(selector) )
-        {
-            result = filters( selector );
-        }
-        //是一个选择器或者指定一个需要创建的html标签
-        else if (typeof selector === "string")
-        {
-            selector = System.trim( selector );
-            //创建一个指定标签的新元素
-            if( selector.charAt(0) === '<' && selector.charAt(selector.length - 1) === '>' )
-            {
-                result=[createElement(selector)];
-            }
-            //查询指定选择器的元素
-            else
-            {
-                result = querySelector(selector, context);
-            }
-        }
-        //指定的选择器为元素对象
-        else if ( Element.isNodeElement(selector) || Element.isWindow(selector) )
-        {
-            result = [selector];
-        }
-    }
-    Object.defineProperty(this,"length", {value:0,writable:true});
-    if( result )makeElement( this, result);
-    EventDispatcher.call(this);
-}
 
-Element.prototype= Object.create( EventDispatcher.prototype );
-Element.prototype.constructor=Element;
+Element.prototype= Object.create( EventDispatcher.prototype,{
+    "constructor":{value:Element},
+    
+    /**
+     * 返回此对象的字符串
+     * @returns {*}
+     */
+    "toString":{value:function toString()
+    {
+        if( this.constructor === Element ){
+            return "[object Element]";
+        }
+        return EventDispatcher.prototype.toString.call(this);
+    }},
+
+    /**
+     * 返回此对象的数据值
+     * @returns {*}
+     */
+    "valueOf":{value:function valueOf()
+    {
+        if( this.constructor === Element ){
+            return this.slice(0);
+        }
+        return EventDispatcher.prototype.valueOf.call(this);
+    }}
+})
+
 Element.prototype.setCurrentElementTarget=true;
-
-/**
- * 返回此对象的字符串
- * @returns {*}
- */
-Element.prototype.toString=function toString()
-{
-     if( this.constructor === Element ){
-         return "[object Element]";
-     }
-     return EventDispatcher.prototype.toString.call(this);
-}
-
-/**
- * 返回此对象的数据值
- * @returns {*}
- */
-Element.prototype.valueOf=function valueOf()
-{
-    if( this.constructor === Element ){
-        return this.slice(0);
-    }
-    return EventDispatcher.prototype.valueOf.call(this);
-}
 
 /**
  * 返回一个指定开始索引到结束索引的元素并返回新的Element集合
@@ -2434,5 +2434,3 @@ Element.addStyleSheet=function addStyleSheet(styleName, StyleSheetObject)
     }
     return true;
 };
-
-System.Element = Element;

@@ -11,8 +11,20 @@ function HttpEvent( type, bubbles,cancelable ){
     Event.call(this, type, bubbles,cancelable );
     return this;
 };
-System.HttpEvent=HttpEvent;
-HttpEvent.prototype=Object.create( Event.prototype );
+
+module.exports = HttpEvent;
+var Object = require("./Object.js");
+var Event = require("./Event.js");
+
+HttpEvent.prototype=Object.create( Event.prototype,{
+    "constructor":{value:HttpEvent},
+    "toString":{value:function toString(){
+        return '[object HttpEvent]';
+    }},
+    "valueOf":{value:function valueOf(){
+        return '[object HttpEvent]';
+    }}
+});
 HttpEvent.prototype.data=null;
 HttpEvent.prototype.url=null;
 HttpEvent.prototype.loaded = 0;
@@ -23,12 +35,6 @@ HttpEvent.PROGRESS = 'httpProgress';
 HttpEvent.ERROR   = 'httpError';
 HttpEvent.CANCELED  = 'httpCanceled';
 HttpEvent.TIMEOUT = 'httpTimeout';
-HttpEvent.prototype.toString=function toString(){
-    return '[object HttpEvent]';
-};
-HttpEvent.prototype.valueOf=function valueOf(){
-    return '[object HttpEvent]';
-};
 
 //属性事件
 Event.registerEvent(function ( type , target, originalEvent )

@@ -10,7 +10,12 @@ function TypeError( message , filename, line)
 {
     Error.call(this, message , filename, line);
 }
-TypeError.prototype =Object.create( Error.prototype );
-TypeError.prototype.constructor=TypeError;
+
+module.exports =TypeError;
+var Object = require("./Object.js");
+var Error = require("./Error.js");
+
+TypeError.prototype =Object.create( Error.prototype ,{
+    "constructor":{value:TypeError}
+});
 TypeError.prototype.name='TypeError';
-System.TypeError=TypeError;

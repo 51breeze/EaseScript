@@ -13,11 +13,10 @@ var EaseScript = {
 global.addEventListener(Event.READY,function (e) {
     try{
         var bootstrapClass = System.getDefinitionByName("[CODE[BOOTSTRAP_CLASS_FILE_NAME]]");
-        System.Reflect.construct(null, bootstrapClass);
+        new bootstrapClass();
     }catch(e)
     {
-        window.console.log(e);
-        throw new Error( e.message );
+        throw e.valueOf();
     }
 },false,-500);
 window["[CODE[HANDLE]]"]=EaseScript;

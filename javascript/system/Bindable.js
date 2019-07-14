@@ -6,8 +6,6 @@
  * @require System,Object,Symbol,Reflect,Element,EventDispatcher,SyntaxError,ReferenceError
  */
 
-var storage=Internal.createSymbolStorage( Symbol('bindable') );
-
 /**
  * 提交属性到每个绑定的对象
  * @private
@@ -103,7 +101,6 @@ function getProperty(object, prop )
  * 如果是一个DOM元素则会监听当前元素的属性变更并反应到此绑定器中。
  * @param type 监听的事件类型, 默认为 PropertyEvent.CHANGE
  * @constructor
- * @require Object,EventDispatcher,PropertyEvent,Symbol,Dictionary,Element,Reflect,Class
  */
 function Bindable(source,properties)
 {
@@ -121,8 +118,23 @@ function Bindable(source,properties)
     storage(this,true,{"source":source,"properties":properties,"hash":{},"subscriber":new Dictionary(),"binding":{}});
     this.addEventListener(PropertyEvent.CHANGE,commitProperties);
 }
-Bindable.prototype=Object.create( EventDispatcher.prototype );
-Bindable.prototype.constructor=Bindable;
+
+module.exports = Bindable;
+var EventDispatcher = require("./EventDispatcher.js");
+var Object = require("./Object.js");
+var PropertyEvent = require("./PropertyEvent.js");
+var Symbol = require("./Symbol.js");
+var Dictionary = require("./Dictionary.js");
+var Symbol = require("./Symbol.js");
+var Element = require("./Element.js");
+var Reflect = require("./Reflect.js");
+var Internal = require("./Internal.js");
+var storage=Internal.createSymbolStorage( Symbol('Bindable') );
+
+
+Bindable.prototype=Object.create( EventDispatcher.prototype,{
+   "constructor":{value:Bindable}
+});
 
 /**
  * 指定对象到当前绑定器。
@@ -311,4 +323,3 @@ Bindable.prototype.hasProperty=function hasProperty(name)
     }
     return properties.indexOf(name) >= 0;
 };
-System.Bindable = Bindable;

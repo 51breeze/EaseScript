@@ -3,9 +3,11 @@
  * 返回一个函数
  * @type {bind}
  */
-if( !$Function.prototype.bind )
+if( !Function.prototype.bind )
 {
-    Function.prototype.bind = function bind(thisArg)
+    var Array = require("./Array.js");
+    var TypeError = require("./TypeError.js");
+    Object.defineProperty(Function.prototype,"bind", {value:function bind(thisArg)
     {
         if (typeof this !== "function")throw new TypeError("Function.prototype.bind - what is trying to be bound is not callable");
         var args = Array.prototype.slice.call(arguments, 1),
@@ -18,5 +20,5 @@ if( !$Function.prototype.bind )
         Nop.prototype = this.prototype;
         Bound.prototype = new Nop();
         return Bound;
-    };
+    }});
 }

@@ -11,7 +11,12 @@ function StyleEvent( type, bubbles,cancelable ){
     PropertyEvent.call(this, type, bubbles,cancelable );
     return this;
 };
-System.StyleEvent =StyleEvent;
-StyleEvent.prototype=Object.create( PropertyEvent.prototype );
-StyleEvent.prototype.constructor=StyleEvent;
+
+module.exports =StyleEvent;
+var Object = require("./Object.js");
+var PropertyEvent = require("./PropertyEvent.js");
+
+StyleEvent.prototype=Object.create( PropertyEvent.prototype ,{
+    "constructor":{value:StyleEvent}
+});
 StyleEvent.CHANGE='styleChange';

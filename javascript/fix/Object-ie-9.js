@@ -6,7 +6,7 @@ if( !Object.create  )
     Object.create = (function () {
         function F() {
         }
-        var $has = $Object.prototype.hasOwnProperty;
+        var $has = Object.prototype.hasOwnProperty;
         return function (O, P) {
             if (typeof O != 'object'){
                 throw new TypeError('Object prototype may only be an Object or null');

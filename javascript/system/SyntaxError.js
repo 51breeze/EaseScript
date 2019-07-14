@@ -10,7 +10,12 @@ function SyntaxError(  message , filename, line)
 {
     Error.call(this, message , filename, line);
 };
-System.SyntaxError = SyntaxError;
-SyntaxError.prototype = Object.create( Error.prototype );
-SyntaxError.prototype.constructor=SyntaxError;
+
+module.exports =SyntaxError;
+var Object = require("./Object.js");
+var Error = require("./Error.js");
+
+SyntaxError.prototype = Object.create( Error.prototype ,{
+    "constructor":{value:SyntaxError}
+});
 SyntaxError.prototype.name='SyntaxError';

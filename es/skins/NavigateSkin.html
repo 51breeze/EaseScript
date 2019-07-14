@@ -15,18 +15,21 @@
                 e.preventDefault();
                 return false; 
             }
-           
+
             var dataProfile:String =  hostComponent.dataProfile;
             var event:NavigateEvent = new NavigateEvent( NavigateEvent.URL_JUMP_BEFORE );
             event.content = href;
             event.originalEvent = e;
             var datalist:Array = this.assign( dataProfile ) as Array;
-            for(var i:int in datalist)
+            if( datalist )
             {
-                if(datalist[i].link===event.content)
+                for(var i:int in datalist)
                 {
-                    event.item=datalist[i];
-                    break;
+                    if(datalist[i].link===event.content)
+                    {
+                        event.item=datalist[i];
+                        break;
+                    }
                 }
             }
             hostComponent.dispatchEvent(event);

@@ -1,0 +1,16 @@
+{
+	"get":{
+		"/MyIndex":"IndexApplication@home",
+		"/MyIndex/viewport":"IndexApplication@viewport",
+		"/MyIndex/list":"IndexApplication@list",
+		"/MyIndex/home":"IndexApplication@home",
+		"/MyIndex/index":"IndexApplication@index"
+	},
+	"post":{
+		"/MyIndex/home":"IndexApplication@home",
+		"/MyIndex/add":"IndexApplication@add"
+	},
+	"put":{
+		"/MyIndex/home":"IndexApplication@home"
+	}
+}

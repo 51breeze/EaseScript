@@ -354,14 +354,14 @@ package es.components
                     var content:*= e.content || (e.item && e.item.link);
                     if( typeof content === "string" )
                     {
-                        var isUrl:Boolean = /^https?/i.test(content);
-                        var segment:Object = Locator.create(content);
+                        var isUrl:Boolean = /^https?/i.test(content as String);
+                        var segment:Object = Locator.create(content as String);
                         var provider:String = Locator.match(segment);
                         if( isUrl && !provider ){
                             return;
                         }
                     }
-                    if( e.item.content )
+                    if(e.item && e.item.content )
                     {
                         e.preventDefault();
                         this.current = content;

@@ -6,6 +6,18 @@
  * @author Jun Ye <664371281@qq.com>
 * @require System,Internal;
 */
+
+var System={};
+module.exports =System;
+
+var Internal = require("./Internal.js");
+var Object = require("./Object.js");
+var Array = require("./Array.js");
+var JSON = require("./JSON.js");
+var Reflect = require("./Reflect.js");
+var Function = require("./Function.js");
+var EventDispatcher = require("./EventDispatcher.js");
+
 System.isFinite = isFinite;
 System.decodeURI = decodeURI;
 System.decodeURIComponent = decodeURIComponent;
@@ -15,17 +27,17 @@ System.isNaN = isNaN;
 System.Infinity = Infinity;
 System.parseFloat = parseFloat;
 System.parseInt = parseInt;
-System.Math = $Math;
-System.String = $String;
-System.Number = $Number;
-System.Boolean  = $Boolean;
-System.RegExp = $RegExp;
-System.Date = $Date;
-System.RegExp = $RegExp;
-System.Error  = $Error;
-System.TypeError  = $TypeError;
-System.ReferenceError  = $ReferenceError;
-System.SyntaxError = $SyntaxError;
+System.Math = Math;
+System.String = String;
+System.Number = Number;
+System.Boolean  = Boolean;
+System.RegExp = RegExp;
+System.Date = Date;
+System.RegExp = RegExp;
+System.Error  = Error;
+System.TypeError  = TypeError;
+System.ReferenceError  = ReferenceError;
+System.SyntaxError = SyntaxError;
 System.Node = Node;
 
 ;(function(f){
@@ -148,7 +160,7 @@ System.instanceOf = function instanceOf(instanceObj, theClass)
 {
     if( instanceObj == null )
     {
-        return theClass === System.Object || theClass===$Object  ? true : false;
+        return theClass === Object || theClass===$Object  ? true : false;
     }
 
     if (theClass === 'class')
@@ -156,25 +168,25 @@ System.instanceOf = function instanceOf(instanceObj, theClass)
         return System.isClass( instanceObj );
     }
 
-    if( theClass === System.JSON )
+    if( theClass === JSON )
     {
         return System.isObject( instanceObj );
     }
 
     if( System.isClass( theClass ) )
     {
-        return theClass && instanceObj instanceof theClass;
+        return instanceObj instanceof theClass;
     }
 
-    if ( theClass === System.Array )
+    if ( theClass === Array )
     {
         return System.isArray( instanceObj );
     }
-    if ( theClass === System.Object )
+    if ( theClass === Object )
     {
         return typeof instanceObj ==="object";
     }
-    if ( theClass === System.Function )
+    if ( theClass === Function )
     {
         return System.isFunction( instanceObj );
     }
@@ -191,7 +203,7 @@ System.is=function is(instanceObj, theClass)
 {
     if( instanceObj == null )
     {
-        return theClass === System.Object || theClass===$Object  ? true : false;
+        return theClass === Object || theClass===$Object  ? true : false;
     }
    
     if (theClass === 'class')
@@ -200,12 +212,10 @@ System.is=function is(instanceObj, theClass)
     }
 
     var isClass = System.isClass( instanceObj.constructor );
-    var isInterfaceClass = System.isInterface(theClass);
-    if( instanceObj && isClass && isInterfaceClass )
+    if( isClass && System.isInterface(theClass) )
     {
         var objClass =instanceObj.constructor;
-        if (objClass === theClass)return true;
-        while ( System.isClass(objClass) )
+        while ( objClass && System.isClass(objClass) )
         {
             var impls = objClass.__T__.implements;
             if (impls && impls.length > 0)
@@ -220,12 +230,10 @@ System.is=function is(instanceObj, theClass)
                    }
                 }
             }
-            objClass =objClass.__T__["extends"] || System.Object;
-            if (objClass === theClass)return true;
+            objClass =objClass.__T__["extends"];
         }
-        if( objClass.prototype )instanceObj = objClass.prototype;  
+        return false;
     }
-    if( isInterfaceClass )return false;
     return System.instanceOf(instanceObj, theClass);
 };
 
@@ -284,15 +292,15 @@ function isInterfaceEqual(interfaceModule,interfaceClass)
  * @param val
  * @returns {boolean}
  */
-System.isObject = function isObject(val)
+System.isObject = function isObject(val, flag )
 {
     if (!val || typeof val !== "object")return false;
-    var proto = System.Object.getPrototypeOf(val);
-    if( proto === System.Object.prototype || proto === $Object.prototype )
+    var proto = Object.getPrototypeOf(val);
+    if( proto === Object.prototype || proto === $Object.prototype )
     {
         return true;
     }
-    return false;
+    return flag && val instanceof $Object;
 };
 /**
  * 检查所有传入的值定义
@@ -313,8 +321,8 @@ System.isDefined = function isDefined()
  */
 System.isArray = function isArray(val) {
     if (!val || typeof val !== "object")return false;
-    var proto = System.Object.getPrototypeOf(val);
-    return proto === System.Array.prototype || proto === $Array.prototype;
+    var proto = Object.getPrototypeOf(val);
+    return proto === Array.prototype || proto === $Array.prototype;
 };
 
 /**
@@ -324,7 +332,7 @@ System.isArray = function isArray(val) {
  */
 System.isFunction = function isFunction(val) {
     if (!val)return false;
-    return System.typeOf(val) === 'function' || val instanceof System.Function || val instanceof $Function;
+    return System.typeOf(val) === 'function' || val instanceof Function || val instanceof $Function;
 };
 /**
  * 判断是否为布尔类型
@@ -431,7 +439,7 @@ System.lcfirst =  function lcfirst(str) {
  */
 System.repeat = function repeat(str, num) {
     if (typeof str === "string") {
-        return new System.Array((parseInt(num) || 0) + 1).join(str);
+        return new Array((parseInt(num) || 0) + 1).join(str);
     }
     return '';
 };
@@ -476,9 +484,9 @@ System.sprintf = function sprintf() {
                         param = System.parseFloat(param);
                         return System.isNaN(param) ? '' : param;
                     } else if (method === 'v') {
-                        return System.Object.prototype.valueOf.call(param);
+                        return Object.prototype.valueOf.call(param);
                     }
-                    return System.Object.prototype.toString.call(param);
+                    return Object.prototype.toString.call(param);
                 });
             }
             str.replace(/%(s|d|f|v)/g, '');
@@ -557,7 +565,7 @@ var __uid__=1;
  */
 System.uid =function uid()
 {
-   return (__uid__++)+''+(System.Math.random() * 100000)>>>0;
+   return (__uid__++)+''+( Math.random() * 100000 )>>>0;
 };
 
 /**
@@ -597,7 +605,7 @@ System.getGlobalEvent=function getGlobalEvent()
 {
       if( _globalEvent===null )
       {
-          _globalEvent = new System.EventDispatcher( window );
+          _globalEvent = new EventDispatcher( window );
       }
       return _globalEvent;
 }
@@ -612,7 +620,7 @@ System.environments=function environments( name )
     if( typeof name === "string" ) {
         return System.environmentMap[name] || null;
     }
-    return System.Object.merge({},System.environmentMap);
+    return Object.merge({},System.environmentMap);
 }
 
 
@@ -621,14 +629,17 @@ System.environments=function environments( name )
  * @param name
  * @returns {Object}
  */
-System.getDefinitionByName = function getDefinitionByName(name) {
-
-    var module = Internal.getClassModule(name);
-    if( module && module.exports )
+System.getDefinitionByName = function getDefinitionByName(name)
+{
+    if( has.call(System, name) )
     {
-        return module.exports;
+        return System[name];
     }
-    if( has.call(System, name) )return System[name];
+    var module = Internal.require(name);
+    if( module )
+    {
+        return module;
+    }
     throw new TypeError('"' + name + '" is not defined.');
 };
 
@@ -710,7 +721,7 @@ System.getQualifiedSuperclassName =function getQualifiedSuperclassName(target)
 {
     if( target == null )throw new ReferenceError( 'target is null or undefined' );
     var classname = System.getQualifiedClassName( Object.getPrototypeOf( target ).constructor );
-    var module = Internal.getClassModule( classname );
+    var module = Internal.require( classname );
     if( module )
     {
         return System.getQualifiedClassName( module["extends"] || Object );

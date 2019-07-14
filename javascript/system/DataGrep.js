@@ -4,6 +4,7 @@
  * Released under the MIT license
  * https://github.com/51breeze/EaseScript
  * @author Jun Ye <664371281@qq.com>
+ * @require Object,Array,Function,Error,Symbol
  */
 
 /**
@@ -91,9 +92,7 @@ function createFilter()
 /**
  * @returns {DataGrep}
  * @constructor
- * @require Object,Math,DataArray,Array,Function,Error,Symbol
  */
-var storage=Internal.createSymbolStorage( Symbol('DataGrep') );
 function DataGrep( dataItems )
 {
     if( !(System.instanceOf(this,DataGrep)) )return new DataGrep( dataItems );
@@ -105,21 +104,25 @@ function DataGrep( dataItems )
     Object.defineProperty(this,"length", {value:0,writable:true});
 }
 
-System.DataGrep=DataGrep;
-DataGrep.prototype = Object.create( Object.prototype );
+module.exports = DataGrep;
+var System = require("./System.js");
+var Object = require("./Object.js");
+var Internal = require("./Internal.js");
+var Array = require("./Array.js");
+var Function = require("./Function.js");
+var Symbol = require("./Symbol.js");
+var Error = require("./Error.js");
+var storage=Internal.createSymbolStorage( Symbol('DataGrep') );
 
-/**
- * constructor.
- * @type {DataGrep}
- */
-DataGrep.prototype.constructor=DataGrep;
-
+DataGrep.prototype = Object.create( Object.prototype,{
+    "constructor":{value:DataGrep},
+    
 /**
  * 获取设置过滤器
  * @param condition
  * @returns {*}
  */
-DataGrep.prototype.filter=function filter( condition )
+"filter":{value:function filter( condition )
 {
     if( typeof condition === "undefined" )
     {
@@ -178,12 +181,12 @@ DataGrep.prototype.filter=function filter( condition )
         storage(this,"filter",null);
     }
     return storage(this,"filter");
-};
+}},
 
 /**
  * @returns {DataGrep}
  */
-DataGrep.prototype.clean=function()
+"clean":{value:function clean()
 {
     for(var i=0; i<this.length; i++)
     {
@@ -192,7 +195,7 @@ DataGrep.prototype.clean=function()
     storage(this,"filter",null);
     this.length=0;
     return this;
-};
+}},
 
 /**
  * 查询数据
@@ -200,7 +203,7 @@ DataGrep.prototype.clean=function()
  * @param filter
  * @returns {*}
  */
-DataGrep.prototype.execute=function(filter)
+"execute":{value:function execute(filter)
 {
     var data=storage(this,"dataItems");
     filter = this.filter( filter );
@@ -211,7 +214,7 @@ DataGrep.prototype.execute=function(filter)
         result.push( data[i] );
     }
     return result;
-};
+}},
 
 /**
  * 指定范围
@@ -221,14 +224,14 @@ DataGrep.prototype.execute=function(filter)
  * @param logic
  * @returns {*}
  */
-DataGrep.prototype.range=function(column, start, end, logic)
+"range":{value:function range(column, start, end, logic)
 {
     if(  start >= 0 || end > 0 )
     {
         strainer.call(this,column,start+','+end,'range',logic);
     }
     return this;
-};
+}},
 
 
 /**
@@ -239,7 +242,7 @@ DataGrep.prototype.range=function(column, start, end, logic)
  * @param logic
  * @returns {DataGrep}
  */
-DataGrep.prototype.index=function(start, end, logic)
+"index":{value:function index(start, end, logic)
 {
     if( start >= 0 || end > 0 )
     {
@@ -248,7 +251,7 @@ DataGrep.prototype.index=function(start, end, logic)
         strainer.call(this,'index',start+','+start+end,'index',logic);
     }
     return this;
-};
+}},
 
 /**
  * 筛选等于指定列的值
@@ -257,11 +260,11 @@ DataGrep.prototype.index=function(start, end, logic)
  * @param logic
  * @returns {DataGrep}
  */
-DataGrep.prototype.eq=function(column, value, logic)
+"eq":{value:function eq(column, value, logic)
 {
     strainer.call(this,column,value,'==',logic);
     return this;
-};
+}},
 
 /**
  * 筛选不等于指定列的值
@@ -270,11 +273,11 @@ DataGrep.prototype.eq=function(column, value, logic)
  * @param logic
  * @returns {DataGrep}
  */
-DataGrep.prototype.not=function(column, value, logic)
+"not":{value:function not(column, value, logic)
 {
     strainer.call(this,column,value,'!=',logic);
     return this;
-};
+}},
 
 /**
  * 筛选大于列的值
@@ -283,11 +286,11 @@ DataGrep.prototype.not=function(column, value, logic)
  * @param logic
  * @returns {DataGrep}
  */
-DataGrep.prototype.gt=function(column, value, logic)
+"gt":{value:function gt(column, value, logic)
 {
     strainer.call(this,column,value,'>',logic);
     return this;
-};
+}},
 
 /**
  * 筛选小于列的值
@@ -296,11 +299,11 @@ DataGrep.prototype.gt=function(column, value, logic)
  * @param logic
  * @returns {DataGrep}
  */
-DataGrep.prototype.lt=function(column, value, logic)
+"lt":{value:function lt(column, value, logic)
 {
     strainer.call(this,column,value,'<',logic);
     return this;
-};
+}},
 
 /**
  * 筛选大于等于列的值
@@ -309,11 +312,11 @@ DataGrep.prototype.lt=function(column, value, logic)
  * @param logic
  * @returns {DataGrep}
  */
-DataGrep.prototype.egt=function(column, value, logic)
+"egt":{value:function egt(column, value, logic)
 {
     strainer.call(this,column,value,'>=',logic);
     return this;
-};
+}},
 
 /**
  * 筛选小于等于列的值
@@ -322,11 +325,11 @@ DataGrep.prototype.egt=function(column, value, logic)
  * @param logic
  * @returns {DataGrep}
  */
-DataGrep.prototype.elt=function(column, value, logic)
+"elt":{value:function elt(column, value, logic)
 {
     strainer.call(this,column,value,'<=',logic);
     return this;
-};
+}},
 
 /**
  * 筛选模糊匹配列的值
@@ -335,11 +338,11 @@ DataGrep.prototype.elt=function(column, value, logic)
  * @param logic
  * @returns {DataGrep}
  */
-DataGrep.prototype.like=function(column, value, type, logic)
+"like":{value:function like(column, value, type, logic)
 {
     strainer.call(this,column,value,'like',logic,type);
     return this;
-};
+}},
 
 /**
  * 筛选排除模糊匹配列的值
@@ -348,11 +351,14 @@ DataGrep.prototype.like=function(column, value, type, logic)
  * @param logic
  * @returns {DataGrep}
  */
-DataGrep.prototype.notLike=function(column, value, type, logic)
+"notLike":{value:function notLike(column, value, type, logic)
 {
     strainer.call(this,column,value,'notlike',logic,type);
     return this;
-};
+}}
+
+});
+
 DataGrep.LIKE_LEFT='left';
 DataGrep.LIKE_RIGHT='right';
 DataGrep.LIKE_BOTH='both';

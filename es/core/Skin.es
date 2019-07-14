@@ -481,7 +481,7 @@ package es.core
         * 每一次调用此方法都会延迟执行来解决重复刷新的问题
         * @private
         */
-        protected function nowUpdate(delay:int=20):void
+        protected function nowUpdate(delay:int=200):void
         {
              invalidate=false;
              if( timeoutId )

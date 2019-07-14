@@ -2,15 +2,15 @@ if (System.env.platform(System.env.BROWSER_IE,8))
 {
     System.typeOf = function typeOf(instanceObj)
     {
-        if (instanceObj == null )return 'object';
-        if (instanceObj instanceof System.Class )return 'class';
-        if (instanceObj instanceof System.Interface)return 'interface';
-        if (instanceObj instanceof System.Namespace)return 'namespace';
+        if ( instanceObj == null )return 'object';
+        if ( System.isClass( instanceObj ) )return 'class';
+        if ( System.isInterface( instanceObj )  )return 'interface';
+        if ( System.isNamespace( instanceObj) )return 'namespace';
         var val = typeof instanceObj;
         if( val === "object" && /function/i.test(instanceObj+"") )
         {
             return "function";
-        } else if( val === 'function' && (instanceObj.constructor === System.RegExp || instanceObj.constructor===$RegExp ) )
+        } else if( val === 'function' && ( instanceObj.constructor === RegExp ) )
         {
             return "object";
         }
