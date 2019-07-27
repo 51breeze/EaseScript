@@ -19,6 +19,8 @@ function Error( message , filename, line )
 
 module.exports = Error;
 var Object = require("./Object.js");
+var Internal = require("./Internal.js");
+var $Error = Internal.$Error;
 
 Error.prototype =Object.create( $Error.prototype,{
     "constructor":{value:Error},

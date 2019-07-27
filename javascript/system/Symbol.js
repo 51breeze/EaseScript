@@ -6,8 +6,10 @@
  * @author Jun Ye <664371281@qq.com>
  * @require System,Internal
  */
-var hasSymbol = !!$Symbol;
-var _Symbol = $Symbol || (function()
+var Internal = require("./Internal.js");
+var System = require("./System.js");
+var hasSymbol = !!Internal.$Symbol;
+var _Symbol = Internal.$Symbol || (function()
 {
     var tables={};
     var hash={};

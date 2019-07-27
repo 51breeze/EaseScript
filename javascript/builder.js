@@ -183,6 +183,12 @@ function include_module(contents, name , filepath, fix, libs, callback )
     name = mapname[name] || name;
     if( loaded[name] === true )return;
     loaded[name]=true;
+
+    if( utils.excludeLoadSystemFile( name ) )
+    {
+         return;
+    }
+
     if( !filepath )
     {
         filepath = rootPath + '/system/' + name + '.js';
@@ -220,10 +226,11 @@ function include_module(contents, name , filepath, fix, libs, callback )
             }
         }
        
-        if( globals.indexOf( orign ) >=0 )
-        {
-            str = "(function($"+orign+"){\n"+str+"\nreturn "+name+";\n}("+orign+"));";
-        }
+        // if( globals.indexOf( orign ) >=0 )
+        // {
+        //     str = "(function($"+orign+"){\n"+str+"\nreturn "+name+";\n}("+orign+"));";
+        // }
+        
         contents[ name ]=str;
         return true;
 

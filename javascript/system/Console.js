@@ -11,11 +11,12 @@ function Console()
 }
 
 module.exports = Console;
+var Internal = require("./Internal.js");
 var System = require("./System.js");
 var SyntaxError = require("./SyntaxError.js");
 var Function = require("./Function.js");
 var call = Function.prototype.call;
-var output = $console;
+var output = Internal.$console;
 
 function toString( args )
 {

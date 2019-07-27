@@ -147,6 +147,8 @@ Locator.toUrl=function toUrl( urlSegments )
         +(query?"?"+query:"");
 }
 
+var cached={};
+
 /**
  * 创建一个指定的url的分段信息
  * @param url  一个完整的url信息
@@ -156,45 +158,51 @@ Locator.toUrl=function toUrl( urlSegments )
 Locator.create=function create(url,name){
     if( typeof url !== "string" )return false;
     url = System.trim(url);
-    if( !/^(https?|file)\:\/\//i.test(url) ){
-       var http = location.protocol+"//"+location.hostname+(location.port ? ":"+location.port : "");
-       url = url.charAt(0) === "/" || url.charAt(0) === "?" ? http+url : http+"/"+url;
-    }
-
-    var match= url.match(/^((https?)\:\/\/)([\w\.\-]+)(\:(\d+))?(((\/([a-zA-Z]+[\w+](\.[a-zA-Z]+[\w+])?)*)+)?(\?(&?\w+\=?[^&#=]*)+)?(#[\w\,\|\-\+]*)?)?$/i);
-    if( !match && /^file\:\/\//i.test(url) )
+    if( !/^(https?|file)\:\/\//i.test(url) )
     {
-        match= url.match(/^((file)\:\/\/\/)([a-zA-Z]+\:)(\:(\d+))?(((\/([a-zA-Z]+[\w+](\.[a-zA-Z]+[\w+])?)*)+)?(\?(&?\w+\=?[^&#=]*)+)?(#[\w\,\|\-\+]*)?)?$/i);
+        var http = location.protocol+"//"+location.hostname+(location.port ? ":"+location.port : "");
+        url = url.charAt(0) === "/" || url.charAt(0) === "?" ? http+url : http+"/"+url;
     }
 
-    if( !match )return null;
-    var segments={
-        "host":match[3],
-        "origin":match[2]+"://"+match[3]+(match[5]?":"+match[5]:""),
-        "scheme":match[2],
-        "port":match[5]||"",
-        "uri":match[6],
-        "url":url,
-        "path":[],
-        "query":{},
-        "fragment":[]
-    }
-
-    var info = segments.uri.split("?",2);
-    var path = info[0].substr(1);
-    segments.path = path.split("/");
-    if( info[1] )
+    var segments = cached[ url ];
+    if( !segments )
     {
-        var query=info[1];
-        query = query.replace(/#([\w\,\|\-\+]+)$/g, function (a, b) {
-            if (b) segments.fragment.push(b);
-            return "";
-        });
-        query = query.split("&");
-        for (var i in query) {
-            var item = query[i].split("=");
-            segments.query[System.trim(item[0])] = window.decodeURIComponent(System.trim(item[1]));
+        var match= url.match(/^((https?)\:\/\/)([\w\.\-]+)(\:(\d+))?(((\/([a-zA-Z]+[\w+](\.[a-zA-Z]+[\w+])?)*)+)?(\?(&?\w+\=?[^&#=]*)+)?(#[\w\,\|\-\+]*)?)?$/i);
+        if( !match && /^file\:\/\//i.test(url) )
+        {
+            match= url.match(/^((file)\:\/\/\/)([a-zA-Z]+\:)(\:(\d+))?(((\/([a-zA-Z]+[\w+](\.[a-zA-Z]+[\w+])?)*)+)?(\?(&?\w+\=?[^&#=]*)+)?(#[\w\,\|\-\+]*)?)?$/i);
         }
+
+        if( !match )return null;
+        segments={
+            "host":match[3],
+            "origin":match[2]+"://"+match[3]+(match[5]?":"+match[5]:""),
+            "scheme":match[2],
+            "port":match[5]||"",
+            "uri":match[6],
+            "url":url,
+            "path":[],
+            "query":{},
+            "fragment":[]
+        }
+
+        var info = segments.uri.split("?",2);
+        var path = info[0].substr(1);
+        segments.path = path.split("/");
+        if( info[1] )
+        {
+            var query=info[1];
+            query = query.replace(/#([\w\,\|\-\+]+)$/g, function (a, b) {
+                if (b) segments.fragment.push(b);
+                return "";
+            });
+            query = query.split("&");
+            for (var i in query) {
+                var item = query[i].split("=");
+                segments.query[System.trim(item[0])] = window.decodeURIComponent(System.trim(item[1]));
+            }
+        }
+        cached[ url ] = segments;
     }
     return name ? segments[name] : segments;
 }

@@ -13,6 +13,8 @@ function Function() {
 module.exports = Function;
 var Object = require("./Object.js");
 var Array = require("./Array.js");
+var Internal = require("./Internal.js");
+var $Function = Internal.$Function;
 
 Function.prototype = Object.create( Object.prototype );
 Function.prototype.apply = $Function.prototype.apply;

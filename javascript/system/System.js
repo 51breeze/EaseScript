@@ -17,6 +17,9 @@ var JSON = require("./JSON.js");
 var Reflect = require("./Reflect.js");
 var Function = require("./Function.js");
 var EventDispatcher = require("./EventDispatcher.js");
+var $Object = Internal.$Object;
+var $Array = Internal.$Array;
+var $Function = Internal.$Function;
 
 System.isFinite = isFinite;
 System.decodeURI = decodeURI;
@@ -27,18 +30,6 @@ System.isNaN = isNaN;
 System.Infinity = Infinity;
 System.parseFloat = parseFloat;
 System.parseInt = parseInt;
-System.Math = Math;
-System.String = String;
-System.Number = Number;
-System.Boolean  = Boolean;
-System.RegExp = RegExp;
-System.Date = Date;
-System.RegExp = RegExp;
-System.Error  = Error;
-System.TypeError  = TypeError;
-System.ReferenceError  = ReferenceError;
-System.SyntaxError = SyntaxError;
-System.Node = Node;
 
 ;(function(f){
     System.setTimeout =f(setTimeout);
@@ -55,83 +46,9 @@ System.clearInterval = function(id){
 };
 
 /**
- * 环境参数配置
+ * 系统环境
  */
-System.env = {
-    'BROWSER_IE': 'IE',
-    'BROWSER_FIREFOX': 'FIREFOX',
-    'BROWSER_CHROME': 'CHROME',
-    'BROWSER_OPERA': 'OPERA',
-    'BROWSER_SAFARI': 'SAFARI',
-    'BROWSER_MOZILLA': 'MOZILLA',
-    'NODE_JS': 'NODE_JS',
-    'IS_CLIENT': false
-};
-
-/**
- * 获取环境变量的参数
- */
-(function (env) {
-
-    var _platform = [];
-    if (typeof navigator !== "undefined") {
-        var ua = navigator.userAgent.toLowerCase();
-        var s;
-        (s = ua.match(/msie ([\d.]+)/)) ? _platform = [env.BROWSER_IE, System.parseFloat(s[1])] :
-        (s = ua.match(/firefox\/([\d.]+)/)) ? _platform = [env.BROWSER_FIREFOX, System.parseFloat(s[1])] :
-        (s = ua.match(/chrome\/([\d.]+)/)) ? _platform = [env.BROWSER_CHROME, System.parseFloat(s[1])] :
-        (s = ua.match(/opera.([\d.]+)/)) ? _platform = [env.BROWSER_OPERA, System.parseFloat(s[1])] :
-        (s = ua.match(/version\/([\d.]+).*safari/)) ? _platform = [env.BROWSER_SAFARI, System.parseFloat(s[1])] :
-        (s = ua.match(/^mozilla\/([\d.]+)/)) ? _platform = [env.BROWSER_MOZILLA, System.parseFloat(s[1])] : null;
-        env.IS_CLIENT = true;
-    } else if (typeof process !== "undefined") {
-        _platform = [env.NODE_JS, process.versions.node];
-    }
-
-    /**
-     * 获取当前运行平台
-     * @returns {*}
-     */
-    env.platform = function platform(name, version)
-    {
-        if ( typeof name === "string" )
-        {
-            name = name.toUpperCase();
-            if( version > 0 )return name == _platform[0] && env.version( version );
-            return name == _platform[0];
-        }
-        return _platform[0];
-    };
-
-    /**
-     * 判断是否为指定的浏览器
-     * @param type
-     * @returns {string|null}
-     */
-    env.version = function version(value, expre) {
-        var result = _platform[1];
-        if (value == null)return result;
-        value = parseFloat(value);
-        switch (expre) {
-            case '=' :
-                return result == value;
-            case '!=' :
-                return result != value;
-            case '>' :
-                return result > value;
-            case '>=' :
-                return result >= value;
-            case '<=' :
-                return result <= value;
-            case '<' :
-                return result < value;
-            default:
-                return result <= value;
-        }
-    };
-
-}(System.env));
-
+System.env = Internal.env;
 
 /**
  * 返回对象类型的字符串表示形式
@@ -203,7 +120,7 @@ System.is=function is(instanceObj, theClass)
 {
     if( instanceObj == null )
     {
-        return theClass === Object || theClass===$Object  ? true : false;
+        return theClass === Object || theClass===$Object ? true : false;
     }
    
     if (theClass === 'class')
@@ -300,7 +217,7 @@ System.isObject = function isObject(val, flag )
     {
         return true;
     }
-    return flag && val instanceof $Object;
+    return flag && val instanceof Object;
 };
 /**
  * 检查所有传入的值定义
@@ -314,6 +231,7 @@ System.isDefined = function isDefined()
     while (i > 0) if (typeof arguments[--i] === 'undefined')return false;
     return true;
 };
+
 /**
  * 判断是否为数组
  * @param val
@@ -332,7 +250,7 @@ System.isArray = function isArray(val) {
  */
 System.isFunction = function isFunction(val) {
     if (!val)return false;
-    return System.typeOf(val) === 'function' || val instanceof Function || val instanceof $Function;
+    return System.typeOf(val) === 'function' || val instanceof Function || Object.getPrototypeOf(val) === $Function.prototype;
 };
 /**
  * 判断是否为布尔类型
@@ -635,7 +553,7 @@ System.getDefinitionByName = function getDefinitionByName(name)
     {
         return System[name];
     }
-    var module = Internal.require(name);
+    var module = Internal.getClassModule(name);
     if( module )
     {
         return module;
@@ -645,10 +563,10 @@ System.getDefinitionByName = function getDefinitionByName(name)
 
 System.hasClass = function hasClass(name) 
 {
-    return !!Internal.getClassModule(name);
+    return !!Internal.getClassModule( name );
 };
 
-var map=['System','Class','Interface','Namespace','Reflect','Object','JSON','Array','String','EventDispatcher','TypeError','Error','Symbol','Element'];
+var map=['System','Class','Interface','Namespace','Reflect','Object','JSON','Array','String','RegExp','EventDispatcher','TypeError','Error','Symbol','Element'];
 
 /**
  * 返回类的完全限定类名
@@ -721,7 +639,7 @@ System.getQualifiedSuperclassName =function getQualifiedSuperclassName(target)
 {
     if( target == null )throw new ReferenceError( 'target is null or undefined' );
     var classname = System.getQualifiedClassName( Object.getPrototypeOf( target ).constructor );
-    var module = Internal.require( classname );
+    var module = Internal.getClassModule( classname );
     if( module )
     {
         return System.getQualifiedClassName( module["extends"] || Object );

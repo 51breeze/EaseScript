@@ -16,6 +16,7 @@ module.exports = MouseEvent;
 var Object = require("./Object.js");
 var Event = require("./Event.js");
 var System = require("./System.js");
+var Element = require("./Element.js");
 
 MouseEvent.prototype=Object.create( Event.prototype,{
     "constructor":{value:MouseEvent}
@@ -74,7 +75,7 @@ Event.fix.hooks[ MouseEvent.MOUSE_OUTSIDE ]=function(listener, dispatcher)
 {
     var doc = window;
     var target = this;
-    var elem = new System.Element( this );
+    var elem = new Element( this );
     var type = Event.fix.prefix+MouseEvent.CLICK;
     listener.proxyTarget = doc;
     listener.proxyType = [type];

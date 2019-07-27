@@ -18,6 +18,9 @@ var Namespace = require("./Namespace.js");
 var TypeError = require("./TypeError.js");
 var SyntaxError = require("./SyntaxError.js");
 var Object = require("./Object.js");
+var System = require("./System.js");
+var Internal = require("./Internal.js");
+var $Reflect = Internal.$Reflect;
 var $has = Object.prototype.hasOwnProperty;
 var ATTR_TYPE={
     1:"function",

@@ -16,6 +16,7 @@ function Event( type, bubbles, cancelable )
 module.exports = Event;
 var Object = require("./Object.js");
 var System = require("./System.js");
+var TypeError = require("./TypeError.js");
 
 
 /**

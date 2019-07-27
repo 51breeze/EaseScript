@@ -8,7 +8,7 @@ public function __construct(){
 parent::__construct();
 }
 public function one($id){
-	if(!\es\system\System::is($id,'int'))throw new \es\system\TypeError("type mismatch the \"\$id\" parameter must be int");
+	if(!\es\system\System::is('int',undefined))throw new \es\system\TypeError("type mismatch the \"\$id\" parameter must be int");
 	$result=$this->query('select * from news  where id = ?',[$id]);
 	return $this->success($result);
 }

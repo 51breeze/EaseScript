@@ -8,8 +8,8 @@ use es\system\System;
 class Service extends \es\system\EventDispatcher
 {
 static protected function pipeline(EventDispatcher $target,$type,$name,$cmd){
-	if(!\es\system\System::is($type,'String'))throw new \es\system\TypeError("type mismatch the \"\$type\" parameter must be String");
-	if(!\es\system\System::is($name,'String'))throw new \es\system\TypeError("type mismatch the \"\$name\" parameter must be String");
+	if(!\es\system\System::is('String',undefined))throw new \es\system\TypeError("type mismatch the \"\$type\" parameter must be String");
+	if(!\es\system\System::is('String',undefined))throw new \es\system\TypeError("type mismatch the \"\$name\" parameter must be String");
 	$event=new PipelineEvent($type);
 	$event->name=$name;
 	$event->cmd=$cmd;
@@ -24,19 +24,19 @@ public function __construct(){
 	parent::__construct();
 }
 protected function query($sql){
-	if(!\es\system\System::is($sql,'String'))throw new \es\system\TypeError("type mismatch the \"\$sql\" parameter must be String");
+	if(!\es\system\System::is('String',undefined))throw new \es\system\TypeError("type mismatch the \"\$sql\" parameter must be String");
 	return Service::pipeline($this,PipelineEvent::PIPELINE_DATABASE,"select",func_get_args());
 }
 protected function save($sql){
-	if(!\es\system\System::is($sql,'String'))throw new \es\system\TypeError("type mismatch the \"\$sql\" parameter must be String");
+	if(!\es\system\System::is('String',undefined))throw new \es\system\TypeError("type mismatch the \"\$sql\" parameter must be String");
 	return Service::pipeline($this,PipelineEvent::PIPELINE_DATABASE,"update",func_get_args());
 }
 protected function append($sql){
-	if(!\es\system\System::is($sql,'String'))throw new \es\system\TypeError("type mismatch the \"\$sql\" parameter must be String");
+	if(!\es\system\System::is('String',undefined))throw new \es\system\TypeError("type mismatch the \"\$sql\" parameter must be String");
 	return Service::pipeline($this,PipelineEvent::PIPELINE_DATABASE,"insert",func_get_args());
 }
 protected function remove($sql){
-	if(!\es\system\System::is($sql,'String'))throw new \es\system\TypeError("type mismatch the \"\$sql\" parameter must be String");
+	if(!\es\system\System::is('String',undefined))throw new \es\system\TypeError("type mismatch the \"\$sql\" parameter must be String");
 	return Service::pipeline($this,PipelineEvent::PIPELINE_DATABASE,"delete",func_get_args());
 }
 protected function success($data){
@@ -51,9 +51,9 @@ protected function success($data){
 	return new \es\system\BaseObject(["data"=>$data,"status"=>200]);
 }
 protected function failed($message,$errorCode=500,$status=200){
-	if(!\es\system\System::is($message,'String'))throw new \es\system\TypeError("type mismatch the \"\$message\" parameter must be String");
-	if(!\es\system\System::is($errorCode,'int'))throw new \es\system\TypeError("type mismatch the \"\$errorCode\" parameter must be int");
-	if(!\es\system\System::is($status,'int'))throw new \es\system\TypeError("type mismatch the \"\$status\" parameter must be int");
+	if(!\es\system\System::is('String',undefined))throw new \es\system\TypeError("type mismatch the \"\$message\" parameter must be String");
+	if(!\es\system\System::is('int',undefined))throw new \es\system\TypeError("type mismatch the \"\$errorCode\" parameter must be int");
+	if(!\es\system\System::is('int',undefined))throw new \es\system\TypeError("type mismatch the \"\$status\" parameter must be int");
 	return new \es\system\BaseObject(["message"=>$message,"errorCode"=>$errorCode,"status"=>$status]);
 }
 }

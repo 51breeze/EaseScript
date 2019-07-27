@@ -11,6 +11,7 @@ function EvalError( message , filename, line) {
 };
 module.exports = EvalError;
 var Object = require("./Object.js");
+var Error = require("./Error.js");
 EvalError.prototype = Object.create( Error.prototype,{
     "constructor":{value:EvalError}
 });

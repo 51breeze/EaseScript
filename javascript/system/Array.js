@@ -5,7 +5,6 @@
 * @author Jun Ye <664371281@qq.com>
 * @require System,Object,ReferenceError,TypeError
 */
-
 function Array(length)
 {
     if( !(this instanceof Array) )
@@ -29,11 +28,12 @@ function Array(length)
 };
 
 module.exports = Array;
-
+var Internal = require("./Internal.js");
 var System = require("./System.js");
 var Object = require("./Object.js");
 var ReferenceError = require("./ReferenceError.js");
 var TypeError = require("./TypeError.js");
+var $Array = Internal.$Array;
 
 Array.prototype = Object.create( Object.prototype,{
     "constructor":{value:Array},  

@@ -6,7 +6,8 @@
  * @author Jun Ye <664371281@qq.com>
  * @require Object, Array
  */
-var JSON= $JSON || (function()
+var Internal = require("./Internal.js");
+var _JSON= Internal.$JSON || (function()
 {
     function JSON() {
         if (this instanceof JSON)throw new TypeError('JSON is not constructor.');
@@ -49,7 +50,7 @@ var JSON= $JSON || (function()
 
 }());
 
-module.exports = JSON;
+module.exports = _JSON;
 var Object = require("./Object.js");
 var Array = require("./Array.js");
 var System = require("./System.js");

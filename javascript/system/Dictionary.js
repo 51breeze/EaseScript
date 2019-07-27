@@ -38,7 +38,7 @@ function indexByKey(map,key)
     return -1;
 };
 
-Object.create( Object.prototype, {
+Dictionary.prototype = Object.create( Object.prototype, {
 
 /**
  * 设置指定键值的数据,如果相同的键值则会覆盖之前的值。

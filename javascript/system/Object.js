@@ -6,6 +6,8 @@
  * @require System
  */
 
+var Internal = require("./Internal.js");
+var $Object = Internal.$Object;
 
 function Object( value )
 {
@@ -15,25 +17,9 @@ function Object( value )
 }
 
 /**
- * 定义属性描述
+ * 定义属性
  */
-if( $Object.defineProperty )
-{
-    $Object.defineProperty(Object, "defineProperty",{value:$Object.defineProperty});
-}
-
-var msie = typeof navigator !== "undefined" ? navigator.userAgent.toLowerCase().match(/msie ([\d.]+)/) : null;
-if( !Object.defineProperty || (msie && parseFloat( msie[1] ) < 9 ) )
-{
-    Object.defineProperty = function defineProperty(obj, prop, desc)
-    {
-        if( obj == null)
-        {
-            throw new TypeError('target is non-object');
-        }
-        return obj[prop] = desc.value;
-    }
-}
+Internal.defineProperty(Object,"defineProperty",{value:Internal.defineProperty});
 
 /**
  * 生成一个对象
@@ -165,7 +151,7 @@ Object.defineProperty(Object,"forEach",{
             var prop;
             for (prop in object)
             {
-                if (System.Symbol.isSymbolPropertyName && System.Symbol.isSymbolPropertyName(prop))continue;
+                if (Symbol.isSymbolPropertyName && Symbol.isSymbolPropertyName(prop))continue;
                 if (prop !== token && $Object.prototype.propertyIsEnumerable.call(object, prop))
                 {
                     value = object[prop];
@@ -279,7 +265,7 @@ Object.prototype = Object.create( $Object.prototype,{
                 if( this.constructor.__T__.dynamic !==true )return false;
                 if( this.constructor.__T__.uri[0] === name )return false;
             }
-            if( System.Symbol.isSymbolPropertyName && System.Symbol.isSymbolPropertyName(name) )return false;
+            if( Symbol.isSymbolPropertyName && Symbol.isSymbolPropertyName(name) )return false;
             return $Object.prototype.propertyIsEnumerable.call(this,name);
         }
     },
