@@ -4,7 +4,8 @@
 		"/MyIndex/viewport":"IndexApplication@viewport",
 		"/MyIndex/list":"IndexApplication@list",
 		"/MyIndex/home":"IndexApplication@home",
-		"/MyIndex/index":"IndexApplication@index"
+		"/MyIndex/index":"IndexApplication@index",
+		"/Person":"PersonApplication@index"
 	},
 	"post":{
 		"/MyIndex/home":"IndexApplication@home",

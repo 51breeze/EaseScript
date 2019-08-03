@@ -41,7 +41,7 @@ class EaseScript extends \es\system\EventDispatcher
             "HTTP_DEFAULT_ROUTE"=>"IndexApplication@home",
             "HTTP_ROUTES"=>&$routes,
             "URL_PATH_NAME"=>URL_PATH_NAME,
-            "VERSION"=>1564192015666,
+            "VERSION"=>1564835921314,
             "ROOT_PATH"=>EASESCRIPT_ROOT,
             "HTTP_ROUTE_CONTROLLER"=>null,
             "HTTP_ROUTE_PATH"=>null,

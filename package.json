@@ -10,8 +10,8 @@
   "scripts": {
     "version": "node ./bin/es.js -V",
     "dev": "node ./bin/es.js -p ./test -m test -s javascript --clean -b app",
-    "test": "node ./bin/es.js -p ./test -m production -s javascript -M disabled --clean -b Test --bm norm  --server disabled -o E:\\webroot\\working",
-    "create": "node ./bin/es.js -p ./test -m production -M disabled -s javascript --clean --server disabled -o E:\\webroot\\working"
+    "test": "node ./bin/es.js -p ./test -m production -s javascript -M disabled --clean -b Test --bm norm  --server disabled",
+    "create": "node ./bin/es.js -p ./test -m production -M disabled -s javascript --clean --server disabled"
   },
   "repository": {
     "type": "git",
@@ -43,7 +43,7 @@
     "source-map": "^0.7.3",
     "ts-loader": "^6.0.4",
     "uglify-js": "~3.1.1",
-    "webpack": "^4.35.2"
+    "webpack": "^4.38.0"
   },
   "devDependencies": {
     "colors": "~1.1.2",
@@ -52,6 +52,6 @@
     "socket.io": "^2.2.0",
     "source-map": "^0.7.3",
     "uglify-js": "~3.1.1",
-    "webpack-cli": "^3.3.5"
+    "webpack-cli": "^3.3.6"
   }
 }

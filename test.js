@@ -9,7 +9,7 @@ const config = {
   devtool:"(none)",
   entry:'./main.js',
   output: {
-    path:path.resolve('E:/webroot/working/webroot'),
+    path:path.resolve('./test/build'),
     filename: './bundle.js',
   },
   module: {
@@ -31,7 +31,8 @@ const config = {
     ]
   },
   plugins: [
-    new MyPlugin({context:__dirname})
+    new MyPlugin({context:__dirname}),
+   // new webpack.MemoryOutputFileSystem()
   ]
 };
 
@@ -62,27 +63,55 @@ MyPlugin.prototype.apply = function(compiler)
   compiler.hooks.normalModuleFactory.tap("MyPlugin",function(normalModuleFactory){
 
 
+      
+
+      // normalModuleFactory.hooks.factory.tap("MyPlugin",function( callback ){
+
+      //        console.log( this  );
+      //        process.exit();
+
+      //        //return null;
+         
+
+      // })
+
+
+
       normalModuleFactory.hooks.beforeResolve.tapAsync("MyPlugin",function(	data, callback )
       {
+
+
+        // console.log(data, data.request )
+        // process.exit();
+        
           if( data.request.charAt(0)==="@" && path.extname(data.request)===options.suffix  )
           {
               data.request = data.request.substr(1);
-              if( !fs.existsSync( data.request ) )
+
+              var file = data.request.slice(0,-options.suffix.length);
+              if( path.extname(file) === ".js" )
               {
-                 var file = data.request.slice(0,-options.suffix.length);
-                 if( path.extname(file) === ".js" )
-                 {
-                    var file = path.resolve( options.context,'javascript/system',  data.request );
-                    if( !fs.existsSync( file ) )
-                    {
-                        file = file.slice(0,-options.suffix.length);
-                    }
-                 }
-                 
-                 data.request = file;
+                  file = path.resolve(options.context,'javascript/system', file );
+
+              }else{
+                
+                file = path.resolve(options.context,'javascript/system', file+".js" );
+                if( !fs.existsSync( file ) )
+                {
+                    file = data.request;
+                }
               }
+
+            // console.log( file,"====" );
+              
+              data.request = file;
+             
           }
-          callback();
+
+          //if( data.request !== 'System.js'  ){
+
+              callback();
+          //}
         
       });
         

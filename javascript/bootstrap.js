@@ -1,38 +1,67 @@
+(function(definedModules, undefined){
+
 var httpRoutes = [CODE[SERVICE_ROUTE_LIST]];
 var defaultRoute = "[CODE[DEFAULT_BOOTSTRAP_ROUTER_PROVIDER]]";
-var global = System.getGlobalEvent();
 
 /**
  * 运行环境相关信息
  */
-System.environmentMap={
+var env={
     "HTTP_DEFAULT_ROUTE":defaultRoute,
     "HTTP_ROUTES":httpRoutes,
     "HTTP_ROUTE_PATH":null,
+    "MODE":[CODE[MODE]],
+    "ORIGIN_SYNTAX":"[CODE[ORIGIN_SYNTAX]]",
+    "URL_PATH_NAME":"[CODE[STATIC_URL_PATH_NAME]]",
     "HTTP_ROUTE_CONTROLLER":null,
     "COMMAND_SWITCH":[CODE[COMMAND_SWITCH]],
-    "URL_PATH_NAME":"[CODE[STATIC_URL_PATH_NAME]]",
     "VERSION":[CODE[VERSION]],
     "LOAD_JS_PATH":"[CODE[JS_LOAD_PATH]]",
     "LOAD_CSS_PATH":"[CODE[CSS_LOAD_PATH]]",
-}
-
-var EaseScript = {
-    "System":System,
-    "Internal":Internal,
-    "Requirements":[CODE[LOAD_REQUIREMENTS]],
-    "Load":{},
-    "Environments":System.environmentMap
+    "MODULE_SUFFIX":"[CODE[MODULE_SUFFIX]]"
 };
 
 /**
- * 分块时加载文件的安装器
+ * 框架信息
  */
-EaseScript.installer=function(classname, factory)
+var EaseScript = {
+    "Requirements":[CODE[LOAD_REQUIREMENTS]],
+    "Load":{},
+    "Environments":env
+};
+
+/**
+ * 已加载的模块
+ */
+var installedModules = {};
+
+/**
+ * 加载并初始化模块
+ * @param string 
+ */
+function require( classname )
 {
-    EaseScript.Load[ classname ]= factory;
-    factory.call( EaseScript , Internal, System );
+    if( installedModules[classname] )
+    {
+        return installedModules[classname].exports;
+    }
+
+    var module = installedModules[classname] = {
+        id: classname,
+        exports: {}
+    };
+
+	definedModules[classname].call(module.exports, module, require);
+	return module.exports;
 }
+
+var Internal= require("[CODE[REQUIRE_IDENTIFIER(Internal)]]");
+var locator = require("[CODE[REQUIRE_IDENTIFIER(Locator)]]");
+var Object  = require("[CODE[REQUIRE_IDENTIFIER(Object)]]");
+var System  = require("[CODE[REQUIRE_IDENTIFIER(System)]]");
+var Event   = require("[CODE[REQUIRE_IDENTIFIER(Event)]]");
+var global  = System.getGlobalEvent();
+Object.merge(Internal.env, env);
 
 /**
  * 加载指定的脚本文件
@@ -100,10 +129,10 @@ function loadScript(filename,callback){
 function start(module, method)
 {
     try {
-        var main = Internal.require( module );
+        var main = require( module );
         var obj = new main();
-        var Event = System.Event;
-        var response = Reflect.call(main, obj, method);
+        global.dispatchEvent(new Event(Event.INITIALIZING));
+        var response = obj[method]();
         if (global.hasEventListener(Event.INITIALIZE_COMPLETED)) {
             global.dispatchEvent(new Event(Event.INITIALIZE_COMPLETED));
         }
@@ -128,23 +157,39 @@ function loader(requirements, then)
     }());
 }
 
+/**
+ * 初始化模块文件
+ * @param {} module 
+ */
 function initModule(module)
 {
     if( typeof EaseScript.Load[module] === "function" && EaseScript.Load[module].init !==true )
     {
         EaseScript.Load[module].init = true;
-        EaseScript.Load[module](Internal, System);
+        var modules = EaseScript.Load[module].call( EaseScript, require );
+        Object.forEach( modules, function(classModule,classname)
+        {
+            if( !definedModules.hasOwnProperty(classname) )
+            {
+                definedModules[ classname ] = classModule;
+            }
+        });
     }
 }
+
+var handle = "[CODE[HANDLE]]";
+EaseScript.Load = (typeof window[ handle ] === "object" &&  window[ handle ].Load) || {};
+window[ handle ]=EaseScript;
 
 /**
  * 文档加载就绪
  */
 global.addEventListener(Event.READY,function (e) {
+
     try{
-        var locator = System.Locator;
+       
         var router = httpRoutes.get || {};
-        var path = locator.query("[CODE[STATIC_URL_PATH_NAME]]");
+        var path = locator.query( env.URL_PATH_NAME );
         if( !path ){
             path = '/'+locator.path().join("/");
         }
@@ -153,21 +198,22 @@ global.addEventListener(Event.READY,function (e) {
         var controller = router.split("@");
         var module = controller[0];
         var method = controller[1];
-        System.environmentMap.HTTP_ROUTE_CONTROLLER=router;
+        env.HTTP_ROUTE_CONTROLLER=router;
         if( typeof httpRoutes.get[ path ] !== "undefined"){
-            System.environmentMap.HTTP_ROUTE_PATH = path ;
+            env.HTTP_ROUTE_PATH = path ;
         }else{
-            System.Object.forEach(httpRoutes.get,function (provider, name) {
+            Object.forEach(httpRoutes.get,function (provider, name) {
                 if( provider === router ){
-                    System.environmentMap.HTTP_ROUTE_PATH = name;
+                    env.HTTP_ROUTE_PATH = name;
                     return false;
                 }
             });
         }
 
         //调度指定模块中的方法
-        (System.environmentMap.HTTP_DISPATCHER=function(module, method, callback)
+        (env.HTTP_DISPATCHER=function(module, method, callback)
         {
+            module = module+env.MODULE_SUFFIX;
             //如果存在先初始化
             initModule(module);
             //如果模块类已经加载
@@ -209,4 +255,5 @@ global.addEventListener(Event.READY,function (e) {
         throw new Error( e.message );
     }
 },false,-500);
-window["[CODE[HANDLE]]"]=EaseScript;
+
+}([CODE[MODULES]]));

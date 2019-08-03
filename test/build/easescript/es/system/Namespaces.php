@@ -13,7 +13,7 @@ class Namespaces
 {
     private $prefix = '';
     private $uri = '';
-    private static $map = array('es.core/public:es_internal'=>'K3');
+    private static $map = array('es.core/public:es_internal'=>'s3');
     static public function getUid( $uri )
     {
           if( isset( self::$map[$uri] ) )

@@ -1,18 +1,20 @@
-import Index from './test/src/IndexApplication.es';
-import Event from '@Event.es';
-import System from '@System.es';
+//  import Index from './test/src/IndexApplication.es';
+//  import Event from '@Event.es';
+//  import System from '@System.es';
+
+ import System from 'System.js';
 
 
-var bb = () => 123;
-var obj = new Index();
+// var bb = () => 123;
+// var obj = new Index();
 
-var global = System.getGlobalEvent();
-global.addEventListener(Event.READY,function (e) {
+// var global = System.getGlobalEvent();
+// global.addEventListener(Event.READY,function (e) {
    
 
-    console.log(  bb(), obj.home()+""  );
+//     console.log(  bb(), obj.home()+""  );
 
 
-},false,-500);
+// },false,-500);
 
 

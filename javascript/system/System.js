@@ -7,10 +7,16 @@
 * @require System,Internal;
 */
 
+
 var System={};
+var Internal = require("./Internal.js");
 module.exports =System;
 
-var Internal = require("./Internal.js");
+/**
+ * 系统环境
+ */
+System.env = Internal.env;
+
 var Object = require("./Object.js");
 var Array = require("./Array.js");
 var JSON = require("./JSON.js");
@@ -44,11 +50,6 @@ System.clearTimeout = function(id){
 System.clearInterval = function(id){
     return clearInterval( id );
 };
-
-/**
- * 系统环境
- */
-System.env = Internal.env;
 
 /**
  * 返回对象类型的字符串表示形式

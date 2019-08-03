@@ -3,117 +3,128 @@
 	"debug":"enable",
 	"blockScope":"disabled",
 	"reserved":[],
-	"minify":"enable",
-	"animate":true,
+	"minify":"disabled",
+	"animate":false,
 	"font":true,
+	"theme":"default",
+	"theme_file_path":"D:/workspace/EaseScript/test/src/theme",
 	"source_file":"enable",
 	"compat_version":{
 		"ie":9
 },
-	"build_path":"E:/EaseScript/test/build",
-	"project_path":"E:/EaseScript/test",
-	"workspace":"E:/EaseScript/test/src",
+	"build_path":"D:/workspace/EaseScript/test/build",
+	"project_path":"D:/workspace/EaseScript/test",
+	"workspace":"D:/workspace/EaseScript/test/src",
 	"skin_file_suffix":".html",
 	"project_file_suffix":".es",
 	"browser":"enable",
 	"baseSkinClass":"es.core.Skin",
-	"bootstrap":"E:/EaseScript/test/src/IndexApplication.es",
 	"strictType":true,
 	"service_provider_syntax":"php",
 	"static_url_path_name":"PATH",
-	"enable_webroot":true,
+	"enable_webroot":false,
 	"command_switch":0,
 	"script_part_load":true,
 	"system_lib_path_name":"es",
-	"system_lib_path":"E:/EaseScript/",
+	"system_global_path":"D:/workspace/EaseScript/javascript/system",
+	"system_lib_path":"D:/workspace/EaseScript/",
 	"system_style_name":"style",
-	"system_style_path":"E:/EaseScript/",
+	"system_style_path":"D:/workspace/EaseScript/",
 	"build_libaray_name":"es",
 	"build_system_path":"es.system",
 	"clean":true,
-	"mode":1,
+	"mode":3,
 	"build_mode":"app",
 	"on_error_exit":true,
 	"watching":false,
 	"serverEnable":false,
-	"module_exports":true,
-	"root_path":"E:/EaseScript",
+	"module_exports":false,
+	"syntax":"javascript",
+	"root_path":"D:/workspace/EaseScript",
 	"build":{
-		"path":"E:/EaseScript/test/build",
+		"path":"D:/workspace/EaseScript/test/build",
 		"name":"build",
 		"child":{
 			"js":{
-				"path":"E:/EaseScript/test/build/webroot/js",
+				"path":"D:/workspace/EaseScript/test/build/webroot/js",
 				"name":"js"
 		},
 			"img":{
-				"path":"E:/EaseScript/test/build/webroot/img",
+				"path":"D:/workspace/EaseScript/test/build/webroot/img",
 				"name":"img"
 		},
 			"css":{
-				"path":"E:/EaseScript/test/build/webroot/css",
+				"path":"D:/workspace/EaseScript/test/build/webroot/css",
 				"name":"css"
 		},
 			"font":{
-				"path":"E:/EaseScript/test/build/webroot/fonts",
+				"path":"D:/workspace/EaseScript/test/build/webroot/fonts",
 				"name":"fonts"
 		},
 			"view":{
-				"path":"E:/EaseScript/test/build/easescript/view",
+				"path":"D:/workspace/EaseScript/test/build/easescript/view",
 				"name":"view"
 		},
 			"html":{
-				"path":"E:/EaseScript/test/build/webroot/html",
+				"path":"D:/workspace/EaseScript/test/build/webroot/html",
 				"name":"html"
 		},
 			"webroot":{
-				"path":"E:/EaseScript/test/build/webroot",
+				"path":"D:/workspace/EaseScript/test/build/webroot",
 				"name":"webroot"
 		},
+			"system":{
+				"path":"D:/workspace/EaseScript/test/build/webroot/js/system",
+				"name":"system"
+		},
+			"core":{
+				"path":"D:/workspace/EaseScript/test/build/webroot/js",
+				"name":"js"
+		},
 			"bootstrap":{
-				"path":"E:/EaseScript/test/build/easescript/bootstrap",
+				"path":"D:/workspace/EaseScript/test/build/easescript/bootstrap",
 				"name":"bootstrap"
 		},
 			"application":{
-				"path":"E:/EaseScript/test/build/easescript",
+				"path":"D:/workspace/EaseScript/test/build/easescript",
 				"name":"easescript"
 		}
 	}
 },
 	"project":{
-		"path":"E:/EaseScript/test",
+		"path":"D:/workspace/EaseScript/test",
 		"name":"test",
 		"child":{
 			"src":{
-				"path":"E:/EaseScript/test/src",
+				"path":"D:/workspace/EaseScript/test/src",
 				"name":"src"
 		},
 			"image":{
-				"path":"E:/EaseScript/test/src/image",
+				"path":"D:/workspace/EaseScript/test/src/image",
 				"name":"image"
 		},
 			"style":{
-				"path":"E:/EaseScript/test/src/style",
+				"path":"D:/workspace/EaseScript/test/src/style",
 				"name":"style"
 		},
 			"theme":{
-				"path":"E:/EaseScript/test/src/theme",
+				"path":"D:/workspace/EaseScript/test/src/theme",
 				"name":"theme"
 		},
 			"app":{
-				"path":"E:/EaseScript/test/src/app",
+				"path":"D:/workspace/EaseScript/test/src/app",
 				"name":"app"
 		},
 			"view":{
-				"path":"E:/EaseScript/test/src/view",
+				"path":"D:/workspace/EaseScript/test/src/view",
 				"name":"view"
 		},
 			"component":{
-				"path":"E:/EaseScript/test/src/component",
+				"path":"D:/workspace/EaseScript/test/src/component",
 				"name":"component"
 		},
 			"skin":{
-				"path":"E:/EaseScript/test/src/skin",
+				"path":"D:/workspace/EaseScript/test/src/skin",
 				"name":"skin"
 		}
 	}
