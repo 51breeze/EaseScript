@@ -72,8 +72,8 @@
         [Bindable]
         public var childText:String = "Hello Word!";
 
-        [Embed('./Tulips.jpg')]
-        private var img:*;
+        //[Embed('./Tulips.jpg')]
+        //private var img:*;
 
         public var myName:String = "yejun";
 
@@ -104,7 +104,7 @@
             margin:0px;
             .border-radius( @radius, @radius,  @radius,  @radius);
             .box-shadow( 0px 2px 8px rgba(0,0,0,.35) );
-            background: url(@Embed("./Tulips.jpg"));
+            background:url(./image/Tulips.jpg);
         }
 
         /*ie6*/
@@ -183,24 +183,24 @@
 
     <thead id="@head">
       <tr>
-          <:foreach name="columns" value="name" >
-              <th style="height:{headHeight}px;line-height:{headHeight}px;">{name}</th>
+          <:foreach name="dataset.columns" value="name" >
+              <th style="height:{dataset.headHeight}px;line-height:{dataset.headHeight}px;">{name}</th>
           </:foreach>
       </tr>
     </thead>
 
     <tbody id="@body">
-        <:foreach name="datalist" value="item">
+        <:foreach name="dataset.datalist" value="item">
             <tr> 
                 <:foreach name="item" value="val" key="ukey">
                     <:switch condition="ukey">
                         <:case condition="name" break="true">
-                            <td data-column="{key}" style="height:{rowHeight}px;line-height:{rowHeight}px;">
+                            <td data-column="{key}" style="height:{dataset.rowHeight}px;line-height:{dataset.rowHeight}px;">
                                 <input value="{val}" data-index="{item.id}" style="height: 25px;" />
                             </td>
                         </:case>
                         <:default>
-                             <td data-column="{key}" style="height:{rowHeight}px;line-height:{rowHeight}px;">{val}</td>
+                             <td data-column="{key}" style="height:{dataset.rowHeight}px;line-height:{dataset.rowHeight}px;">{val}</td>
                         </:default>
                     </:switch>
                 </:foreach>

@@ -3,6 +3,7 @@ const globals=utils.globals;
 const rootPath =  utils.getResolvePath( __dirname );
 const path = require("path");
 const fs = require("fs");
+const url = require('url');
 
 /**
  * 在特定的版本下需要加载的库文件
@@ -495,7 +496,17 @@ function findThemeStyleByName(styles, name )
 function combineThemeStyle( themes, styles, config )
 {
     return themes.map(function (a) {
+
         var content = a.content;
+        var file = a.file;
+        if( !content && a.attr.file )
+        {
+            content = utils.trim( utils.getContents( a.attr.file ) );
+            file = a.attr.file;
+        }
+
+        //content = correction(config, content, [path.dirname(file)] );
+
         if( a.attr.combine )
         {
            var results = findThemeStyleByName( styles, a.attr.combine ).map(function (a) {
@@ -503,9 +514,11 @@ function combineThemeStyle( themes, styles, config )
            });
            return content +"\n"+ results.join("\n");
 
-        }else{
+        }else
+        {
             return content;
         }
+
     }).join("\n");
 }
 
@@ -625,68 +638,58 @@ function importCssPath( name , project_path, less_path )
  * @param lessPath
  * @returns {*}
  */
-function correction( file, content, importStyle, loadedStyle, included, config, lessPath )
+function correction(config, content, context)
 {
     var e = content;
-    var root = file ? path.dirname(file) : "";
-    if( root )
-    {
-        root = root.replace(/\\/g, '/').replace(/\/$/,'')+"/";
-    }
 
     //修正图片地址
-    e = e.replace(/url\s*\(\s*[^@](.*?)\)/ig, function (a, b) 
+    e = e.replace(/\burl\s*\(\s*([\'\"])([^\1]*?)\1\)/ig, function (a,c,b) 
     {
-        b = root+b.replace(/^["']|["']$/g,"");
+        b = utils.trim(b);
         if( b.substr(0,5) === "http:" || b.substr(0,6) === "https:" )return a;
-        var dest = utils.copyfileToBuildDir( b, utils.getBuildPath(config, 'build.img'), config );
-        var url = '"./' + path.relative(utils.getBuildPath(config, 'build.css'), dest).replace(/\\/g, '/') + '"';
-        return "url("+url+")";
-    });
-
-    //加载需要嵌入的文件
-    e = e.replace(/@Embed\(.*?\)/ig, function (a, b)
-    {
-        var metatype = utils.executeMetaType(a.substr(1));
-        var dest = utils.parseMetaEmbed(metatype, config, root);
-        return '"./' + path.relative(utils.getBuildPath(config, 'build.css'), dest).replace(/\\/g, '/') + '"';
+        var info = url.parse( b );
+        var suffix = [info.search,info.hash].filter(function(val){return !!val;}).join("");
+        b = utils.resolvePath( b, context);
+        var dest = utils.copyfileToBuildDir( b, utils.getBuildPath(config, 'build.assets'), config );
+        var u = '"./' + path.relative( utils.getBuildPath(config, 'build.css'), dest).replace(/\\/g, '/') +suffix+ '"';
+        return "url("+u+")";
     });
 
     //导入样式或者less
-    e = e.replace(/\B@import\s+([\'\"])(.*?)\1[;\B]?/gi, function (a,b,c)
-    {
-        c = root+ utils.trim(c);
+    // e = e.replace(/\B@import\s+([\'\"])(.*?)\1[;\B]?/gi, function (a,b,c)
+    // {
+    //     c = root+ utils.trim(c);
 
-        //获取样式的绝对路径
-        var file = importCssPath( c , config.project_path, lessPath );
+    //     //获取样式的绝对路径
+    //     var file = importCssPath( c , config.project_path, lessPath );
 
-        //如果没有加载过指定的文件
-        if( loadedStyle[file] !== true )
-        {
-            loadedStyle[file] = true;
-            if (c.slice(-4) === ".css")
-            {
-                return utils.getContents( file );
-            } else {
-                importStyle.push( file );
-            }
-        }
-        return '';
-    });
+    //     //如果没有加载过指定的文件
+    //     if( loadedStyle[file] !== true )
+    //     {
+    //         loadedStyle[file] = true;
+    //         if (c.slice(-4) === ".css")
+    //         {
+    //             return utils.getContents( file );
+    //         } else {
+    //             importStyle.push( file );
+    //         }
+    //     }
+    //     return '';
+    // });
 
     //合并样式
-    e = e.replace(/\B@include\s+([\'\"])(.*?)\1[;\B]?/gi, function (a,b,c)
-    {
-        c = root+ utils.trim(c);
-        if( included[c] !==true  )
-        {
-            included[c] = true;
-            //获取样式的绝对路径
-            var file = importCssPath(c, config.project_path );
-            return utils.getContents( file );
-        }
-        return "";
-    });
+    // e = e.replace(/\B@include\s+([\'\"])(.*?)\1[;\B]?/gi, function (a,b,c)
+    // {
+    //     c = root+ utils.trim(c);
+    //     if( included[c] !==true  )
+    //     {
+    //         included[c] = true;
+    //         //获取样式的绝对路径
+    //         var file = importCssPath(c, config.project_path );
+    //         return utils.getContents( file );
+    //     }
+    //     return "";
+    // });
     return e;
 }
 
@@ -710,7 +713,9 @@ function makeAllModuleStyleContent(config,modules)
             {
                 stylefile = path.resolve( config.project_path, stylefile );
             }
+           
             e = utils.getContents(stylefile);
+            //e = correction( config, e , [path.dirname(stylefile)] );
         }
         //模块中的样式内容
         else if( m.ownerFragmentModule )
@@ -745,6 +750,36 @@ function makeLessStyleContent(config, modules)
     return `\n@import "${imports}";\n${content}`;
 }
 
+function makeStyleContentAssets(config, content, context )
+{
+    var assets  ={};
+    var formpath   = config.workspace;
+    var csspath = utils.getBuildPath(config, 'build.css');
+
+     //修正图片地址
+    content = content.replace(/((\:|\,)\s*)url\s*\(\s*([\'\"])?([^\3]*?)\3?\)/ig, function (a,c,e,f,b) 
+    {
+         b = utils.trim(b);
+         if( b.substr(0,5) === "http:" || b.substr(0,6) === "https:" )
+         {
+             return a;
+         }
+        var info = url.parse( b );
+        var suffix = [info.search,info.hash].filter(function(val){return !!val;}).join("");
+        var dest = utils.makeAssetsFile( config, formpath, utils.resolvePath( b, context) );
+        var u =  utils.getRequestRelativePath(config, utils.getBuildPath(config,'css'), dest)+suffix;
+        assets[ b ]= dest;
+        return `${c}url("${u}")`;
+    });
+
+    return {
+        content:content,
+        assets:assets,
+    };
+}
+
+
+
 
 builder.outputFiles = outputFiles;
 builder.makeLessStyleContent = makeLessStyleContent;
@@ -752,6 +787,8 @@ builder.makeAllModuleStyleContent = makeAllModuleStyleContent;
 builder.buildModuleToJsonString = buildModuleToJsonString;
 builder.getAssetsFilePath = getAssetsFilePath;
 builder.getCoreStyleFilePath = getCoreStyleFilePath;
+builder.correction = correction;
+builder.makeStyleContentAssets = makeStyleContentAssets;
 builder.chunk=chunk;
 builder.getThemeConfig=getThemeConfig;
 builder.getBootstrapView = getBootstrapView;

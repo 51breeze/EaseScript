@@ -122,6 +122,7 @@ function Bindable(source,properties)
 module.exports = Bindable;
 var EventDispatcher = require("./EventDispatcher.js");
 var Object = require("./Object.js");
+var System = require("./System.js");
 var PropertyEvent = require("./PropertyEvent.js");
 var Symbol = require("./Symbol.js");
 var Dictionary = require("./Dictionary.js");

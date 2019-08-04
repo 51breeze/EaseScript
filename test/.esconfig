@@ -22,7 +22,7 @@
 	"strictType":true,
 	"service_provider_syntax":"php",
 	"static_url_path_name":"PATH",
-	"enable_webroot":false,
+	"enable_webroot":true,
 	"command_switch":0,
 	"script_part_load":true,
 	"system_lib_path_name":"es",
@@ -37,7 +37,7 @@
 	"build_mode":"app",
 	"on_error_exit":true,
 	"watching":false,
-	"serverEnable":false,
+	"serverEnable":true,
 	"module_exports":false,
 	"syntax":"javascript",
 	"root_path":"D:/workspace/EaseScript",
@@ -45,21 +45,25 @@
 		"path":"D:/workspace/EaseScript/test/build",
 		"name":"build",
 		"child":{
+			"assets":{
+				"path":"D:/workspace/EaseScript/test/build/webroot/assets",
+				"name":"assets"
+		},
 			"js":{
 				"path":"D:/workspace/EaseScript/test/build/webroot/js",
 				"name":"js"
 		},
 			"img":{
-				"path":"D:/workspace/EaseScript/test/build/webroot/img",
-				"name":"img"
+				"path":"D:/workspace/EaseScript/test/build/webroot/assets",
+				"name":"assets"
 		},
 			"css":{
 				"path":"D:/workspace/EaseScript/test/build/webroot/css",
 				"name":"css"
 		},
 			"font":{
-				"path":"D:/workspace/EaseScript/test/build/webroot/fonts",
-				"name":"fonts"
+				"path":"D:/workspace/EaseScript/test/build/webroot/assets",
+				"name":"assets"
 		},
 			"view":{
 				"path":"D:/workspace/EaseScript/test/build/easescript/view",
