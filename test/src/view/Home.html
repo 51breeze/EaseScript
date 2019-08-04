@@ -65,14 +65,14 @@
             {this.children}
         </s:Container>
     
-        <c:DataGrid id="@dataGrid"  includeIn="success" onClick="{click}" skinClass='MyDataGridSkin' >
+        <c:DataGrid id="@dataGrid"  includeIn="success" onClick="{click}"  >
 
-            <!-- <c:source>http://local.working.com/json.php</c:source>
+            <c:source>http://local.working.com/json.php</c:source>
             <c:dataSource>
                 <c:dataType>@Http.TYPE_JSONP</c:dataType>
-            </c:dataSource> -->
+            </c:dataSource>
 
-            <c:source>
+            <!-- <c:source>
                 <ss:Array>
                     <ss:Object>
                         <id>ID</id>
@@ -85,7 +85,7 @@
                         <phone>kkkkk</phone>
                     </ss:Object>
                 </ss:Array>
-            </c:source>
+            </c:source> -->
             
             <c:columns>
                 <id>ID</id>

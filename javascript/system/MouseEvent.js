@@ -38,12 +38,10 @@ MouseEvent.MOUSE_WHEEL='mousewheel';
 MouseEvent.CLICK='click';
 MouseEvent.DBLCLICK='dblclick';
 
-var lastOriginalEvent;
 
 //鼠标事件
 Event.registerEvent(function ( type , target, originalEvent ) {
 
-    lastOriginalEvent = originalEvent;
     if( type && /^mouse|click$/i.test(type) )
     {
         var event =new MouseEvent( type );

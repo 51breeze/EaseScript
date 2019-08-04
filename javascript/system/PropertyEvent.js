@@ -34,14 +34,26 @@ Event.registerEvent(function ( type , target, originalEvent )
     switch ( type ){
         case PropertyEvent.CHANGE :
         case PropertyEvent.COMMIT :
-            if( originalEvent instanceof  Event )return originalEvent;
+            if( originalEvent instanceof Event )return originalEvent;
             var event =new PropertyEvent( type );
             var property = typeof originalEvent.propertyName === "string" ? originalEvent.propertyName : null;
             if( property===hash)return null;
-            if( !property && System.Element.isForm(target,'button') )
+
+            var nodename = target && typeof target.nodeName=== "string" ? target.nodeName.toLowerCase() : '';
+            if( !property && nodename )
             {
-                property = 'value';
+                switch ( nodename )
+                {
+                    case 'select'   :
+                    case 'input'    :
+                    case 'textarea' :
+                        property='value';
+                    break;
+                    default:
+                        property='textContent';
+                }
             }
+          
             if( property )
             {
                 event.property = property;

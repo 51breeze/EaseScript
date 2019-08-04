@@ -88,7 +88,7 @@ Event.fix.hooks[ Event.READY ]=function (listener, dispatcher)
         {
             if( document_head === null && !document.head )
             {
-                document.head = (new System.Element("head"))[0];
+                document.head = document.getElementsByTagName("head")[0];
             }
             event = event instanceof Event ? event : Event.create( event );
             event.currentTarget = target;

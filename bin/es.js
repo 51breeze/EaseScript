@@ -41,7 +41,7 @@ program
 .option('--tfp, --theme-file-path [project_path/theme]', '指定主题配置文件的目录,默认为当前工程目录,每一个配置文件名必须与主题名一致',"./theme")
 .option('-r, --reserved [keyword1,keyword2,...]', '指定需要保护的关键字', function (val) {
     return val.split(',');
-}).option('--webroot', '指示项目是部署在webroot下运行,否则为构建目录下运行',"enable")
+}).option('--webroot, --webroot [enable|disabled]', '指示项目是部署在webroot下运行,否则为构建目录下运行','enable')
 .option('--dbc, --default-bootstrap-class [ExampleClass]', '指定默认的入口类')
 .option('--ssc, --skin-style-config [style.conf,skinClassName:style.less,...]', '皮肤样式配置文件或者指定具体组件名称键对样式名文件', keyValue)
 .option('-L, --library [name,name:alias,...]', '指定使用第三方组件库',keyValue)
@@ -115,6 +115,7 @@ for( var key in mapKeys )
 {
     var name = mapKeys[ key ];
     var val =  program[ name ];
+ 
     if( typeof val !== "undefined" )
     {
         switch( name ){
@@ -135,6 +136,7 @@ for( var key in mapKeys )
                 val = true;
             break;
         }
+       
         config[ key ] = val;
     }
 }
