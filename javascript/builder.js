@@ -85,7 +85,7 @@ function include(contents, name , filepath, fix, libs, config )
              var info = path.parse(c);
              include(contents, info.name , null, fix, libs, config );
              dependencies.push( info.name );
-             return '=require("'+utils.getRequireIdentifier( config, config.globals[ info.name ] || {type:info.name}, '.es' )+'")';
+             return '=require("'+utils.getRequireIdentifier( config, config.globals[ info.name ] || {type:info.name}, '.js' )+'")';
         });
 
         //加载对应模块的兼容策略文件
@@ -152,6 +152,7 @@ function loadRequireSystemModuleContents(config,requirements)
 function loadSystemModuleContentByName(config,name)
 {
    name =  utils.getGlobalTypeMap( name );
+
    if( !makedSystemModules[name] )
    {
        loadRequireSystemModuleContents(config,[name]);
@@ -333,10 +334,9 @@ function outputFiles(config, classModules, suffix )
     const corename = config.system_lib_path_name+'.';
     const core_path = utils.getBuildPath(config, 'core');
     const system_path = utils.getBuildPath(config, 'system');
-    const base = path.relative( bulid_path, config.workspace ).replace(/\\/g,'/').replace(/\.\.\//g,'');
+    const base = path.relative( config.project.path, config.workspace ).replace(/\\/g,'/').replace(/\.\.\//g,'');
     const hash = {};
-    bulid_path = path.resolve( bulid_path, base);
-
+    const workspace_path = path.resolve(bulid_path, base);
     const emitFile = function(file, content )
     {
         if( !hash[file] )
@@ -375,8 +375,9 @@ function outputFiles(config, classModules, suffix )
             var content = localModule.makeContent ? localModule.makeContent[ 'javascript' ] : '';
             if ( content )
             {
-                var file = utils.getResolvePath( localModule.fullclassname.slice(0, corename.length )===corename ?  core_path : bulid_path , localModule.fullclassname );
+                var file = utils.getResolvePath( localModule.fullclassname.slice(0, corename.length )===corename ?  core_path : workspace_path , localModule.fullclassname );
                 utils.mkdir( file.substr(0, file.lastIndexOf("/") ) );
+              
                 emitFile(file+suffix, content);
             }
         }else if( localModule.type )
@@ -428,7 +429,7 @@ function getAssetsFilePath(config, modules)
             push(stylefile);
         }
         //模块中的样式内容
-        else
+        else if( m.ownerFragmentModule )
         {
             var styles = m.ownerFragmentModule.moduleContext.style;
             if( styles && styles.length > 0 )
@@ -718,7 +719,7 @@ function makeAllModuleStyleContent(config,modules)
             //e = correction( config, e , [path.dirname(stylefile)] );
         }
         //模块中的样式内容
-        else if( m.ownerFragmentModule )
+        else if( m.ownerFragmentModule && m.isSkinModule )
         {
             var styles = m.ownerFragmentModule.moduleContext.style;
             var themes = findThemeStyleByName(styles, config.theme);
@@ -736,6 +737,28 @@ function makeAllModuleStyleContent(config,modules)
 }
 
 
+/**
+ * 获取指定皮肤模块的样式内容
+ * @param m
+ * @param config
+ * @returns {string}
+ */
+function makeModuleStyleContentExcludeFile(config,m)
+{
+    var e = "";
+    if( m.ownerFragmentModule && m.isSkinModule )
+    {
+        var styles = m.ownerFragmentModule.moduleContext.style;
+        var themes = findThemeStyleByName(styles, config.theme);
+        if( themes.length === 0  ){
+            themes = findThemeStyleByName(styles, "default" );
+        }
+        e = combineThemeStyle( themes.filter(function(item){
+            return !(item.attr && item.attr.file);
+        }), styles ,config );
+    }
+    return e;
+}
 
 /**
  * 构建样式
@@ -779,8 +802,7 @@ function makeStyleContentAssets(config, content, context )
 }
 
 
-
-
+builder.makeModuleStyleContentExcludeFile=makeModuleStyleContentExcludeFile;
 builder.outputFiles = outputFiles;
 builder.makeLessStyleContent = makeLessStyleContent;
 builder.makeAllModuleStyleContent = makeAllModuleStyleContent;

@@ -54,9 +54,10 @@ if (typeof navigator !== "undefined")
     (s = ua.match(/^mozilla\/([\d.]+)/)) ? _platform = [env.BROWSER_MOZILLA, parseFloat(s[1])] : null;
     env.IS_CLIENT = true;
 
-} else if (typeof process !== "undefined")
+} else
 {
-    _platform = [env.NODE_JS, process.versions.node];
+    var nodejs = eval("(typeof process !== 'undefined' ? process.versions.node : 0)");
+    _platform = [env.NODE_JS, nodejs];
 }
 
 /**

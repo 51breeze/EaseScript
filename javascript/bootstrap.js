@@ -18,6 +18,7 @@ var env={
     "VERSION":[CODE[VERSION]],
     "LOAD_JS_PATH":"[CODE[JS_LOAD_PATH]]",
     "LOAD_CSS_PATH":"[CODE[CSS_LOAD_PATH]]",
+    "WORKSPACE":"[CODE[WORKSPACE]]",
     "MODULE_SUFFIX":"[CODE[MODULE_SUFFIX]]"
 };
 
@@ -213,7 +214,7 @@ global.addEventListener(Event.READY,function (e) {
         //调度指定模块中的方法
         (env.HTTP_DISPATCHER=function(module, method, callback)
         {
-            module = module+env.MODULE_SUFFIX;
+            module = env.WORKSPACE+module+env.MODULE_SUFFIX;
             //如果存在先初始化
             initModule(module);
             //如果模块类已经加载
