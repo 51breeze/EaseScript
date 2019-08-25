@@ -32,7 +32,7 @@ package
             this.title="Index page";
 
             new Database();
-            console.log("===index==123");
+            console.log("===index==123==============");
         }
 
         private window(container:View)
@@ -131,7 +131,7 @@ package
 
             var iis:String = " the is template";
             var bb:int = 99999;
-            var tem:String = `ssss {iis} ===== {{bb}} 66666=====33333 `;
+            var tem:String = `ssss {iis} ===== {{bb}} ====1111111111111111====5`;
             console.log( tem );
 
             console.log( new Date().getTime() );

@@ -33,6 +33,7 @@ const config = {
   devServer: {
     contentBase: path.resolve('./test/build'),
     hot:true,
+    //inline:true,
     host:'localhost',
     open:false
   },
@@ -54,11 +55,12 @@ const config = {
             loader:'./lib/loader.js',
             options:{
               "config":esConfig,
-              styleLoader:[
-                MiniCssExtractPlugin.loader.replace(/\\/g,'/'),
-                'css-loader',
-               'less-loader'
-              ],
+              // styleLoader:[
+              //  // MiniCssExtractPlugin.loader.replace(/\\/g,'/'),
+              //   'style-loader',
+              //   'css-loader',
+              //   //'less-loader'
+              // ],
               globalVars:es.builder.getThemeConfig( esConfig ),
               paths:[
                   path.resolve(__dirname,'style'),
@@ -66,6 +68,27 @@ const config = {
             },
           }
         ]
+      },
+      {
+        test: /\.(css|less)$/,
+        use: [ 
+          'style-loader',
+          {
+            loader:'css-loader',
+            options:{
+              onlyLocals:false
+            }
+          },
+          {
+            loader:'less-loader',
+            options:{
+              globalVars:es.builder.getThemeConfig( esConfig ),
+              paths:[
+                    path.resolve(__dirname,'style'),
+              ]
+            }
+          }
+        ],
       },
       {
         test: /\.(eot|svg|ttf|woff|woff2|png|jpg|jpeg|gif)$/,
@@ -77,7 +100,7 @@ const config = {
     //new MyPlugin({context:__dirname}),
    // new webpack.MemoryOutputFileSystem()
    // new ExtractTextWebpackPlugin({filename:'[name].min.css'})
-   new MiniCssExtractPlugin({filename: "./css/[name].css"}),
+  // new MiniCssExtractPlugin({filename: "./css/[name].css"}),
 
     //new webpack.NamedModulesPlugin(),
     //new webpack.HotModuleReplacementPlugin()

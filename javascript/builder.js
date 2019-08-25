@@ -98,6 +98,7 @@ function include(contents, name , filepath, fix, libs, config )
         }
 
         makedSystemModules[ name ].content = str;
+        makedSystemModules[ name ].path = filepath;
         makedSystemModules[ name ].deps = dependencies;
         contents[ name ]=makedSystemModules[ name ];
         return true;
@@ -116,7 +117,7 @@ function include(contents, name , filepath, fix, libs, config )
  * @param config
  * @returns {string}
  */
-function loadRequireSystemModuleContents(config,requirements)
+function loadRequireSystemModuleContents(config,requirements,flag)
 {
     var contents = {};
     var fix = polyfill( config );
@@ -138,6 +139,10 @@ function loadRequireSystemModuleContents(config,requirements)
 
     for(var prop in requirements)
     {
+        if( flag === true )
+        {
+            makedSystemModules[ requirements[prop] ] = undefined;
+        }
         include(contents, requirements[prop], null, fix, libs, config );
     }
     return contents;
@@ -149,13 +154,13 @@ function loadRequireSystemModuleContents(config,requirements)
  * @param {*} config 
  * @param {*} name 
  */
-function loadSystemModuleContentByName(config,name)
+function loadSystemModuleContentByName(config,name,flag)
 {
    name =  utils.getGlobalTypeMap( name );
 
-   if( !makedSystemModules[name] )
+   if( !makedSystemModules[name] || flag===true )
    {
-       loadRequireSystemModuleContents(config,[name]);
+       loadRequireSystemModuleContents(config,[name], flag );
    }
    return makedSystemModules[name];
 }
@@ -737,6 +742,51 @@ function makeAllModuleStyleContent(config,modules)
 }
 
 
+
+/**
+ * 获取指定皮肤模块的所有样式内容
+ * @param modules
+ * @param config
+ * @returns {*|{type, id, param}|{}|Array}
+ */
+function makeModuleStyleExcludeContent(config,module)
+{
+    var files = [];
+
+    //是否有指定样式文件
+    if( config.skin_style_config && config.skin_style_config.hasOwnProperty(module.fullclassname) )
+    {
+        var stylefile = config.skin_style_config[ module.fullclassname ];
+        if( !path.isAbsolute(stylefile) )
+        {
+            stylefile = path.resolve( config.project_path, stylefile );
+        }
+        files.push( stylefile );
+    }
+    //模块中的样式内容
+    else if(  module.isSkinModule )
+    {
+        var styles = module.ownerFragmentModule.moduleContext.style;
+        var themes = findThemeStyleByName(styles, config.theme);
+        if( themes.length === 0  ){
+            themes = findThemeStyleByName(styles, "default" );
+        }
+        themes.map(function(a){
+            if( !a.content && a.attr.file )
+            {
+                if( !path.isAbsolute(a.attr.file) )
+                {
+                    a.attr.file = path.resolve( config.project_path, a.attr.file );
+                }
+                files.push( a.attr.file );
+            }
+        })
+    }
+
+    return files;
+}
+
+
 /**
  * 获取指定皮肤模块的样式内容
  * @param m
@@ -803,6 +853,7 @@ function makeStyleContentAssets(config, content, context )
 
 
 builder.makeModuleStyleContentExcludeFile=makeModuleStyleContentExcludeFile;
+builder.makeModuleStyleExcludeContent=makeModuleStyleExcludeContent;
 builder.outputFiles = outputFiles;
 builder.makeLessStyleContent = makeLessStyleContent;
 builder.makeAllModuleStyleContent = makeAllModuleStyleContent;

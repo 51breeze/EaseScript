@@ -7,14 +7,14 @@
 	"animate":false,
 	"font":true,
 	"theme":"default",
-	"theme_file_path":"E:/EaseScript/test/src/theme",
+	"theme_file_path":"D:/workspace/EaseScript/test/src/theme",
 	"source_file":"enable",
 	"compat_version":{
 		"ie":9
 },
-	"build_path":"E:/webroot/working",
-	"project_path":"E:/EaseScript/test",
-	"workspace":"E:/EaseScript/test/src",
+	"build_path":"D:/working",
+	"project_path":"D:/workspace/EaseScript/test",
+	"workspace":"D:/workspace/EaseScript/test/src",
 	"skin_file_suffix":".html",
 	"project_file_suffix":".es",
 	"browser":"enable",
@@ -26,10 +26,10 @@
 	"command_switch":0,
 	"script_part_load":true,
 	"system_lib_path_name":"es",
-	"system_global_path":"E:/EaseScript/javascript/system",
-	"system_lib_path":"E:/EaseScript/",
+	"system_global_path":"D:/workspace/EaseScript/javascript/system",
+	"system_lib_path":"D:/workspace/EaseScript/",
 	"system_style_name":"style",
-	"system_style_path":"E:/EaseScript/",
+	"system_style_path":"D:/workspace/EaseScript/",
 	"build_libaray_name":"es",
 	"build_system_path":"es.system",
 	"clean":true,
@@ -39,96 +39,97 @@
 	"watching":false,
 	"serverEnable":false,
 	"module_exports":false,
+	"module_suffix":".js",
 	"syntax":"javascript",
-	"root_path":"E:/EaseScript",
+	"root_path":"D:/workspace/EaseScript",
 	"build":{
-		"path":"E:/webroot/working",
+		"path":"D:/working",
 		"name":"working",
 		"child":{
 			"assets":{
-				"path":"E:/webroot/working/webroot/assets",
+				"path":"D:/working/webroot/assets",
 				"name":"assets"
 		},
 			"js":{
-				"path":"E:/webroot/working/webroot/js",
+				"path":"D:/working/webroot/js",
 				"name":"js"
 		},
 			"img":{
-				"path":"E:/webroot/working/webroot/assets",
+				"path":"D:/working/webroot/assets",
 				"name":"assets"
 		},
 			"css":{
-				"path":"E:/webroot/working/webroot/css",
+				"path":"D:/working/webroot/css",
 				"name":"css"
 		},
 			"font":{
-				"path":"E:/webroot/working/webroot/assets",
+				"path":"D:/working/webroot/assets",
 				"name":"assets"
 		},
 			"view":{
-				"path":"E:/webroot/working/easescript/view",
+				"path":"D:/working/easescript/view",
 				"name":"view"
 		},
 			"html":{
-				"path":"E:/webroot/working/webroot/html",
+				"path":"D:/working/webroot/html",
 				"name":"html"
 		},
 			"webroot":{
-				"path":"E:/webroot/working/webroot",
+				"path":"D:/working/webroot",
 				"name":"webroot"
 		},
 			"system":{
-				"path":"E:/webroot/working/webroot/js/system",
+				"path":"D:/working/webroot/js/system",
 				"name":"system"
 		},
 			"core":{
-				"path":"E:/webroot/working/webroot/js",
+				"path":"D:/working/webroot/js",
 				"name":"js"
 		},
 			"bootstrap":{
-				"path":"E:/webroot/working/easescript/bootstrap",
+				"path":"D:/working/easescript/bootstrap",
 				"name":"bootstrap"
 		},
 			"application":{
-				"path":"E:/webroot/working/easescript",
+				"path":"D:/working/easescript",
 				"name":"easescript"
 		}
 	}
 },
 	"project":{
-		"path":"E:/EaseScript/test",
+		"path":"D:/workspace/EaseScript/test",
 		"name":"test",
 		"child":{
 			"src":{
-				"path":"E:/EaseScript/test/src",
+				"path":"D:/workspace/EaseScript/test/src",
 				"name":"src"
 		},
 			"image":{
-				"path":"E:/EaseScript/test/src/image",
+				"path":"D:/workspace/EaseScript/test/src/image",
 				"name":"image"
 		},
 			"style":{
-				"path":"E:/EaseScript/test/src/style",
+				"path":"D:/workspace/EaseScript/test/src/style",
 				"name":"style"
 		},
 			"theme":{
-				"path":"E:/EaseScript/test/src/theme",
+				"path":"D:/workspace/EaseScript/test/src/theme",
 				"name":"theme"
 		},
 			"app":{
-				"path":"E:/EaseScript/test/src/app",
+				"path":"D:/workspace/EaseScript/test/src/app",
 				"name":"app"
 		},
 			"view":{
-				"path":"E:/EaseScript/test/src/view",
+				"path":"D:/workspace/EaseScript/test/src/view",
 				"name":"view"
 		},
 			"component":{
-				"path":"E:/EaseScript/test/src/component",
+				"path":"D:/workspace/EaseScript/test/src/component",
 				"name":"component"
 		},
 			"skin":{
-				"path":"E:/EaseScript/test/src/skin",
+				"path":"D:/workspace/EaseScript/test/src/skin",
 				"name":"skin"
 		}
 	}
