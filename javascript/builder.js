@@ -219,7 +219,13 @@ function replaceContent(content, data, config)
         var requireex = b.match(/^REQUIRE_IDENTIFIER\((.*?)\)$/i);
         if( requireex  )
         {
-            return utils.getRequireIdentifier(config, config.globals[ requireex[1] ] || {type:requireex[1]} , '.es' )
+            var m = config.globals[ requireex[1] ];
+            if( !m && requireex[1] ==="Internal" ){
+                m = {
+                    type:requireex[1]
+                };
+            }
+            return utils.getRequireIdentifier(config, m || {type:requireex[1]} , m ? '.js' : '.es' )
         }
 
         switch ( b )
@@ -273,15 +279,15 @@ function buildModuleToJsonString(config, modules)
     {
         return loadSystemModuleContentByName(config, name);
     }
-    const getModuleIdentifier=function( module )
+    const getModuleIdentifier=function( module, suffix )
     {
-        return utils.getRequireIdentifier(config, module, '.es');
+        return utils.getRequireIdentifier(config, module, suffix );
     }
     const make = function( modules )
     {
         return modules.map(function (e) 
         {
-            var name = getModuleIdentifier(e);
+            var name = getModuleIdentifier(e, e.nonglobal ? '.es' : '.js');
             if( loaded[ name ] ){
                 return null;
             }
