@@ -11,7 +11,13 @@ package es.events
     {
         static public const INITIALIZING:String = 'componentInitializing';
         static public const INITIALIZED:String  = 'componentInitialized';
+        static public const COMPONENT_HOT_UPDATE:String = 'componentHotUpdate';
+        static public const COMPONENT_INSTALL:String  = 'componentInstall';
+        static public const COMPONENT_UNINSTALL:String  = 'componentUnInstall';
+
         public var hostComponent:Component=null;
+        public var hotUpdateModule:Class = null;
+
         public function ComponentEvent(type:String, bubbles:Boolean=true, cancelable:Boolean=true)
         {
             super(type, bubbles, cancelable);

@@ -7,6 +7,7 @@
 package es.core
 {
     import es.components.SkinComponent;
+    import es.events.ComponentEvent;
     import es.core.Container;
     import es.core.Skin;
     import es.events.SkinEvent;
@@ -17,6 +18,7 @@ package es.core
     import es.interfaces.IBindable;
     import es.core.BaseLayout;
     import es.core.es_internal;
+
 
     public class Skin extends Container implements IBindable
     {
@@ -38,7 +40,28 @@ package es.core
             {
                 elem = (name as IDisplay).element;
             } 
-            super( elem , attr ); 
+            super( elem , attr );
+        }
+
+        /**
+         * 实现热替换, 一般用于开发环境中
+         * @protected
+         */
+        protected hotUpdate():void
+        {
+            this.addEventListener( SkinEvent.INSTALL, function( e:SkinEvent )
+            {
+                if( e.oldSkin )
+                {
+                    var oldNode:Node = e.oldSkin.element.current() as Node;
+                    var newNode:Node = e.newSkin.element.current() as Node;
+                    var parentNode:Node = oldNode.parentNode;
+                    if( parentNode )
+                    {
+                        parentNode.replaceChild(newNode, oldNode);
+                    }
+                }
+            });
         }
 
         /**
@@ -121,7 +144,10 @@ package es.core
          * 在第一次调用 createChildren 之前调用此函数，用来初始化皮肤需要的一些参数
          * 如需要使用，请在子类中覆盖
          */
-        protected function initializing(){}
+        protected function initializing()
+        {
+             this.hotUpdate();
+        }
 
         /**
         * 当前皮肤重新生成子级列表后调用
@@ -160,6 +186,7 @@ package es.core
                 this.updateChildren(this, nodes);
                 this.updateInstallState();
                 this.updateDisplayList();
+
                 if( this.hasEventListener(SkinEvent.UPDATE_DISPLAY_LIST) )
                 {
                     var e:SkinEvent = new SkinEvent( SkinEvent.UPDATE_DISPLAY_LIST );
@@ -483,17 +510,19 @@ package es.core
         */
         protected function nowUpdate(delay:int=200):void
         {
-             invalidate=false;
-             if( timeoutId )
-             {
-                  clearTimeout( timeoutId as Number );
-             }
-             var callback:Function = this.callback;
-             if( !callback ){
+            invalidate=false;
+            if( timeoutId )
+            {
+                clearTimeout( timeoutId as Number );
+            }
+
+            var callback:Function = this.callback;
+            if( !callback )
+            {
                 callback = this.createChildren.bind(this);
                 this.callback = callback;
-             }
-             timeoutId = setTimeout(callback,delay);
+            }
+            timeoutId = setTimeout(callback,delay);
         }
 
 

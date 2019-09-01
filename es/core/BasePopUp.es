@@ -15,6 +15,7 @@ package es.core
     import es.interfaces.IDisplay;
     import es.core.SystemManage;
     import es.core.PopUpManage;
+    import es.events.SkinEvent;
 
     [RunPlatform("client")]
     public abstract class BasePopUp extends SkinComponent
@@ -142,6 +143,11 @@ package es.core
          */
         protected function position()
         {
+            if( !this.state )
+            {
+                return;
+            }
+
             var opt:Object =  this.option;
             var horizontal:String = opt.horizontal as String;
             var vertical:String = opt.vertical as String;
@@ -166,6 +172,7 @@ package es.core
             var win:Element = SystemManage.getWindow();
             var winX:int =  win.width();
             var winY:int =  win.height();
+
             switch ( horizontal )
             {
                 case "left" :
@@ -364,15 +371,54 @@ package es.core
             return this.option.onclose;
         }
 
-        /**
+         /**
+         * 设置皮肤对象
          * @inherit
-         * @return
+         * @param Skin skinObj
+         * @returns {Object}
          */
-        override public function display():Element
+        override public function set skin( skinObj:Skin ):void
+        {
+            if( this.initialized )
+            {
+                var old:Skin = this.skin;
+                if( skinObj !== old )
+                {
+                    if( this.state  )
+                    {
+                        var callback:Function = function(e:SkinEvent){
+                            this.position();
+                            this.removeEventListener( SkinEvent.UPDATE_DISPLAY_LIST , callback);
+                        };
+                        skinObj.addEventListener( SkinEvent.UPDATE_DISPLAY_LIST,callback ,false,0, this);
+                        super.skin = skinObj;
+                        this.setProfile(); 
+
+                    }else if( old && old.hasEventListener( SkinEvent.UNINSTALL ) )
+                    {
+                        var uninstall:SkinEvent = new SkinEvent( SkinEvent.UNINSTALL );
+                        uninstall.oldSkin = old;
+                        uninstall.newSkin = skinObj;
+                        old.dispatchEvent( uninstall );
+                    }
+                }
+
+            }else
+            {
+                super.skin = skinObj;
+            }
+        }
+
+        /**
+        * 设置组件的属性
+        * @return void
+        */
+        protected function setProfile():void
         {
             var skin:Skin    = this.skin;
             var options:Object = this.option;
             var profile:Object = options.profile as Object;
+
             if( System.env.platform('IE', 8) )
             {
                 skin.style('position','absolute');
@@ -386,7 +432,8 @@ package es.core
             //设置皮肤元素属性
             Object.forEach(profile,function(value:*,prop:String)
             {
-                switch(prop){
+                switch(prop)
+                {
                     case "currentState" :
                        skin.currentState = value as String;
                        break;
@@ -410,11 +457,25 @@ package es.core
                 skin.height = options.height as uint;
             }
 
+            this.position();
+        }
+
+
+        /**
+         * @inherit
+         * @return
+         */
+        override public function display():Element
+        {
+            var skin:Skin = this.skin;
+            var options:Object = this.option;
+
+            this.setProfile();
             var elem:Element = super.display();
-           
+
             //应用效果
             elem.show();
-
+            
             var container:Container = this.getContainer();
             var animation:Object = options.animation as Object;
             var timeout:Number   = options.timeout * 1000;

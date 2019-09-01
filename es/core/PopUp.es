@@ -17,6 +17,7 @@ package es.core
     import es.core.SystemManage;
     import es.core.PopUpManage;
     import es.skins.PopUpSkin;
+    import es.events.SkinEvent;
 
     [Skin(es.skins.PopUpSkin)]
     [RunPlatform("client")]
@@ -43,10 +44,12 @@ package es.core
          */
         static private function getInstance( skinClass:Class=null ):BasePopUp
         {
+            if( !skinClass )skinClass = PopUpSkin;
             if( !_instance )
             {
                 _instance=new PopUp();
-                _instance.skinClass = PopUp.skinClass;
+                _instance.skinClass = skinClass;
+                (_instance as PopUp)._type = "box";
             }
             //如果有指定一个新的皮肤类
             if( skinClass && _instance.skinClass !== skinClass )
@@ -67,11 +70,12 @@ package es.core
          */
         static private function getModalityInstance( skinClass:Class=null ):BasePopUp
         {
-            if( !skinClass )skinClass = PopUp.skinClass;
+            if( !skinClass )skinClass = PopUpSkin;
             if( !modalityInstance )
             {
                 modalityInstance=new PopUp();
                 modalityInstance.skinClass = skinClass;
+                (modalityInstance as PopUp)._type = "modality";
             }
             //如果有指定一个新的皮肤类
             if( skinClass && modalityInstance.skinClass !== skinClass )
@@ -211,6 +215,8 @@ package es.core
             },options));
         }
 
+        private var _type:String="box";
+
         
         /**
          * 显示弹窗
@@ -233,6 +239,24 @@ package es.core
             return (this.skin as PopUpSkin).popupContainer;
         }
 
+        override protected function initializing()
+        {
+            super.initializing();
+            var skin:Skin = this.skin;
+            skin.addEventListener( SkinEvent.UNINSTALL,function(e:SkinEvent)
+            {
+                if( this._type ==="box" )
+                {
+                    PopUp._instance = null;
+                }else
+                {
+                    PopUp.modalityInstance = null;   
+                }
+
+            } ,false,0,this);
+
+        }
+       
         /**
          * @override
          * @return Boolean

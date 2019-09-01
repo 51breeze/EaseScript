@@ -12,6 +12,7 @@ package es.core
    import es.core.Interaction;
    import es.events.ApplicationEvent;
    import es.interfaces.IDisplay;
+
    public class Application extends EventDispatcher
    {
        static private var lastApp:Node=null;
@@ -222,7 +223,7 @@ package es.core
        /**
         * 渲染并且显示一个视图
         */
-       protected function render( view:View ):View
+       public function render( view:View ):View
        {
            view.display();
            when( RunPlatform(server) )

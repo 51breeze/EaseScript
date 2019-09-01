@@ -4,7 +4,6 @@ import Index from './test/src/IndexApplication.es';
 import Event from 'system/Event.js';
 import System from 'system/System.js';
 
-
 // require("./es/skins/DataGridStyle.less");
 // require("./es/skins/NavigateStyle.less");
 // require("./es/skins/PaginationStyle.less");
@@ -24,8 +23,8 @@ if( module.hot ){
     module.hot.accept('./test/src/IndexApplication.es', function() {
          
 
-        var obj = new Index();
-        obj.home();
+        //var obj = new Index();
+       // obj.home();
         console.log("./test/src/IndexApplication.es===============")
 
     });

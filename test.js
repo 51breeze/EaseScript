@@ -6,7 +6,15 @@ const webpackDevServer = require('webpack-dev-server');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 
+
 const esConfig = es.getConfigure(  JSON.parse( fs.readFileSync( path.resolve(__dirname, "test",'.esconfig') ) ) );
+
+const lessOptions = {
+  globalVars:es.builder.getThemeConfig( esConfig ),
+  paths:[
+      path.resolve(__dirname,'style'),
+  ]
+}
 
 const config = {
   mode:"development",
@@ -54,23 +62,22 @@ const config = {
           {
             loader:'./lib/loader.js',
             options:{
-              "config":esConfig,
+              config:esConfig,
+              //"styleLoader":[],
               // styleLoader:[
               //  // MiniCssExtractPlugin.loader.replace(/\\/g,'/'),
               //   'style-loader',
               //   'css-loader',
               //   //'less-loader'
               // ],
-              globalVars:es.builder.getThemeConfig( esConfig ),
-              paths:[
-                  path.resolve(__dirname,'style'),
-              ]
+              globalVars:lessOptions.globalVars,
+              paths:lessOptions.paths
             },
           }
         ]
       },
       {
-        test: /\.(css|less)$/,
+        test:/\.(less|css)$/i,
         use: [ 
           'style-loader',
           {
@@ -81,15 +88,11 @@ const config = {
           },
           {
             loader:'less-loader',
-            options:{
-              globalVars:es.builder.getThemeConfig( esConfig ),
-              paths:[
-                    path.resolve(__dirname,'style'),
-              ]
-            }
+            options:lessOptions
           }
         ],
       },
+      
       {
         test: /\.(eot|svg|ttf|woff|woff2|png|jpg|jpeg|gif)$/,
         use: ['file-loader'],

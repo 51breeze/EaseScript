@@ -317,7 +317,7 @@ Reflect.type=function type(value, typeClass)
             case "class" :
                if( !System.isClass(value) )
                {
-                   throw new System.TypeError(original + " is not Class.");
+                   throw new TypeError(original + " is not Class.");
                }
                break;
         }
@@ -331,7 +331,7 @@ Reflect.type=function type(value, typeClass)
         if( System[ up ] ){
             classname = up;
         }
-        throw new System.TypeError( value+' can not be convert for ' + classname );
+        throw new TypeError( value+' can not be convert for ' + classname );
     }
     return value;
 };

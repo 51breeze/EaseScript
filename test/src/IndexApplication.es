@@ -113,7 +113,7 @@ package
             //view.children = [ "======sss=" ];
 
 
-            (new EventDispatcher(view.popup)).addEventListener( MouseEvent.CLICK, function(e:MouseEvent){
+           (new EventDispatcher(view.popup)).addEventListener( MouseEvent.CLICK, function(e:MouseEvent){
 
                     PopUp.confirm("您有3条信息未处理2",function (type:String) {
 
@@ -138,9 +138,9 @@ package
 
             this.es_internal::test();
 
-            var tt:Class = PopUp as Class;
+            //var tt:Class = PopUp as Class;
 
-            new tt('dfdsf');
+            //new tt('dfdsf');
           
             return this.render( view );
         }

@@ -9,6 +9,7 @@ package es.components
     import es.components.Component;
     import es.components.SkinComponent;
     import es.events.ComponentEvent;
+    import es.events.SkinEvent;
     import es.core.Skin;
     import es.interfaces.IContainer;
     import es.interfaces.IDisplay;
@@ -119,21 +120,41 @@ package es.components
         public function set skin( skinObj:Skin ):void
         {
             var old:Skin = this._skin;
-            this._skin = skinObj;
-            if( this.initialized && old && skinObj !== old )
+            if( skinObj !== old )
             {
-                if( this.hasEventListener(PropertyEvent.CHANGE) )
+                this._skin = skinObj;
+                if( this.initialized )
                 {
-                    var event:PropertyEvent = new PropertyEvent(PropertyEvent.CHANGE);
-                    event.oldValue = old;
-                    event.newValue = skinObj;
-                    event.property = 'skin';
-                    this.dispatchEvent(event);
+                    if( this.hasEventListener(PropertyEvent.CHANGE) )
+                    {
+                        var event:PropertyEvent = new PropertyEvent(PropertyEvent.CHANGE);
+                        event.oldValue = old;
+                        event.newValue = skinObj;
+                        event.property = 'skin';
+                        this.dispatchEvent(event);
+                    }
+
+                    if( old && old.hasEventListener( SkinEvent.UNINSTALL ) )
+                    {
+                        var uninstall:SkinEvent = new SkinEvent( SkinEvent.UNINSTALL );
+                        uninstall.oldSkin = old;
+                        uninstall.newSkin = skinObj;
+                        old.dispatchEvent( uninstall );
+                    }
+
+                    this.installChildren();
+                    this.commitProperty();
+                    this.nowUpdateSkin();
+                    
+                    if( skinObj.hasEventListener( SkinEvent.INSTALL ) )
+                    {
+                        var install:SkinEvent = new SkinEvent( SkinEvent.INSTALL );
+                        install.oldSkin = old;
+                        install.newSkin = skinObj;
+                        skinObj.dispatchEvent( install );
+                    }
                 }
-                this.installChildren();
-                this.commitProperty();
-                this.commitPropertyAndUpdateSkin();
-            }
+            } 
         }
 
         /**
@@ -161,11 +182,6 @@ package es.components
                 this._skinClass = value;
                 if( this.initialized )
                 {
-                    var skin:Skin = (Skin)new value( this );
-                    this._skin = skin;
-                    this.installChildren();
-                    this.commitProperty();
-                    this.commitPropertyAndUpdateSkin();
                     if( this.hasEventListener(PropertyEvent.CHANGE) )
                     {
                         var event:PropertyEvent = new PropertyEvent(PropertyEvent.CHANGE);
@@ -174,6 +190,8 @@ package es.components
                         event.property = 'skinClass';
                         this.dispatchEvent(event);
                     }
+
+                    this.skin = (Skin)new value( this );
                 }
             }
         }
@@ -414,7 +432,7 @@ package es.components
         {
             if( this.initialized )
             {
-                return this.skin.children;
+                return this.skin.children.slice(0);
             }else{
                 return _children.slice(0);
             }
@@ -428,7 +446,7 @@ package es.components
         {
             if( this.initialized )
             {
-                this.skin.children=value;
+                this.skin.children=value.slice(0);
             }else{
                _children = value.slice(0);
             }
@@ -589,23 +607,24 @@ package es.components
         */
         override public function addEventListener(type:String,callback:Function,useCapture:Boolean=false,priority:int=0,reference:Object=null):EventDispatcher
         {
-            if( this.initialized ){
-                this.skin.addEventListener(type,callback,useCapture,priority,reference);
-            }else{
-                super.addEventListener(type,callback,useCapture,priority,reference);
-            }
-
-            if( !events.hasOwnProperty(type) )
+            super.addEventListener(type,callback,useCapture,priority,reference);
+            if( this.initialized )
             {
-                events[ type ] = [];
-            }
+                this.skin.addEventListener(type,callback,useCapture,priority,reference);
 
-            events[type].push({
-                "callback":callback,
-                "useCapture":useCapture,
-                "priority":priority,
-                "reference":reference
-            });
+            }else
+            {
+                if( !events.hasOwnProperty(type) )
+                {
+                    events[ type ] = [];
+                }
+                events[type].push({
+                    "callback":callback,
+                    "useCapture":useCapture,
+                    "priority":priority,
+                    "reference":reference
+                });
+            }
             return this;
         }
 
@@ -617,36 +636,31 @@ package es.components
         */
         override public function removeEventListener(type:String,listener:Function=null):Boolean
         {
-             if( this.initialized )
-             {
-                 return this.skin.removeEventListener(type,listener);
-             }else
-             {
-                 super.removeEventListener(type,listener);
-             }
-
-            if( !events.hasOwnProperty(type) )
+            var flag:Boolean = super.removeEventListener(type,listener);
+            if( this.initialized )
             {
-                return false;
-            }
+                return this.skin.removeEventListener(type,listener);
 
-            if( !listener )
+            }else if( events.hasOwnProperty(type) )
             {
-                delete events[type];
-                return true;
-            }
-
-            var map:Array = events[type] as Array;
-            var len:int = map.length;
-            for(;len>0;)
-            {
-                if( map[--len].callback===listener )
+                if( !listener )
                 {
-                    map.splice(len,1);
+                    delete events[type];
                     return true;
                 }
+
+                var map:Array = events[type] as Array;
+                var len:int = map.length;
+                for(;len>0;)
+                {
+                    if( map[--len].callback===listener )
+                    {
+                        map.splice(len,1);
+                        return true;
+                    }
+                }
             }
-            return false;
+            return flag;
         }
 
         /**
@@ -656,12 +670,7 @@ package es.components
         */
         override public function dispatchEvent( event:Event ):Boolean
         {
-            if( this.initialized )
-            {
-                return this.skin.dispatchEvent(event);
-            }else{
-                return super.dispatchEvent(event);
-            }
+            return super.dispatchEvent(event);
         }
 
         /**
@@ -672,12 +681,7 @@ package es.components
         */
         override public function hasEventListener( type:String , listener:Function=null):Boolean
         {
-            if( this.initialized )
-            {
-               return this.skin.hasEventListener(type,listener);
-            }else{
-               return super.hasEventListener(type,listener);
-            }
+            return super.hasEventListener(type,listener);
         }
 
         /**
@@ -703,9 +707,12 @@ package es.components
          */
         override protected function initializing()
         {
-            super.initializing();
-            this.installChildren();
-            this.commitProperty();
+            if( !this.initialized )
+            {
+                super.initializing();
+                this.installChildren();
+                this.commitProperty();
+            }
         }
 
         /**

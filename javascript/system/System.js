@@ -647,3 +647,35 @@ System.getQualifiedSuperclassName =function getQualifiedSuperclassName(target)
     }
     return null;
 };
+
+var hotUpdateMap = {};
+var hotUpdateEvent = null;
+System.hotUpdate=function hotUpdate( target, callback )
+{
+    if( hotUpdateEvent === null )
+    {
+        hotUpdateEvent = function(e){
+            var module = e.getHotUpdateModule();
+            var updateClass = System.getQualifiedClassName(module);
+            if( hotUpdateMap[updateClass] )
+            {
+                var items = hotUpdateMap[updateClass].splice(0);
+                while( items.length > 0 )
+                {
+                    var item = items.shift();
+                    var callback = item[2];
+                    if( !callback.call(item, item[1], module) )
+                    {
+                        hotUpdateMap[updateClass].push( item );
+                    };
+                }
+            }
+        }
+        System.getGlobalEvent().removeEventListener("componentHotUpdate");
+        System.getGlobalEvent().addEventListener("componentHotUpdate",hotUpdateEvent);
+    }
+
+    var name = System.getQualifiedObjectName(target);
+    var list = hotUpdateMap[ name ] || (hotUpdateMap[ name ] = []);
+    list.push([name,target,callback]);
+}
