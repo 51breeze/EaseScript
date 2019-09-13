@@ -410,7 +410,7 @@ function getAssetsFilePath(config, modules)
     const files = [];
     const push = function(file)
     {
-        if( map[ file ] !==true )
+        if(file && map[ file ] !==true )
         {
             map[ file ] = true;
             files.push( file );
@@ -453,7 +453,7 @@ function getAssetsFilePath(config, modules)
 
     });
 
-    return getCoreStyleFilePath(config).concat( files );
+    return files;
 }
 
 
@@ -743,6 +743,8 @@ function makeAllModuleStyleContent(config,modules)
         //设置每一个样式表的作用域
         var scope = "#"+m.fullclassname.replace(/\./g,"_");
         return [scope,"(){\n",e,"\n}\n",scope,";\n"].join("");
+    }).filter(function(val){
+        return !!val;
     });
     return style;
 }

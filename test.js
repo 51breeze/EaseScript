@@ -23,7 +23,8 @@ const config = {
   entry:{
     'index':'./main.js',
     'person':'./main2.js',
-    //'address':'./test/src/IndexApplication.es',
+    'test':'./test/src/Test.es'
+    //'address':'./test/src/IndexApplication.es?main',
   },
   output: {
     path:path.resolve('./test/build'),
@@ -100,14 +101,44 @@ const config = {
     ]
   },
   plugins: [
-    //new MyPlugin({context:__dirname}),
+   // new MyPlugin({context:__dirname}),
    // new webpack.MemoryOutputFileSystem()
    // new ExtractTextWebpackPlugin({filename:'[name].min.css'})
   // new MiniCssExtractPlugin({filename: "./css/[name].css"}),
 
     //new webpack.NamedModulesPlugin(),
     //new webpack.HotModuleReplacementPlugin()
-  ]
+  ],
+  optimization: {
+    splitChunks: {
+      chunks: 'all',
+      minSize: 30000,
+      maxSize: 0,
+      minChunks:1,
+      maxAsyncRequests: 5,
+      maxInitialRequests: 3,
+      automaticNameDelimiter: '~',
+      name: true,
+      cacheGroups: {
+        vendors: {
+          test: /[\\/]node_modules[\\/]/,
+          priority: -10,
+          name:"vendor"
+        },
+        default: {
+          minChunks: 2,
+          priority: -20,
+          reuseExistingChunk: true,
+          name:"common"
+        }
+
+      }
+    },
+    runtimeChunk: {
+      name: 'runtime'
+    }
+  }
+
 };
 
 
@@ -138,245 +169,43 @@ MyPlugin.prototype.apply = function(compiler)
 
   var options = this.options;
 
- compiler.hooks.afterCompile.tapAsync("MyPlugin",function(compilation,callback){
+  console.log( "=============MyPlugin==============" )
 
-        
-     // console.log( "========afterCompile==========" )
+
+  compiler.hooks.make.tapAsync('MyPluginMake',function(compilation, callback ){
+
+      compilation.hooks.finishModules.tapAsync("MyPluginMake",function(modules,callback){
+            //console.log(  modules );
+            callback();
+      });
+
+      compilation.hooks.succeedEntry.tap("MyPluginMake",function(entry, name, module){
+            //console.log(  entry, name );
+            //callback();
+      });
+
+      // compilation.hooks.buildModule.tap("buildModule",function(module,callback){
+      //      // console.log( module );
+      //       //callback();
+      // });
+
+      console.log( "=============finishModules==============" )
+
       callback();
 
 
- })
+  });
 
-
- compiler.hooks.watchRun.tapAsync('MyPlugin', function( compiler, callback ){
-
-   //   console.log( "=========watchRun========"  )
-      //console.log( compiler )
-      callback();
-
- });
-
-
-  compiler.hooks.normalModuleFactory.tap("MyPlugin",function(normalModuleFactory){
-
-
-      
-
-      // normalModuleFactory.hooks.factory.tap("MyPlugin",function( callback ){
-
-      //        console.log( this  );
-      //        process.exit();
-
-      //        //return null;
-         
-
-      // })
-
-
-     
-
-      normalModuleFactory.hooks.factory.tap("MyPlugin", () => (result, callback) => {
-
-
-        // if( result.request.slice(-3) ===".es" )
-        // {
-        //     // console.log(  result.request ,"+++++++++++++++++")
-             
-        //     result.resource="javascript/system/System.js";
-        //     result.type="javascript/auto";
-        //     result.loaders = [];
-        //     result.userRequest = "System.es";
-            
-        //      return callback(null,   new NormalModule(result) );
-        // }
-
-
-        let resolver = normalModuleFactory.hooks.resolver.call(null);
-  
-        // Ignored
-        if (!resolver) return callback();
-  
-        resolver(result, (err, data) => {
-          if (err) return callback(err);
-  
-          // Ignored
-          if (!data) return callback();
-  
-          // direct module
-          if (typeof data.source === "function") return callback(null, data);
-  
-          normalModuleFactory.hooks.afterResolve.callAsync(data, (err, result) => {
-            if (err) return callback(err);
-  
-            // Ignored
-            if (!result) return callback();
-  
-            let createdModule = normalModuleFactory.hooks.createModule.call(result);
-            if (!createdModule) {
-              if (!result.request) {
-                return callback(new Error("Empty dependency (no request)"));
-              }
-  
-              createdModule = new NormalModule(result);
-            }
-  
-            createdModule = normalModuleFactory.hooks.module.call(createdModule, result);
-  
-            return callback(null, createdModule);
-          });
-
-        });
-
-      });
-
-     
-
-      // normalModuleFactory.resolverFactory.hooks.resolver.for("normal").tap("MyPlugin",function(resolver, resolveOptions){
-
-        
-
-      //     // resolver.hooks.noResolve.tap("MyPlugin", function(){
-
-      //     //   console.log(arguments)
-
-      //     // })
-
-      //     resolver.hooks.resolve.tap("MyPlugin", function(request, innerContext,callback ){
-
-      //         request.request="d:/workspace/EaseScript/lib/loader.js??ref--4-0!d:/workspace/EaseScript/javascript/system/System.js";
-      //         request.path = "javascript/system/System.js";
-      //         request.resource="javascript/system/System.js"
-          
-      //         return request;
-
-      //     })
-        
-      // })
-
-      
+  compiler.hooks.beforeRun.tapAsync("MyPlugin",function(compiler, callback){
 
 
 
-      normalModuleFactory.hooks.beforeResolve.tapAsync("MyPlugin",function(	data, callback )
-      {
+  //  console.log("This is an example plugin!!!", compiler.options );
+    // 功能完成后调用 webpack 提供的回调。
+    callback();
 
 
-       //  console.log( data.request ,"====================")
-        // process.exit();
-        
-          if( /^system\//.test(data.request) && path.extname(data.request)===options.suffix  )
-          {
-              //data.request = data.request.substr(1);
-
-              //var file = data.request.slice(0,-options.suffix.length)+'.js';
-              // if( path.extname(file) === ".js" )
-              // {
-              //     file = path.resolve(options.context,'javascript/system', file );
-
-              // }else{
-                
-              //   file = path.resolve(options.context,'javascript/system', file+".js" );
-              //   if( !fs.existsSync( file ) )
-              //   {
-              //       file = data.request;
-              //   }
-              // }
-
-              //  console.log( file,"====" );
-              
-             // data.request = file;
-             
-          }
-
-          //if( data.request !== 'System.js'  ){
-
-              callback();
-          //}
-        
-      });
-        
   })
-
-  compiler.hooks.thisCompilation.tap("MyPluginDone",function(compilation, params){
-
-       // console.log(arguments )
-
-
-        compilation.hooks.rebuildModule.tap("MyPluginDone",function(){
-
-
-
-                  console.log("============rebuildModule==========")
-
-                  console.log(arguments )
-
-        })
-
-
-        //callback();
-  })
-
-
-
-
-  // compiler.hooks.make.tapAsync('MyPluginMake',function(compilation, callback ){
-
-  //     // compilation.hooks.finishModules.tapAsync("finishModules",function(modules,callback){
-  //     //       console.log(  modules );
-  //     //       callback();
-  //     // });
-
-  //     compilation.hooks.buildModule.tap("buildModule",function(module,callback){
-  //          // console.log( module );
-  //           //callback();
-  //     });
-
-  //     callback();
-
-
-  // });
-
-  // compiler.hooks.run.tapAsync("MyPlugin",function(compiler, callback){
-
-
-
-  //   console.log("This is an example plugin!!!" );
-  //   // 功能完成后调用 webpack 提供的回调。
-  //   callback();
-
-
-  //   // const finalCallback = (err, stats) => {
-	// 	// 	compiler.running = false;
-
-	// 	// 	if (err) {
-	// 	// 		compiler.hooks.failed.call(err);
-	// 	// 	}
-
-	// 	// 	if (callback !== undefined) return callback(err, stats);
-	// 	// };
-
-
-
-  //   // compiler.readRecords(err => {
-
-  //   //     console.log( err,  "============2===========" );
-  //   //     if (err) return finalCallback(err);
-  //   //     //compiler.compile(onCompiled);
-
-  //   //    // console.log( "============3===========" , this.recordsInputPath )
-
-  //   //     console.log( compiler )
-  //   //     // callback();
-
-
-  //   // });
-
-
-
-
-
-
-  // })
 
  
   // compiler.plugin('run', function(compilation, callback)
@@ -385,6 +214,19 @@ MyPlugin.prototype.apply = function(compiler)
   //    // 功能完成后调用 webpack 提供的回调。
   //    callback();
   // });
+
+
+    compiler.hooks.thisCompilation.tap("MyPlugin", compilation => {
+    
+
+        compilation.hooks.optimizeChunksAdvanced.tap("SplitChunksPlugin",chunks => {
+
+            //console.log( chunks )
+
+
+        });
+
+    });
 
 };
 
@@ -395,20 +237,20 @@ webpackDevServer.addDevServerEntrypoints(config, config.devServer);
 
 var compiler = webpack( config );
 
-// compiler.run(function(){
+compiler.run(function(){
 
-//       console.log( "==ok==="  )
+      console.log( "==ok==="  )
 
-// })
+})
 
-const server = new webpackDevServer(compiler, config.devServer);
+// const server = new webpackDevServer(compiler, config.devServer);
 
 
 
-server.listen(8080, 'localhost', () => {
+// server.listen(8080, 'localhost', () => {
 
-   console.log('dev server listening on port 8080');
+//    console.log('dev server listening on port 8080');
 
-});
+// });
 
 

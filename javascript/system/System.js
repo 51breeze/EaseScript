@@ -655,7 +655,7 @@ System.hotUpdate=function hotUpdate( target, callback )
     if( hotUpdateEvent === null )
     {
         hotUpdateEvent = function(e){
-            var module = e.getHotUpdateModule();
+            var module = e.hotUpdateModule;
             var updateClass = System.getQualifiedClassName(module);
             if( hotUpdateMap[updateClass] )
             {
@@ -671,8 +671,8 @@ System.hotUpdate=function hotUpdate( target, callback )
                 }
             }
         }
-        System.getGlobalEvent().removeEventListener("componentHotUpdate");
-        System.getGlobalEvent().addEventListener("componentHotUpdate",hotUpdateEvent);
+        System.getGlobalEvent().removeEventListener("DEVELOPMENT_HOT_UPDATE");
+        System.getGlobalEvent().addEventListener("DEVELOPMENT_HOT_UPDATE",hotUpdateEvent);
     }
 
     var name = System.getQualifiedObjectName(target);
