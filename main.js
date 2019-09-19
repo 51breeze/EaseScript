@@ -25,6 +25,7 @@ if( module.hot ){
 
         //var obj = new Index();
        // obj.home();
+       window.location.reload();
         console.log("./test/src/IndexApplication.es===============")
 
     });

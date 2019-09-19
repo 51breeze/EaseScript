@@ -65,11 +65,9 @@ function describe( str, name )
 
 
 var classMap = {
-    "Namespace":"Namespaces",
     "document":"Document",
     "window":"Window",
-    "console":"Console",
-    "Object":"BaseObject",
+    "Console":"console",
 }
 
 /**
@@ -84,27 +82,11 @@ function builder(path , config , localModules, requirements , replacements )
     var o;
     var namespaceMapValue=[];
     utils.forEach(replacements.NAMESPACE_HASH_MAP,function (value,name) {
-        namespaceMapValue.push( "'"+name+"'=>'"+value+"'" );
+        namespaceMapValue.push( "'"+name+"':'"+value+"'" );
     });
 
-    var exclude = {
-        'Function':true,
-        'Array':true,
-        'Boolean':true,
-        'Number':true,
-        'Math':true,
-        'int':true,
-        'uint':true,
-        'Integer':true,
-        'Float':true,
-        'float':true,
-        'double':true,
-        'Double':true,
-        'arguments':true,
-    };
-
-    var requires = ['System','Namespace','document','window','HTMLElement','Node','Element','RouteEvent'].concat( globals.slice(0), requirements );
-    var loaded = {};
+    var requires = ['System','Namespace','document','HTMLElement','Node','Element','RouteEvent'].concat( globals.slice(0), requirements );
+    var loaded = {"console":true};
     var name;
     while ( name= requires.pop() )
     {
@@ -113,14 +95,15 @@ function builder(path , config , localModules, requirements , replacements )
         {
             continue;
         }
+
         loaded[ name ] = true;
-        if( utils.isFileExists(config.root_path+'/php/system/'+name+'.php') )
+        if( utils.isFileExists(config.root_path+'/node/system/'+name+'.js') )
         {
-            var content = utils.getContents( config.root_path+'/php/system/'+name+'.php' );
+            var content = utils.getContents( config.root_path+'/node/system/'+name+'.js' );
             if( name==="Namespaces" && namespaceMapValue.length>0 )
             {
-                content = content.replace(/private\s+static\s+\$map\s*=\s*array\(\.*\)\s*;/,function (a) {
-                    return 'private static $map = array('+namespaceMapValue.join(",\n")+');';
+                content = content.replace(/var\s+codeMap\s*=\s*\{\.*\}\s*;/,function (a) {
+                    return 'var codeMap = {'+namespaceMapValue.join(",\n")+'};';
                 });
             }
 
@@ -149,25 +132,8 @@ function builder(path , config , localModules, requirements , replacements )
                 });
             }
 
-            //需要加载的类名
-            var _require = describe(content,"");
-            _require = _require.requirements.filter(function (name) {
-                 return !exclude[ name ];
-            });
-
-            var namespace = config.build_system_path.replace(/\./g,"\\");
-            //定义系统类的命名空间
-            var usename = [ "namespace "+namespace+";" ];
-            _require.forEach(function (name) {
-                usename.push("use "+namespace+"\\"+name+";" );
-                if( !loaded[ name ] ){
-                    requires.push( name );
-                }
-            });
-
             content = utils.trim( content );
-            content = content.replace(/^([\r\n\s]+)?<\?php/i, "<?php\n"+usename.join("\n") )
-            utils.setContents( dir+"/"+name+'.php', content );
+            utils.setContents( dir+"/"+name+'.js', content );
         }
     }
 
@@ -177,27 +143,40 @@ function builder(path , config , localModules, requirements , replacements )
         o = localModules[n];
         var file = utils.getResolvePath( app_path , o.fullclassname );
         utils.mkdir( file.substr(0, file.lastIndexOf("/") ) );
-        utils.setContents( file+'.php', o.makeContent['php'] );
+        utils.setContents( file+'.js', o.makeContent['node'] );
     }
 
     var bootstrap_dir = utils.getBuildPath(config,"build.bootstrap");
     var webroot_dir = utils.getBuildPath(config,"build.webroot");
 
     //生成引导文件
-    var content = utils.getContents( config.root_path+"/php/bootstrap.php");
+    var content = utils.getContents( config.root_path+"/node/bootstrap.js");
     content = replaceContent(content, replacements,config);
     utils.setContents( bootstrap_dir+'/'+replacements["BOOTSTRAP_CLASS_FILE_NAME"],  content );
 
     //生成入口文件
-    content = utils.getContents( config.root_path+"/php/index.php");
+    content = utils.getContents( config.root_path+"/node/index.js");
     content = replaceContent(content, replacements, config);
-    utils.setContents( webroot_dir+"/index.php",  content );
+    utils.setContents( webroot_dir+"/index.js",  content );
 }
 
 function replaceContent(content, data, config)
 {
     data = data||{};
     content = content.replace(/\[CODE\[(.*?)\]\]/ig, function (a, b) {
+
+        var requireex = b.match(/^REQUIRE_IDENTIFIER\((.*?)\)$/i);
+        if( requireex  )
+        {
+            var m = config.globals[ requireex[1] ];
+            if( !m && requireex[1] ==="Internal" ){
+                m = {
+                    type:requireex[1]
+                };
+            }
+            return utils.getRequireIdentifier(config, m || {type:requireex[1]} , m ? '.js' : '.es' )
+        }
+
         switch ( b )
         {
             case "SERVICE_ROUTE_LIST" :
@@ -214,14 +193,14 @@ function makeServiceRouteList( serviceRouteList )
     var items = {};
     utils.forEach(serviceRouteList,function (item) {
         var obj = items[ item.method ] || (items[ item.method ] = []);
-        obj.push("\t\t'"+item.alias+"'=>'"+item.provider.replace(/\./g,"\\")+"'");
+        obj.push("\t\t'"+item.alias+"':'"+item.provider+"'");
     });
 
     var bind=[];
     utils.forEach(items,function (item,method) {
-        bind.push( "\n\t'"+method+"'=>array(\n"+item.join(",\n")+'\n\t)' );
+        bind.push( "\n\t'"+method+"':{\n"+item.join(",\n")+'\n\t}' );
     });
-    return 'array(' + bind.join(",") +'\n)';
+    return '{' + bind.join(",") +'\n}';
 }
 
 module.exports = builder;

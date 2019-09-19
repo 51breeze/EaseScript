@@ -46,7 +46,7 @@
 	"root_path":"D:/workspace/EaseScript",
 	"build":{
 		"path":"D:/working",
-		"name":"working",
+		"name":"",
 		"child":{
 			"assets":{
 				"path":"D:/working/webroot/assets",
@@ -140,5 +140,25 @@
 		"iteratorClass":"es.interfaces.IListIterator"
 },
 	"system_require_main_class":["es.interfaces.IListIterator"],
-	"build_application_name":"easescript"
+	"build_application_name":"easescript",
+	"requirements":{
+
+},
+	"originMakeSyntax":"javascript",
+	"syntax_supported":{
+		"php":true,
+		"javascript":true
+},
+	"ServiceProviderList":{
+
+},
+	"makeVersion":1568536516379,
+	"context":{
+		"public":"__PUBLIC__",
+		"protected":"__PROTECTED__",
+		"private":"__PRIVATE__",
+		"internal":"__INTERNAL__",
+		"defineModuleMethod":"define",
+		"package":"Context"
+}
 }

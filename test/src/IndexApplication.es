@@ -16,10 +16,10 @@ package
     import app.*;
 
 
-   // [Embed('./jquery-1.11.2.js')];
+    //[Embed('./jquery-1.11.2.js')];
 
 
-   // [Import( file='./jquery-1.11.2.js', alias=JQ, export=jQuery )];
+    [Import( 'jquery-1.11.2.js', alias=JQ )];
 
 
     [Router(default=home, alias=MyIndex)]
@@ -32,7 +32,8 @@ package
             this.title="Index page";
 
             new Database();
-            console.log("===index==123==============");
+            console.log("===index==123=================");
+
         }
 
         private window(container:View)
@@ -133,6 +134,16 @@ package
             var bb:int = 99999;
             var tem:String = `ssss {iis} ===== {{bb}} ====1111111111111111====5`;
             console.log( tem );
+
+            setTimeout(function(){
+
+                var jq:JQ = new JQ("body");
+
+  console.log( jq.height() ,"========+++==66666999999=====",  jq is JQ );
+  console.log( jq.length , JQ("body").find("div").length );
+
+            },1000);
+          
 
             console.log( new Date().getTime() );
 

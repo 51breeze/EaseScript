@@ -63,7 +63,7 @@ const config = {
           {
             loader:'./lib/loader.js',
             options:{
-              config:esConfig,
+              //config:esConfig,
               //"styleLoader":[],
               // styleLoader:[
               //  // MiniCssExtractPlugin.loader.replace(/\\/g,'/'),
@@ -237,20 +237,20 @@ webpackDevServer.addDevServerEntrypoints(config, config.devServer);
 
 var compiler = webpack( config );
 
-compiler.run(function(){
+// compiler.run(function(){
 
-      console.log( "==ok==="  )
+//       console.log( "==ok==="  )
 
-})
+// })
 
-// const server = new webpackDevServer(compiler, config.devServer);
+const server = new webpackDevServer(compiler, config.devServer);
 
 
 
-// server.listen(8080, 'localhost', () => {
+server.listen(8080, 'localhost', () => {
 
-//    console.log('dev server listening on port 8080');
+   console.log('dev server listening on port 8080');
 
-// });
+});
 
 
