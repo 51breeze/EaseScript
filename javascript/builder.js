@@ -4,6 +4,9 @@ const rootPath =  utils.getResolvePath( __dirname );
 const path = require("path");
 const fs = require("fs");
 const url = require('url');
+const Less = require('less');
+const Maker = require('../lib/maker.js');
+const Compile = require('../lib/compile.js');
 
 /**
  * 在特定的版本下需要加载的库文件
@@ -165,46 +168,6 @@ function loadSystemModuleContentByName(config,name,flag)
    return makedSystemModules[name];
 }
 
-
-/**
- * 合并代码
- * @param config
- * @returns {string}
- */
-function builder(config ,  replacements)
-{
-    //系统引导器
-    var bootstrap = config.build_mode ==="app" ? rootPath+'/bootstrap.js' : rootPath+'/boot.js';
-    bootstrap = utils.getContents( bootstrap );
-    bootstrap = replaceContent(bootstrap, replacements, config);
-    return bootstrap;
-}
-
-/**
- * 构建单个块的内容
- * @param {*} config 
- * @param {*} replacements 
- */
-function chunk(config,replacements)
-{
-    var bootstrap = utils.getContents( rootPath+'/chunk.js' );
-    bootstrap = replaceContent(bootstrap, replacements, config);
-    return bootstrap;
-}
-
-
-/**
- * 生成入口视图
- * @param content
- * @param requirements
- * @return {*|string}
- */
-function getBootstrapView( config, replacements )
-{
-    return replaceContent( utils.getContents( config.view_template_path || (rootPath+'/index.html') ), replacements, config);
-}
-
-
 /**
  * 替换入口模板内容
  * @param {*} content 
@@ -256,15 +219,6 @@ function makeServiceRouteList( serviceRouteList )
         bind.push( "\n\t\""+method+"\":{\n"+item.join(",\n")+'\n\t}' );
     });
     return '{' + bind.join(",") +'\n}';
-}
-
-/**
- * 判断系统文件是否存在
- * @param {*} name 
- */
-function isSystemFileExists( name )
-{
-   return utils.isFileExists( rootPath + '/system/' + name + '.js' )
 }
 
 /**
@@ -617,95 +571,6 @@ function getThemeConfig( config )
 }
 
 
-
-function importCssPath( name , project_path, less_path )
-{
-    var file = name;
-    //如果不是指定的绝对路径
-    if( !path.isAbsolute( name ) )
-    {
-        file = path.resolve( project_path, name );
-    }
-
-    //如果文件不存在,则指向到默认目录
-    if( less_path && !utils.isFileExists( file ) )
-    {
-        file = path.resolve(less_path, name);
-        if( !utils.isFileExists( file ) )
-        {
-            throw new Error( "'"+file +"' is not exists." );
-        }
-    }
-    return file;
-}
-
-/**
- * 修正内容路径
- * @param file
- * @param content
- * @param importStyle
- * @param loadedStyle
- * @param included
- * @param config
- * @param lessPath
- * @returns {*}
- */
-function correction(config, content, context)
-{
-    var e = content;
-
-    //修正图片地址
-    e = e.replace(/\burl\s*\(\s*([\'\"])([^\1]*?)\1\)/ig, function (a,c,b) 
-    {
-        b = utils.trim(b);
-        if( b.substr(0,5) === "http:" || b.substr(0,6) === "https:" )return a;
-        var info = url.parse( b );
-        var suffix = [info.search,info.hash].filter(function(val){return !!val;}).join("");
-        b = utils.resolvePath( b, context);
-        var dest = utils.copyfileToBuildDir( b, utils.getBuildPath(config, 'build.assets'), config );
-        var u = '"./' + path.relative( utils.getBuildPath(config, 'build.css'), dest).replace(/\\/g, '/') +suffix+ '"';
-        return "url("+u+")";
-    });
-
-    //导入样式或者less
-    // e = e.replace(/\B@import\s+([\'\"])(.*?)\1[;\B]?/gi, function (a,b,c)
-    // {
-    //     c = root+ utils.trim(c);
-
-    //     //获取样式的绝对路径
-    //     var file = importCssPath( c , config.project_path, lessPath );
-
-    //     //如果没有加载过指定的文件
-    //     if( loadedStyle[file] !== true )
-    //     {
-    //         loadedStyle[file] = true;
-    //         if (c.slice(-4) === ".css")
-    //         {
-    //             return utils.getContents( file );
-    //         } else {
-    //             importStyle.push( file );
-    //         }
-    //     }
-    //     return '';
-    // });
-
-    //合并样式
-    // e = e.replace(/\B@include\s+([\'\"])(.*?)\1[;\B]?/gi, function (a,b,c)
-    // {
-    //     c = root+ utils.trim(c);
-    //     if( included[c] !==true  )
-    //     {
-    //         included[c] = true;
-    //         //获取样式的绝对路径
-    //         var file = importCssPath(c, config.project_path );
-    //         return utils.getContents( file );
-    //     }
-    //     return "";
-    // });
-    return e;
-}
-
-
 /**
  * 获取指定皮肤模块的所有样式内容
  * @param modules
@@ -749,132 +614,605 @@ function makeAllModuleStyleContent(config,modules)
     return style;
 }
 
-
-
-/**
- * 获取指定皮肤模块的所有样式内容
- * @param modules
- * @param config
- * @returns {*|{type, id, param}|{}|Array}
- */
-function makeModuleStyleExcludeContent(config,module)
+function makeLessStyleContent(config, modules, isApp )
 {
-    var files = [];
-
-    //是否有指定样式文件
-    if( config.skin_style_config && config.skin_style_config.hasOwnProperty(module.fullclassname) )
+    var content = '';
+    if( isApp )
     {
-        var stylefile = config.skin_style_config[ module.fullclassname ];
-        if( !path.isAbsolute(stylefile) )
-        {
-            stylefile = path.resolve( config.project_path, stylefile );
+        var imports = getCoreStyleFilePath( config ).join( `";\n@import "` );
+        if( imports ){
+        content+=`@import "${imports}";`;
         }
-        files.push( stylefile );
-    }
-    //模块中的样式内容
-    else if(  module.isSkinModule )
-    {
-        var styles = module.ownerFragmentModule.moduleContext.style;
-        var themes = findThemeStyleByName(styles, config.theme);
-        if( themes.length === 0  ){
-            themes = findThemeStyleByName(styles, "default" );
-        }
-        themes.map(function(a){
-            if( !a.content && a.attr.file )
-            {
-                if( !path.isAbsolute(a.attr.file) )
-                {
-                    a.attr.file = path.resolve( config.project_path, a.attr.file );
-                }
-                files.push( a.attr.file );
-            }
-        })
     }
 
-    return files;
-}
-
-
-/**
- * 获取指定皮肤模块的样式内容
- * @param m
- * @param config
- * @returns {string}
- */
-function makeModuleStyleContentExcludeFile(config,m)
-{
-    var e = "";
-    if( m.ownerFragmentModule && m.isSkinModule )
-    {
-        var styles = m.ownerFragmentModule.moduleContext.style;
-        var themes = findThemeStyleByName(styles, config.theme);
-        if( themes.length === 0  ){
-            themes = findThemeStyleByName(styles, "default" );
-        }
-        e = combineThemeStyle( themes.filter(function(item){
-            return !(item.attr && item.attr.file);
-        }), styles ,config );
-    }
-    return e;
-}
-
-/**
- * 构建样式
- * @param modules
- * @param config
- */
-function makeLessStyleContent(config, modules)
-{
     //需要处理样内容
-    const content = makeAllModuleStyleContent(config, modules).join("\n");
-    const imports = getCoreStyleFilePath( config ).join( `";\n@import "` );
-    return `\n@import "${imports}";\n${content}`;
-}
-
-function makeStyleContentAssets(config, content, context )
-{
-    var assets  ={};
-    var formpath   = config.workspace;
-    var csspath = utils.getBuildPath(config, 'build.css');
-
-     //修正图片地址
-    content = content.replace(/((\:|\,)\s*)url\s*\(\s*([\'\"])?([^\3]*?)\3?\)/ig, function (a,c,e,f,b) 
+    var style = makeAllModuleStyleContent(config, modules).join("\n");
+    if( style )
     {
-         b = utils.trim(b);
-         if( b.substr(0,5) === "http:" || b.substr(0,6) === "https:" )
-         {
-             return a;
-         }
-        var info = url.parse( b );
-        var suffix = [info.search,info.hash].filter(function(val){return !!val;}).join("");
-        var dest = utils.makeAssetsFile( config, formpath, utils.resolvePath( b, context) );
-        var u =  utils.getRequestRelativePath(config, utils.getBuildPath(config,'css'), dest)+suffix;
-        assets[ b ]= dest;
-        return `${c}url("${u}")`;
-    });
-
-    return {
-        content:content,
-        assets:assets,
-    };
+        content+=`\n${style}`;
+    }
+    return content;
 }
 
 
-builder.makeModuleStyleContentExcludeFile=makeModuleStyleContentExcludeFile;
-builder.makeModuleStyleExcludeContent=makeModuleStyleExcludeContent;
-builder.outputFiles = outputFiles;
-builder.makeLessStyleContent = makeLessStyleContent;
-builder.makeAllModuleStyleContent = makeAllModuleStyleContent;
-builder.buildModuleToJsonString = buildModuleToJsonString;
-builder.getAssetsFilePath = getAssetsFilePath;
-builder.getCoreStyleFilePath = getCoreStyleFilePath;
-builder.correction = correction;
-builder.makeStyleContentAssets = makeStyleContentAssets;
-builder.chunk=chunk;
-builder.getThemeConfig=getThemeConfig;
-builder.getBootstrapView = getBootstrapView;
-builder.isSystemFileExists = isSystemFileExists;
-builder.makeServiceRouteList = makeServiceRouteList;
-builder.loadRequireSystemModuleContents = loadRequireSystemModuleContents;
-builder.loadSystemModuleContentByName = loadSystemModuleContentByName;
-module.exports = builder;
+// builder.buildModuleToJsonString = buildModuleToJsonString;
+// builder.getAssetsFilePath = getAssetsFilePath;
+// builder.getCoreStyleFilePath = getCoreStyleFilePath;
+// builder.correction = correction;
+// builder.chunk=chunk;
+// builder.getThemeConfig=getThemeConfig;
+// builder.getBootstrapView = getBootstrapView;
+// builder.isSystemFileExists = isSystemFileExists;
+// builder.makeServiceRouteList = makeServiceRouteList;
+// builder.loadRequireSystemModuleContents = loadRequireSystemModuleContents;
+// builder.loadSystemModuleContentByName = loadSystemModuleContentByName;
+// module.exports = builder;
+
+class Builder
+{
+    static getLessVariables( config )
+    {
+        return getThemeConfig( config );
+    }
+   
+    static makeStyleContentAssets(config, content, context )
+    {
+        const assets  ={};
+        const formpath   = config.workspace;
+        //修正图片地址
+        content = content.replace(/((\:|\,)\s*)url\s*\(\s*([\'\"])?([^\3]*?)\3?\)/ig, function (a,c,e,f,b) 
+        {
+            b = utils.trim(b);
+            if( b.substr(0,5) === "http:" || b.substr(0,6) === "https:" )
+            {
+                return a;
+            }
+            var info = url.parse( b );
+            var suffix = [info.search,info.hash].filter(function(val){return !!val;}).join("");
+            var dest = utils.makeAssetsFile( config, formpath, utils.resolvePath( b, context) );
+            var u =  utils.getRequestRelativePath(config, utils.getBuildPath(config,'css'), dest)+suffix;
+            assets[ b ]= dest;
+            return `${c}url("${u}")`;
+        });
+
+        return {
+            content:content,
+            assets:assets,
+        };
+    }
+
+    static makeModuleStyleContentExcludeFile(config,module)
+    {
+       var e = "";
+       if( module.ownerFragmentModule && module.isSkinModule )
+       {
+           var styles = module.ownerFragmentModule.moduleContext.style;
+           var themes = findThemeStyleByName(styles, config.theme);
+           if( themes.length === 0  ){
+               themes = findThemeStyleByName(styles, "default" );
+           }
+           e = combineThemeStyle( themes.filter(function(item){
+               return !(item.attr && item.attr.file);
+           }), styles ,config );
+       }
+       return e;
+    }
+
+    static makeModuleStyleExcludeContent(config,module)
+    {
+        const files = [];
+
+        //是否有指定样式文件
+        if( config.skin_style_config && config.skin_style_config.hasOwnProperty(module.fullclassname) )
+        {
+            var stylefile = config.skin_style_config[ module.fullclassname ];
+            if( !path.isAbsolute(stylefile) )
+            {
+                stylefile = path.resolve( config.project_path, stylefile );
+            }
+            files.push( stylefile );
+        }
+        //模块中的样式内容
+        else if(  module.isSkinModule )
+        {
+            var styles = module.ownerFragmentModule.moduleContext.style;
+            var themes = findThemeStyleByName(styles, config.theme);
+            if( themes.length === 0  ){
+                themes = findThemeStyleByName(styles, "default" );
+            }
+            themes.map(function(a){
+                if( !a.content && a.attr.file )
+                {
+                    if( !path.isAbsolute(a.attr.file) )
+                    {
+                        a.attr.file = path.resolve( config.project_path, a.attr.file );
+                    }
+                    files.push( a.attr.file );
+                }
+            })
+        }
+
+        return files;
+    }
+
+    static buildSystemModule( config , module )
+    {
+        if( !module.makeContent )
+        {
+            module.makeContent={};
+        }
+
+        if( !module.makeContent['javascript'] )
+        {
+            const data = loadSystemModuleContentByName(config, module.type);
+            if( data )
+            {
+                module.makeContent[ 'javascript' ] = data.content;
+                module.path = data.path;
+                module.deps=data.deps;
+            }
+        }
+        return module;
+    }
+
+    static getDependencies(config, modules)
+    {
+        return modules.map(function(module)
+        {
+            const modules = Builder.getAllModules(config, module );
+            const usedModules = Builder.getUsedModules( modules, "javascript" );
+            return {
+                module:module,
+                context:[config.workspace],
+                routes:Builder.getServiceRoutes(config, usedModules),
+                dependencies:usedModules.filter(function(item){
+                    if( !item.nonglobal && !item.path ){
+                        item.path = path.join(config.system_global_path,item.type).replace(/\\/g,'/')+'.js';
+                    }
+                    return item.fullclassname !== module.fullclassname;
+                }),
+                assets: getAssetsFilePath( config, Builder.getModulesWithPolicy(usedModules, Builder.MODULE_POLICY_LOCAL | Builder.MODULE_POLICY_CORE ) )
+            };
+        });
+    }
+
+    static getServiceRoutes(config,modules )
+    {
+       var routes = {};
+       utils.forEach(modules.filter(function (e)
+       {
+           return !!e.controllerRouteList;
+       }),function (item) {
+           utils.forEach(item.controllerRouteList,function (item,key) {
+               item.classModule = item;
+               routes[key]=item;
+           });
+       });
+       return routes;
+    }
+
+    static getModulesWithPolicy( modules, mode )
+    {
+        if( (mode & Builder.MODULE_POLICY_ALL) ===Builder.MODULE_POLICY_ALL )
+        {
+            return modules;
+        }
+        return modules.filter(function (e)
+        {
+            for(var i = 0, n = 0; i <= mode; n++)
+            {
+                i = 1 * Math.pow(2, n);
+                var v = i & mode;
+                if ( v === Builder.MODULE_POLICY_GLOBAL && e.nonglobal !== true) {
+                    return true;
+                } else if ( v === Builder.MODULE_POLICY_CORE && e.nonglobal === true && e.fullclassname.indexOf("es.") === 0) {
+                    return true
+                } else if ( v === Builder.MODULE_POLICY_LOCAL && e.nonglobal === true && e.fullclassname.indexOf("es.") !== 0) {
+                    return true
+                }
+            }
+            return false;
+        });
+    }
+
+    static getUsedModules( modules,syntax )
+    {
+        return modules.filter(function (module) {
+
+            var hasUsed = Compile.hasUsedModuleOf(module, syntax);
+            if( module.nonglobal===true )
+            {
+                var isNs = module.id === "namespace";
+               
+                if (isNs && !hasUsed)
+                {
+                    hasUsed = Compile.hasUsedModuleOf(module.namespaces[module.classname], syntax);
+                }
+                return hasUsed && module["has_syntax_remove_" + syntax] !== true;
+            }
+            return hasUsed;
+        });
+    }
+
+    static getAllModules(config, module , results, hash, syntax )
+    {
+        results = results || [];
+        hash    = hash || {};
+        var name = module.fullclassname || module.type;
+        if ( hash[name] === true )
+        {
+            return results;
+        }
+        hash[name] = true;
+
+        if( module.nonglobal===true )
+        {
+            //与当前指定的语法不一致的依赖不获取
+            if( !Compile.isConformRunPlatform(module,syntax||"javascript") )
+            {
+                return results;
+            }
+    
+            var isNs = module.id==="namespace";
+            var hasUsed = Compile.hasUsedModuleOf( module );
+            if( isNs && !hasUsed ){
+                hasUsed = Compile.hasUsedModuleOf( module.namespaces[ module.classname ] );
+            }
+    
+            if( hasUsed && results.indexOf(module)<0 )
+            {
+               results.push(module);
+            }
+    
+            if( module.useExternalClassModules instanceof Array)
+            {
+                module.useExternalClassModules.forEach( (classname)=>{
+                    const module = Maker.getLoaclAndGlobalModuleDescription( classname );
+                    if( module )
+                    {
+                        Builder.getAllModules(config, module, results,  hash, syntax);
+                    }
+                });
+            }
+    
+        }else if( results.indexOf(module)<0 )
+        {
+            results.push( module );
+        }
+        return results;
+    }
+
+    static getAllSkinModules( modules )
+    {
+        return modules.filter(function (e) {
+            var m = Maker.getLoaclAndGlobalModuleDescription(e.fullclassname||e.type);
+            return m.nonglobal===true && m.ownerFragmentModule && m.ownerFragmentModule.isSkin;
+        });
+    }
+
+    static getBootstrapView( config, replacements )
+    {
+        return replaceContent( utils.getContents( config.view_template_path || (rootPath+'/index.html') ), replacements, config);
+    }
+   
+    constructor(config, chunkFlag)
+    {
+        this._config = config;
+        this.fs = fs;
+        this.assets ={};
+        this.modules={};
+        this.routes ={};
+        this.outputMap = new Map();
+        this.chunkFlag = chunkFlag;
+        const stylePath = path.resolve(config.system_style_path, config.system_style_name );
+        this.lessOptions = {
+            paths: [config.workspace,path.resolve(stylePath,"less"), stylePath],
+            globalVars:getThemeConfig( config ),
+            compress: config.minify === 'enable',
+        };
+    }
+
+    getWebrootPath(file)
+    {
+        var config = this._config;
+        var root = utils.getBuildPath(config,"build.webroot");
+        var prefix = config.originMakeSyntax !=="javascript" || config.enable_webroot ? "/" : "";
+        if( !config.enable_webroot && config.originMakeSyntax !=="javascript" )
+        {
+            root = utils.getBuildPath(config,"build");
+        }
+        return prefix+path.relative( root, file ).replace(/\\/g,"/");
+    }
+
+    getMainPath(outputname,suffix)
+    {
+        const config = this._config;
+        return path.resolve( utils.getBuildPath(config, `build${suffix}`), outputname + `${suffix}`);
+    }
+
+    emit(file, content)
+    {
+        this.fs.writeFileSync(file, content);
+    }
+
+    start(enterModules,bootstrap,callback)
+    {
+        var index = 0;
+        const config = this._config;
+        const completed = ( err )=>{
+            if( err )
+            {
+                callback(err);
+
+            }else
+            {
+                const dependencies = Object.values( this.modules );
+                var base = this.getMainPath('easescript','.js');
+                if( this.chunkFlag )
+                {
+                    const buildModules = Builder.getModulesWithPolicy( dependencies , Builder.MODULE_POLICY_CORE | Builder.MODULE_POLICY_GLOBAL  );
+                    const requiremnets={};
+
+                    enterModules.forEach( (module)=>{
+                        if( module.isApplication )
+                        {
+                            const identifier = utils.getRequireIdentifier(config, module, '.es');
+                            const output = this.outputMap.get( module ) || [];
+                            const script = output.filter( (item)=>{ return item.suffix ===".js" });
+                            const css = output.filter( (item)=>{ return item.suffix ===".css" });
+
+                            requiremnets[ identifier ] = {
+                                script:script[0] ? utils.getLoadFileRelativePath(config, script[0].path+'?v='+config.makeVersion ) : null,
+                                css: css[0] ? utils.getLoadFileRelativePath(config, css[0].path+'?v='+config.makeVersion ) : null,
+                                require:module.assets.filter( (file)=>{
+                                    return path.parse( file ).ext === ".js"
+                               })
+                            };
+                        }
+                    });
+                    
+                    const scriptContent = this.runtime(config, bootstrap , buildModules, this.routes, requiremnets );
+                    this.emit( base, scriptContent );
+                }
+
+                if( config.source_file ==="enable" )
+                {
+                    outputFiles( config, dependencies,  config.module_suffix );
+                }
+
+                if( bootstrap )
+                {
+                    const output = this.outputMap.get( bootstrap ) || [];
+                    const script = output.filter( (item)=>{ return item.suffix ===".js" });
+                    const css = output.filter( (item)=>{ return item.suffix ===".css" });
+                    if( !this.chunkFlag )
+                    {
+                        base = script[0].path;
+                    }
+
+                    this.emit(
+                        path.resolve( utils.getBuildPath(config, 'build.webroot'),'index.html' ),
+                        Builder.getBootstrapView(config, {
+                            META_CHARSET:"UTF-8",
+                            META_HTTP_EQUIV:"X-UA-Compatible",
+                            META_CONTENT:"IE=edge",
+                            META_KEYWORD_HTTP_EQUIV:"es,easescript,web",
+                            BASE_STYLE_FILE:"",
+                            COMMAND_SWITCH:config.command_switch,
+                            VERSION:config.makeVersion,
+                            APP_STYLE_FILE:css[0] ? utils.getLoadFileRelativePath(config, css[0].path ) : null,
+                            BASE_SCRIPT_FILE:utils.getLoadFileRelativePath( config, base ),
+                            APP_SCRIPT_FILE:script[0] ? utils.getLoadFileRelativePath(config, script[0].path) : null,
+                            VIEW_TITLE:"easescript",
+                        })
+                    );
+                }
+
+                callback();
+            }
+        };
+        const process = ()=>{
+
+            return new Promise((resovle, reject) =>{
+
+               const module = enterModules[ index++ ];
+               if( module )
+               {
+                    this.build( module, (err)=>{
+                        if( err ){
+                            reject(err);
+                        }else{
+                            resovle( false );
+                        }
+                    });
+
+               }else
+               {
+                   resovle( true );
+               }
+
+            }).then( ( done )=>{
+
+                if( !done )
+                {
+                    return process();
+                }else{
+                    completed();
+                }
+
+            }).catch( completed );
+
+        };
+        process();
+
+    }
+
+    runtime(config, bootstrap, modules, routes, requirements)
+    {
+        const workspace = path.relative( config.project.path, config.workspace ).replace(/\\/g,'/').replace(/\.\.\//g,'').replace(/^\/|\/$/g,'');
+        const js_load_path = path.relative( utils.getBuildPath(config, 'build.webroot') , utils.getBuildPath(config, 'build.js') ).replace(/\\/g,"/").replace(/^[\/\.]+/g,'');
+        const css_load_path = path.relative( utils.getBuildPath(config, 'build.webroot') , utils.getBuildPath(config, 'build.css') ).replace(/\\/g,"/").replace(/^[\/\.]+/g,'');
+        const apps = modules.filter( (module)=>module.isApplication );
+        const runTemplate = config.build_mode ==="app" || apps.length>0 ? rootPath+'/bootstrap.js' : rootPath+'/boot.js';
+        return replaceContent( utils.getContents( runTemplate ) , {
+            "namespace": '',
+            "MODULES":buildModuleToJsonString(config, modules),
+            "MODE":config.mode,
+            "HANDLE":config.makeVersion,
+            "VERSION":config.makeVersion,
+            "JS_LOAD_path":js_load_path,
+            "CSS_LOAD_path":css_load_path,
+            "NAMESPACE_HASH_MAP": '',
+            "MODULE_SUFFIX":config.suffix,
+            "WORKSPACE":workspace ? workspace+'/' : '',
+            "SERVICE_ROUTE_LIST": routes,
+            "BOOTSTRAP_CLASS_FILE_NAME": bootstrap && bootstrap.fullclassname,
+            "COMMAND_SWITCH":config.command_switch,
+            "LOAD_REQUIREMENTS":JSON.stringify(requirements),
+            "ORIGIN_SYNTAX": config.originMakeSyntax,
+            "STATIC_URL_path_NAME": config.static_url_path_name,
+            "DEFAULT_BOOTSTRAP_ROUTER_PROVIDER": bootstrap && bootstrap.defineMetaTypeList && bootstrap.defineMetaTypeList.Router ? bootstrap.fullclassname + "@" + bootstrap.defineMetaTypeList.Router.param.default : null,
+            "BOOTSTRAP_CLASS_path": utils.getRelativePath(
+                utils.getBuildPath(config, "build.webroot"),
+                utils.getBuildPath(config, "build.bootstrap")
+            )
+         }, config);
+    }
+
+    chunk(config, module, modules)
+    {
+        const identifier  = utils.getRequireIdentifier(config, module, '.es');      
+        return replaceContent(utils.getContents( rootPath+'/chunk.js' ), {
+            "MODULES":buildModuleToJsonString(config, modules ),
+            "MODE":config.mode,
+            "FILENAME":identifier,
+            "HANDLE":config.makeVersion,
+            "VERSION":config.makeVersion,
+        }, config);
+    }
+
+    addDependents( modules )
+    {
+        modules.forEach( (module)=>{
+            if( module && !this.modules[ module.type ] )
+            {
+                if( module.type )
+                {
+                    this.modules[ module.type ] = module;
+                    if( !module.nonglobal )
+                    {
+                        Builder.buildSystemModule(this._config, module);
+                        if( module.deps instanceof Array )
+                        {
+                            this.addDependents( module.deps.map( (name)=>{
+                                return Maker.getLoaclAndGlobalModuleDescription( name );
+                            }));
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    build({module,dependencies,assets,routes}, callback )
+    {
+        const config = this._config;
+        const outputname = module.fullclassname;
+        const requires = assets.filter(function(file){
+            return path.parse(file).ext ===".js";
+        });
+
+        if( routes )
+        {
+           Object.assign(this.routes,routes);
+        }
+       
+        var buildModules = null;
+        var scriptContent = '';
+        if( this.chunkFlag )
+        {
+            buildModules = Builder.getModulesWithPolicy(dependencies, Builder.MODULE_POLICY_LOCAL).concat( module );
+            scriptContent = this.chunk(config, module, buildModules);
+
+        }else
+        {
+            buildModules = dependencies.concat( module );
+            scriptContent= this.runtime(config, module, buildModules, routes, requires);
+        }
+
+        this.addDependents( buildModules );
+
+        //皮肤模块
+        const skinModules = Builder.getAllSkinModules( buildModules );
+
+        //生成入口样式文件
+        new Promise((resovle, reject) =>{
+
+            const styleContent = makeLessStyleContent(config, skinModules, module.isApplication );
+            if( styleContent )
+            {
+                Less.render(styleContent, this.lessOptions, function(err, output){
+        
+                    if (err) 
+                    {
+                        reject( err );
+                    
+                    } else if(output)
+                    {
+                        resovle( output.css );
+                    }
+                });
+
+            }else
+            {
+                resovle();
+            }
+
+
+        }).then( (content)=>{
+
+            const map = [];
+            this.outputMap.set( module, map );
+            if( content )
+            {
+                const styles = Builder.makeStyleContentAssets(config, content, this.lessOptions.paths);
+                Object.assign(this.assets,styles.assets);
+                map.push({
+                    path:this.getMainPath(outputname,'.css'),
+                    name:outputname,
+                    suffix:".css"
+                });
+                this.emit( this.getMainPath(outputname,'.css') , styles.content );
+            }
+
+            if ( config.minify === 'enable')
+            {
+                var script = uglify.minify(scriptContent, {ie8: true});
+                if (script.error)
+                {
+                    throw script.error;
+                }
+                scriptContent = script.code;
+            }
+
+            map.push({
+                path:this.getMainPath(outputname,'.js'),
+                name:outputname,
+                requires:requires,
+                suffix:".js"
+            });
+
+            this.emit( this.getMainPath(outputname,'.js') , scriptContent);
+            callback();
+            
+        }).catch( callback );
+    }
+
+}
+
+Builder.MODULE_POLICY_GLOBAL = 1;
+Builder.MODULE_POLICY_CORE = 2;
+Builder.MODULE_POLICY_LOCAL = 4;
+Builder.MODULE_POLICY_ALL = 7;
+
+module.exports = Builder;

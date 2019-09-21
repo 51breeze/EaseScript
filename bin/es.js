@@ -47,7 +47,7 @@ program
 .option('-L, --library [name,name:alias,...]', '指定使用第三方组件库',keyValue)
 .option('-m, --mode [dev|test|production]', '构建模式是用于生产环境还是测试环境','production')
 .option('--clean', '清除编译配置文件,并重新生成')
-.option('--bm, --build-mode [app|norm]', '构建文件模式', "app")
+.option('--bm, --build-mode [app|all]', '构建文件模式', "all")
 .option('--st, --strict-type [enable|disabled]', '启用强类型模式,对于声明的变量、属性、函数的返回值必须指定类型', 'enable')
 .option('--cv, --compat-version [ie:number,chrome:number,...]', '需要兼容的浏览器版本,默认为所有(*)',function (val) {
    val = val.split(',');
