@@ -1,3 +1,4 @@
+import "./style/less/main.less";
 import Index from './test/src/PersonApplication.es';
 import Event from 'system/Event.js';
 import System from 'system/System.js';

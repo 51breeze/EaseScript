@@ -23,19 +23,26 @@ const config = {
   entry:{
     'index':'./main.js',
     'person':'./main2.js',
-    'test':'./test/src/Test.es'
+  //  'test':'./test/src/Test.es'
     //'address':'./test/src/IndexApplication.es?main',
   },
   output: {
     path:path.resolve('./test/build'),
     filename: './js/[name].bundle.js',
+    chunkFilename:'./js/[name].bundle.js',
   },
   resolve:{
     extensions:[".js", ".json", ".jsx", ".css",'.es'],
+    alias:{
+      "@system":path.resolve(__dirname, "javascript/system"),
+      "@core":path.resolve(__dirname),
+      "@src":path.resolve(__dirname,'test/src')
+    },
     modules:[
      path.resolve(__dirname),
      path.resolve(__dirname,'test'),
      path.resolve(__dirname, "javascript"),
+     path.resolve(__dirname, "javascript/system"),
      path.resolve(__dirname, "node_modules"),
     ]
   },
@@ -65,12 +72,11 @@ const config = {
             options:{
               //config:esConfig,
               //"styleLoader":[],
-              // styleLoader:[
-              //  // MiniCssExtractPlugin.loader.replace(/\\/g,'/'),
-              //   'style-loader',
+              //  styleLoader:[
+              //    MiniCssExtractPlugin.loader.replace(/\\/g,'/'),
               //   'css-loader',
-              //   //'less-loader'
-              // ],
+              //   'less-loader'
+              //  ],
               globalVars:lessOptions.globalVars,
               paths:lessOptions.paths
             },
@@ -80,6 +86,7 @@ const config = {
       {
         test:/\.(less|css)$/i,
         use: [ 
+          //MiniCssExtractPlugin.loader,
           'style-loader',
           {
             loader:'css-loader',
@@ -104,11 +111,12 @@ const config = {
    // new MyPlugin({context:__dirname}),
    // new webpack.MemoryOutputFileSystem()
    // new ExtractTextWebpackPlugin({filename:'[name].min.css'})
-  // new MiniCssExtractPlugin({filename: "./css/[name].css"}),
+   //new MiniCssExtractPlugin({filename: "./css/[name].css"}),
 
     //new webpack.NamedModulesPlugin(),
     //new webpack.HotModuleReplacementPlugin()
   ],
+
   optimization: {
     splitChunks: {
       chunks: 'all',
@@ -131,7 +139,6 @@ const config = {
           reuseExistingChunk: true,
           name:"common"
         }
-
       }
     },
     runtimeChunk: {

@@ -1,8 +1,8 @@
 
 import "./style/less/main.less";
-import Index from './test/src/IndexApplication.es';
-import Event from 'system/Event.js';
-import System from 'system/System.js';
+import Index from '@src/IndexApplication.es';
+import Event from '@system/Event.js';
+import System from '@system/System.js';
 
 // require("./es/skins/DataGridStyle.less");
 // require("./es/skins/NavigateStyle.less");
@@ -10,9 +10,24 @@ import System from 'system/System.js';
 // require("./es/skins/PopUpStyle.less");
 
 
+
+
 var obj = new Index();
 var global = System.getGlobalEvent();
 global.addEventListener(Event.READY,function (e) {
+
+   // import(/*webpackChunkName:"index2"*/ './test/src/IndexApplication.es' )
+
+   // import(/*webpackChunkName:"person"*/ './test/src/PersonApplication.es' ).then(function(module){
+
+        //console.log( module.default );
+
+        //console.log("==========");
+
+      // var obj = new module.default();
+      // obj.index();
+
+    //});
    
     console.log(  obj.home()+""  );
 
@@ -24,9 +39,9 @@ if( module.hot ){
          
 
         //var obj = new Index();
-       // obj.home();
-       window.location.reload();
-        console.log("./test/src/IndexApplication.es===============")
+        // obj.home();
+        //window.location.reload();
+        //console.log("./test/src/IndexApplication.es===============")
 
     });
 
