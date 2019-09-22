@@ -37,7 +37,7 @@ program
 .option('-B, --browser [enable|disabled]', '是否需要支持浏览器','enable')
 .option('-b, --bootstrap [file|dir]', '指定需要编译的文件或者一个目录')
 .option('-d, --debug [enable|disabled]', '是否需要开启调试','enable')
-.option('-t, --theme [default,blue,...]', '指定使用的主题颜色','default')
+.option('-t, --theme [default,blue,...]', '指定使用的主题颜色')
 .option('--tfp, --theme-file-path [project_path/theme]', '指定主题配置文件的目录,默认为当前工程目录,每一个配置文件名必须与主题名一致',"./theme")
 .option('-r, --reserved [keyword1,keyword2,...]', '指定需要保护的关键字', function (val) {
     return val.split(',');

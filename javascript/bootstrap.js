@@ -1,13 +1,12 @@
 (function(definedModules, undefined){
 
 var httpRoutes = [CODE[SERVICE_ROUTE_LIST]];
-var defaultRoute = "[CODE[DEFAULT_BOOTSTRAP_ROUTER_PROVIDER]]";
 
 /**
  * 运行环境相关信息
  */
 var env={
-    "HTTP_DEFAULT_ROUTE":defaultRoute,
+    "HTTP_DEFAULT_ROUTE":"[CODE[DEFAULT_BOOTSTRAP_ROUTER_PROVIDER]]",
     "HTTP_ROUTES":httpRoutes,
     "HTTP_ROUTE_PATH":null,
     "MODE":[CODE[MODE]],
@@ -31,6 +30,10 @@ var EaseScript = {
     "Environments":env
 };
 
+var handle = "[CODE[HANDLE]]";
+EaseScript.Load = (typeof window[ handle ] === "object" &&  window[ handle ].Load) || {};
+window[ handle ]=EaseScript;
+
 /**
  * 已加载的模块
  */
@@ -40,20 +43,30 @@ var installedModules = {};
  * 加载并初始化模块
  * @param string 
  */
-function require( classname )
+function require( identifier )
 {
-    if( installedModules[classname] )
+    if( installedModules[identifier] )
     {
-        return installedModules[classname].exports;
+        return installedModules[identifier].exports;
     }
 
-    var module = installedModules[classname] = {
-        id: classname,
+    if( !definedModules.hasOwnProperty(identifier) )
+    {
+         throw new ReferenceError( identifier +" is not define.");
+    }
+
+    var module = installedModules[identifier] = {
+        id: identifier,
         exports: {}
     };
 
-	definedModules[classname].call(module.exports, module, require);
+	definedModules[identifier].call(module.exports, module, require);
 	return module.exports;
+}
+
+require.has=function has( identifier )
+{
+    return definedModules.hasOwnProperty(identifier);
 }
 
 var Internal= require("[CODE[REQUIRE_IDENTIFIER(Internal)]]");
@@ -129,19 +142,25 @@ function loadScript(filename,callback){
  */
 function start(module, method)
 {
-    try {
-        var main = require( module );
-        var obj = new main();
-        global.dispatchEvent(new Event(Event.INITIALIZING));
-        var response = obj[method]();
-        if (global.hasEventListener(Event.INITIALIZE_COMPLETED)) {
-            global.dispatchEvent(new Event(Event.INITIALIZE_COMPLETED));
-        }
-        return response;
-    }catch(e)
+    var main = require( module );
+    var obj = new main();
+    global.dispatchEvent(new Event(Event.INITIALIZING));
+    
+    if( method )
     {
-        throw e.valueOf();
+        if( typeof obj[method] === "function" )
+        {
+            obj[method]();
+        }else{
+            throw new ReferenceError( method+" is not exist.");
+        }
     }
+
+    if (global.hasEventListener(Event.INITIALIZE_COMPLETED)) 
+    {
+        global.dispatchEvent(new Event(Event.INITIALIZE_COMPLETED));
+    }
+    
 }
 
 /**
@@ -178,83 +197,76 @@ function initModule(module)
     }
 }
 
-var handle = "[CODE[HANDLE]]";
-EaseScript.Load = (typeof window[ handle ] === "object" &&  window[ handle ].Load) || {};
-window[ handle ]=EaseScript;
-
 /**
  * 文档加载就绪
  */
 global.addEventListener(Event.READY,function (e) {
+ 
+    var routeMap = httpRoutes && httpRoutes.get || {};
+    var path = locator.query( env.URL_PATH_NAME );
+    if( !path ){
+        path = '/'+locator.path().join("/");
+    }
+    path = path.toLowerCase();
+    //指定需要执行的模块
+    var router = routeMap[ path ] || window[handle+"_HTTP_DEFAULT_ROUTE"] || env.HTTP_DEFAULT_ROUTE;
+    var controller = router ? router.split("@") : [];
+    var module = controller[0];
+    var method = controller[1];
+    env.HTTP_ROUTE_CONTROLLER=router;
+    if( typeof routeMap[ path ] !== "undefined"){
+        env.HTTP_ROUTE_PATH = path ;
+    }else{
+        Object.forEach(routeMap,function (provider, name) {
+            if( provider === router ){
+                env.HTTP_ROUTE_PATH = name;
+                return false;
+            }
+        });
+    }
 
-    try{
-       
-        var router = httpRoutes.get || {};
-        var path = locator.query( env.URL_PATH_NAME );
-        if( !path ){
-            path = '/'+locator.path().join("/");
+    //调度指定模块中的方法
+    (env.HTTP_DISPATCHER=function(module, method, callback)
+    {
+        module = env.WORKSPACE+module+env.MODULE_SUFFIX;
+
+        //如果存在先初始化
+        initModule(module);
+
+        //如果模块类已经加载
+        if( require.has( module ) )
+        {
+            typeof callback === "function" ? callback( start(module, method) ) : start(module, method);
         }
-        //指定需要执行的模块
-        router = router[ path ] || defaultRoute;
-        var controller = router.split("@");
-        var module = controller[0];
-        var method = controller[1];
-        env.HTTP_ROUTE_CONTROLLER=router;
-        if( typeof httpRoutes.get[ path ] !== "undefined"){
-            env.HTTP_ROUTE_PATH = path ;
-        }else{
-            Object.forEach(httpRoutes.get,function (provider, name) {
-                if( provider === router ){
-                    env.HTTP_ROUTE_PATH = name;
-                    return false;
-                }
+        //需要加载模块及模块相关脚本
+        else
+        {
+            //如果没有配置指定的模块
+            var moduleInfo = EaseScript.Requirements[ module ]
+            if( !moduleInfo || !moduleInfo.script )
+            {
+                throw new ReferenceError("Not found the '"+module+"'." );
+            }
+
+            //加载模块样式
+            if( moduleInfo.css )
+            {
+                loadScript( moduleInfo.css );
+            }
+
+            //加载模块依赖文件
+            loader(moduleInfo.require, function () {
+                //加载主模块
+                loadScript(moduleInfo.script, function () {
+                    //初始化模块
+                    initModule(module);
+                    typeof callback === "function" ? callback( start(module, method) ) : start(module, method);
+                },module);
             });
         }
 
-        //调度指定模块中的方法
-        (env.HTTP_DISPATCHER=function(module, method, callback)
-        {
-            module = env.WORKSPACE+module+env.MODULE_SUFFIX;
-            //如果存在先初始化
-            initModule(module);
-            //如果模块类已经加载
-            if( System.hasClass( module ) )
-            {
-                typeof callback === "function" ? callback( start(module, method) ) : start(module, method);
-            }
-            //需要加载模块及模块相关脚本
-            else
-            {
-                //如果没有配置指定的模块
-                var moduleInfo = EaseScript.Requirements[ module ]
-                if( !moduleInfo || !moduleInfo.script )
-                {
-                    throw new ReferenceError("Not found the '"+module+"'." );
-                }
-
-                //加载模块样式
-                if( moduleInfo.css )
-                {
-                    loadScript( moduleInfo.css );
-                }
-
-                //加载模块依赖文件
-                loader(moduleInfo.require, function () {
-                    //加载主模块
-                    loadScript(moduleInfo.script, function () {
-                        //初始化模块
-                        initModule(module);
-                        typeof callback === "function" ? callback( start(module, method) ) : start(module, method);
-                    },module);
-                });
-            }
-        })(module, method);
-
-    }catch(e)
-    {
-        window.console.log(e);
-        throw new Error( e.message );
-    }
+    })(module, method);
+    
 },false,-500);
 
 }([CODE[MODULES]]));

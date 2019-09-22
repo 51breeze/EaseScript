@@ -195,6 +195,50 @@ function replaceContent(content, data, config)
         {
             case "SERVICE_ROUTE_LIST" :
                 return makeServiceRouteList( data["SERVICE_ROUTE_LIST"]||{});
+            case "VIEW_HTML" :
+
+                var html = [];
+
+                if( data.BASE_STYLE_FILE ){
+                    html.push(`<link rel="stylesheet" href="${data.BASE_STYLE_FILE}"></link>`);
+                }
+
+                if( data.APP_STYLE_FILE ){
+                    html.push(`<link rel="stylesheet" href="${data.APP_STYLE_FILE}"></link>`);
+                }
+
+               if( data.REQUIREMENTS )
+               {
+                    data.REQUIREMENTS.sort( (item)=>item.suffix ===".css" ? -1 : 0 ).forEach( (item)=>{
+                        switch( item.suffix )
+                        {
+                            case '.css' :
+                                html.push(`<link rel="stylesheet" href="${item.path}"></link>`);
+                            break;
+                            case '.js' :
+                                html.push(`<script type="text/javascript" src="${item.path}"></script>`);
+                            break;
+                        }
+                    });
+               }
+
+               if( data.BASE_SCRIPT_FILE )
+               {
+                   html.push(`<script type="text/javascript" src="${data.BASE_SCRIPT_FILE}"></script>`);
+               }
+
+               if( data.APP_SCRIPT_FILE )
+               {
+                   html.push(`<script type="text/javascript" src="${data.APP_SCRIPT_FILE}"></script>`);
+               }
+
+               if( data.DEFAULT_ROUTER )
+               {
+                   html.push(`<script>window["${data.HANDLE}_HTTP_DEFAULT_ROUTE"]="${data.DEFAULT_ROUTER}";</script>`);
+               }
+
+               return html.join("\n\t");
+
             break;
         }
         return typeof data[b] !== "undefined" ? data[b] : "null";
@@ -211,7 +255,8 @@ function makeServiceRouteList( serviceRouteList )
     var items = {};
     utils.forEach(serviceRouteList,function (item) {
         var obj = items[ item.method ] || (items[ item.method ] = []);
-        obj.push("\t\t\""+item.alias+"\":\""+item.provider+"\"");
+        var name = item.alias;
+        obj.push("\t\t\""+name.replace(/^\//,'').toLowerCase()+"\":\""+item.provider+"\"");
     });
 
     var bind=[];
@@ -735,8 +780,13 @@ class Builder
         return files;
     }
 
-    static buildSystemModule( config , module )
+    static buildSystemModule( config , module , flag)
     {
+        if( typeof module === "string" )
+        {
+            module = Maker.getLoaclAndGlobalModuleDescription( module );
+        }
+
         if( !module.makeContent )
         {
             module.makeContent={};
@@ -744,7 +794,7 @@ class Builder
 
         if( !module.makeContent['javascript'] )
         {
-            const data = loadSystemModuleContentByName(config, module.type);
+            const data = loadSystemModuleContentByName(config, module.type, flag );
             if( data )
             {
                 module.makeContent[ 'javascript' ] = data.content;
@@ -875,7 +925,7 @@ class Builder
                 });
             }
     
-        }else if( results.indexOf(module)<0 )
+        }else if( !utils.excludeLoadSystemFile( module.type ) && results.indexOf(module)<0 )
         {
             results.push( module );
         }
@@ -886,13 +936,13 @@ class Builder
     {
         return modules.filter(function (e) {
             var m = Maker.getLoaclAndGlobalModuleDescription(e.fullclassname||e.type);
-            return m.nonglobal===true && m.ownerFragmentModule && m.ownerFragmentModule.isSkin;
+            return m && m.nonglobal===true && m.ownerFragmentModule && m.ownerFragmentModule.isSkin;
         });
     }
 
     static getBootstrapView( config, replacements )
     {
-        return replaceContent( utils.getContents( config.view_template_path || (rootPath+'/index.html') ), replacements, config);
+        return replaceContent( utils.getContents( config.view_template_path || (rootPath+'/index.html') ), replacements, config).replace(/(\n[\s\t]*\r*\n)/g, '\n')
     }
    
     constructor(config, chunkFlag)
@@ -902,7 +952,8 @@ class Builder
         this.assets ={};
         this.modules={};
         this.routes ={};
-        this.outputMap = new Map();
+        this.outputMap = new WeakMap();
+        this.dependentsTreeMap = new WeakMap();
         this.chunkFlag = chunkFlag;
         const stylePath = path.resolve(config.system_style_path, config.system_style_name );
         this.lessOptions = {
@@ -910,18 +961,7 @@ class Builder
             globalVars:getThemeConfig( config ),
             compress: config.minify === 'enable',
         };
-    }
-
-    getWebrootPath(file)
-    {
-        var config = this._config;
-        var root = utils.getBuildPath(config,"build.webroot");
-        var prefix = config.originMakeSyntax !=="javascript" || config.enable_webroot ? "/" : "";
-        if( !config.enable_webroot && config.originMakeSyntax !=="javascript" )
-        {
-            root = utils.getBuildPath(config,"build");
-        }
-        return prefix+path.relative( root, file ).replace(/\\/g,"/");
+        this.id = utils.MD5( (new Date()).getTime() +'_'+ Math.random() , 16);
     }
 
     getMainPath(outputname,suffix)
@@ -935,6 +975,45 @@ class Builder
         this.fs.writeFileSync(file, content);
     }
 
+    getViewOptions( config, options )
+    {
+       return Object.assign({
+            META_CHARSET:"UTF-8",
+            META_HTTP_EQUIV:"X-UA-Compatible",
+            META_CONTENT:"IE=edge",
+            META_KEYWORD_HTTP_EQUIV:"es,easescript,web",
+            BASE_STYLE_FILE:"",
+            COMMAND_SWITCH:config.command_switch,
+            VERSION:config.makeVersion,
+            VIEW_TITLE:"easescript",
+            APP_STYLE_FILE:null,
+            BASE_SCRIPT_FILE:null,
+            APP_SCRIPT_FILE:null,
+        }, options);
+    }
+
+    getAllDependents( enterModules )
+    {
+        const config = this._config;
+        const result = [];
+        const hash   ={};
+        const requirements = utils.globals.concat(["Internal",'System','Locator','Event']);
+        requirements.forEach( (name)=>{
+            var module = Maker.getLoaclAndGlobalModuleDescription( name ) || {type:'Internal'};
+            if( result.indexOf( module ) < 0 )
+            {
+                result.push( module );
+            }
+        });
+
+        enterModules.forEach( ({module,dependencies})=>{
+            Builder.getAllModules( config, module, result, hash, 'javascript' )
+            dependencies.forEach( ( module )=>Builder.getAllModules( config, module, result, hash, 'javascript' ) )
+        });
+
+        return result;
+    }
+
     start(enterModules,bootstrap,callback)
     {
         var index = 0;
@@ -946,71 +1025,114 @@ class Builder
 
             }else
             {
-                const dependencies = Object.values( this.modules );
-                var base = this.getMainPath('easescript','.js');
-                if( this.chunkFlag )
-                {
-                    const buildModules = Builder.getModulesWithPolicy( dependencies , Builder.MODULE_POLICY_CORE | Builder.MODULE_POLICY_GLOBAL  );
-                    const requiremnets={};
-
-                    enterModules.forEach( (module)=>{
-                        if( module.isApplication )
-                        {
-                            const identifier = utils.getRequireIdentifier(config, module, '.es');
-                            const output = this.outputMap.get( module ) || [];
-                            const script = output.filter( (item)=>{ return item.suffix ===".js" });
-                            const css = output.filter( (item)=>{ return item.suffix ===".css" });
-
-                            requiremnets[ identifier ] = {
-                                script:script[0] ? utils.getLoadFileRelativePath(config, script[0].path+'?v='+config.makeVersion ) : null,
-                                css: css[0] ? utils.getLoadFileRelativePath(config, css[0].path+'?v='+config.makeVersion ) : null,
-                                require:module.assets.filter( (file)=>{
-                                    return path.parse( file ).ext === ".js"
-                               })
-                            };
-                        }
-                    });
-                    
-                    const scriptContent = this.runtime(config, bootstrap , buildModules, this.routes, requiremnets );
-                    this.emit( base, scriptContent );
-                }
+                const dependencies = this.getAllDependents( enterModules );
+                const base = this.getMainPath('easescript','.js');
 
                 if( config.source_file ==="enable" )
                 {
                     outputFiles( config, dependencies,  config.module_suffix );
                 }
 
-                if( bootstrap )
-                {
-                    const output = this.outputMap.get( bootstrap ) || [];
-                    const script = output.filter( (item)=>{ return item.suffix ===".js" });
-                    const css = output.filter( (item)=>{ return item.suffix ===".css" });
-                    if( !this.chunkFlag )
+                new Promise((resovle, reject) =>{
+
+                    if( this.chunkFlag )
                     {
-                        base = script[0].path;
+                        const buildModules = Builder.getModulesWithPolicy( dependencies , Builder.MODULE_POLICY_CORE | Builder.MODULE_POLICY_GLOBAL  );
+                        const requiremnets={};
+                        enterModules.forEach( ({module})=>{
+                            if( module.isApplication )
+                            {
+                                const identifier = utils.getRequireIdentifier(config, module, '.es');
+                                const output = this.outputMap.get( module ) || [];
+                                const script = output.filter( (item)=>{ return item.suffix ===".js" });
+                                const css = output.filter( (item)=>{ return item.suffix ===".css" });
+                                const require = output.filter( (item)=>{ return item.require }).map((item)=>item.path);
+                                requiremnets[ identifier ] = {
+                                    script:script[0] ? utils.getLoadFileRelativePath(config, script[0].path+'?v='+config.makeVersion ) : null,
+                                    css: css[0] ? utils.getLoadFileRelativePath(config, css[0].path+'?v='+config.makeVersion ) : null,
+                                    require:require
+                                };
+                            }
+                        });
+
+                        const scriptContent = this.runtime(config, bootstrap , buildModules, this.routes, requiremnets );
+                        this.emit( base, scriptContent );
+
+                        const styleContent = makeLessStyleContent(config, Builder.getAllSkinModules( buildModules ), true );
+                        if( styleContent )
+                        {
+                            Less.render(styleContent, this.lessOptions, function(err, output){
+                                if (err) 
+                                {
+                                    reject( err );
+                                
+                                } else if(output)
+                                {
+                                    resovle( output.css );
+                                }
+                            });
+
+                            return;
+                        }
                     }
 
-                    this.emit(
-                        path.resolve( utils.getBuildPath(config, 'build.webroot'),'index.html' ),
-                        Builder.getBootstrapView(config, {
-                            META_CHARSET:"UTF-8",
-                            META_HTTP_EQUIV:"X-UA-Compatible",
-                            META_CONTENT:"IE=edge",
-                            META_KEYWORD_HTTP_EQUIV:"es,easescript,web",
-                            BASE_STYLE_FILE:"",
-                            COMMAND_SWITCH:config.command_switch,
-                            VERSION:config.makeVersion,
-                            APP_STYLE_FILE:css[0] ? utils.getLoadFileRelativePath(config, css[0].path ) : null,
-                            BASE_SCRIPT_FILE:utils.getLoadFileRelativePath( config, base ),
-                            APP_SCRIPT_FILE:script[0] ? utils.getLoadFileRelativePath(config, script[0].path) : null,
-                            VIEW_TITLE:"easescript",
-                        })
-                    );
-                }
+                    resovle();
+        
+                }).then( (content)=>{
+        
+                    if( content )
+                    {
+                        const styles = Builder.makeStyleContentAssets(config, content, this.lessOptions.paths);
+                        this.emit( this.getMainPath('common','.css') , styles.content);
+                    }
 
-                callback();
+                    if( bootstrap && this.chunkFlag )
+                    {
+                        this.emit(
+                            path.resolve( utils.getBuildPath(config, 'build.webroot'), 'index.html' ),
+                            Builder.getBootstrapView(config,this.getViewOptions(config,{
+                                VIEW_TITLE:bootstrap.classname,
+                                HANDLE:this.id,
+                                VERSION:config.makeVersion,
+                                BASE_SCRIPT_FILE:utils.getLoadFileRelativePath(config, base ),
+                                BASE_STYLE_FILE:content ? utils.getLoadFileRelativePath(config, this.getMainPath('common','.css') ) : null,
+                            }))
+                        );
+
+                    }else
+                    {
+                        enterModules.forEach( ({module})=>{
+                            if( module.isApplication )
+                            {
+                                const output = this.outputMap.get( module ) || [];
+                                const script = output.filter( (item)=>{ return item.suffix ===".js" });
+                                const css = output.filter( (item)=>{ return item.suffix ===".css" });
+                                const require = output.filter( (item)=>{ return item.require });
+                                this.emit(
+                                    path.resolve( utils.getBuildPath(config, 'build.webroot'), module.classname.toLowerCase()  +'.html' ),
+                                    Builder.getBootstrapView(config,this.getViewOptions(config,{
+                                        VIEW_TITLE:module.classname,
+                                        REQUIREMENTS:require,
+                                        HANDLE:this.id,
+                                        VERSION:config.makeVersion,
+                                        DEFAULT_ROUTER:this.chunkFlag && module.defineMetaTypeList && module.defineMetaTypeList.Router ? module.fullclassname + "@" + module.defineMetaTypeList.Router.param.default : null,
+                                        APP_STYLE_FILE:css[0] ? utils.getLoadFileRelativePath(config, css[0].path ) : null,
+                                        BASE_STYLE_FILE:content ? utils.getLoadFileRelativePath(config, this.getMainPath('common','.css') ) : null,
+                                        BASE_SCRIPT_FILE:this.chunkFlag ? utils.getLoadFileRelativePath(config, base ) : null,
+                                        APP_SCRIPT_FILE:script[0] ? utils.getLoadFileRelativePath(config,script[0].path) : null
+                                    }))
+                                );
+                            }
+                        });
+                    }
+                    
+                    callback();
+
+                }).catch( callback );
+
             }
         };
+
         const process = ()=>{
 
             return new Promise((resovle, reject) =>{
@@ -1052,16 +1174,21 @@ class Builder
         const workspace = path.relative( config.project.path, config.workspace ).replace(/\\/g,'/').replace(/\.\.\//g,'').replace(/^\/|\/$/g,'');
         const js_load_path = path.relative( utils.getBuildPath(config, 'build.webroot') , utils.getBuildPath(config, 'build.js') ).replace(/\\/g,"/").replace(/^[\/\.]+/g,'');
         const css_load_path = path.relative( utils.getBuildPath(config, 'build.webroot') , utils.getBuildPath(config, 'build.css') ).replace(/\\/g,"/").replace(/^[\/\.]+/g,'');
-        const apps = modules.filter( (module)=>module.isApplication );
-        const runTemplate = config.build_mode ==="app" || apps.length>0 ? rootPath+'/bootstrap.js' : rootPath+'/boot.js';
+        const runTemplate = rootPath+'/bootstrap.js';
+        var router_provider = bootstrap && bootstrap.defineMetaTypeList && bootstrap.defineMetaTypeList.Router ? bootstrap.fullclassname + "@" + bootstrap.defineMetaTypeList.Router.param.default : null
+        if( !router_provider && bootstrap )
+        {
+            router_provider = bootstrap.fullclassname;
+        }
+
         return replaceContent( utils.getContents( runTemplate ) , {
             "namespace": '',
             "MODULES":buildModuleToJsonString(config, modules),
             "MODE":config.mode,
-            "HANDLE":config.makeVersion,
+            "HANDLE":this.id,
             "VERSION":config.makeVersion,
-            "JS_LOAD_path":js_load_path,
-            "CSS_LOAD_path":css_load_path,
+            "JS_LOAD_PATH":js_load_path,
+            "CSS_LOAD_PATH":css_load_path,
             "NAMESPACE_HASH_MAP": '',
             "MODULE_SUFFIX":config.suffix,
             "WORKSPACE":workspace ? workspace+'/' : '',
@@ -1070,9 +1197,9 @@ class Builder
             "COMMAND_SWITCH":config.command_switch,
             "LOAD_REQUIREMENTS":JSON.stringify(requirements),
             "ORIGIN_SYNTAX": config.originMakeSyntax,
-            "STATIC_URL_path_NAME": config.static_url_path_name,
-            "DEFAULT_BOOTSTRAP_ROUTER_PROVIDER": bootstrap && bootstrap.defineMetaTypeList && bootstrap.defineMetaTypeList.Router ? bootstrap.fullclassname + "@" + bootstrap.defineMetaTypeList.Router.param.default : null,
-            "BOOTSTRAP_CLASS_path": utils.getRelativePath(
+            "STATIC_URL_PATH_NAME": config.static_url_path_name,
+            "DEFAULT_BOOTSTRAP_ROUTER_PROVIDER": router_provider,
+            "BOOTSTRAP_CLASS_PATH": utils.getRelativePath(
                 utils.getBuildPath(config, "build.webroot"),
                 utils.getBuildPath(config, "build.bootstrap")
             )
@@ -1086,7 +1213,7 @@ class Builder
             "MODULES":buildModuleToJsonString(config, modules ),
             "MODE":config.mode,
             "FILENAME":identifier,
-            "HANDLE":config.makeVersion,
+            "HANDLE":this.id,
             "VERSION":config.makeVersion,
         }, config);
     }
@@ -1096,18 +1223,15 @@ class Builder
         modules.forEach( (module)=>{
             if( module && !this.modules[ module.type ] )
             {
-                if( module.type )
+                this.modules[ module.type ] = module;
+                if( !module.nonglobal )
                 {
-                    this.modules[ module.type ] = module;
-                    if( !module.nonglobal )
+                    Builder.buildSystemModule(this._config, module);
+                    if( module.deps instanceof Array )
                     {
-                        Builder.buildSystemModule(this._config, module);
-                        if( module.deps instanceof Array )
-                        {
-                            this.addDependents( module.deps.map( (name)=>{
-                                return Maker.getLoaclAndGlobalModuleDescription( name );
-                            }));
-                        }
+                        this.addDependents( module.deps.map( (name)=>{
+                            return Maker.getLoaclAndGlobalModuleDescription( name );
+                        }));
                     }
                 }
             }
@@ -1117,10 +1241,12 @@ class Builder
     build({module,dependencies,assets,routes}, callback )
     {
         const config = this._config;
-        const outputname = module.fullclassname;
+        const outputname = module.fullclassname.toLowerCase();
         const requires = assets.filter(function(file){
             return path.parse(file).ext ===".js";
         });
+        const map = [];
+        this.outputMap.set(module, map);
 
         if( routes )
         {
@@ -1129,26 +1255,24 @@ class Builder
        
         var buildModules = null;
         var scriptContent = '';
+        const deps =  dependencies.concat( module );
         if( this.chunkFlag )
         {
-            buildModules = Builder.getModulesWithPolicy(dependencies, Builder.MODULE_POLICY_LOCAL).concat( module );
+            buildModules = Builder.getModulesWithPolicy(deps, Builder.MODULE_POLICY_LOCAL);
             scriptContent = this.chunk(config, module, buildModules);
 
         }else
         {
-            buildModules = dependencies.concat( module );
+            buildModules = this.getAllDependents( [{module,dependencies,assets,routes}] );
             scriptContent= this.runtime(config, module, buildModules, routes, requires);
         }
 
-        this.addDependents( buildModules );
-
-        //皮肤模块
         const skinModules = Builder.getAllSkinModules( buildModules );
 
-        //生成入口样式文件
+        this.addDependents( buildModules );
         new Promise((resovle, reject) =>{
 
-            const styleContent = makeLessStyleContent(config, skinModules, module.isApplication );
+            const styleContent = makeLessStyleContent(config, skinModules, module.isApplication && !this.chunkFlag );
             if( styleContent )
             {
                 Less.render(styleContent, this.lessOptions, function(err, output){
@@ -1171,8 +1295,6 @@ class Builder
 
         }).then( (content)=>{
 
-            const map = [];
-            this.outputMap.set( module, map );
             if( content )
             {
                 const styles = Builder.makeStyleContentAssets(config, content, this.lessOptions.paths);
@@ -1180,9 +1302,12 @@ class Builder
                 map.push({
                     path:this.getMainPath(outputname,'.css'),
                     name:outputname,
+                    main:true,
+                    app:module.isApplication,
+                    require:false,
                     suffix:".css"
                 });
-                this.emit( this.getMainPath(outputname,'.css') , styles.content );
+                this.emit( this.getMainPath(outputname,'.css') , styles.content);
             }
 
             if ( config.minify === 'enable')
@@ -1198,8 +1323,22 @@ class Builder
             map.push({
                 path:this.getMainPath(outputname,'.js'),
                 name:outputname,
-                requires:requires,
+                main:true,
+                app:module.isApplication,
+                require:false,
                 suffix:".js"
+            });
+
+            requires.forEach( (file)=>{
+                var info = path.parse(file);
+                map.push({
+                    path:file,
+                    name:info.name,
+                    main:false,
+                    app:module.isApplication,
+                    require:true,
+                    suffix:info.ext
+                });
             });
 
             this.emit( this.getMainPath(outputname,'.js') , scriptContent);
