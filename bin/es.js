@@ -141,4 +141,5 @@ for( var key in mapKeys )
     }
 }
 
-require('../lib/index.js')( config );
+const compiler = require('../lib/index.js');
+compiler.build( config );

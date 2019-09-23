@@ -7,6 +7,7 @@ const url = require('url');
 const Less = require('less');
 const Maker = require('../lib/maker.js');
 const Compile = require('../lib/compile.js');
+const uglify = require('uglify-js');
 
 /**
  * 在特定的版本下需要加载的库文件
@@ -291,33 +292,42 @@ function buildModuleToJsonString(config, modules)
                 return null;
             }
             loaded[ name ] = true;
-
             if( e.nonglobal )
             {
                 return '\n\n/***** Class '+name+' *****/\n\n"'+name+"\": function(module,require){\n"+e.makeContent['javascript']+"\n}";
 
             }else if( e.type )
             {
-                var data = loadSystemModuleFactory( e.type )
-                if( data )
+                if( e.isImportMetatype )
                 {
-                    var deps = [];
-                    data.deps.forEach(function(name){
-                        if( !loaded[name] ){
-                            deps.push( {type:name} );
-                        }
-                    });
-
-                    var content = [];
-                    if( deps.length > 0 )
+                    if( e.path && fs.existsSync(e.path) )
                     {
-                        content = make(deps);
+                        return '\n\n/***** external '+name+' *****/\n\n"'+name+"\": function(module,require){\nvar exports = module.exports;\n"+(fs.readFileSync( e.path ))+"\n}";
                     }
 
-                    content.push( '\n\n/***** System '+name+' *****/\n\n"'+name+"\": function(module,require){\n"+data.content+"\n}" );
-                    return content.join(",");
+                }else
+                {
+                    var data = loadSystemModuleFactory( e.type )
+                    if( data )
+                    {
+                        var deps = [];
+                        data.deps.forEach(function(name){
+                            if( !loaded[name] ){
+                                deps.push( {type:name} );
+                            }
+                        });
+
+                        var content = [];
+                        if( deps.length > 0 )
+                        {
+                            content = make(deps);
+                        }
+
+                        content.push( '\n\n/***** System '+name+' *****/\n\n"'+name+"\": function(module,require){\n"+data.content+"\n}" );
+                        return content.join(",");
+                    }
+                    return null;
                 }
-                return null;
             }
             return '\n\n/***** Not found '+name+' *****/\n\n"'+name+"\": function(module,require){\nthrow new Error('Not found "+name+"');\n}";
         }).filter(function(content){ return !!content; });
@@ -392,69 +402,28 @@ function outputFiles(config, classModules, suffix )
             }
         }else if( localModule.type )
         {
-            emitSystemFile( localModule.type );
+            if( localModule.isImportMetatype )
+            {
+                if( localModule.path )
+                {
+                    if( localModule.path.replace(/\\/g,'/').indexOf( config.workspace.replace(/\\/g,'/') )===0 )
+                    {
+                        var file = path.join(bulid_path,path.relative(config.workspace, localModule.path));
+                        utils.mkdir( path.dirname(file) );
+                        utils.copyfile( localModule.path, file );
+                    }else{
+                        var info = path.parse(localModule.path);
+                        utils.copyfile( localModule.path, path.join(bulid_path,info.name+info.ext));
+                    }
+                }
+
+            }else
+            {
+               emitSystemFile( localModule.type );
+            }
         }
     }
 }
-
-
-/**
- * 获取所有的资源路径
- * @param {*} config 
- * @param {*} modules 
- */
-function getAssetsFilePath(config, modules)
-{
-    const map = {};
-    const files = [];
-    const push = function(file)
-    {
-        if(file && map[ file ] !==true )
-        {
-            map[ file ] = true;
-            files.push( file );
-        }
-    }
-
-    modules.filter(function(m){
-       return m.nonglobal;
-    }).map(function (m)
-    {
-        var o = m.ownerFragmentModule || m;
-        if( o.moduleContext && o.moduleContext.external_requires instanceof Array && o.moduleContext.external_requires.length > 0  )
-        {
-            o.moduleContext.external_requires.forEach(function(file){
-                push(file);
-            }); 
-        }
-
-        //是否有指定样式文件
-        if( config.skin_style_config && config.skin_style_config.hasOwnProperty(m.fullclassname) )
-        {
-            var stylefile = config.skin_style_config[ m.fullclassname ];
-            if( !path.isAbsolute(stylefile) )
-            {
-                stylefile = path.resolve( config.project_path, stylefile );
-            }
-            push(stylefile);
-        }
-        //模块中的样式内容
-        else if( m.ownerFragmentModule )
-        {
-            var styles = m.ownerFragmentModule.moduleContext.style;
-            if( styles && styles.length > 0 )
-            {
-                styles.forEach(function(item){
-                    push( item.file );
-                });
-            }
-        }
-
-    });
-
-    return files;
-}
-
 
 /**
  * 获取默认的样式文件路径
@@ -680,19 +649,6 @@ function makeLessStyleContent(config, modules, isApp )
 }
 
 
-// builder.buildModuleToJsonString = buildModuleToJsonString;
-// builder.getAssetsFilePath = getAssetsFilePath;
-// builder.getCoreStyleFilePath = getCoreStyleFilePath;
-// builder.correction = correction;
-// builder.chunk=chunk;
-// builder.getThemeConfig=getThemeConfig;
-// builder.getBootstrapView = getBootstrapView;
-// builder.isSystemFileExists = isSystemFileExists;
-// builder.makeServiceRouteList = makeServiceRouteList;
-// builder.loadRequireSystemModuleContents = loadRequireSystemModuleContents;
-// builder.loadSystemModuleContentByName = loadSystemModuleContentByName;
-// module.exports = builder;
-
 class Builder
 {
     static getLessVariables( config )
@@ -780,11 +736,21 @@ class Builder
         return files;
     }
 
-    static buildSystemModule( config , module , flag)
+    static getSystemModule( config , module , flag)
     {
         if( typeof module === "string" )
         {
-            module = Maker.getLoaclAndGlobalModuleDescription( module );
+            var type = module;
+            module = Maker.getLoaclAndGlobalModuleDescription( type );
+            if( !module )
+            {
+                module = loadSystemModuleContentByName(config, type, flag );
+                if( module ){
+                    module.makeContent={'javascript':module.content};
+                }else{
+                    return null;
+                }
+            }
         }
 
         if( !module.makeContent )
@@ -803,141 +769,6 @@ class Builder
             }
         }
         return module;
-    }
-
-    static getDependencies(config, modules)
-    {
-        return modules.map(function(module)
-        {
-            const modules = Builder.getAllModules(config, module );
-            const usedModules = Builder.getUsedModules( modules, "javascript" );
-            return {
-                module:module,
-                context:[config.workspace],
-                routes:Builder.getServiceRoutes(config, usedModules),
-                dependencies:usedModules.filter(function(item){
-                    if( !item.nonglobal && !item.path ){
-                        item.path = path.join(config.system_global_path,item.type).replace(/\\/g,'/')+'.js';
-                    }
-                    return item.fullclassname !== module.fullclassname;
-                }),
-                assets: getAssetsFilePath( config, Builder.getModulesWithPolicy(usedModules, Builder.MODULE_POLICY_LOCAL | Builder.MODULE_POLICY_CORE ) )
-            };
-        });
-    }
-
-    static getServiceRoutes(config,modules )
-    {
-       var routes = {};
-       utils.forEach(modules.filter(function (e)
-       {
-           return !!e.controllerRouteList;
-       }),function (item) {
-           utils.forEach(item.controllerRouteList,function (item,key) {
-               item.classModule = item;
-               routes[key]=item;
-           });
-       });
-       return routes;
-    }
-
-    static getModulesWithPolicy( modules, mode )
-    {
-        if( (mode & Builder.MODULE_POLICY_ALL) ===Builder.MODULE_POLICY_ALL )
-        {
-            return modules;
-        }
-        return modules.filter(function (e)
-        {
-            for(var i = 0, n = 0; i <= mode; n++)
-            {
-                i = 1 * Math.pow(2, n);
-                var v = i & mode;
-                if ( v === Builder.MODULE_POLICY_GLOBAL && e.nonglobal !== true) {
-                    return true;
-                } else if ( v === Builder.MODULE_POLICY_CORE && e.nonglobal === true && e.fullclassname.indexOf("es.") === 0) {
-                    return true
-                } else if ( v === Builder.MODULE_POLICY_LOCAL && e.nonglobal === true && e.fullclassname.indexOf("es.") !== 0) {
-                    return true
-                }
-            }
-            return false;
-        });
-    }
-
-    static getUsedModules( modules,syntax )
-    {
-        return modules.filter(function (module) {
-
-            var hasUsed = Compile.hasUsedModuleOf(module, syntax);
-            if( module.nonglobal===true )
-            {
-                var isNs = module.id === "namespace";
-               
-                if (isNs && !hasUsed)
-                {
-                    hasUsed = Compile.hasUsedModuleOf(module.namespaces[module.classname], syntax);
-                }
-                return hasUsed && module["has_syntax_remove_" + syntax] !== true;
-            }
-            return hasUsed;
-        });
-    }
-
-    static getAllModules(config, module , results, hash, syntax )
-    {
-        results = results || [];
-        hash    = hash || {};
-        var name = module.fullclassname || module.type;
-        if ( hash[name] === true )
-        {
-            return results;
-        }
-        hash[name] = true;
-
-        if( module.nonglobal===true )
-        {
-            //与当前指定的语法不一致的依赖不获取
-            if( !Compile.isConformRunPlatform(module,syntax||"javascript") )
-            {
-                return results;
-            }
-    
-            var isNs = module.id==="namespace";
-            var hasUsed = Compile.hasUsedModuleOf( module );
-            if( isNs && !hasUsed ){
-                hasUsed = Compile.hasUsedModuleOf( module.namespaces[ module.classname ] );
-            }
-    
-            if( hasUsed && results.indexOf(module)<0 )
-            {
-               results.push(module);
-            }
-    
-            if( module.useExternalClassModules instanceof Array)
-            {
-                module.useExternalClassModules.forEach( (classname)=>{
-                    const module = Maker.getLoaclAndGlobalModuleDescription( classname );
-                    if( module )
-                    {
-                        Builder.getAllModules(config, module, results,  hash, syntax);
-                    }
-                });
-            }
-    
-        }else if( !utils.excludeLoadSystemFile( module.type ) && results.indexOf(module)<0 )
-        {
-            results.push( module );
-        }
-        return results;
-    }
-
-    static getAllSkinModules( modules )
-    {
-        return modules.filter(function (e) {
-            var m = Maker.getLoaclAndGlobalModuleDescription(e.fullclassname||e.type);
-            return m && m.nonglobal===true && m.ownerFragmentModule && m.ownerFragmentModule.isSkin;
-        });
     }
 
     static getBootstrapView( config, replacements )
@@ -1007,8 +838,8 @@ class Builder
         });
 
         enterModules.forEach( ({module,dependencies})=>{
-            Builder.getAllModules( config, module, result, hash, 'javascript' )
-            dependencies.forEach( ( module )=>Builder.getAllModules( config, module, result, hash, 'javascript' ) )
+            Compile.getAllModules( module, result, hash, 'javascript' )
+            dependencies.forEach( ( module )=>Compile.getAllModules( module, result, hash, 'javascript' ) )
         });
 
         return result;
@@ -1019,6 +850,7 @@ class Builder
         var index = 0;
         const config = this._config;
         const completed = ( err )=>{
+
             if( err )
             {
                 callback(err);
@@ -1037,7 +869,7 @@ class Builder
 
                     if( this.chunkFlag )
                     {
-                        const buildModules = Builder.getModulesWithPolicy( dependencies , Builder.MODULE_POLICY_CORE | Builder.MODULE_POLICY_GLOBAL  );
+                        const buildModules = Compile.getModulesWithPolicy( dependencies , Compile.MODULE_POLICY_CORE | Compile.MODULE_POLICY_GLOBAL  );
                         const requiremnets={};
                         enterModules.forEach( ({module})=>{
                             if( module.isApplication )
@@ -1058,7 +890,7 @@ class Builder
                         const scriptContent = this.runtime(config, bootstrap , buildModules, this.routes, requiremnets );
                         this.emit( base, scriptContent );
 
-                        const styleContent = makeLessStyleContent(config, Builder.getAllSkinModules( buildModules ), true );
+                        const styleContent = makeLessStyleContent(config, Compile.getSkinModules( buildModules ), true );
                         if( styleContent )
                         {
                             Less.render(styleContent, this.lessOptions, function(err, output){
@@ -1125,11 +957,10 @@ class Builder
                             }
                         });
                     }
-                    
+
                     callback();
 
                 }).catch( callback );
-
             }
         };
 
@@ -1226,8 +1057,8 @@ class Builder
                 this.modules[ module.type ] = module;
                 if( !module.nonglobal )
                 {
-                    Builder.buildSystemModule(this._config, module);
-                    if( module.deps instanceof Array )
+                    module = Builder.getSystemModule(this._config, module);
+                    if( module && module.deps instanceof Array )
                     {
                         this.addDependents( module.deps.map( (name)=>{
                             return Maker.getLoaclAndGlobalModuleDescription( name );
@@ -1258,7 +1089,7 @@ class Builder
         const deps =  dependencies.concat( module );
         if( this.chunkFlag )
         {
-            buildModules = Builder.getModulesWithPolicy(deps, Builder.MODULE_POLICY_LOCAL);
+            buildModules = Compile.getModulesWithPolicy(deps, Compile.MODULE_POLICY_LOCAL );
             scriptContent = this.chunk(config, module, buildModules);
 
         }else
@@ -1267,8 +1098,7 @@ class Builder
             scriptContent= this.runtime(config, module, buildModules, routes, requires);
         }
 
-        const skinModules = Builder.getAllSkinModules( buildModules );
-
+        const skinModules = Compile.getSkinModules( buildModules );
         this.addDependents( buildModules );
         new Promise((resovle, reject) =>{
 
@@ -1348,10 +1178,5 @@ class Builder
     }
 
 }
-
-Builder.MODULE_POLICY_GLOBAL = 1;
-Builder.MODULE_POLICY_CORE = 2;
-Builder.MODULE_POLICY_LOCAL = 4;
-Builder.MODULE_POLICY_ALL = 7;
 
 module.exports = Builder;
