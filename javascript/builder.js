@@ -406,9 +406,9 @@ function outputFiles(config, classModules, suffix )
             {
                 if( localModule.path )
                 {
-                    if( localModule.path.replace(/\\/g,'/').indexOf( config.workspace.replace(/\\/g,'/') )===0 )
+                    if( localModule.path.replace(/\\/g,'/').indexOf(config.project.path.replace(/\\/g,'/') )===0 )
                     {
-                        var file = path.join(bulid_path,path.relative(config.workspace, localModule.path));
+                        var file = path.join(bulid_path,path.relative(config.project.path, localModule.path));
                         utils.mkdir( path.dirname(file) );
                         utils.copyfile( localModule.path, file );
                     }else{
@@ -869,7 +869,7 @@ class Builder
 
                     if( this.chunkFlag )
                     {
-                        const buildModules = Compile.getModulesWithPolicy( dependencies , Compile.MODULE_POLICY_CORE | Compile.MODULE_POLICY_GLOBAL  );
+                        const buildModules = Compile.getModulesWithPolicy( dependencies , Compile.MODULE_POLICY_CORE | Compile.MODULE_POLICY_GLOBAL | Compile.MODULE_POLICY_EXTERNAL  );
                         const requiremnets={};
                         enterModules.forEach( ({module})=>{
                             if( module.isApplication )
