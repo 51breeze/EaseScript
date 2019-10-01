@@ -60,7 +60,7 @@ program
    return item;
 })
 .option('--bs, --block-scope [enable|disabled]', '是否需要启用块级域','disabled')
-.option('--pla, --part-load-app', '分开加载应用页面')
+.option('--chunk', '拆分文件')
 .option('--switch, --command-switch [value]', '需要编译到程序中的指令开关，通常的值为N^2用作模式值',0)
 .option('--bsc, --base-skin-class [value]', '指定皮肤文件的基础类','es.core.Skin')
 .option('--sfs, --skin-file-suffix [value]', '皮肤文件的后缀','.html')
@@ -70,6 +70,7 @@ program
 .option('--server, --server [enable|disabled]', '服务提供者的语法','enable')
 .option('--watch', '启用监听文件如有变动自动编译')
 .option('--source-map', '生成调试的源码文件');
+.option('--pack', '打包文件');
 program.parse(process.argv);
 
 var mapKeys={
@@ -103,10 +104,11 @@ var mapKeys={
     "clean":"clean",
     "syntax":"syntax",
     "build_mode":"buildMode",
-    "script_part_load":"partLoadApp",
+    "script_part_load":"chunk",
     "watching":"watch",
     "serverEnable":"server",
-    "sourceMap":"sourceMap"
+    "sourceMap":"sourceMap",
+    "build_pack":"pack",
 }
 
 //全局配置
