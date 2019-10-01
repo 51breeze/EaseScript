@@ -69,7 +69,7 @@ program
 .option('--sps, --service-provider-syntax [php]', '服务提供者的语法')
 .option('--server, --server [enable|disabled]', '服务提供者的语法','enable')
 .option('--watch', '启用监听文件如有变动自动编译')
-.option('--source-map', '生成调试的源码文件');
+.option('--source-map', '生成调试的源码文件')
 .option('--pack', '打包文件');
 program.parse(process.argv);
 
@@ -108,7 +108,7 @@ var mapKeys={
     "watching":"watch",
     "serverEnable":"server",
     "sourceMap":"sourceMap",
-    "build_pack":"pack",
+    "build_pack":"pack"
 }
 
 //全局配置
