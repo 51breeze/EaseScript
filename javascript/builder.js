@@ -790,7 +790,7 @@ class Builder
         this.lessOptions = {
             paths: [config.workspace,path.resolve(stylePath,"less"), stylePath],
             globalVars:getThemeConfig( config ),
-            compress: config.minify === 'enable',
+            compress: config.minify,
         };
         this.id = utils.MD5( (new Date()).getTime() +'_'+ Math.random() , 16);
     }
@@ -860,7 +860,7 @@ class Builder
                 const dependencies = this.getAllDependents( enterModules );
                 const base = this.getMainPath('easescript','.js');
 
-                if( config.source_file ==="enable" )
+                if( config.source_file )
                 {
                     outputFiles( config, dependencies,  config.module_suffix );
                 }
@@ -1140,7 +1140,7 @@ class Builder
                 this.emit( this.getMainPath(outputname,'.css') , styles.content);
             }
 
-            if ( config.minify === 'enable')
+            if ( config.minify )
             {
                 var script = uglify.minify(scriptContent, {ie8: true});
                 if (script.error)
