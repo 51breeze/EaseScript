@@ -92,6 +92,17 @@ function include(contents, name , filepath, fix, libs, config )
              return '=require("'+utils.getRequireIdentifier( config, config.globals[ info.name ] || {type:info.name}, '.js' )+'")';
         });
 
+        if( name ==="Internal" )
+        {
+            str = str.replace(/\[CODE\[(.*?)\]\]/ig, function (a, b) {
+                switch(b){
+                    case "ITERATOR_INTERFACE" :
+                        return config.iterator_interface;
+                }
+                return '';
+            });
+        }
+
         //加载对应模块的兼容策略文件
         if( fix && fix[name] )
         {
@@ -100,7 +111,7 @@ function include(contents, name , filepath, fix, libs, config )
                 str+='\n'+utils.getContents( fix[name][f] );
             }
         }
-
+        
         makedSystemModules[ name ].content = str;
         makedSystemModules[ name ].path = filepath;
         makedSystemModules[ name ].deps = dependencies;
@@ -351,9 +362,9 @@ function outputFiles(config, classModules, suffix )
     }
 
     var bulid_path = utils.getBuildPath(config, 'build.js');
+    const system_path = utils.mkdir( path.resolve(bulid_path, "system") );
     const corename = config.system_lib_path_name+'.';
     const core_path = utils.getBuildPath(config, 'core');
-    const system_path = utils.getBuildPath(config, 'system');
     const base = path.relative( config.project.path, config.workspace ).replace(/\\/g,'/').replace(/\.\.\//g,'');
     const hash = {};
     const workspace_path = path.resolve(bulid_path, base);
@@ -484,8 +495,6 @@ function combineThemeStyle( themes, styles, config )
             content = utils.trim( utils.getContents( a.attr.file ) );
             file = a.attr.file;
         }
-
-        //content = correction(config, content, [path.dirname(file)] );
 
         if( a.attr.combine )
         {
@@ -655,6 +664,11 @@ class Builder
     {
         return getThemeConfig( config );
     }
+
+    static routerListToJsonString( routerObject )
+    {
+        return makeServiceRouteList( routerObject );
+    }
    
     static makeStyleContentAssets(config, content, context )
     {
@@ -695,6 +709,19 @@ class Builder
            e = combineThemeStyle( themes.filter(function(item){
                return !(item.attr && item.attr.file);
            }), styles ,config );
+
+            var regexp = /@import\s+([\'\"])([^\1]+?)\1/gi;
+            e = e.replace(regexp, function(a,b,c){
+                if( c.charAt(0) === "@" )
+                {
+                    c = utils.resolvePath( c.substr(1) , [config.system_style_path] );
+                }else
+                {
+                   c = utils.resolvePath( c,  [ path.dirname( module.filename ) ] );
+                }
+                return `@import "${c}"`;
+            });
+           
        }
        return e;
     }
@@ -790,7 +817,7 @@ class Builder
         this.lessOptions = {
             paths: [config.workspace,path.resolve(stylePath,"less"), stylePath],
             globalVars:getThemeConfig( config ),
-            compress: config.minify === 'enable',
+            compress: config.minify,
         };
         this.id = utils.MD5( (new Date()).getTime() +'_'+ Math.random() , 16);
     }
@@ -860,7 +887,7 @@ class Builder
                 const dependencies = this.getAllDependents( enterModules );
                 const base = this.getMainPath('easescript','.js');
 
-                if( config.source_file ==="enable" )
+                if( config.source_file )
                 {
                     outputFiles( config, dependencies,  config.module_suffix );
                 }
@@ -1140,7 +1167,7 @@ class Builder
                 this.emit( this.getMainPath(outputname,'.css') , styles.content);
             }
 
-            if ( config.minify === 'enable')
+            if ( config.minify )
             {
                 var script = uglify.minify(scriptContent, {ie8: true});
                 if (script.error)
