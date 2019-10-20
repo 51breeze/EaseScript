@@ -205,6 +205,7 @@ Internal.$ReferenceError = $ReferenceError;
 Internal.$JSON = $JSON;
 Internal.$Symbol = $Symbol;
 Internal.$console = $console;
+Internal.iteratorClassName="[CODE[ITERATOR_INTERFACE]]";
 return Internal;
 
 }({},Object,Array,String,Number,Function,RegExp,Boolean,Date,Math,Error,SyntaxError,TypeError,EvalError,ReferenceError,JSON,Symbol,console));

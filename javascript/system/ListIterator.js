@@ -11,12 +11,8 @@ function ListIterator( target )
 {
     if( target instanceof ListIterator )return target;
     if( !(this instanceof ListIterator) )return new ListIterator(target);
-    var isIterator = false;
-    //如果是一个类则有可能实现迭代器接口
-    if( target && Internal.iteratorClass && System.isClass(target.constructor) )
-    {
-        isIterator = System.is(object, System.getDefinitionByName( Internal.iteratorClass ) );
-    }
+    var iteratorClass = Internal.getClassModule( Internal.iteratorClassName );
+    var isIterator = target && iteratorClass && System.is(target, iteratorClass );
     storage(this,true,{
         "isIterator":isIterator,
         "target":target,
@@ -83,7 +79,7 @@ ListIterator.prototype = Object.create( Object.prototype, {
         }
         var items = storage(this, "items");
         var result = false;
-        if( items.length > 0 )
+        if( items && items.length > 0 )
         {
             var cursor = storage(this, "cursor", "increment") + 1;
             result = cursor < items.length;

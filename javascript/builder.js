@@ -92,6 +92,17 @@ function include(contents, name , filepath, fix, libs, config )
              return '=require("'+utils.getRequireIdentifier( config, config.globals[ info.name ] || {type:info.name}, '.js' )+'")';
         });
 
+        if( name ==="Internal" )
+        {
+            str = str.replace(/\[CODE\[(.*?)\]\]/ig, function (a, b) {
+                switch(b){
+                    case "ITERATOR_INTERFACE" :
+                        return config.iterator_interface;
+                }
+                return '';
+            });
+        }
+
         //加载对应模块的兼容策略文件
         if( fix && fix[name] )
         {
@@ -100,7 +111,7 @@ function include(contents, name , filepath, fix, libs, config )
                 str+='\n'+utils.getContents( fix[name][f] );
             }
         }
-
+        
         makedSystemModules[ name ].content = str;
         makedSystemModules[ name ].path = filepath;
         makedSystemModules[ name ].deps = dependencies;
@@ -699,10 +710,18 @@ class Builder
                return !(item.attr && item.attr.file);
            }), styles ,config );
 
-           e = e.replace(/@import\s+([\'\"'])(\s*@[^\1]+)\1/ig, function(a,b,c){
-                c = path.join(config.system_style_path, c.substr(1) );
+            var regexp = /@import\s+([\'\"])([^\1]+?)\1/gi;
+            e = e.replace(regexp, function(a,b,c){
+                if( c.charAt(0) === "@" )
+                {
+                    c = utils.resolvePath( c.substr(1) , [config.system_style_path] );
+                }else
+                {
+                   c = utils.resolvePath( c,  [ path.dirname( module.filename ) ] );
+                }
                 return `@import "${c}"`;
-           });
+            });
+           
        }
        return e;
     }

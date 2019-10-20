@@ -7,7 +7,6 @@
 package es.components
 {
     import es.components.Component;
-    import es.components.SkinComponent;
     import es.events.ComponentEvent;
     import es.events.SkinEvent;
     import es.core.Skin;

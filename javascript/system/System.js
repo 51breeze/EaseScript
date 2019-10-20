@@ -7,15 +7,10 @@
 * @require System,Internal;
 */
 
-
 var System={};
 var Internal = require("./Internal.js");
-module.exports =System;
-
-/**
- * 系统环境
- */
 System.env = Internal.env;
+module.exports =System;
 
 var Object = require("./Object.js");
 var Array = require("./Array.js");
@@ -522,26 +517,12 @@ System.storage=function storage(target, name , value)
 var _globalEvent=null;
 System.getGlobalEvent=function getGlobalEvent()
 {
-      if( _globalEvent===null )
-      {
-          _globalEvent = new EventDispatcher( window );
-      }
-      return _globalEvent;
-}
-
-/**
- * 运行相关的环境信息
- * @type {{}}
- */
-System.environmentMap = {};
-System.environments=function environments( name )
-{
-    if( typeof name === "string" ) {
-        return System.environmentMap[name] || null;
+    if( _globalEvent===null )
+    {
+        _globalEvent = new EventDispatcher( window );
     }
-    return Object.merge({},System.environmentMap);
+    return _globalEvent;
 }
-
 
 /**
  * 根据指定的类名获取类的对象
@@ -550,10 +531,6 @@ System.environments=function environments( name )
  */
 System.getDefinitionByName = function getDefinitionByName(name)
 {
-    if( has.call(System, name) )
-    {
-        return System[name];
-    }
     var module = Internal.getClassModule(name);
     if( module )
     {
@@ -566,8 +543,6 @@ System.hasClass = function hasClass(name)
 {
     return !!Internal.getClassModule( name );
 };
-
-var map=['System','Class','Interface','Namespace','Reflect','Object','JSON','Array','String','RegExp','EventDispatcher','TypeError','Error','Symbol','Element'];
 
 /**
  * 返回类的完全限定类名
@@ -595,24 +570,9 @@ System.getQualifiedClassName = function getQualifiedClassName( target )
         {
             return valueof.slice(11,-1);
         }
-
-        var con  = target;
-        if( con )
-        {
-            var str = con.toString();
-            if( str.indexOf('[native code]')>0 )
-            {
-                str = str.substr(0, str.indexOf('(') );
-                return str.substr(str.lastIndexOf(' ')+1);
-            }
-            for (var b in map)
-            {
-                var obj = System[ map[b] ];
-                if (con === obj) {
-                    return map[b];
-                }
-            }
-        }
+        var str = con.toString();
+        str = str.substr(0, str.indexOf('(') );
+        return str.substr(str.lastIndexOf(' ')+1);
     }
     throw new ReferenceError( 'target is not Class' );
 };
@@ -647,35 +607,3 @@ System.getQualifiedSuperclassName =function getQualifiedSuperclassName(target)
     }
     return null;
 };
-
-var hotUpdateMap = {};
-var hotUpdateEvent = null;
-System.hotUpdate=function hotUpdate( target, callback )
-{
-    if( hotUpdateEvent === null )
-    {
-        hotUpdateEvent = function(e){
-            var module = e.hotUpdateModule;
-            var updateClass = System.getQualifiedClassName(module);
-            if( hotUpdateMap[updateClass] )
-            {
-                var items = hotUpdateMap[updateClass].splice(0);
-                while( items.length > 0 )
-                {
-                    var item = items.shift();
-                    var callback = item[2];
-                    if( !callback.call(item, item[1], module) )
-                    {
-                        hotUpdateMap[updateClass].push( item );
-                    };
-                }
-            }
-        }
-        System.getGlobalEvent().removeEventListener("DEVELOPMENT_HOT_UPDATE");
-        System.getGlobalEvent().addEventListener("DEVELOPMENT_HOT_UPDATE",hotUpdateEvent);
-    }
-
-    var name = System.getQualifiedObjectName(target);
-    var list = hotUpdateMap[ name ] || (hotUpdateMap[ name ] = []);
-    list.push([name,target,callback]);
-}

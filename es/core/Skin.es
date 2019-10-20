@@ -9,7 +9,6 @@ package es.core
     import es.components.SkinComponent;
     import es.events.ComponentEvent;
     import es.core.Container;
-    import es.core.Skin;
     import es.events.SkinEvent;
     import es.core.State;
     import es.interfaces.IDisplay;
@@ -355,6 +354,29 @@ package es.core
         }
 
         /**
+        * @private
+        */
+        private function meregChildren( children:Array ):Array
+        {
+            var len:int = children.length;
+            var index:int = 0;
+            var results:Array = [];
+            for(;index<len;index++)
+            {
+               var child:* = children[index];
+               if( child instanceof Array )
+               {
+                  results = results.concat( meregChildren( child as Array ) );
+
+               }else 
+               {
+                   results.push( child );
+               }
+            }
+            return results;
+        }
+
+        /**
         * 更新一组应于父节点的子级元素。更新完后两边的子级节点会完全一致。
         * 如果指定的children列表和parentNode的子级列表中的每一个元素不相等，则会做相应的添加和删除操作。
         * @param parentNode 
@@ -362,7 +384,7 @@ package es.core
         * @param index
         * @param total
         */
-        protected function updateChildren(parentNode:Object,children:Array,index:int=0,total:int=NaN ):void
+        protected function updateChildren(parentNode:Object,children:Array):void
         {
             if(!parentNode)return;
             var parentDisplay:IDisplay=null;
@@ -376,18 +398,19 @@ package es.core
                 parentDisplay = parentNode as IDisplay;
                 parentNode = (parentNode as IDisplay).element.current() as Object; 
             }
-
+     
+            children = this.meregChildren( children );
             var parent:Node = parentNode as Node;
             var totalNodes:int = parent.childNodes.length;
             var totalChilds:int = children.length;
-            var len:int = isNaN( total ) ? Math.max(totalChilds, totalNodes) : total;
-            var i:int=index;
+            var len:int = Math.max(totalChilds, totalNodes);
+            var i:int=0;
             var offset:int = 0;
-            while( i<len && (i-index < totalChilds || i < totalNodes) )
+            while( i<len )
             {
                 var newNode:Node=null;
                 var oldNode:Node=parent.childNodes[i-offset] as Node;
-                var childItem:* = children[i-index];
+                var childItem:* = children[i];
                 var isDisplay:Boolean = childItem is IDisplay;
                 if( isDisplay )
                 {
@@ -405,7 +428,7 @@ package es.core
                         newNode =elem.current() as Node;
                     }
 
-                }else
+                }else if( childItem )
                 { 
                     if( typeof childItem === "string" )
                     {
@@ -415,31 +438,22 @@ package es.core
                             {
                                 oldNode.textContent = childItem as String;
                             }
-                            i++;
-                            continue;
+                            newNode = oldNode;
 
                         }else
                         {
-                           newNode = Element.createElement("text") as Node;
-                           newNode.textContent = childItem as String;
+                            newNode = Element.createElement("text") as Node;
+                            newNode.textContent = childItem as String;
                         }
 
-                    }
-                    //将一组子级元素合并到当前的子级元素中
-                    else if( childItem instanceof Array )
-                    {
-                        var childItems:Array =  childItem as Array;
-                        this.updateChildren(parentNode,childItems,i,childItems.length+len);
-                        i+=childItems.length;
-                        len+=childItems.length;
-                        index+=childItems.length;
-                        i++;
-                        continue;
-
-                    }else
+                    }else 
                     {
                         newNode = childItem as Node;
                     }
+
+                }else
+                {
+                    offset++;
                 }
 
                 //两边节点不一致 
@@ -450,16 +464,36 @@ package es.core
                     {
                         parent.replaceChild(newNode,oldNode);
                         removeEvent(parent,oldNode);
-
+                        
                     }else
                     {
                         //移除元素
                         if( oldNode )
                         {
-                            parent.removeChild( oldNode );
-                            removeEvent(parent,oldNode);
-                            i++;
-                            continue;
+                            var nextIndex:int = i;
+                            var nextChild:* = null;
+                            var nextChildNode:Node = null;
+                            while( nextIndex < len && !(nextChild = children[ ++nextIndex ] ) );
+                            if( nextChild )
+                            {
+                                if( nextChild is IDisplay )
+                                {
+                                    nextChildNode =(nextChild as IDisplay).display().current() as Node;
+
+                                }else if( typeof nextChild === "string" && Element.getNodeName(oldNode) === "text" )
+                                {
+                                    nextChildNode = oldNode;
+                                }else
+                                {
+                                    nextChildNode = nextChild as Node;
+                                }
+                            }
+
+                            if( nextChildNode !== oldNode )
+                            {
+                                parent.removeChild( oldNode );
+                                removeEvent(parent,oldNode);
+                            }
                         }
 
                         //添加元素
