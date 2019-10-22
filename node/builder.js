@@ -1,73 +1,207 @@
+const fs = require('fs');
+const path = require('path');
 const utils = require('../lib/utils.js');
-const globals=['Object','Function','Array','String','Number','EventDispatcher','Event','Boolean','Math',
-    'Date','RegExp','Error','ReferenceError','TypeError','SyntaxError','JSON','Reflect','Symbol','console','Request'];
-
-const cg = ['non-writable','non-enumerable','non-configurable'];
+const globals=utils.globals;
+const rootPath =  utils.getResolvePath( __dirname );
 
 /**
- * 获取内置模块的描述信息
- * @param str
- * @param name
- * @returns {{import: Array, describe: {static: {}, proto: {}}}}
+ * 已经构建的系统模块
  */
-function describe( str, name )
+const makedSystemModules={};
+
+const excludeMap={
+    "arguments":true,
+    "Function":true,
+    "Object":true,
+    "Symbol":true,
+    "Error":true,
+};
+
+/**
+ * 获取指定的文件模块
+ * @param filepath
+ */
+function include(contents, name , filepath, config )
 {
-   // var result = str.match(/@(require|public|private|protected|internal)\s+([^\r\n\;]*)/ig );
-    var result = str.match(/@(require)\s+([^\r\n\;]*)/ig );
-    var desc={"requirements":[],'describe':{"static":{},"proto":{}}};
-    for( var i in result )
+    name = utils.getGlobalTypeMap(name)
+    if( makedSystemModules[ name ] )
     {
-        var val = utils.trim(result[i]).replace(/\s+/g,' ');
-        var index = val.indexOf(' ');
-        var prefix = val.substr(1, index-1).toLowerCase();
-        val = val.substr(index+1);
-        switch ( prefix )
-        {
-            case 'require' :
-                desc.requirements = desc.requirements.concat( val.replace(/\s+/g,'').split(',') );
-            break;
-            case 'internal' :
-            case 'public' :
-            case 'private' :
-            case 'protected' :
-                val = val.split(' ');
-                var prop = val[0];
-                var lastIndex = prop.lastIndexOf('.');
-                var proto = true;
-                if( lastIndex > 0 )
-                {
-                    proto = prop.indexOf( name+'.prototype.' )===0;
-                    prop = prop.substr( lastIndex+1 );
-                }
-                var obj = proto ? desc.describe.proto : desc.describe.static;
-                var info=[];
-                if( prefix !== 'public' )info.push('"qualifier":"'+prefix+'"');
-                for(var i in cg)
-                {
-                    if( val.indexOf(cg[i]) > 0 )
-                    {
-                        switch ( cg[i] )
-                        {
-                            case 'non-writable' : info.push('"writable":false'); break;
-                            case 'non-enumerable' : info.push('"enumerable":false'); break;
-                            case 'non-configurable' : info.push('"configurable":false'); break;
-                        }
-                        break;
-                    }
-                }
-                if( info.length > 0 && prop )obj[ prop ]=JSON.parse('{'+info.join(',')+'}');
-            break;
-        }
+        contents[ name ] = makedSystemModules[ name ];
+        return;
     }
-    utils.unique(desc.requirements);
-    return desc;
+
+    makedSystemModules[ name ] = {};
+
+    if( excludeMap[ name ] ||  utils.excludeLoadSystemFile( name ) || ( config.globals.hasOwnProperty(name) && config.globals[name].notLoadFile===true ) )
+    {
+        return;
+    }
+
+    if( !filepath )
+    {
+        filepath = rootPath + '/system/' + name + '.js';
+    }
+
+    var str = '';
+
+    if( fs.existsSync( filepath ) )
+    {     
+        var dependencies = [];
+        str += utils.getContents( filepath );
+        str = str.replace(/\=\s*require\s*\(\s*([\"\'])(.*?)\1\s*\)/g,function(a,b,c){
+
+             var info = path.parse(c);
+             include(contents, info.name , null, config );
+             dependencies.push( info.name );
+             return '=require("'+utils.getRequireIdentifier( config, config.globals[ info.name ] || {type:info.name}, '.js' )+'")';
+        });
+
+        if( name ==="Internal" )
+        {
+            str = str.replace(/\[CODE\[(.*?)\]\]/ig, function (a, b) {
+                switch(b){
+                    case "ITERATOR_INTERFACE" :
+                        return config.iterator_interface;
+                }
+                return '';
+            });
+        }
+
+        makedSystemModules[ name ].content = str;
+        makedSystemModules[ name ].path = filepath;
+        makedSystemModules[ name ].deps = dependencies;
+        contents[ name ]=makedSystemModules[ name ];
+        return true;
+
+    }else if( globals.indexOf(name) >=0 )
+    {
+        return true;
+    }
+
+    throw new Error(name+' does exists ('+filepath+')');
 }
 
 
-var classMap = {
-    "document":"Document",
-    "window":"Window",
-    "Console":"console",
+/**
+ * 加载系统模板所有需要的类
+ * @param config
+ * @returns {string}
+ */
+function loadRequireSystemModuleContents(config,requirements,flag)
+{
+    var contents = {};
+    for(var prop in requirements)
+    {
+        if( flag === true )
+        {
+            makedSystemModules[ requirements[prop] ] = undefined;
+        }
+        include(contents, requirements[prop], null, config );
+    }
+    return contents;
+
+}
+
+/**
+ * 加载系统模块内容
+ * @param {*} config 
+ * @param {*} name 
+ */
+function loadSystemModuleContentByName(config,name,flag)
+{
+   name =  utils.getGlobalTypeMap( name );
+   if( !makedSystemModules[name] || flag===true )
+   {
+       loadRequireSystemModuleContents(config,[name], flag );
+   }
+   return makedSystemModules[name];
+}
+
+
+
+/**
+ * 生成文件内容
+ * @param {*} config 
+ * @param {*} classModules 
+ * @param {*} loadSystemModuleFactory 
+ * @param {*} suffix 
+ */
+function outputFiles(config, classModules, suffix )
+{
+    const loadSystemModuleFactory = function(name)
+    {
+        return loadSystemModuleContentByName(config, name);
+    }
+   
+    const app_path = utils.getBuildPath(config,"build.application");
+    const app_system_path = utils.mkdir( utils.getResolvePath( app_path,  config.build_system_path ) );
+    const hash = {};
+    const emitFile = function(file, content )
+    {
+        if( !hash[file] )
+        {
+            hash[file] = true;
+            if( content )
+            {
+                utils.setContents(file, content);
+            }
+        }
+    }
+    const emitSystemFile = function( name )
+    {
+        name = utils.getGlobalTypeMap( name );
+        var file = path.join(app_system_path,name+suffix);
+        if( !hash[file] )
+        {
+            var data = loadSystemModuleFactory( name );
+            if( data && data.content )
+            {
+                var deps = data.deps;
+                emitFile(file, data.content);
+                deps.forEach(function(name)
+                {
+                    emitSystemFile(name);
+                });
+            }
+        }
+    }
+
+    for (var m in classModules)
+    {
+        var localModule = classModules[m];
+        if( localModule.nonglobal  )
+        {
+            var content = localModule.makeContent ? localModule.makeContent[ 'node' ] : '';
+            if ( content )
+            {
+                var file = utils.getResolvePath( app_path  , localModule.fullclassname );
+                utils.mkdir( file.substr(0, file.lastIndexOf("/") ) );
+                emitFile( path.join(file+suffix), content);
+            }
+
+        }else if( localModule.type )
+        {
+            if( localModule.isImportMetatype )
+            {
+                if( localModule.path )
+                {
+                    if( localModule.path.replace(/\\/g,'/').indexOf(config.project.path.replace(/\\/g,'/') )===0 )
+                    {
+                        var file = path.join(app_path,path.relative(config.project.path, localModule.path));
+                        utils.mkdir( path.dirname(file) );
+                        utils.copyfile( localModule.path, file );
+                    }else{
+                        var info = path.parse(localModule.path);
+                        utils.copyfile( localModule.path, path.join(app_path,info.name+info.ext));
+                    }
+                }
+
+            }else
+            {
+               emitSystemFile( localModule.type );
+            }
+        }
+    }
 }
 
 /**
@@ -75,87 +209,21 @@ var classMap = {
  * @param config
  * @returns {string}
  */
-function builder(path , config , localModules, requirements , replacements )
+function builder(config, localModules,  replacements )
 {
-    var app_path = utils.getBuildPath(config,"build.application");
-    var dir = utils.mkdir( utils.getResolvePath( utils.getResolvePath(path, app_path), config.build_system_path ) );
-    var o;
-    var namespaceMapValue=[];
-    utils.forEach(replacements.NAMESPACE_HASH_MAP,function (value,name) {
-        namespaceMapValue.push( "'"+name+"':'"+value+"'" );
-    });
+    
+    outputFiles( config,  localModules , ".js");
 
-    var requires = ['System','Namespace','document','HTMLElement','Node','Element','RouteEvent'].concat( globals.slice(0), requirements );
-    var loaded = {"console":true};
-    var name;
-    while ( name= requires.pop() )
-    {
-        name = classMap[ name ] || name;
-        if( loaded[ name ] === true )
-        {
-            continue;
-        }
-
-        loaded[ name ] = true;
-        if( utils.isFileExists(config.root_path+'/node/system/'+name+'.js') )
-        {
-            var content = utils.getContents( config.root_path+'/node/system/'+name+'.js' );
-            if( name==="Namespaces" && namespaceMapValue.length>0 )
-            {
-                content = content.replace(/var\s+codeMap\s*=\s*\{\.*\}\s*;/,function (a) {
-                    return 'var codeMap = {'+namespaceMapValue.join(",\n")+'};';
-                });
-            }
-
-            //替换系统类的动态常量
-            if( name === "System" )
-            {
-                var regexp = new RegExp("\\{@("+[
-                    "ES_BUILD_APPLICATION_NAME",
-                    "ES_BUILD_LIBARAY_NAME",
-                    "ES_BUILD_SYSTEM_PATH",
-                ].join("|")+")\\}","g");
-                content = content.replace(regexp,function (a,b) {
-                    switch ( b )
-                    {
-                        case "ES_BUILD_APPLICATION_NAME" :
-                            return config.build_application_name;
-                            break;
-                        case "ES_BUILD_LIBARAY_NAME" :
-                            return config.build_libaray_name;
-                            break;
-                        case "ES_BUILD_SYSTEM_PATH" :
-                            return config.build_system_path.replace(/\./g,"\\");
-                        break;
-                    }
-                    return "";
-                });
-            }
-
-            content = utils.trim( content );
-            utils.setContents( dir+"/"+name+'.js', content );
-        }
-    }
-
-    //生成本地模块
-    for (var n in localModules )
-    {
-        o = localModules[n];
-        var file = utils.getResolvePath( app_path , o.fullclassname );
-        utils.mkdir( file.substr(0, file.lastIndexOf("/") ) );
-        utils.setContents( file+'.js', o.makeContent['node'] );
-    }
-
-    var bootstrap_dir = utils.getBuildPath(config,"build.bootstrap");
-    var webroot_dir = utils.getBuildPath(config,"build.webroot");
+    const bootstrap_dir = utils.getBuildPath(config,"build.bootstrap");
+    const webroot_dir = utils.getBuildPath(config,"build.webroot");
 
     //生成引导文件
-    var content = utils.getContents( config.root_path+"/node/bootstrap.js");
-    content = replaceContent(content, replacements,config);
-    utils.setContents( bootstrap_dir+'/'+replacements["BOOTSTRAP_CLASS_FILE_NAME"],  content );
+    var content = utils.getContents( path.join(rootPath,"bootstrap.js") );
+    content = replaceContent(content, replacements, config);
+    utils.setContents( bootstrap_dir+'/bootstrap.js',  content );
 
     //生成入口文件
-    content = utils.getContents( config.root_path+"/node/index.js");
+    content = utils.getContents( path.join(rootPath,"index.js") );
     content = replaceContent(content, replacements, config);
     utils.setContents( webroot_dir+"/index.js",  content );
 }
