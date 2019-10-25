@@ -35,9 +35,3 @@ HttpEvent.PROGRESS = 'httpProgress';
 HttpEvent.ERROR   = 'httpError';
 HttpEvent.CANCELED  = 'httpCanceled';
 HttpEvent.TIMEOUT = 'httpTimeout';
-
-//属性事件
-Event.registerEvent(function ( type , target, originalEvent )
-{
-    if( originalEvent instanceof HttpEvent )return originalEvent;
-});

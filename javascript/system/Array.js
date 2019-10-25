@@ -109,7 +109,7 @@ Array.prototype = Object.create( Object.prototype,{
             if (typeof callback !== 'function')throw new TypeError('callback must be a function');
             if (this==null)throw new ReferenceError('this is null or not defined');
             var items = new Array();
-            var obj = System.Object(this);
+            var obj = Object(this);
             var len = obj.length >> 0;
             var k = 0;
             thisArg = thisArg || this;

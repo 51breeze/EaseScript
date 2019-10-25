@@ -109,7 +109,8 @@ EventDispatcher.prototype.removeEventListener=function removeEventListener(type,
         return target.removeEventListener(type,listener);
     }
     var len = target.length >> 0;
-    if( len > 0 ){
+    if( len > 0 )
+    {
         while(len>0 && target[--len] )$removeEventListener( target[len], type, listener, this);
         return true;
     }
@@ -123,7 +124,6 @@ EventDispatcher.prototype.removeEventListener=function removeEventListener(type,
  */
 EventDispatcher.prototype.dispatchEvent=function dispatchEvent( event )
 {
-    //if( typeof event === "string" )event = new System.Event( event );
     if( !System.is(event,Event) )throw new TypeError('Invalid event');
     var target = storage(this,'target') || this;
     if( target instanceof EventDispatcher && target !== this )
@@ -182,43 +182,14 @@ function $hasEventListener(target, type, listener)
 function $addEventListener(target, listener )
 {
     if( target==null )throw new ReferenceError('this is null or not define');
-
     //获取事件数据集
     var type = listener.type;
     var data = storage(target);
     var events = data.events || (data.events={});
     //获取指定事件类型的引用
     events = events[ type ] || ( events[ type ]=[] );
-    //如果不是 EventDispatcher 则在第一个事件中添加事件代理。
-    if( events.length===0 && !(target instanceof EventDispatcher) )
-    {
-        //自定义事件处理
-        if( Object.prototype.hasOwnProperty.call(Event.fix.hooks,type) )
-        {
-            Event.fix.hooks[ type ].call(target, listener, $dispatchEvent);
-
-        }else {
-            type = Event.type(type);
-            try {
-                if( target.addEventListener )
-                {
-                    target.addEventListener(type, $dispatchEvent, listener.useCapture);
-                }else
-                {
-                    listener.proxyType=[type];
-                    listener.proxyTarget=target;
-                    listener.proxyHandle=function (e) {
-                        $dispatchEvent(e, target);
-                    }
-                    target.attachEvent(type, listener.proxyHandle);
-                }
-            }catch (e) {}
-        }
-    }
-
     //添加到元素
     events.push( listener );
-    
     //按权重排序，值大的在前面
     if( events.length > 1 ) events.sort(function(a,b)
     {
@@ -253,41 +224,11 @@ function $removeEventListener(target, type, listener , dispatcher )
         //如果有指定侦听器则删除指定的侦听器
         if ( (!is || events[length].callback === listener) && events[length].dispatcher === dispatcher )
         {
-            var result = events.splice(length, 1);
-            if( result[0] && result[0].proxyHandle && result[0].proxyType )
-            {
-                var types = result[0].proxyType;
-                var num = types.length;
-                while ( num > 0 )
-                {
-                    $removeListener(result[0].proxyTarget || target, types[ --num ], result[0].proxyHandle);
-                }
-            }
+            events.splice(length, 1);
         }
-    }
-
-    //如果是元素并且没有侦听器就删除
-    if( events.length < 1 && !(target instanceof EventDispatcher)  )
-    {
-        $removeListener(target, type, $dispatchEvent);
     }
     return events.length !== ret;
 }
-
-function $removeListener(target, type , handle )
-{
-    var eventType= Event.type( type );
-    if( target.removeEventListener )
-    {
-        target.removeEventListener(eventType,handle,false);
-        target.removeEventListener(eventType,handle,true);
-
-    }else if( target.detachEvent )
-    {
-        target.detachEvent(eventType,handle);
-    }
-}
-
 
 /**
  * 调度指定侦听项
@@ -299,7 +240,7 @@ function $dispatchEvent(e, currentTarget )
 {
     if( !(e instanceof Event) )
     {
-        e = Event.create( e );
+        e = new Event( e );
         if(currentTarget)e.currentTarget = currentTarget;
     }
     if( !e || !e.currentTarget )throw new Error('invalid event target');
@@ -312,11 +253,6 @@ function $dispatchEvent(e, currentTarget )
     {
         listener = events[ length++ ];
         thisArg = listener.reference || listener.dispatcher;
-        //如果是一个元素对象，设置当前元素为事件元素
-        // bug 在Display 组件中使用事件后
-        //if( thisArg.setCurrentElementTarget===true && e.target && (e.target.nodeType === 1 || e.target.nodeType === 9 || e.target.window) ){
-            //thisArg.current( e.target );
-        //}
         //调度侦听项
         listener.callback.call( thisArg , e );
         if( e.immediatePropagationStopped===true )

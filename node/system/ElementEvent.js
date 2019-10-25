@@ -27,9 +27,3 @@ ElementEvent.ADD='elementAdd';
 ElementEvent.ADD_TO_DOCUMENT='elementAddToDocument';
 ElementEvent.REMOVE='elementRemove';
 ElementEvent.CHANGE='elementChildrenChange';
-
-//鼠标事件
-Event.registerEvent(function ( type , target, originalEvent )
-{
-    if( originalEvent instanceof ElementEvent )return originalEvent;
-});

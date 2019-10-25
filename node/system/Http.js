@@ -33,7 +33,6 @@ module.exports = Http;
 var Object = require("./Object.js");
 var EventDispatcher = require("./EventDispatcher.js");
 var System = require("./System.js");
-var JSON = require("./JSON.js");
 var HttpEvent = require("./HttpEvent.js");
 var isSupported=false;
 var XHR=null;

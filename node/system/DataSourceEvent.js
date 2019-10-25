@@ -40,17 +40,3 @@ DataSourceEvent.REMOVE='dataSourceRemove';
 DataSourceEvent.UPDATE='dataSourceUpdate';
 DataSourceEvent.SELECT ='dataSourceSelect';
 DataSourceEvent.CHANGED='dataSourceChanged';
-
-//属性事件
-Event.registerEvent(function ( type , target, originalEvent )
-{
-    if( originalEvent instanceof DataSourceEvent )return originalEvent;
-    switch ( type ){
-        case DataSourceEvent.APPEND :
-        case DataSourceEvent.REMOVE :
-        case DataSourceEvent.UPDATE :
-        case DataSourceEvent.SELECT :
-        case DataSourceEvent.CHANGED :
-            return new DataSourceEvent( type );
-    }
-});

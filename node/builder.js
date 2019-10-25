@@ -12,9 +12,6 @@ const makedSystemModules={};
 const excludeMap={
     "arguments":true,
     "Function":true,
-    "Object":true,
-    "Symbol":true,
-    "Error":true,
 };
 
 /**
@@ -41,19 +38,20 @@ function include(contents, name , filepath, config )
     {
         filepath = rootPath + '/system/' + name + '.js';
     }
-
+  
     var str = '';
-
     if( fs.existsSync( filepath ) )
     {     
+        var context = path.dirname( filepath );
         var dependencies = [];
         str += utils.getContents( filepath );
         str = str.replace(/\=\s*require\s*\(\s*([\"\'])(.*?)\1\s*\)/g,function(a,b,c){
-
              var info = path.parse(c);
+             var filename = info.name+".js";
+             var identifier = path.isAbsolute(c) ? c : path.relative(context , path.resolve( context, filename ) );
              include(contents, info.name , null, config );
              dependencies.push( info.name );
-             return '=require("'+utils.getRequireIdentifier( config, config.globals[ info.name ] || {type:info.name}, '.js' )+'")';
+             return '=require("'+identifier.replace(/\\/g,'/')+'")';
         });
 
         if( name ==="Internal" )
@@ -211,16 +209,16 @@ function outputFiles(config, classModules, suffix )
  */
 function builder(config, localModules,  replacements )
 {
-    
     outputFiles( config,  localModules , ".js");
 
     const bootstrap_dir = utils.getBuildPath(config,"build.bootstrap");
     const webroot_dir = utils.getBuildPath(config,"build.webroot");
+    replacements.BOOTSTRAP_FILE_BUILD_PATH = path.join(bootstrap_dir, replacements.BOOTSTRAP_CLASS_FILE_NAME );
 
     //生成引导文件
     var content = utils.getContents( path.join(rootPath,"bootstrap.js") );
     content = replaceContent(content, replacements, config);
-    utils.setContents( bootstrap_dir+'/bootstrap.js',  content );
+    utils.setContents( replacements.BOOTSTRAP_FILE_BUILD_PATH,  content );
 
     //生成入口文件
     content = utils.getContents( path.join(rootPath,"index.js") );
@@ -237,12 +235,12 @@ function replaceContent(content, data, config)
         if( requireex  )
         {
             var m = config.globals[ requireex[1] ];
-            if( !m && requireex[1] ==="Internal" ){
+            if( !m ){
                 m = {
                     type:requireex[1]
                 };
             }
-            return utils.getRequireIdentifier(config, m || {type:requireex[1]} , m ? '.js' : '.es' )
+            return utils.getRequireIdentifier(config, m , "node", path.dirname( data.BOOTSTRAP_FILE_BUILD_PATH ) )
         }
 
         switch ( b )
