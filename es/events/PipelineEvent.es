@@ -14,11 +14,32 @@ package es.events
         static public const RESPONSE_BEFORE:String = 'pipelineResponseBefore';
         public var name:String=null;
         public var data:*=null;
-        public var cmd:*=null;
+        public var cmd:String=null;
+        public var message:String=null;
+        public var code:int=NaN;
+        public var callback:Function=null;
+        public var params:Array=null;
         public function PipelineEvent(type:String, bubbles:Boolean=true, cancelable:Boolean=true)
         {
             super(type, bubbles, cancelable);
         };
+        override public function valueOf():*
+        {
+            var hook:Function = this.callback;
+            if( hook )
+            {
+                var ret:* = hook();
+                if( ret )
+                {
+                    return ret;
+                }
+            }
+            return {
+                "data":this.data,
+                "message":this.message,
+                "status": isNaN(this.code) ? 200 : code
+            };
+        }
     }
 }
 

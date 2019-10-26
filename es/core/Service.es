@@ -27,15 +27,35 @@ package es.core
         * @param cmd
         * @return {*}
         */
-       protected static function pipeline(target:EventDispatcher,type:String,name:String, cmd:* )
+       protected static function pipeline(target:EventDispatcher,type:String,name:String, args:Array )
        {
            var event:PipelineEvent = new PipelineEvent( type );
            event.name = name;
-           event.cmd = cmd;
-           if(target.hasEventListener(type) )
+           event.cmd = (String)args[0];
+           if( args.length > 1 )
            {
-               var data:* = target.dispatchEvent( event );
-               return data===null ? event.data : data;
+               if( args[1] instanceof Function )
+               {
+                  event.callback = (Function)args[1];
+               }else{
+                  event.params = (Array)args[1];
+               }
+
+               if( args.length > 2 )
+               {
+                  if( args[2] instanceof Function )
+                  {
+                     event.callback = (Function)args[2];
+                  }else{
+                     event.params = (Array)args[2];
+                  }
+               }
+           }
+
+           if( target.hasEventListener(type) )
+           {
+               target.dispatchEvent( event );
+               return event;
            }
            throw new ReferenceError("No binding to the specified '"+type+"' pipeline.");
        }
@@ -43,11 +63,13 @@ package es.core
        /**
         * 查询数据
         * @param sql
+        * @param params
+        * @param callback
         * @return {*}
         */
-       protected function query( sql:String )
+       protected function query( sql:String  )
        {
-           return Service.pipeline(this,PipelineEvent.PIPELINE_DATABASE, "select", arguments );
+           return Service.pipeline(this, PipelineEvent.PIPELINE_DATABASE, "select", arguments as Array );
        }
 
        /**
@@ -58,7 +80,7 @@ package es.core
         */
        protected function save( sql:String)
        {
-           return Service.pipeline(this,PipelineEvent.PIPELINE_DATABASE, "update", arguments );
+           return Service.pipeline(this,PipelineEvent.PIPELINE_DATABASE, "update", arguments as Array );
        }
 
        /**
@@ -68,7 +90,7 @@ package es.core
         */
        protected function append(sql:String )
        {
-           return Service.pipeline(this,PipelineEvent.PIPELINE_DATABASE, "insert", arguments );
+           return Service.pipeline(this,PipelineEvent.PIPELINE_DATABASE, "insert",arguments as Array );
        }
 
        /**
@@ -78,7 +100,7 @@ package es.core
         */
        protected function remove( sql:String )
        {
-           return Service.pipeline(this,PipelineEvent.PIPELINE_DATABASE, "delete", arguments );
+           return Service.pipeline(this,PipelineEvent.PIPELINE_DATABASE, "delete", arguments as Array );
        }
 
        /**
@@ -99,7 +121,7 @@ package es.core
            {
                data = (data as Object).valueOf();
            }
-           return {"data":data, "status":200};
+           return this._response = {"data":data, "status":200};
        }
 
        /**
@@ -111,7 +133,22 @@ package es.core
         */
        protected function failed(message:String, errorCode:int=500, status:int=200)
        {
-            return {"message":message,"errorCode":errorCode,"status":status};
+            return this._response = {"message":message,"errorCode":errorCode,"status":status};
+       }
+
+       private var _response:Object = null;
+
+      /**
+       * 发送响应数据对象
+       */
+       public function get response():Object
+       {
+            var res:Object = this._response;
+            if( res.data instanceof PipelineEvent )
+            {
+                res.data = res.data.valueOf();
+            }
+            return res;
        }
    }
 }
