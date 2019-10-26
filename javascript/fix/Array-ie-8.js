@@ -54,7 +54,7 @@ if ( !Array.prototype.indexOf )
 
 if (!Array.prototype.lastIndexOf)
 {
-    Object.defineProperty(Array.prototype,"indexOf", {value:function lastIndexOf(searchElement)
+    Object.defineProperty(Array.prototype,"lastIndexOf", {value:function lastIndexOf(searchElement)
     {
         if (this == null)throw new TypeError('this is null or not defined');
         var n, k, t = Object(this), len = t.length >>> 0;
@@ -81,5 +81,84 @@ if (!Array.prototype.lastIndexOf)
             }
         }
         return -1;
+    }});
+}
+
+/**
+ * 方法使用指定的函数测试所有元素，并创建一个包含所有通过测试的元素的新数组。
+ * @param callback
+ * @param thisArg
+ * @returns {Array}
+ */
+    
+if (!Array.prototype.filter)
+{
+    Object.defineProperty(Array.prototype,"filter",{value:function filter(callback, thisArg)
+    {
+        if (typeof callback !== 'function')throw new TypeError('callback must be a function');
+        if (this==null)throw new ReferenceError('this is null or not defined');
+        var items = new Array();
+        var obj = Object(this);
+        var len = obj.length >> 0;
+        var k = 0;
+        thisArg = thisArg || this;
+        while (k<len)
+        {
+            if( k in obj && callback.call(thisArg, obj[k], k, obj) )
+            {
+                items.push(obj[k]);
+            }
+            k++;
+        }
+        return items;
+    }});
+}
+
+ /**
+ * 循环对象中的每一个属性，只有纯对象或者是一个数组才会执行。
+ * @param callback 一个回调函数。
+ * 参数中的第一个为属性值，第二个为属性名。
+ * 如果返回 false 则退出循环
+ * @returns {Object}
+ */
+if (!Array.prototype.forEach)
+{
+    Object.defineProperty(Array.prototype,"forEach",{value:function forEach(callback, thisArg)
+        {
+            var T, k;
+            if (this == null)
+            {
+                throw new TypeError(' this is null or not defined');
+            }
+            var O = Object(this);
+            var len = O.length >>> 0;
+            if (typeof callback !== "function") 
+            {
+                throw new TypeError(callback + ' is not a function');
+            }
+            if (arguments.length > 1) 
+            {
+                T = thisArg;
+            }
+            k = 0;
+            while (k < len) 
+            {
+                var kValue;
+                if (k in O)
+                {
+                    kValue = O[k];
+                    callback.call(T, kValue, k, O);
+                }
+                k++;
+            }
+        }
+    });
+}
+
+if (!Array.isArray)
+{
+    Object.defineProperty(Array,"isArray",{value:function isArray(arg) 
+    {
+       return Object.prototype.toString.call(arg) === '[object Array]';
     }});
 }

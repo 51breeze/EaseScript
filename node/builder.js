@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const utils = require('../lib/utils.js');
+const maker = require('../lib/maker.js');
 const globals=utils.globals;
 const rootPath =  utils.getResolvePath( __dirname );
 
@@ -11,6 +12,9 @@ const makedSystemModules={};
 
 const excludeMap={
     "arguments":true,
+    "Console":true,
+    "console":true,
+    "JSON":true,
     "Function":true,
 };
 
@@ -48,7 +52,7 @@ function include(contents, name , filepath, config )
         str = str.replace(/\=\s*require\s*\(\s*([\"\'])(.*?)\1\s*\)/g,function(a,b,c){
              var info = path.parse(c);
              var filename = info.name+".js";
-             var identifier = path.isAbsolute(c) ? c : path.relative(context , path.resolve( context, filename ) );
+             var identifier = path.isAbsolute(c) ? c : './'+path.relative(context , path.resolve( context, filename ) );
              include(contents, info.name , null, config );
              dependencies.push( info.name );
              return '=require("'+identifier.replace(/\\/g,'/')+'")';
@@ -212,8 +216,11 @@ function builder(config, localModules,  replacements )
     outputFiles( config,  localModules , ".js");
 
     const bootstrap_dir = utils.getBuildPath(config,"build.bootstrap");
+    const app_dir = utils.getBuildPath(config,"build.application");
     const webroot_dir = utils.getBuildPath(config,"build.webroot");
+    const index_path = path.join(webroot_dir,"index.js");
     replacements.BOOTSTRAP_FILE_BUILD_PATH = path.join(bootstrap_dir, replacements.BOOTSTRAP_CLASS_FILE_NAME );
+    replacements.ROOT_PATH = path.relative( bootstrap_dir, app_dir );
 
     //生成引导文件
     var content = utils.getContents( path.join(rootPath,"bootstrap.js") );
@@ -223,7 +230,7 @@ function builder(config, localModules,  replacements )
     //生成入口文件
     content = utils.getContents( path.join(rootPath,"index.js") );
     content = replaceContent(content, replacements, config);
-    utils.setContents( webroot_dir+"/index.js",  content );
+    utils.setContents( index_path ,  content );
 }
 
 function replaceContent(content, data, config)
@@ -234,11 +241,9 @@ function replaceContent(content, data, config)
         var requireex = b.match(/^REQUIRE_IDENTIFIER\((.*?)\)$/i);
         if( requireex  )
         {
-            var m = config.globals[ requireex[1] ];
-            if( !m ){
-                m = {
-                    type:requireex[1]
-                };
+            var m = maker.getLoaclAndGlobalModuleDescription( requireex[1] );
+            if( requireex[1] ==="Internal" ){
+                m = {type:"Internal"};
             }
             return utils.getRequireIdentifier(config, m , "node", path.dirname( data.BOOTSTRAP_FILE_BUILD_PATH ) )
         }

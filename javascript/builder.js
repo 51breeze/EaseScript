@@ -36,9 +36,10 @@ function polyfill( config )
         var info = utils.getFilenameByPath(path).split('-', 3);
         if( config.compat_version && typeof config.compat_version === 'object' && config.compat_version.hasOwnProperty( info[1] ) )
         {
-            is = parseFloat( info[2] ) >= parseFloat( config.compat_version[ info[1] ] );
+            is = info[2].toLowerCase()==="all" || parseFloat( info[2] ) >= parseFloat( config.compat_version[ info[1] ] );
         }
-        if(is){
+        if(is)
+        {
             if( !(items[ info[0] ] instanceof Array) )items[ info[0] ]=[];
             items[ info[0] ].push(path);
         }

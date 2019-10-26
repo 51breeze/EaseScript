@@ -327,10 +327,6 @@ Reflect.type=function type(value, typeClass)
     if( typeClass && !System.is(value, typeClass) )
     {
         var classname = System.isClass(typeClass.constructor) ? typeClass.constructor.__CLASS__ :  System.typeOf( typeClass );
-        var up = System.ucfirst( System.typeOf( typeClass ) );
-        if( System[ up ] ){
-            classname = up;
-        }
         throw new TypeError( value+' can not be convert for ' + classname );
     }
     return value;

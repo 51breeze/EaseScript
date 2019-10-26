@@ -19,9 +19,7 @@ System.env = Internal.env;
 
 var Object = require("./Object.js");
 var Array = require("./Array.js");
-var JSON = require("./JSON.js");
 var Reflect = require("./Reflect.js");
-var Function = require("./Function.js");
 var EventDispatcher = require("./EventDispatcher.js");
 var $Object = Internal.$Object;
 var $Array = Internal.$Array;

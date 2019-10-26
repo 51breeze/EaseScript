@@ -69,7 +69,7 @@ package es.core
         */
        protected function query( sql:String  )
        {
-           return Service.pipeline(this, PipelineEvent.PIPELINE_DATABASE, "select", arguments as Array );
+           return Service.pipeline(this, PipelineEvent.PIPELINE_DATABASE, "select", Array.from(arguments) );
        }
 
        /**
@@ -80,7 +80,7 @@ package es.core
         */
        protected function save( sql:String)
        {
-           return Service.pipeline(this,PipelineEvent.PIPELINE_DATABASE, "update", arguments as Array );
+           return Service.pipeline(this,PipelineEvent.PIPELINE_DATABASE, "update", Array.from(arguments) );
        }
 
        /**
@@ -90,7 +90,7 @@ package es.core
         */
        protected function append(sql:String )
        {
-           return Service.pipeline(this,PipelineEvent.PIPELINE_DATABASE, "insert",arguments as Array );
+           return Service.pipeline(this,PipelineEvent.PIPELINE_DATABASE, "insert", Array.from(arguments) );
        }
 
        /**
@@ -100,7 +100,7 @@ package es.core
         */
        protected function remove( sql:String )
        {
-           return Service.pipeline(this,PipelineEvent.PIPELINE_DATABASE, "delete", arguments as Array );
+           return Service.pipeline(this,PipelineEvent.PIPELINE_DATABASE, "delete", Array.from(arguments) );
        }
 
        /**

@@ -25,19 +25,22 @@ package es.events
         };
         override public function valueOf():*
         {
-            var hook:Function = this.callback;
-            if( hook )
+            var callback:Function = this.callback;
+            var data:* = this.data;
+            var message:String = this.message;
+            var code:int = this.code;
+            if( callback )
             {
-                var ret:* = hook();
+                var ret:* = callback( data, message, code );
                 if( ret )
                 {
                     return ret;
                 }
             }
             return {
-                "data":this.data,
-                "message":this.message,
-                "status": isNaN(this.code) ? 200 : code
+                "data":data,
+                "message":message,
+                "status": isNaN(code) ? 200 : code
             };
         }
     }

@@ -8,6 +8,22 @@
  */
 class ArrayList extends BaseObject implements \Countable
 {
+
+    public static function from( $target, \Closure $callback = null )
+    {
+    
+    }
+
+    public static function of( $target )
+    {
+        return array_slice($target,0);
+    }
+
+    public static function isArray( $target )
+    {
+        return is_array( $target  );
+    }
+
     private $dataItems=array();
     public function __construct()
     {
