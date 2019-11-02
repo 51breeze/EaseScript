@@ -79,20 +79,20 @@ Object.defineProperty(Object,"merge",{
             return target;
         }
 
+        var isArrayTarget = System.isArray(target);
+
         for ( ;i < length; i++ )
         {
             if ( (options = arguments[ i ]) != null )
             {
-                var token;
                 if( System.isClass(options) )continue;
                 if( System.isClass(options.constructor) )
                 {
-                    if( options.constructor.__T__.dynamic !== true )continue;
-                    token = options.constructor.__T__.uri[0];
+                    options = Object.prototype.getEnumerableProperties.call(options, 2);
                 }
-                for ( name in options )
+                for( name in options )
                 {
-                    if( token===name || !$Object.prototype.hasOwnProperty.call(options,name) )continue;
+                    if( !$Object.prototype.hasOwnProperty.call(options,name) )continue;
                     copy = options[name];
                     if ( target === copy )continue;
                     if ( deep && copy && ( System.isObject(copy) || ( copyIsArray = System.isArray(copy) ) ) )
@@ -102,15 +102,25 @@ Object.defineProperty(Object,"merge",{
                         {
                             copyIsArray = false;
                             clone = src && System.isArray(src) ? src : [];
+
                         } else
                         {
                             clone = src && System.isObject(src) ? src : {};
                         }
-                        target[name]=Object.merge( deep, clone, copy )
+                        
+                        if( isArrayTarget ){
+                           target.push( Object.merge( deep, clone, copy ) );
+                        }else{
+                           target[name]=Object.merge( deep, clone, copy );
+                        }
 
-                    } else if ( typeof copy !== "undefined" )
+                    } else if ( copy !== void 0 )
                     {
-                        target[name]=copy;
+                        if( isArrayTarget ){
+                           target.push( copy );
+                        }else{
+                           target[name]=copy;
+                        }
                     }
                 }
             }

@@ -79,20 +79,20 @@ Object.defineProperty(Object,"merge",{
             return target;
         }
 
+        var isArrayTarget = System.isArray(target);
+
         for ( ;i < length; i++ )
         {
             if ( (options = arguments[ i ]) != null )
             {
-                var token;
                 if( System.isClass(options) )continue;
                 if( System.isClass(options.constructor) )
                 {
-                    if( options.constructor.__T__.dynamic !== true )continue;
-                    token = options.constructor.__T__.uri[0];
+                    options = Object.prototype.getEnumerableProperties.call(options, 2);
                 }
-                for ( name in options )
+                for( name in options )
                 {
-                    if( token===name || !$Object.prototype.hasOwnProperty.call(options,name) )continue;
+                    if( !$Object.prototype.hasOwnProperty.call(options,name) )continue;
                     copy = options[name];
                     if ( target === copy )continue;
                     if ( deep && copy && ( System.isObject(copy) || ( copyIsArray = System.isArray(copy) ) ) )
@@ -102,15 +102,25 @@ Object.defineProperty(Object,"merge",{
                         {
                             copyIsArray = false;
                             clone = src && System.isArray(src) ? src : [];
+
                         } else
                         {
                             clone = src && System.isObject(src) ? src : {};
                         }
-                        target[name]=Object.merge( deep, clone, copy )
+                        
+                        if( isArrayTarget ){
+                           target.push( Object.merge( deep, clone, copy ) );
+                        }else{
+                           target[name]=Object.merge( deep, clone, copy );
+                        }
 
-                    } else if ( typeof copy !== "undefined" )
+                    } else if ( copy !== void 0 )
                     {
-                        target[name]=copy;
+                        if( isArrayTarget ){
+                           target.push( copy );
+                        }else{
+                           target[name]=copy;
+                        }
                     }
                 }
             }
@@ -128,17 +138,9 @@ Object.defineProperty(Object,"forEach",{
     value:function forEach(object,callback,thisObject)
     {
         if( object == null || System.isClass(object) || typeof callback !== "function" )return;
-        var isIterator = false;
         var value = null;
-        if( object && System.hasClass( Internal.iteratorClass ) )
-        {
-            if( object.constructor && System.isClass(object.constructor) )
-            {
-                isIterator = System.is(object, System.getDefinitionByName( Internal.iteratorClass ) );
-            }else{
-                isIterator = object instanceof System.ListIterator;
-            }
-        }
+        var iteratorClass = Internal.getClassModule( Internal.iteratorClassName );
+        var isIterator = object instanceof ListIterator || ( iteratorClass && System.is(object, iteratorClass) );
         thisObject = thisObject||object;
         if( isIterator && typeof object.next === "function" )
         {
@@ -147,7 +149,7 @@ Object.defineProperty(Object,"forEach",{
             var key = object.key;
             var rewind = object.rewind;
             rewind.call(object);
-            for (;next.call(object); )
+            while(next.call(object))
             {
                 value = current.call(object);
                 if( callback.call(thisObject, value, key.call(object) ) === false )
@@ -158,20 +160,21 @@ Object.defineProperty(Object,"forEach",{
 
         }else
         {
-            var token;
+            var token = null;
             if ( System.isClass(object.constructor) )
             {
                 if (object.constructor.__T__.dynamic !== true)return;
                 token = object.constructor.__T__.uri[0];
             }
-            var prop;
-            for (prop in object)
+
+            for (var prop in object)
             {
                 if (Symbol.isSymbolPropertyName && Symbol.isSymbolPropertyName(prop))continue;
                 if (prop !== token && $Object.prototype.propertyIsEnumerable.call(object, prop))
                 {
                     value = object[prop];
-                    if( callback.call(thisObject, value, prop) === false ){
+                    if( callback.call(thisObject, value, prop) === false )
+                    {
                         return value;
                     }
                 }
@@ -209,6 +212,48 @@ Object.defineProperty(Object,"setPrototypeOf",{
         }
         obj.__proto__ = proto;
         return obj;
+    }
+});
+
+
+/**
+ * 设置对象的原型链
+ * @returns {Object}
+ */
+Object.defineProperty(Object,"setPrototypeOf",{
+    value:$Object.setPrototypeOf || function setPrototypeOf(obj, proto)
+    {
+        if( obj == null )throw new TypeError("non-object");
+        if( System.isClass(obj.constructor))
+        {
+            return false;
+        }
+        obj.__proto__ = proto;
+        return obj;
+    }
+});
+
+
+ /**
+ * 返回对象可枚举的属性的键名
+ * @returns {Array}
+ */
+Object.defineProperty(Object,"keys",{
+    value:function keys( target )
+    {
+        return Object.prototype.getEnumerableProperties.call(target,-1);
+    }
+});
+
+
+/**
+ * 返回对象可枚举的属性值
+ * @returns {Array}
+ */
+Object.defineProperty(Object, "values",{
+    value:function values( target )
+    {
+        return Object.prototype.getEnumerableProperties.call(target,1);
     }
 });
 
@@ -287,29 +332,6 @@ Object.prototype = Object.create( $Object.prototype,{
     },
 
     /**
-     * 返回对象可枚举的属性的键名
-     * @returns {Array}
-     */
-    "keys":{
-        value:function keys()
-        {
-            return Object.prototype.getEnumerableProperties.call(this,-1);
-        }
-    },
-
-
-    /**
-     * 返回对象可枚举的属性值
-     * @returns {Array}
-     */
-    "values":{
-        value:function values()
-        {
-            return Object.prototype.getEnumerableProperties.call(this,1);
-        }
-    },
-
-    /**
      * 获取可枚举的属性
      * @param state
      * @returns {Array}
@@ -320,25 +342,37 @@ Object.prototype = Object.create( $Object.prototype,{
             if( this == null )throw new TypeError("non-object");
             var items=state===2 ? {} : [];
             if( System.isClass(this) )return items;
-            var token;
-            if( System.isClass(this.constructor) )
+            if( System.isArray(this) && state !==2 )return this;
+
+            var iteratorClass = Internal.getClassModule( Internal.iteratorClassName );
+            var isIterator = this instanceof ListIterator || ( iteratorClass && System.is(this, iteratorClass) );
+            if( isIterator && typeof this.next === "function" )
             {
-                if( this.constructor.__T__.dynamic !==true )return items;
-                token = this.constructor.__T__.uri[0];
-            }
-            var prop;
-            for( prop in this )
-            {
-                if( Symbol.isSymbolPropertyName && Symbol.isSymbolPropertyName(prop) )continue;
-                if( prop !== token && $propertyIsEnumerable.call(this,prop) )
+                var next = this.next;
+                var current = this.current;
+                var key = this.key;
+                var rewind = this.rewind;
+                rewind.call(this);
+                while( next.call(this) )
                 {
-                    //类中定义的属性成员不可枚举
-                    //动态类设置的属性可以枚举，但属性描述符enumerable=false时不可枚举
-                    switch (state){
-                        case -1 : items.push(prop); break;
-                        case  1 : items.push( this[prop] ); break;
-                        case  2 : items[prop] = this[prop]; break;
-                        default : items.push({key: prop, value: this[prop]});
+                    makeValue(items, current.call(this), key.call(this) , state);
+                }
+    
+            }else 
+            {
+                var token = null;
+                if ( System.isClass(this.constructor) )
+                {
+                    if (this.constructor.__T__.dynamic !== true)return items;
+                    token = this.constructor.__T__.uri[0];
+                }
+                
+                for (var prop in this)
+                {
+                    if (Symbol.isSymbolPropertyName && Symbol.isSymbolPropertyName(prop))continue;
+                    if (prop !== token && $Object.prototype.propertyIsEnumerable.call(this, prop))
+                    {
+                        makeValue(items,this[prop], prop, state);
                     }
                 }
             }
@@ -354,6 +388,20 @@ Object.prototype = Object.create( $Object.prototype,{
     }
 });
 
+function makeValue(items,value, prop, state)
+{
+    //类中定义的属性成员不可枚举
+    //动态类设置的属性可以枚举，但属性描述符enumerable=false时不可枚举
+    switch (state){
+        case -1 : items.push(prop); break;
+        case  1 : items.push(value); break;
+        case  2 : items[prop] = value; break;
+        default : items.push({key: prop, value: value});
+    }
+}
+
 module.exports =Object;
 var System = require("./System.js");
 var Symbol = require("./Symbol.js");
+var Array = require("./Array.js");
+var ListIterator = require("./ListIterator.js");
