@@ -12,18 +12,19 @@
  * 可以使用非字符串作为键值的存储表
  * @constructor
  */
-function Dictionary()
+function Map()
 {
-    if( !(this instanceof Dictionary) )
-        return new Dictionary();
+    if( !(this instanceof Map) )
+        return new Map();
     storage(this,true,{map:[]});
 }
 
-module.exports = Dictionary;
+module.exports = Map;
 var Object = require("./Object.js");
 var Internal = require("./Internal.js");
 var Symbol = require("./Symbol.js");
-var storage=Internal.createSymbolStorage( Symbol('dictionary') );
+var ListIterator = require("./ListIterator.js");
+var storage=Internal.createSymbolStorage( Symbol('Map') );
 
 function indexByKey(map,key)
 {
@@ -38,7 +39,7 @@ function indexByKey(map,key)
     return -1;
 };
 
-Dictionary.prototype = Object.create( Object.prototype, {
+Map.prototype = Object.create( Object.prototype, {
 
 /**
  * 设置指定键值的数据,如果相同的键值则会覆盖之前的值。
@@ -86,9 +87,26 @@ Dictionary.prototype = Object.create( Object.prototype, {
  * 数组中的每个项是一个对象
  * @returns {Array}
  */
-"getAll":{value:function getAll()
+"entries":{value:function entries()
 {
-    return storage(this,'map');
+    return new ListIterator( storage(this,'map') );
+}},
+
+/**
+ * 返回所有已设置的数据
+ * 数组中的每个项是一个对象
+ * @returns {Array}
+ */
+"forEach":{value:function forEach(callback,thisObj)
+{
+    var map = storage(this,'map');
+    var len = map.length;
+    var i=0;
+    while( i<len )
+    {
+       var item = map[i++];
+       callback.call(thisObj||null,  item.value, item.key, this);
+    }
 }},
 
 /**
@@ -126,25 +144,53 @@ Dictionary.prototype = Object.create( Object.prototype, {
  * @param key
  * @returns {*}
  */
-"remove":{value:function remove( key )
+"delete":{value:function( key )
 {
     var map = storage(this,'map');
     var index = indexByKey(map,key);
     if( index >=0 )
     {
-        return map.splice(index,1);
+        delete map.splice(index,1);
+        return true;
     }
-    return null;
+    return false;
 }},
 
 /**
  * 返回已设置数据的总数
  * @returns {Number}
  */
-"count":{value:function count()
+"size":{value:function size()
 {
     var map = storage(this,'map');
     return map.length;
+}},
+
+/**
+ * 返回已设置数据的总数
+ * @returns {Number}
+ */
+"has":{value:function has()
+{
+    var map = storage(this,'map');
+    return indexByKey(map,key) >= 0;
+}},
+
+/**
+ * 返回已设置数据的总数
+ * @returns {Number}
+ */
+"clear":{value:function clear()
+{
+    var map = storage(this,'map');
+    var len = map.length;
+    var i=0;
+    while( i<len )
+    {
+       delete map.splice(i,1);
+    }
 }}
 
 });
+
+Object.defineProperty(Map.prototype["delete"],"name",{value:"delete"});

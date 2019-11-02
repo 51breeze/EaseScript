@@ -668,16 +668,16 @@ package es.core
         /*
         * @private
         */
-        private var _installer:Dictionary=null;
+        private var _installer:Map=null;
 
         /*
         * @private
         */
         private function installer(child:IDisplay, viewport:IContainer):void
         {
-            var map:Dictionary = this._installer;
+            var map:Map = this._installer;
             if( map === null ){
-                map = new Dictionary();
+                map = new Map();
                 this._installer = map;
             }
             var install:Object = map.get(child);
@@ -700,35 +700,33 @@ package es.core
         */
         private function updateInstallState():void
         {
-            var map:Dictionary = this._installer;
+            var map:Map = this._installer;
             if( map )
             {
-                Object.forEach( map.getAll() , function(item:Object)
-                {
-                    if( item.value.state !== true && (item.key as IDisplay).parent )
+                map.forEach(function(value:Object, key:IDisplay){
+                    if( value.state !== true && key.parent )
                     {
-                        (item.value.viewport as IContainer).removeChild( item.key as IDisplay);
+                        (value.viewport as IContainer).removeChild( key );
                     }
-                    item.value.state = false;
+                    value.state = false;
                 });
             }
         }
 
+        /*
+        * @private
+        */
+        private var _watchMap:Map=null;
 
         /*
         * @private
         */
-        private var _dictionary:Dictionary=null;
-
-        /*
-        * @private
-        */
-        private function get dictionary():Dictionary
+        private function get watchMap():Map
         {
-            var dict:Dictionary = this._dictionary;
+            var dict:Map = this._watchMap;
             if( dict === null ){
-                dict = new Dictionary();
-                this._dictionary = dict;
+                dict = new Map();
+                this._watchMap = dict;
             }
             return dict;
         }
@@ -745,7 +743,7 @@ package es.core
             var bindable:Bindable= this.bindable;
             if( sourceTarget )
             {
-               var dict:Dictionary = this.dictionary;
+               var dict:Map = this.watchMap;
                bindable = dict.get( sourceTarget ) as Bindable;
                if( !bindable ){
                   bindable = new Bindable(sourceTarget,"*");
@@ -764,12 +762,12 @@ package es.core
         {
             if( sourceTarget )
             {
-               var dict:Dictionary = this.dictionary;
+               var dict:Map = this.watchMap;
                var bind:Bindable = dict.get( sourceTarget ) as Bindable;
                if( bind )
                {
                     bind.unbind(target, propName);
-                    dict.remove( sourceTarget );
+                    dict.delete( sourceTarget );
                }
 
             }else

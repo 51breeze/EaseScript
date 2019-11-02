@@ -92,6 +92,7 @@ ListIterator.prototype = Object.create( Object.prototype, {
                 var item = items[ cursor ];
                 storage(this, "current", item.value );
                 storage(this, "key", item.key );
+                return Object.merge({}, item);
 
             }else if ( cursor > 0 )
             {

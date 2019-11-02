@@ -27,6 +27,22 @@ Internal.defineProperty(Object,"defineProperty",{value:Internal.defineProperty})
 Object.defineProperty(Object,"create",{value:$Object.create});
 
 /**
+ * 返回一个给定对象自身可枚举属性的键值对数组
+ */
+Object.defineProperty(Object,"entries",{value:function(obj){
+
+    var properties = Object.prototype.getEnumerableProperties(2);
+    var resArray = new Array();
+    for(var p in properties)
+    {
+        resArray.push([ p , properties[p] ])
+    } 
+    return resArray;
+
+}});
+
+
+/**
  * 合并其它参数到指定的 target 对象中
  * 如果只有一个参数则只对本身进行扩展。
  * @param deep true 深度合并
@@ -377,4 +393,5 @@ function makeValue(items,value, prop, state)
 module.exports =Object;
 var System = require("./System.js");
 var Symbol = require("./Symbol.js");
+var Array = require("./Array.js");
 var ListIterator = require("./ListIterator.js");

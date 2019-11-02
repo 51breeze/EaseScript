@@ -115,7 +115,7 @@ function Bindable(source,properties)
     {
         throw new TypeError('Invalid properties must is be String or Array. in Bindable');
     }
-    storage(this,true,{"source":source,"properties":properties,"hash":{},"subscriber":new Dictionary(),"binding":{}});
+    storage(this,true,{"source":source,"properties":properties,"hash":{},"subscriber":new Map(),"binding":{}});
     this.addEventListener(PropertyEvent.CHANGE,commitProperties);
 }
 
@@ -125,7 +125,7 @@ var Object = require("./Object.js");
 var System = require("./System.js");
 var PropertyEvent = require("./PropertyEvent.js");
 var Symbol = require("./Symbol.js");
-var Dictionary = require("./Dictionary.js");
+var Map = require("./Map.js");
 var Symbol = require("./Symbol.js");
 var Element = require("./Element.js");
 var Reflect = require("./Reflect.js");
@@ -265,7 +265,7 @@ Bindable.prototype.unbind=function unbind(target,property)
         }
         item.dispatcher.removeEventListener(PropertyEvent.CHANGE,item.handle);
     }
-    return !!subscriber.remove( target );
+    return !!subscriber.delete( target );
 };
 
 function removeItem( bind ,item, name )
