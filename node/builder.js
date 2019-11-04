@@ -245,6 +245,10 @@ function replaceContent(content, data, config)
             if( requireex[1] ==="Internal" ){
                 m = {type:"Internal"};
             }
+            if( !m )
+            {
+                throw new ReferenceError(`"${requireex[1]}" is not exists.`)
+            }
             return utils.getRequireIdentifier(config, m , "node", path.dirname( data.BOOTSTRAP_FILE_BUILD_PATH ) )
         }
 

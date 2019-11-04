@@ -70,7 +70,7 @@ package es.core
        [RunPlatform(server)]
        protected function propertiesToJson():String
        {
-           var object:Object = Interaction.getProperties().valueOf();
+           var object:Object = Interaction.getProperties().valueOf() as Object;
            var data:Object={};
            var self:Application = this;
            Object.forEach(object,function (value:*,name:*) {
