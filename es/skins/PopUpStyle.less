@@ -1,15 +1,18 @@
-@import (reference) "../../style/less/main.less";
-
-@radius:5px;
-@secondary:#DFDFDF;
-@border_color:darken(@secondary,3.5%);
-@background_color:@secondary;
-
-
-@import "../../style/less/animate.less";
+@import (reference) "../../style/less/mixins/border-radius.less";
 @import "../../style/less/fixed.less";
 @import "../../style/less/buttons.less";
 @import "../../style/less/close.less";
+@import "../../style/animate/shake.css";
+@import "../../style/animate/fadeIn.css";
+@import "../../style/animate/fadeOut.css";
+@import "../../style/animate/fadeInUp.css";
+@import "../../style/animate/fadeOutUp.css";
+@import "../../style/animate/fadeInDown.css";
+@import "../../style/animate/fadeOutDown.css";
+
+@radius:5px;
+@background_color:@theme-color;
+@border_color:darken(@background_color,3.5%);
 
 .popup{
   z-index: 99999;
