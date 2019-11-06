@@ -6,7 +6,7 @@
  */
 package es.core
 {
-    import es.components.SkinComponent;
+    import es.core.SkinComponent;
     import es.events.ComponentEvent;
     import es.core.Container;
     import es.events.SkinEvent;
@@ -15,7 +15,7 @@ package es.core
     import es.core.Display;
     import es.interfaces.IContainer;
     import es.interfaces.IBindable;
-    import es.core.BaseLayout;
+    import es.components.layout.BaseLayout;
     import es.core.es_internal;
 
 

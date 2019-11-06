@@ -6,7 +6,7 @@
  */
 package es.events
 {
-    import es.components.Component;
+    import es.core.Component;
     public class ComponentEvent extends Event
     {
         static public const INITIALIZING:String = 'componentInitializing';

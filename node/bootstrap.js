@@ -48,16 +48,74 @@ function query( sql, callback )
     });
 }
 
+function match(routes, pathName )
+{
+    if( !routes )
+    {
+        return null;
+    }
+
+    pathName = pathName.replace(/^\/|\/$/g,'');
+    const pathArr = pathName.split('/');
+    for(var p in routes )
+    {
+       const routeName = p.replace(/^\/|\/$/g,'').toLowerCase();
+       const routeArr = routeName.split('/');
+       if( routeArr.length === pathArr.length )
+       {
+           var args = [];
+           var props = [];
+           if( p.indexOf("{") >= 0 )
+           {
+                var index = 0;
+                var len = routeArr.length;
+                while( index < len )
+                {
+                    var name = routeArr[ index ];
+                    if( name.charAt(0) ==="{" && name.charAt(name.length-1) ==="}" )
+                    {
+                       props.push( name.slice(1,-1) )
+                       args.push( pathArr[index] );
+
+                    }else if( name !== pathArr[index].toLowerCase() )
+                    {
+                       break;
+                    }
+                    index++;
+                }
+
+                if( index < len )
+                {
+                    continue;
+                }
+
+           }else if( routeName !== pathName.toLowerCase() )
+           {
+               continue;
+           }
+
+           return {
+              provider:routes[ p ],
+              props:props,
+              args:args
+           }
+       }
+    }
+    return null;
+}
+
 module.exports = function router(req, res, next)
 {
-    const router = env.HTTP_ROUTES[ req.method.toLowerCase() ]
-    if( router && router[ req.path ] )
+    const router = env.HTTP_ROUTES[ req.method.toLowerCase() ];
+    const result = match( router, req.path );
+    
+    if( result )
     {
-        const route = router[ req.path ].split("@");
+        const route = result.provider.split("@");
         const controller = route[0];
         const method = route[1];
-        const module = require( Path.join(root_path, controller.replace(/\./g,'/')+".js") );
-        const obj = new module();
+        const moduleClass = require( Path.join(root_path, controller.replace(/\./g,'/')+".js") );
+        const obj = new moduleClass();
         obj.addEventListener(PipeLineEvent.PIPELINE_DATABASE,function(e){
             query( e.getCmd(), function( result ){
                   e.setData( result );
@@ -65,7 +123,7 @@ module.exports = function router(req, res, next)
                   res.send( e.valueOf() );
             });
         });
-        obj[ method ]();
+        obj[ method ].apply(obj, result.args );
 
     }else
     {

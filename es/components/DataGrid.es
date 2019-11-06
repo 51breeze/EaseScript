@@ -6,7 +6,7 @@
 */
 package es.components
 {
-    import es.components.SkinComponent;
+    import es.core.SkinComponent;
     import es.core.Display;
     import es.core.Skin;
     import es.core.Interaction;

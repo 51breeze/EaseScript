@@ -4,9 +4,9 @@
  * https://github.com/51breeze/EaseScript
  * @author Jun Ye <664371281@qq.com>
  */
-package es.core
+package es.components.layout
 {
-    import es.core.BaseLayout;
+    import es.components.layout.BaseLayout;
     public class VerticalLayout extends BaseLayout
     {
         public static const TOP:String = "top";

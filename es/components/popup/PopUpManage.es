@@ -5,14 +5,14 @@
  * https://github.com/51breeze/EaseScript
  * @author Jun Ye <664371281@qq.com>
  */
-package es.core
+package es.components.popup
 {
-    import es.components.SkinComponent;
+    import es.core.SkinComponent;
     import es.core.Container;
     import es.interfaces.IContainer;
     import es.interfaces.IDisplay;
     import es.core.SystemManage;
-    import es.core.BasePopUp;
+    import es.components.popup.BasePopUp;
 
     [RunPlatform("client")]
     public class PopUpManage

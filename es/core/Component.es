@@ -4,7 +4,7 @@
  * https://github.com/51breeze/EaseScript
  * @author Jun Ye <664371281@qq.com>
  */
-package es.components
+package es.core
 {
     import es.events.ComponentEvent;
     public class Component extends EventDispatcher

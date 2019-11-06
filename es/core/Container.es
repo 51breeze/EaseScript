@@ -6,12 +6,12 @@
  */
 package es.core
 {
-    import es.components.SkinComponent;
+    import es.core.SkinComponent;
     import es.core.Display;
     import es.interfaces.IDisplay;
     import es.interfaces.IContainer;
     import es.core.es_internal;
-    import es.core.BaseLayout;
+    import es.components.layout.BaseLayout;
 
     public class Container extends Display implements IContainer
     {

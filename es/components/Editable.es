@@ -6,7 +6,7 @@
 */
 package es.components
 {
-    import es.components.SkinComponent;
+    import es.core.SkinComponent;
     import es.skins.EditableSkin;
 
     public class Editable extends SkinComponent

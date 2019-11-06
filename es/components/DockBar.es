@@ -6,7 +6,7 @@
 */
 package es.components
 {
-    import es.components.SkinComponent;
+    import es.core.SkinComponent;
     public class DockBar extends SkinComponent
     {
         public function DockBar()

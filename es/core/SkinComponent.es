@@ -4,9 +4,9 @@
  * https://github.com/51breeze/EaseScript
  * @author Jun Ye <664371281@qq.com>
  */
-package es.components
+package es.core
 {
-    import es.components.Component;
+    import es.core.Component;
     import es.events.ComponentEvent;
     import es.events.SkinEvent;
     import es.core.Skin;

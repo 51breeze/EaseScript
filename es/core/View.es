@@ -9,7 +9,7 @@ package es.core
     import es.core.State;
     import es.events.SkinEvent;
     import es.core.Application;
-    import es.components.Component;
+    import es.core.Component;
     import es.core.Skin;
     import es.interfaces.IDisplay;
     public class View extends Skin

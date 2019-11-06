@@ -5,17 +5,17 @@
  * https://github.com/51breeze/EaseScript
  * @author Jun Ye <664371281@qq.com>
  */
-package es.core
+package es.components.popup
 {
-    import es.components.SkinComponent;
+    import es.core.SkinComponent;
     import es.core.Container;
     import es.core.Display;
     import es.core.Skin;
     import es.interfaces.IContainer;
     import es.interfaces.IDisplay;
     import es.core.SystemManage;
-    import es.core.PopUpManage;
     import es.events.SkinEvent;
+    import es.components.popup.PopUpManage;
 
     [RunPlatform("client")]
     public abstract class BasePopUp extends SkinComponent
@@ -256,7 +256,7 @@ package es.core
          * @param options
          * @returns {PopUp}
          */
-        protected function show(options:Object={}):es.core.BasePopUp
+        protected function show(options:Object={}):BasePopUp
         {
             this.state    = true;
 

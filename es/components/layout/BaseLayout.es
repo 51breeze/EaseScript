@@ -4,7 +4,7 @@
  * https://github.com/51breeze/EaseScript
  * @author Jun Ye <664371281@qq.com>
  */
-package es.core
+package es.components.layout
 {
     import es.interfaces.IDisplay;
     public class BaseLayout extends EventDispatcher

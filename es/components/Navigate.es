@@ -7,7 +7,7 @@
 
 package es.components
 {
-    import es.components.SkinComponent;
+    import es.core.SkinComponent;
     import es.events.NavigateEvent;
     import es.core.Skin;
     import es.core.Display;
