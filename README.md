@@ -29,21 +29,21 @@
 2. 安装成功后进入 cmd 切换到所在目录
 3. 在命令行中输入 ei --init 按提示输入相关信息
 
->   D:\workspace\test>ei --init
->   ? 项目名: ./
->   ? 构建路径: ./build
->   ? 描述:
->   ? 作者:
->   ? 配置文件路径:
->   ? 入口文件(file/path): [project_src_dir]
->   ? 皮肤扩展路径(libxmljs):
->   ? 支持皮肤: Yes
->   ? 是否拆分打包: Yes
->   ? 是否使用webpack打包: Yes
->   ? 服务端运行环境: node
->   ? 服务端运行地址: 127.0.0.1:8080
->   ? 指定编译参数:
->   ? 立即安装 (Y/n) Yes
+>   D:\workspace\test>ei --init 
+>   ? 项目名: ./ 
+>   ? 构建路径: ./build 
+>   ? 描述: 
+>   ? 作者: 
+>   ? 配置文件路径: 
+>   ? 入口文件(file/path): [project_src_dir] 
+>   ? 皮肤扩展路径(libxmljs): 
+>   ? 支持皮肤: Yes 
+>   ? 是否拆分打包: Yes 
+>   ? 是否使用webpack打包: Yes 
+>   ? 服务端运行环境: node 
+>   ? 服务端运行地址: 127.0.0.1:8080 
+>   ? 指定编译参数: 
+>   ? 立即安装 (Y/n) Yes 
 
 4. 立即安装成功后使用 npm run start 来动启动项目
 5. 如果看到 "Welcome use EaseScript!" 字样,那么恭喜你成功了！！
