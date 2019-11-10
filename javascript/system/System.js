@@ -10,6 +10,21 @@
 var System={};
 var Internal = require("./Internal.js");
 System.env = Internal.env;
+
+/**
+ * 运行相关的环境信息
+ * @type {{}}
+ */
+System.environments=function environments( name )
+{
+    if( typeof name === "string" )
+    {
+        return Internal.env[name] || null;
+    }
+    return Object.merge( {}, Internal.env );
+}
+
+
 module.exports =System;
 
 var Object = require("./Object.js");
@@ -45,7 +60,6 @@ System.clearTimeout = function(id){
 System.clearInterval = function(id){
     return clearInterval( id );
 };
-
 /**
  * 返回对象类型的字符串表示形式
  * @param instanceObj

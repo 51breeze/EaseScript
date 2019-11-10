@@ -1,18 +1,21 @@
 const Path= require("path");
-const Mysql= require("mysql");
+const fs= require("fs");
 const Internal= require("[CODE[REQUIRE_IDENTIFIER(Internal)]]");
 const Object  = require("[CODE[REQUIRE_IDENTIFIER(Object)]]");
+const Array  = require("[CODE[REQUIRE_IDENTIFIER(Array)]]");
 const System  = require("[CODE[REQUIRE_IDENTIFIER(System)]]");
 const Event   = require("[CODE[REQUIRE_IDENTIFIER(Event)]]");
 const PipeLineEvent = require("[CODE[REQUIRE_IDENTIFIER(es.events.PipelineEvent)]]");
 const root_path = "[CODE[ROOT_PATH]]";
+const config = require("./config.json");
 
 /**
  * 运行环境相关信息
  */
 const env={
     "HTTP_DEFAULT_ROUTE":"[CODE[DEFAULT_BOOTSTRAP_ROUTER_PROVIDER]]",
-    "HTTP_ROUTES":[CODE[SERVICE_ROUTE_LIST]],
+    "HTTP_SERVER_ROUTES":[CODE[SERVICE_ROUTE_LIST]],
+    "HTTP_VIEW_ROUTES":[CODE[VIEW_ROUTE_LIST]],
     "HTTP_ROUTE_PATH":null,
     "MODE":[CODE[MODE]],
     "ORIGIN_SYNTAX":"[CODE[ORIGIN_SYNTAX]]",
@@ -20,113 +23,118 @@ const env={
     "HTTP_ROUTE_CONTROLLER":null,
     "COMMAND_SWITCH":[CODE[COMMAND_SWITCH]],
     "VERSION":[CODE[VERSION]],
-    "LOAD_JS_PATH":"[CODE[JS_LOAD_PATH]]",
-    "LOAD_CSS_PATH":"[CODE[CSS_LOAD_PATH]]",
-    "WORKSPACE":"[CODE[WORKSPACE]]",
-    "MODULE_SUFFIX":"[CODE[MODULE_SUFFIX]]"
+    "WORKSPACE":"[CODE[WEBROOT_PATH]]"
 };
 
 Object.merge(Internal.env, env);
 
-const connection = Mysql.createConnection({
-    host     : 'localhost',
-    user     : 'root',
-    password : '',
-    database : 'test'
-});
-  
-connection.connect();
-process.on('SIGINT', () => {
-    connection.end();
-});
-
-function query( sql, callback )
-{
-    connection.query(sql, function (err, rows, fields) {
-        if (err) throw err;
-        callback( rows, fields);
-    });
+var db = ()=>{
+    throw new Error("No db connection");
 }
 
-function match(routes, pathName )
+if( config.database )
 {
-    if( !routes )
+    var dbconfig = Array.isArray( config.database ) ? config.database[0] : config.database;
+    if(dbconfig)
     {
-        return null;
+        const drives={
+            mysql(){
+                const Mysql= require("mysql");
+                const connection = Mysql.createConnection({
+                    host     :dbconfig.host     || '127.0.0.1',
+                    port     :dbconfig.port     || '3306',
+                    user     :dbconfig.user     || 'root',
+                    password :dbconfig.password || '',
+                    database :dbconfig.dbname
+                });
+            
+                connection.connect();
+                process.on('SIGINT', () => {
+                    connection.end();
+                });
+
+                return ( sql, callback )=>{
+                    connection.query(sql, function (err, rows, fields) {
+                        if (err) throw err;
+                        callback( rows, fields);
+                    });
+                }
+            }
+        }
+        const driver = drives[ dbconfig.driver.toLowerCase() ];
+        db = driver ? driver() : db;
     }
+}
 
-    pathName = pathName.replace(/^\/|\/$/g,'');
-    const pathArr = pathName.split('/');
-    for(var p in routes )
+module.exports=function createRouter( factory , staticAsset )
+{
+    Object.forEach( env.HTTP_SERVER_ROUTES, function(routes, method)
     {
-       const routeName = p.replace(/^\/|\/$/g,'').toLowerCase();
-       const routeArr = routeName.split('/');
-       if( routeArr.length === pathArr.length )
-       {
-           var args = [];
-           var props = [];
-           if( p.indexOf("{") >= 0 )
-           {
-                var index = 0;
-                var len = routeArr.length;
-                while( index < len )
-                {
-                    var name = routeArr[ index ];
-                    if( name.charAt(0) ==="{" && name.charAt(name.length-1) ==="}" )
-                    {
-                       props.push( name.slice(1,-1) )
-                       args.push( pathArr[index] );
+        Object.forEach(routes,function(provider,route){
+            factory(method,route.replace(/\{(\w+)\}/g,':$1'),function(req, res){
+                const route = provider.split("@");
+                const controller = route[0];
+                const method = route[1];
+                try{
 
-                    }else if( name !== pathArr[index].toLowerCase() )
-                    {
-                       break;
+                    Internal.env.HTTP_REQUEST ={
+                        "method":req.method,
+                        "path":req.path,
+                        "host":req.get("host"),
+                        "port":req.get("host").split(":")[1] || null,
+                        "protocol":req.protocol,
+                        "cookie":req.cookies || null,
+                        "uri":req.originalUrl,
+                        "url":req.protocol + '://' + req.get('host') + req.originalUrl,
                     }
-                    index++;
-                }
+                    
+                    Internal.env.HTTP_RESPONSE =res;
+                    Internal.env.APP_CONFIG = config;
 
-                if( index < len )
+                    const moduleClass = require( Path.join(root_path, controller.replace(/\./g,'/')+".js") );
+                    const obj = new moduleClass();
+                    obj.addEventListener(PipeLineEvent.PIPELINE_DATABASE,function(e){
+                        db( e.getCmd(), function( result ){
+                            e.setData( result );
+                            res.status(200)
+                            res.send( e.valueOf() );
+                        });
+                    });
+                    obj[ method ].apply(obj, Object.values( req.params ) );
+
+                }catch(e)
                 {
-                    continue;
+                    console.log( e );
+                    staticAsset(req, res, "error.html", e);
                 }
-
-           }else if( routeName !== pathName.toLowerCase() )
-           {
-               continue;
-           }
-
-           return {
-              provider:routes[ p ],
-              props:props,
-              args:args
-           }
-       }
-    }
-    return null;
-}
-
-module.exports = function router(req, res, next)
-{
-    const router = env.HTTP_ROUTES[ req.method.toLowerCase() ];
-    const result = match( router, req.path );
-    
-    if( result )
-    {
-        const route = result.provider.split("@");
-        const controller = route[0];
-        const method = route[1];
-        const moduleClass = require( Path.join(root_path, controller.replace(/\./g,'/')+".js") );
-        const obj = new moduleClass();
-        obj.addEventListener(PipeLineEvent.PIPELINE_DATABASE,function(e){
-            query( e.getCmd(), function( result ){
-                  e.setData( result );
-                  res.status(200)
-                  res.send( e.valueOf() );
             });
         });
-        obj[ method ].apply(obj, result.args );
+    });
 
-    }else
+    Object.forEach( env.HTTP_VIEW_ROUTES, function(routes, method)
     {
-        next();
-    }
+        Object.forEach(routes,function(provider,route){
+            factory(method,route.replace(/\{(\w+)\}/g,':$1'),function(req, res){
+                try{
+                    const file = Path.join(__dirname, env.WORKSPACE, "index.html");
+                    if( fs.existsSync(file) )
+                    {
+                        res.status(200);
+                        res.sendFile( file );
+                        res.end();
+
+                    }else if( staticAsset )
+                    {
+                        staticAsset(req, res, "index.html");
+                    }else{
+                        throw new Error("Not find source file.")
+                    }  
+                }catch(e)
+                {
+                    console.log( e );
+                    staticAsset(req, res, "error.html", e);
+                }
+            });
+        });
+    });
 }

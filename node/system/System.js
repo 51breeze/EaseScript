@@ -10,12 +10,31 @@
 
 var System={};
 var Internal = require("./Internal.js");
-module.exports =System;
+System.env = Internal.env;
 
 /**
- * 系统环境
+ * 运行相关的环境信息
+ * @type {{}}
  */
-System.env = Internal.env;
+System.environments=function environments( name )
+{
+    if( typeof name === "string" )
+    {  
+        if( name.substr(0,13) ==="HTTP_REQUEST_" ){
+            var request = Internal.env.HTTP_REQUEST || {};
+            return request[ name.slice(13).toLowerCase() ] || null;
+        }
+        if( name.substr(0,14) ==="HTTP_RESPONSE_" )
+        {
+            var response = Internal.env.HTTP_RESPONSE || {};
+            return response[ name.slice(14).toLowerCase() ] || null;
+        }
+        return Internal.env[name] || null;
+    }
+    return Object.merge( {}, Internal.env );
+}
+
+module.exports =System;
 
 var Object = require("./Object.js");
 var Array = require("./Array.js");
@@ -526,21 +545,6 @@ System.getGlobalEvent=function getGlobalEvent()
       }
       return _globalEvent;
 }
-
-/**
- * 运行相关的环境信息
- * @type {{}}
- */
-System.environmentMap = {};
-System.environments=function environments( name )
-{
-    if( typeof name === "string" ) {
-        return System.environmentMap[name] || null;
-    }
-    return Object.merge({},System.environmentMap);
-}
-
-
 /**
  * 根据指定的类名获取类的对象
  * @param name

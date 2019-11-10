@@ -220,7 +220,9 @@ function builder(config, localModules,  replacements )
     const webroot_dir = utils.getBuildPath(config,"build.webroot");
     const index_path = path.join(webroot_dir,"index.js");
     replacements.BOOTSTRAP_FILE_BUILD_PATH = path.join(bootstrap_dir, replacements.BOOTSTRAP_CLASS_FILE_NAME );
-    replacements.ROOT_PATH = path.relative( bootstrap_dir, app_dir );
+    replacements.ROOT_PATH = path.relative( bootstrap_dir, app_dir ).replace(/\\/g,'/');
+    replacements.WEBROOT_PATH = path.relative( bootstrap_dir, webroot_dir ).replace(/\\/g,'/');
+
 
     //生成引导文件
     var content = utils.getContents( path.join(rootPath,"bootstrap.js") );
@@ -255,8 +257,9 @@ function replaceContent(content, data, config)
         switch ( b )
         {
             case "SERVICE_ROUTE_LIST" :
-                return makeServiceRouteList( data["SERVICE_ROUTE_LIST"]||{});
-            break;
+                return makeServiceRouteList(data["SERVICE_ROUTE_LIST"]||{});
+            case "VIEW_ROUTE_LIST" :
+                return makeServiceRouteList(data["VIEW_ROUTE_LIST"]||{});
         }
         return typeof data[ b ] !== "undefined" ? data[ b ] : "null";
     });
@@ -268,14 +271,14 @@ function makeServiceRouteList( serviceRouteList )
     var items = {};
     utils.forEach(serviceRouteList,function (item) {
         var obj = items[ item.method ] || (items[ item.method ] = []);
-        obj.push("\t\t'"+item.alias+"':'"+item.provider+"'");
+        obj.push("\t\t\t'"+item.alias+"':'"+item.provider+"'");
     });
 
     var bind=[];
     utils.forEach(items,function (item,method) {
-        bind.push( "\n\t'"+method+"':{\n"+item.join(",\n")+'\n\t}' );
+        bind.push( "\n\t\t'"+method+"':{\n"+item.join(",\n")+'\n\t\t}' );
     });
-    return '{' + bind.join(",") +'\n}';
+    return '{' + bind.join(",") +'\n\t}';
 }
 
 module.exports = builder;

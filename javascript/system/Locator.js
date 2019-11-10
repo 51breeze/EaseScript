@@ -141,7 +141,7 @@ Locator.toUrl=function toUrl( urlSegments )
             query+="#"+urlSegments.fragment.join("#");
         }
     }
-    return (urlSegments.scheme||"http")+"://"+urlSegments.host
+    return (urlSegments.scheme||location.protocol||"http")+"://"+(urlSegments.host||location.hostname)
         +(urlSegments.port ? ":"+urlSegments.port : "")
         +( urlSegments.path && urlSegments.path.length>0? "/"+urlSegments.path.join("/") : "" )
         +(query?"?"+query:"");
@@ -155,10 +155,11 @@ var cached={};
  * @param name 返回指定的段名部分
  * @return {}
  */
-Locator.create=function create(url,name){
+Locator.create=function create(url,name)
+{
     if( typeof url !== "string" )return false;
     url = System.trim(url);
-    if( !/^(https?|file)\:\/\//i.test(url) )
+    if( !/^(https?|file|ftp|udp|tcp)\:\/\//i.test(url) )
     {
         var http = location.protocol+"//"+location.hostname+(location.port ? ":"+location.port : "");
         url = url.charAt(0) === "/" || url.charAt(0) === "?" ? http+url : http+"/"+url;
@@ -167,45 +168,79 @@ Locator.create=function create(url,name){
     var segments = cached[ url ];
     if( !segments )
     {
-        var match= url.match(/^((https?)\:\/\/)([\w\.\-]+)(\:(\d+))?(((\/([a-zA-Z]+[\w+](\.[a-zA-Z]+[\w+])?)*)+)?(\?(&?\w+\=?[^&#=]*)+)?(#[\w\,\|\-\+]*)?)?$/i);
-        if( !match && /^file\:\/\//i.test(url) )
-        {
-            match= url.match(/^((file)\:\/\/\/)([a-zA-Z]+\:)(\:(\d+))?(((\/([a-zA-Z]+[\w+](\.[a-zA-Z]+[\w+])?)*)+)?(\?(&?\w+\=?[^&#=]*)+)?(#[\w\,\|\-\+]*)?)?$/i);
-        }
+        segments= cached[ url ] = {};
 
-        if( !match )return null;
-        segments={
-            "host":match[3],
-            "origin":match[2]+"://"+match[3]+(match[5]?":"+match[5]:""),
-            "scheme":match[2],
-            "port":match[5]||"",
-            "uri":match[6],
-            "url":url,
-            "path":[],
-            "query":{},
-            "fragment":[]
-        }
+        var pos = url.indexOf(":");
+        segments.scheme = pos > 0 && pos < 6 ? url.slice(0,pos).toLowerCase() : null;
+        segments.url = url;
 
-        var info = segments.uri.split("?",2);
-        var path = info[0].substr(1);
-        segments.path = path.split("/");
-        if( info[1] )
+        url = url.slice(pos+1).replace(/^\/+/g,'');
+        pos = url.indexOf( segments.scheme==="file" ? ":" : "/");
+
+        segments.host = pos > 0 ? url.slice( 0, pos ) : null;
+        segments.uri  = (pos > 0 ? url.slice( segments.scheme==="file" ? pos+1 : pos ) : url).replace(/^\/\//g,'/');
+        segments.path = segments.uri;
+        segments.fragment=[];
+        segments.query = {};
+        url = segments.uri;
+       
+        if( segments.host && segments.host.indexOf("@") > 0 )
         {
-            var query=info[1];
-            query = query.replace(/#([\w\,\|\-\+]+)$/g, function (a, b) {
-                if (b) segments.fragment.push(b);
-                return "";
-            });
-            query = query.split("&");
-            for (var i in query) {
-                var item = query[i].split("=");
-                segments.query[System.trim(item[0])] = window.decodeURIComponent(System.trim(item[1]));
+            var info = segments.host.split("@",2);
+            if( info[0] )
+            {
+                var userinfo = info[0].split(":",2);
+                segments.username = userinfo[0];
+                segments.password = userinfo[1];
+            }
+
+            if( info[1] )
+            {
+               segments.host = info[1];
             }
         }
-        cached[ url ] = segments;
+      
+        var query = null;
+        pos = url.indexOf("?");
+        if( pos >=0 )
+        {
+            segments.path = url.slice(0, pos);
+            url = url.slice( pos+1 );
+            query = url;
+        }
+
+        if( segments.path )
+        {
+            var path = segments.path.replace(/^\/+|\/+$/g,"");
+            segments.path = path ? path.split("/") : [];
+        }
+
+        pos = url.indexOf("#");
+        if( pos >= 0 )
+        {
+            if( query )
+            {
+                query = url.slice(0,pos)
+            }
+            url = url.slice(pos+1);
+            if( url ){
+                segments.fragment = url.split("#");
+            }
+        }
+        
+        if( query )
+        {
+            query = query.split("&");
+            for(var i=0;i<query.length;i++)
+            {
+                var item = query[i].split("=",2);
+                segments.query[ System.trim(item[0]) ] = item.length > 1 ? window.decodeURIComponent( item[1] ) : "";
+            }
+        }
     }
     return name ? segments[name] : segments;
 }
+
 
 /**
  * 返回一个匹配的路由服务提供者
