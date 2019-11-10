@@ -104,7 +104,7 @@ module.exports=function createRouter( factory , staticAsset )
 
                 }catch(e)
                 {
-                    console.log( e );
+                    console.log( "Error:"+ e.message );
                     staticAsset(req, res, "error.html", e);
                 }
             });
@@ -121,7 +121,6 @@ module.exports=function createRouter( factory , staticAsset )
                     {
                         res.status(200);
                         res.sendFile( file );
-                        res.end();
 
                     }else if( staticAsset )
                     {
@@ -131,7 +130,7 @@ module.exports=function createRouter( factory , staticAsset )
                     }  
                 }catch(e)
                 {
-                    console.log( e );
+                    console.log( "Error:"+ e.message );
                     staticAsset(req, res, "error.html", e);
                 }
             });
