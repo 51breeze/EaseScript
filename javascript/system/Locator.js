@@ -183,7 +183,7 @@ Locator.create=function create(url,name)
         segments.fragment=[];
         segments.query = {};
         url = segments.uri;
-       
+
         if( segments.host && segments.host.indexOf("@") > 0 )
         {
             var info = segments.host.split("@",2);
@@ -197,6 +197,17 @@ Locator.create=function create(url,name)
             if( info[1] )
             {
                segments.host = info[1];
+            }
+        }
+
+        if( segments.host && segments.host.indexOf(":") > 0 )
+        {
+            var hostinfo = segments.host.split(":");
+            if( hostinfo[0] ){
+               segments.host = hostinfo[0];
+            }
+            if( hostinfo[1] ){
+                segments.port = hostinfo[1];
             }
         }
       
@@ -266,6 +277,7 @@ Locator.match = function match( name )
     }
 
     var routes = System.environments("HTTP_ROUTES");
+    
     for(var method in routes)
     {
         var route = routes[method];

@@ -7,24 +7,12 @@
 package es.components
 {
     import es.core.SkinComponent;
-    import es.skins.EditableSkin;
 
     public class Editable extends SkinComponent
     {
         public function Editable()
         {
             super();
-        }
-
-        /**
-         * 获取皮肤类
-         * @returns Class
-         */
-        override public function get skinClass():Class
-        {
-            var value:Class=super.skinClass;
-            if( value===null )return EditableSkin;
-            return value;
         }
 
         /**

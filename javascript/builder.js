@@ -269,7 +269,7 @@ function makeServiceRouteList( serviceRouteList )
     utils.forEach(serviceRouteList,function (item) {
         var obj = items[ item.method ] || (items[ item.method ] = []);
         var name = item.alias;
-        obj.push("\t\t\""+name.replace(/^\//,'').toLowerCase()+"\":\""+item.provider+"\"");
+        obj.push("\t\t\""+name+"\":\""+item.provider+"\"");
     });
 
     var bind=[];
@@ -669,6 +669,11 @@ class Builder
     static routerListToJsonString( routerObject )
     {
         return makeServiceRouteList( routerObject );
+    }
+
+    static getServiceRoutes( modules )
+    {
+        return Compile.getServiceRoutes( modules );
     }
    
     static makeStyleContentAssets(config, content, context )

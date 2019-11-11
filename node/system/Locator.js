@@ -202,6 +202,17 @@ Locator.create=function create(url,name)
                segments.host = info[1];
             }
         }
+
+        if( segments.host && segments.host.indexOf(":") > 0 )
+        {
+            var hostinfo = segments.host.split(":");
+            if( hostinfo[0] ){
+               segments.host = hostinfo[0];
+            }
+            if( hostinfo[1] ){
+                segments.port = hostinfo[1];
+            }
+        }
       
         var query = null;
         pos = url.indexOf("?");

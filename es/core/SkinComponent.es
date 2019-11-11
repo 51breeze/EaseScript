@@ -748,8 +748,8 @@ package es.core
                     var item:Object= listener[index] as Object;
                     skin.removeEventListener(type, item.callback);
                     skin.addEventListener(type, item.callback, item.useCapture, item.priority, item.reference);
-                    super.removeEventListener(type, item.callback);
                 }
+
             },this);
 
             if( _parent )

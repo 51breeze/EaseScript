@@ -281,4 +281,5 @@ function makeServiceRouteList( serviceRouteList )
     return '{' + bind.join(",") +'\n\t}';
 }
 
+builder.output=outputFiles;
 module.exports = builder;
