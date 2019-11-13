@@ -54,6 +54,11 @@ function setProperty(object, prop, newValue )
 
     }else if( object instanceof Element )
     {
+        if( prop ==="content" )
+        {
+            prop="text";
+        }
+        
         if( typeof object[prop] === "function" )
         {
             object[prop]( newValue );
