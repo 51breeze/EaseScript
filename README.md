@@ -54,6 +54,9 @@
 ## 语法格式，看看是不是很期待~
 
 ``` js
+
+./project/src/Welcome.es
+
 //这里是设置命名空间，当前是在根目录下没有命名空间
 //命名空间名必须与文件目录名一致
 package
@@ -61,11 +64,12 @@ package
    import es.core.Application;
    import es.core.View;
    import es.core.Display;
+   import WelcomeView;
 
    //指定路由默认进到的页面。当然也可以不指定,默认会找 index 如果不存在会把第一个类成员方法当成入口
    //所有的入口页必须为 public。
    //这样来标记路由页面入口是不是会优雅很多~，不用再为了一个配置文件而优伤了^v^
-   [Router(default=home)]
+   [Router(default=index)]
 
    //入口模块必须要继承 Application 类
    public class Welcome extends Application 
@@ -74,6 +78,14 @@ package
        {
            super();
        }
+
+       [Router(method="get")]
+       public index()
+       {
+           var view:WelcomeView = new WelcomeView( this );
+           this.render( view );
+       }
+
 
        //默认入口页面，类成员 function 可以省略 
        public home()
@@ -104,77 +116,164 @@ package
 
 ``` html
 
-1、视图
-
-./project/src/view/Welcome.html
+./project/src/WelcomeView.html
 
 <?xml version="1.0" encoding="UTF-8"?>
-<s:View xmlns:s="es.core"  xmlns:c="es.components" xmlns:ss="@">
+<s:View xmlns:s="es.core"  xmlns:c="es.components" xmlns:g="@">
     <s:Metadata>[HostComponent("Welcome")]</s:Metadata>
     <![CDATA[
-        import es.core.Display;
-         public get child():Array
+         import es.core.Display;
+         import es.components.PopUp;
+        
+         private click(e:Event)
          {
-            return  [
-                new Display( new Element(Element.createElement("div")),  {jjj:999,innerHTML:"=======createElement======="} ),
-                new Display( new Element(Element.createElement("div")),  {jjj:7777,innerHTML:"<span style='color:red;'>=======createElement===66666666====</span>"} )
-            ]; 
+             PopUp.title("on click grid");
+
          }
-         private click()
+
+         private showTips(){
+
+            PopUp.confirm("Are you ok?", (e:String)=>{
+
+                this.answer.innerHTML = e==="submit" ? "很好" : "一般"
+
+            },{profile:{
+                submitText:"很好",
+                cancelText:"一般",
+                titleText:"向您问候",
+            }});
+         }
+
+         private change( name:String ){
+             this.currentState = name;
+         }
+
+         protected reset()
          {
-             console.log("=====");
+            this.inputValue = "";
          }
+
+         protected apply()
+         {
+             //提交属性，并刷新当前元素
+             this.assign("message", inputValue);
+         }
+
+         //绑定属性到指定的对象
+         [Bindable]
+         public var inputValue:String="";
     ]]>
 
+    <!--网页的标题 -->
     <head>
-        <title>{this.title}</title>
+        <title>welcome use easescript</title>
     </head>
 
+    <!--定义一组状态，所有指定包函在状态组件的才会渲染并显示 -->
     <s:states>
        <s:State name="show" stateGroup="fail,success"></s:State>
-       <s:State name="hide" stateGroup="hide"></s:State>
+       <s:State name="grid" stateGroup="grid"></s:State>
+       <s:State name="none"></s:State>
+       <s:State name="text"></s:State>
     </s:states>
 
+    <!--声明一组变量值 -->
     <s:Declare>
        const {
-           message:String="title"
+           message:String="title is default"
         } = dataset;
     </s:Declare>
 
-    <s:currentState>hide</s:currentState>
+    <!--定义当前状态为 show ，来控制指了状态机的所有元素，当前匹配的是 show 、fail 、 success 的状态  -->
+    <s:currentState>none</s:currentState>
+
+    <style>
+        h1{
+            size: 24px;
+            margin-top: 30px;
+            text-align: center;
+        }
+        .title-list{
+            text-align: center;
+        }
+        .title-list > a{
+            padding: 12px;
+            margin: 0px 8px;
+            text-align: center;
+            cursor: pointer;
+        }
+    </style>
+
+   <!-- 提倡样式分开写  -->
+   <!-- <style file="./style.less" ></style> -->
 
     <h1>Welcome use EaseScript</h1>
 
-    <span>点我，弹个框看看</span>
- 
-    <c:PopUp title="弹框组件" includeIn="show">
-        <div>这里是内容</div>
-    </c:PopUp>
-
     <!--这只是一个普的元素容器，不能在组件中传递 -->
-    <div>
+    <div style="width: 80%; margin: 0px auto; margin-top: 50px;">
 
-         <!--dataset 是一个数据集，所有从组件中传过来的数据-->
-        <h1>the value in dataset.message, {dataset.message}</h1>
-
-        <!--message 是从dataset中提取的变量 -->
-        <h1>the title {message}</h1>
-
-        <!--这是显示对象（Display）容器元素, 可以在组件中传递-->
+        <!--这是显示对象（Display）容器元素, 可以在组件中传递。Display, 只能设置在此对象上公开的属性，不能直接设置 style 或者 class , 如果需要可以继承来实现 -->
         <s:Container>
-            <div>子元素一</div>
-            <div>子元素二</div>
+            <div style="margin: 15px;" class="title-list">
+                <a onclick="{this.change.bind(this,'show')}">弹框组件</a>
+                <a onclick="{this.change.bind(this,'grid')}">表格组件</a>
+                <a onclick="{this.change.bind(this,'text')}">双向绑定和变量</a>
+                <a onclick="{this.change.bind(this,'none')}">重置状态</a>
+            </div>
         </s:Container>
+       
+        <!--这是一个组件，是否需要渲染在当前DOM受状态机控制，如果需要去掉 includeIn 即可 -->
+        <!--弹框组件是直接渲染在 body 中，所以放在哪个位置都一样。如果要实现这样的功能只需要在组件中设置 owner 即可 -->
+        <c:PopUp title="弹框组件" includeIn="show">
+           
+            <p style="text-align: center;">
+                <div>这里是弹框内容</div>
+            </p>
+            <p style="text-align: center;">
+                <a style="cursor: pointer;" onClick="{showTips}">点我，再来一个问候</a>
+            </p>
+            <p style="text-align: center;">
+                <div>
+                    您选择的结果是? 
+                    <!-- id="@answer" 是在本类中声明此属性，在其它组件可以直接引用 -->
+                    <span style="color: red;margin: 0px 12px;" id="@answer"></span>
+                </div>
+            </p>
+
+        </c:PopUp>
+
+        <div includeIn="text" style="text-align: center;margin: 15px auto;" >
+
+            <!-- 这两输入框的数据联动 [Bindable] 就是一个中间的驱动者，它是属性于元类型，元类型主要是告诉编译器，这部分应该怎么做。 -->
+            <!-- inputValue 是本类中的属性成员， 在此属性上使用了元类型  [Bindable]， 就可以实现数据的双向绑定 -->
+            <input value="{{inputValue}}" placeholder="在里输入,看下面会发生什么" />
+            <br />
+            <br />
+            <input value="{{inputValue}}" placeholder="在里输入,看上面会发生什么" />
+            <br />
+            <br />
+
+            <button onclick="{reset}">清空</button>
+            <button onclick="{apply}">提交并刷新</button>
+
+            <!--dataset 是一个数据集，所有从组件中传过来的数据-->
+            <!--message 是从dataset中提取的变量 -->
+            <h3>
+                <span style="color: red;">{message}</span>
+            </h3>
+
+        </div>
+    
     
         <!-- id 直接声明的公开属性名为 dataGrid 在其它组件中可以直接引用 -->
         <!-- includeIn 当前所在的状态组件，如果当前状态为 show 则显示，否则不显示 -->
         <!-- onClick 为当前组件添加的 click 事件 -->
         <c:DataGrid 
-        id="@dataGrid"  
-        includeIn="success" 
-        onClick="{click}">
+            id="@dataGrid"  
+            includeIn="grid" 
+            onClick="{click}">
 
-            <!-- 这里是使用数据源自动加载数据 -->
+            <!-- 这里是使用数据源自动加载数据  -->
             <!-- <c:source>http://local.working.com/json.php</c:source>
             <c:dataSource>
                 <c:dataType>@Http.TYPE_JSONP</c:dataType>
@@ -182,23 +281,23 @@ package
 
             <!-- 这里是配置的配置数据源 -->
             <c:source>
-                <ss:Array>
-                    <ss:Object>
+                <g:Array>
+                    <g:Object>
                         <id>1</id>
                         <name>张三</name>
                         <phone>15302662598</phone>
-                    </ss:Object>
-                    <ss:Object>
+                    </g:Object>
+                    <g:Object>
                         <id>2</id>
                         <name>李四</name>
                         <phone>1869875696</phone>
-                    </ss:Object>
-                     <ss:Object>
+                    </g:Object>
+                     <g:Object>
                         <id>2</id>
                         <name>王五</name>
                         <phone>1896325987</phone>
-                    </ss:Object>
-                </ss:Array>
+                    </g:Object>
+                </g:Array>
             </c:source>
 
             <!-- 数据源对列的关系名 -->
