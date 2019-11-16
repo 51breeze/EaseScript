@@ -221,6 +221,7 @@ package es.components.popup
             //使用排列位置
             SystemManage.getWindow().addEventListener( Event.RESIZE, this.position, false, 0, this);
             this.getContainer().addEventListener(ElementEvent.ADD, this.position,false, 0, this);
+            skin.addEventListener( SkinEvent.UPDATE_DISPLAY_LIST, this.position ,false,0, this);
 
             var main:Container = this.getContainer();
             var opt:Object = this.option;
@@ -384,13 +385,13 @@ package es.components.popup
                 var old:Skin = this.skin;
                 if( skinObj !== old )
                 {
+                    if( old )
+                    {
+                        old.removeEventListener( SkinEvent.UPDATE_DISPLAY_LIST, this.position);
+                    }
+                    skinObj.addEventListener( SkinEvent.UPDATE_DISPLAY_LIST,this.position ,false,0, this);
                     if( this.state  )
                     {
-                        var callback:Function = function(e:SkinEvent){
-                            this.position();
-                            this.removeEventListener( SkinEvent.UPDATE_DISPLAY_LIST , callback);
-                        };
-                        skinObj.addEventListener( SkinEvent.UPDATE_DISPLAY_LIST,callback ,false,0, this);
                         super.skin = skinObj;
                         this.setProfile(); 
 

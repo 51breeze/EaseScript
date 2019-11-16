@@ -43,22 +43,18 @@
         override protected updateDisplayList()
         {
             super.updateDisplayList();
+            var h:uint = this.popupContainer.height;
+            var stateGroup:State = this.getCurrentStateGroup();
+            if( !stateGroup.includeIn("tips") )
+            {
+                h-=head.height;
+            }
 
-            //if( hasSetHeight )
-            //{
-                var h:uint = this.popupContainer.height;
-                var stateGroup:State = this.getCurrentStateGroup();
-                if( !stateGroup.includeIn("tips") )
-                {
-                    h-=head.height;
-                }
-
-                if( !stateGroup.includeIn("simple") )
-                {
-                    h-=footer.height;
-                }
-                this.body.height = h;
-            //}
+            if( !stateGroup.includeIn("simple") )
+            {
+                h-=footer.height;
+            }
+            this.body.height = h;
         }
 
     ]]>
