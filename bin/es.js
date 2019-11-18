@@ -33,7 +33,7 @@ program
 .option('-S, --suffix [value]', '源文件的后缀名','.es')
 .option('-b, --bootstrap [file|dir]', '指定需要编译的文件或者一个目录')
 .option('-t, --theme [default,blue,...]', '指定使用的主题颜色')
-.option('--tfp, --theme-file-path [project_path/theme]', '指定主题配置文件的目录,默认为当前工程目录,每一个配置文件名必须与主题名一致',"./theme")
+.option('--tfp, --theme-file-path [project_path/theme]', '指定主题配置文件的目录,默认为当前工程目录,每一个配置文件名必须与主题名一致')
 .option('-r, --reserved [keyword1,keyword2,...]', '指定需要保护的关键字', function (val) {
     return val.split(',');
 })
@@ -65,6 +65,8 @@ program
 .option('--font [enable|disabled]', '是否需要启用CSS字体库',"enable")
 .option('--strict-type [enable|disabled]', '启用强类型模式,对于声明的变量、属性、函数的返回值必须指定类型',"enable")
 
+.option('--type-check', '在运行时检查参数类型(会增加编译后的文件体积)')
+.option('--error-debug', '针对javascript在程序中抛错时添加当前源码的位置信息')
 .option('--clean', '清除编译配置文件,并重新生成')
 .option('--debug', '是否需要开启调试')
 .option('--block-scope', '是否需要启用块级域')
@@ -107,6 +109,8 @@ var mapKeys={
     "command_switch":"commandSwitch",
     "mode":"mode",
     "clean":"clean",
+    "runtime_type_check":"typeCheck",
+    "runtime_error_debug":"errorDebug",
     "syntax":"syntax",
     "build_mode":"buildMode",
     "script_part_load":"chunk",

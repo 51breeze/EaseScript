@@ -47,6 +47,16 @@ function polyfill( config )
     return items;
 }
 
+const excludeSystemErrorFile = {
+    "Error":true,
+    "SyntaxError":true,
+    "ReferenceError":true,
+    "URIError":true,
+    "TypeError":true,
+    "EvalError":true,
+    "RangeError":true,
+};
+
 
 /**
  * 获取指定的文件模块
@@ -85,12 +95,17 @@ function include(contents, name , filepath, fix, libs, config )
     {     
         var dependencies = [];
         str += utils.getContents( filepath );
-        str = str.replace(/\=\s*require\s*\(\s*([\"\'])(.*?)\1\s*\)/g,function(a,b,c){
+        str = str.replace(/\bvar\s+(\w+)\s*\=\s*require\s*\(\s*([\"\'])([^\2]*?)\2\s*\)\s*\;?/g,function(a,b,d,c){
 
              var info = path.parse(c);
+             if( !config.runtime_error_debug && excludeSystemErrorFile.hasOwnProperty(info.name) )
+             {
+                 return '';
+             }
+
              include(contents, info.name , null, fix, libs, config );
              dependencies.push( info.name );
-             return '=require("'+utils.getRequireIdentifier( config, config.globals[ info.name ] || {type:info.name}, '.js' )+'")';
+             return 'var '+b+' =require("'+utils.getRequireIdentifier( config, config.globals[ info.name ] || {type:info.name}, '.js' )+'");';
         });
 
         if( name ==="Internal" )
