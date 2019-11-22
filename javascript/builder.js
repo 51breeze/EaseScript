@@ -31,12 +31,12 @@ function polyfill( config )
     var items={};
     for(var i in files )
     {
-        var is=true;
         var path = rootPath + '/fix/' + files[i];
         var info = utils.getFilenameByPath(path).split('-', 3);
+        var is =  false;
         if( config.compat_version && typeof config.compat_version === 'object' && config.compat_version.hasOwnProperty( info[1] ) )
         {
-            is = info[2].toLowerCase()==="all" || parseFloat( info[2] ) >= parseFloat( config.compat_version[ info[1] ] );
+            is = info[2].toLowerCase()==="all" || config.compat_version[ info[1] ] ==="*" || parseFloat( info[2] ) >= parseFloat( config.compat_version[ info[1] ] );
         }
         if(is)
         {
@@ -65,6 +65,12 @@ const excludeSystemErrorFile = {
 function include(contents, name , filepath, fix, libs, config )
 {
     name = utils.getGlobalTypeMap(name)
+
+    if( !config.runtime_error_debug && excludeSystemErrorFile.hasOwnProperty(name) )
+    {
+        return;
+    }
+    
     if( makedSystemModules[ name ] )
     {
         contents[ name ] = makedSystemModules[ name ];
@@ -105,7 +111,7 @@ function include(contents, name , filepath, fix, libs, config )
 
              include(contents, info.name , null, fix, libs, config );
              dependencies.push( info.name );
-             return 'var '+b+' =require("'+utils.getRequireIdentifier( config, config.globals[ info.name ] || {type:info.name}, '.js' )+'");';
+             return 'var '+b+' =require("'+utils.getRequireIdentifier( config, config.globals[ info.name ] || {type:info.name}, 'javascript' )+'");';
         });
 
         if( name ==="Internal" )
@@ -131,6 +137,7 @@ function include(contents, name , filepath, fix, libs, config )
         makedSystemModules[ name ].content = str;
         makedSystemModules[ name ].path = filepath;
         makedSystemModules[ name ].deps = dependencies;
+        makedSystemModules[ name ].type = name;
         contents[ name ]=makedSystemModules[ name ];
         return true;
 
@@ -216,7 +223,7 @@ function replaceContent(content, data, config)
                     type:requireex[1]
                 };
             }
-            return utils.getRequireIdentifier(config, m || {type:requireex[1]} , m ? '.js' : '.es' )
+            return utils.getRequireIdentifier(config, m || {type:requireex[1]} ,  "javascript" )
         }
 
         switch ( b )
@@ -306,15 +313,15 @@ function buildModuleToJsonString(config, modules)
     {
         return loadSystemModuleContentByName(config, name);
     }
-    const getModuleIdentifier=function( module, suffix )
+    const getModuleIdentifier=function( module )
     {
-        return utils.getRequireIdentifier(config, module, suffix );
+        return utils.getRequireIdentifier(config, module, "javascript" );
     }
     const make = function( modules )
     {
         return modules.map(function (e) 
         {
-            var name = getModuleIdentifier(e, e.nonglobal ? '.es' : '.js');
+            var name = getModuleIdentifier(e);
             if( loaded[ name ] ){
                 return null;
             }
@@ -876,15 +883,6 @@ class Builder
         const config = this._config;
         const result = [];
         const hash   ={};
-        const requirements = utils.globals.concat(["Internal",'System','Locator','Event']);
-        requirements.forEach( (name)=>{
-            var module = Maker.getLoaclAndGlobalModuleDescription( name ) || {type:'Internal'};
-            if( result.indexOf( module ) < 0 )
-            {
-                result.push( module );
-            }
-        });
-
         enterModules.forEach( ({module,dependencies})=>{
             Compile.getAllModules( module, result, hash, 'javascript' )
             dependencies.forEach( ( module )=>Compile.getAllModules( module, result, hash, 'javascript' ) )
@@ -910,7 +908,7 @@ class Builder
 
                 if( config.source_file )
                 {
-                    outputFiles( config, dependencies,  config.module_suffix );
+                    outputFiles( config, dependencies,  config.module_suffix || ".js" );
                 }
 
                 new Promise((resovle, reject) =>{
@@ -922,7 +920,7 @@ class Builder
                         enterModules.forEach( ({module})=>{
                             if( module.isApplication )
                             {
-                                const identifier = utils.getRequireIdentifier(config, module, '.es');
+                                const identifier = utils.getRequireIdentifier(config, module, "javascript" );
                                 const output = this.outputMap.get( module ) || [];
                                 const script = output.filter( (item)=>{ return item.suffix ===".js" });
                                 const css = output.filter( (item)=>{ return item.suffix ===".css" });
@@ -1050,17 +1048,52 @@ class Builder
 
     runtime(config, bootstrap, modules, routes, requirements)
     {
+        const isApp = bootstrap && bootstrap.isApplication;
+        const runTemplate = !isApp ? rootPath+'/runtime.js' : rootPath+'/bootstrap.js';
+        modules = modules.slice(0);
+
+        var runtimeCode = utils.getContents( runTemplate );
+        runtimeCode = runtimeCode.replace(/\[CODE\[REQUIRE_IDENTIFIER\((\w+?)\)\]\]/ig, function (a, b) {
+            const module = loadSystemModuleContentByName( config, b);
+            modules.push( module );
+            return utils.getRequireIdentifier(config, module, "javascript");
+        });
+
+        if( !isApp )
+        {
+            const identifier = utils.getRequireIdentifier( config, bootstrap,"javascript");
+            return replaceContent( runtimeCode , {
+                "BOOTSTRAP_CLASS":identifier,
+                "MODULES":buildModuleToJsonString(config, modules)
+            });
+        }
+
         const workspace = path.relative( config.project.path, config.workspace ).replace(/\\/g,'/').replace(/\.\.\//g,'').replace(/^\/|\/$/g,'');
         const js_load_path = path.relative( utils.getBuildPath(config, 'build.webroot') , utils.getBuildPath(config, 'build.js') ).replace(/\\/g,"/").replace(/^[\/\.]+/g,'');
         const css_load_path = path.relative( utils.getBuildPath(config, 'build.webroot') , utils.getBuildPath(config, 'build.css') ).replace(/\\/g,"/").replace(/^[\/\.]+/g,'');
-        const runTemplate = rootPath+'/bootstrap.js';
+       
         var router_provider = bootstrap && bootstrap.defineMetaTypeList && bootstrap.defineMetaTypeList.Router ? bootstrap.fullclassname + "@" + bootstrap.defineMetaTypeList.Router.param.default : null
         if( !router_provider && bootstrap )
         {
             router_provider = bootstrap.fullclassname;
         }
+        
+        var suffix = config.suffix;
+        if( config.syntax === "node" || config.syntax === "javascript" )
+        {
+            suffix = ".js";
+        }
+        else if( config.syntax==="php")
+        {
+            suffix = ".php"; 
+        }
+    
+        if( config.module_suffix )
+        {
+            suffix = config.module_suffix;
+        }
 
-        return replaceContent( utils.getContents( runTemplate ) , {
+        return replaceContent( runtimeCode , {
             "namespace": '',
             "MODULES":buildModuleToJsonString(config, modules),
             "MODE":config.mode,
@@ -1069,7 +1102,7 @@ class Builder
             "JS_LOAD_PATH":js_load_path,
             "CSS_LOAD_PATH":css_load_path,
             "NAMESPACE_HASH_MAP": '',
-            "MODULE_SUFFIX":config.suffix,
+            "MODULE_SUFFIX":suffix,
             "WORKSPACE":workspace ? workspace+'/' : '',
             "SERVICE_ROUTE_LIST": routes,
             "BOOTSTRAP_CLASS_FILE_NAME": bootstrap && bootstrap.fullclassname,
@@ -1087,7 +1120,7 @@ class Builder
 
     chunk(config, module, modules)
     {
-        const identifier  = utils.getRequireIdentifier(config, module, '.es');      
+        const identifier  = utils.getRequireIdentifier(config, module, 'javascript');      
         return replaceContent(utils.getContents( rootPath+'/chunk.js' ), {
             "MODULES":buildModuleToJsonString(config, modules ),
             "MODE":config.mode,
