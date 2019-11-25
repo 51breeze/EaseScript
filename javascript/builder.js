@@ -109,6 +109,11 @@ function include(contents, name , filepath, fix, libs, config )
                  return '';
              }
 
+             if( utils.excludeLoadSystemFile( info.name ) )
+             {
+                return '';
+             }
+
              include(contents, info.name , null, fix, libs, config );
              dependencies.push( info.name );
              return 'var '+b+' =require("'+utils.getRequireIdentifier( config, config.globals[ info.name ] || {type:info.name}, 'javascript' )+'");';
@@ -269,7 +274,10 @@ function replaceContent(content, data, config)
 
                if( data.DEFAULT_ROUTER )
                {
-                   html.push(`<script>window["${data.HANDLE}_HTTP_DEFAULT_ROUTE"]="${data.DEFAULT_ROUTER}";</script>`);
+                    html.push(`<script>(function(){
+                        var obj = window["${data.HANDLE}"] || (window["${data.HANDLE}"]={});
+                        (obj.Environments||obj).HTTP_DEFAULT_ROUTE="${data.DEFAULT_ROUTER}";
+                    }());</script>`.replace(/[\s\r\t\n]+/g," "));
                }
 
                return html.join("\n\t");
@@ -853,7 +861,8 @@ class Builder
     getMainPath(outputname,suffix)
     {
         const config = this._config;
-        return path.resolve( utils.getBuildPath(config, `build${suffix}`), outputname + `${suffix}`);
+        const build_path = utils.mkdir( utils.getBuildPath(config, `build${suffix}`) )
+        return path.resolve( build_path, outputname + `${suffix}`);
     }
 
     emit(file, content)
@@ -933,6 +942,7 @@ class Builder
                             }
                         });
 
+                        
                         const scriptContent = this.runtime(config, bootstrap , buildModules, this.routes, requiremnets );
                         this.emit( base, scriptContent );
 
@@ -952,9 +962,11 @@ class Builder
 
                             return;
                         }
-                    }
 
-                    resovle();
+                    }else
+                    {
+                       resovle();
+                    }
         
                 }).then( (content)=>{
         
@@ -976,34 +988,34 @@ class Builder
                                 BASE_STYLE_FILE:content ? utils.getLoadFileRelativePath(config, this.getMainPath('common','.css') ) : null,
                             }))
                         );
-
-                    }else
-                    {
-                        enterModules.forEach( ({module})=>{
-                            if( module.isApplication )
-                            {
-                                const output = this.outputMap.get( module ) || [];
-                                const script = output.filter( (item)=>{ return item.suffix ===".js" });
-                                const css = output.filter( (item)=>{ return item.suffix ===".css" });
-                                const require = output.filter( (item)=>{ return item.require });
-                                this.emit(
-                                    path.resolve( utils.getBuildPath(config, 'build.webroot'), module.classname.toLowerCase()  +'.html' ),
-                                    Builder.getBootstrapView(config,this.getViewOptions(config,{
-                                        VIEW_TITLE:module.classname,
-                                        REQUIREMENTS:require,
-                                        HANDLE:this.id,
-                                        VERSION:config.makeVersion,
-                                        DEFAULT_ROUTER:this.chunkFlag && module.defineMetaTypeList && module.defineMetaTypeList.Router ? module.fullclassname + "@" + module.defineMetaTypeList.Router.param.default : null,
-                                        APP_STYLE_FILE:css[0] ? utils.getLoadFileRelativePath(config, css[0].path ) : null,
-                                        BASE_STYLE_FILE:content ? utils.getLoadFileRelativePath(config, this.getMainPath('common','.css') ) : null,
-                                        BASE_SCRIPT_FILE:this.chunkFlag ? utils.getLoadFileRelativePath(config, base ) : null,
-                                        APP_SCRIPT_FILE:script[0] ? utils.getLoadFileRelativePath(config,script[0].path) : null
-                                    }))
-                                );
-                            }
-                        });
                     }
+                    
+                    enterModules.forEach( ({module})=>{
 
+                        if( module.isApplication )
+                        {
+                            const output = this.outputMap.get( module ) || [];
+                            const script = output.filter( (item)=>{ return item.suffix ===".js" });
+                            const css = output.filter( (item)=>{ return item.suffix ===".css" });
+                            const require = output.filter( (item)=>{ return item.require });
+                            
+                            this.emit(
+                                path.resolve( utils.getBuildPath(config, 'build.webroot'), module.classname.toLowerCase()  +'.html' ),
+                                Builder.getBootstrapView(config,this.getViewOptions(config,{
+                                    VIEW_TITLE:module.classname,
+                                    REQUIREMENTS:require,
+                                    HANDLE:this.id,
+                                    VERSION:config.makeVersion,
+                                    DEFAULT_ROUTER:this.chunkFlag && module.defineMetaTypeList && module.defineMetaTypeList.Router ? module.fullclassname + "@" + module.defineMetaTypeList.Router.param.default : null,
+                                    APP_STYLE_FILE:css[0] ? utils.getLoadFileRelativePath(config, css[0].path ) : null,
+                                    BASE_STYLE_FILE:content ? utils.getLoadFileRelativePath(config, this.getMainPath('common','.css') ) : null,
+                                    BASE_SCRIPT_FILE:this.chunkFlag ? utils.getLoadFileRelativePath(config, base ) : null,
+                                    APP_SCRIPT_FILE:script[0] ? utils.getLoadFileRelativePath(config,script[0].path) : null
+                                }))
+                            );
+                        }
+                    });
+                
                     callback();
 
                 }).catch( callback );
@@ -1059,7 +1071,7 @@ class Builder
             return utils.getRequireIdentifier(config, module, "javascript");
         });
 
-        if( !isApp )
+        if( !isApp && bootstrap )
         {
             const identifier = utils.getRequireIdentifier( config, bootstrap,"javascript");
             return replaceContent( runtimeCode , {
@@ -1079,7 +1091,7 @@ class Builder
         }
         
         var suffix = config.suffix;
-        if( config.syntax === "node" || config.syntax === "javascript" )
+        if( config.syntax === "node" || (config.syntax === "javascript" && !config.build_pack) )
         {
             suffix = ".js";
         }
@@ -1164,7 +1176,7 @@ class Builder
         {
            Object.assign(this.routes,routes);
         }
-       
+
         var buildModules = null;
         var scriptContent = '';
         const deps =  dependencies.concat( module );
@@ -1202,7 +1214,6 @@ class Builder
             {
                 resovle();
             }
-
 
         }).then( (content)=>{
 

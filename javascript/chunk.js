@@ -1,4 +1,4 @@
-(function(id,filename,undefined)
+(function(id,filename)
 {
     "use strict";
     var Load = (window[id] || (window[id]={Load:{}})).Load;

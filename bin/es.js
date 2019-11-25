@@ -77,6 +77,8 @@ program
 .option('--source-file', '是否需要生成源文件')
 .option('--source-map', '生成调试的源码文件')
 .option('--pack', '打包文件')
+.option('--minimal', '使用最小依赖，可以减少打包文件')
+.option('--hash', '所有资源使用哈希命名')
 .option('--init', '初始化配置文件');
 program.parse(process.argv);
 
@@ -118,6 +120,8 @@ var mapKeys={
     "serverEnable":"server",
     "sourceMap":"sourceMap",
     "initConfig":"init",
+    "minimal":"minimal",
+    "assets_hash":"hash",
     "build_pack":"pack"
 }
 
@@ -151,6 +155,7 @@ for( var key in mapKeys )
 
 const compiler = require('../lib/index.js');
 if( config.initConfig ){
+   config.clean = true;
    compiler.createConfigure( config );
 }else{
    compiler.build( config );

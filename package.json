@@ -1,6 +1,6 @@
 {
   "name": "easescript",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "EaseScript",
   "main": "lib/index.js",
   "bin": {
@@ -30,6 +30,7 @@
   "dependencies": {
     "colors": "~1.1.2",
     "commander": "~2.11.0",
+    "less": "^2.7.3",
     "source-map": "^0.7.3",
     "uglify-js": "~3.1.1"
   }
