@@ -8,7 +8,8 @@
     "es": "./bin/es.js"
   },
   "scripts": {
-    "version": "node ./bin/es.js -V"
+    "version": "node ./bin/es.js -V",
+    "dev":"node ./bin/es.js -p ./test -o ./build --clean"
   },
   "repository": {
     "type": "git",
