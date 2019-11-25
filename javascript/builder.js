@@ -31,12 +31,12 @@ function polyfill( config )
     var items={};
     for(var i in files )
     {
-        var is=true;
         var path = rootPath + '/fix/' + files[i];
         var info = utils.getFilenameByPath(path).split('-', 3);
+        var is =  false;
         if( config.compat_version && typeof config.compat_version === 'object' && config.compat_version.hasOwnProperty( info[1] ) )
         {
-            is = info[2].toLowerCase()==="all" || parseFloat( info[2] ) >= parseFloat( config.compat_version[ info[1] ] );
+            is = info[2].toLowerCase()==="all" || config.compat_version[ info[1] ] ==="*" || parseFloat( info[2] ) >= parseFloat( config.compat_version[ info[1] ] );
         }
         if(is)
         {
@@ -47,6 +47,16 @@ function polyfill( config )
     return items;
 }
 
+const excludeSystemErrorFile = {
+    "Error":true,
+    "SyntaxError":true,
+    "ReferenceError":true,
+    "URIError":true,
+    "TypeError":true,
+    "EvalError":true,
+    "RangeError":true,
+};
+
 
 /**
  * 获取指定的文件模块
@@ -55,6 +65,12 @@ function polyfill( config )
 function include(contents, name , filepath, fix, libs, config )
 {
     name = utils.getGlobalTypeMap(name)
+
+    if( !config.runtime_error_debug && excludeSystemErrorFile.hasOwnProperty(name) )
+    {
+        return;
+    }
+    
     if( makedSystemModules[ name ] )
     {
         contents[ name ] = makedSystemModules[ name ];
@@ -85,12 +101,22 @@ function include(contents, name , filepath, fix, libs, config )
     {     
         var dependencies = [];
         str += utils.getContents( filepath );
-        str = str.replace(/\=\s*require\s*\(\s*([\"\'])(.*?)\1\s*\)/g,function(a,b,c){
+        str = str.replace(/\bvar\s+(\w+)\s*\=\s*require\s*\(\s*([\"\'])([^\2]*?)\2\s*\)\s*\;?/g,function(a,b,d,c){
 
              var info = path.parse(c);
+             if( !config.runtime_error_debug && excludeSystemErrorFile.hasOwnProperty(info.name) )
+             {
+                 return '';
+             }
+
+             if( utils.excludeLoadSystemFile( info.name ) )
+             {
+                return '';
+             }
+
              include(contents, info.name , null, fix, libs, config );
              dependencies.push( info.name );
-             return '=require("'+utils.getRequireIdentifier( config, config.globals[ info.name ] || {type:info.name}, '.js' )+'")';
+             return 'var '+b+' =require("'+utils.getRequireIdentifier( config, config.globals[ info.name ] || {type:info.name}, 'javascript' )+'");';
         });
 
         if( name ==="Internal" )
@@ -116,6 +142,7 @@ function include(contents, name , filepath, fix, libs, config )
         makedSystemModules[ name ].content = str;
         makedSystemModules[ name ].path = filepath;
         makedSystemModules[ name ].deps = dependencies;
+        makedSystemModules[ name ].type = name;
         contents[ name ]=makedSystemModules[ name ];
         return true;
 
@@ -201,7 +228,7 @@ function replaceContent(content, data, config)
                     type:requireex[1]
                 };
             }
-            return utils.getRequireIdentifier(config, m || {type:requireex[1]} , m ? '.js' : '.es' )
+            return utils.getRequireIdentifier(config, m || {type:requireex[1]} ,  "javascript" )
         }
 
         switch ( b )
@@ -247,7 +274,10 @@ function replaceContent(content, data, config)
 
                if( data.DEFAULT_ROUTER )
                {
-                   html.push(`<script>window["${data.HANDLE}_HTTP_DEFAULT_ROUTE"]="${data.DEFAULT_ROUTER}";</script>`);
+                    html.push(`<script>(function(){
+                        var obj = window["${data.HANDLE}"] || (window["${data.HANDLE}"]={});
+                        (obj.Environments||obj).HTTP_DEFAULT_ROUTE="${data.DEFAULT_ROUTER}";
+                    }());</script>`.replace(/[\s\r\t\n]+/g," "));
                }
 
                return html.join("\n\t");
@@ -291,15 +321,15 @@ function buildModuleToJsonString(config, modules)
     {
         return loadSystemModuleContentByName(config, name);
     }
-    const getModuleIdentifier=function( module, suffix )
+    const getModuleIdentifier=function( module )
     {
-        return utils.getRequireIdentifier(config, module, suffix );
+        return utils.getRequireIdentifier(config, module, "javascript" );
     }
     const make = function( modules )
     {
         return modules.map(function (e) 
         {
-            var name = getModuleIdentifier(e, e.nonglobal ? '.es' : '.js');
+            var name = getModuleIdentifier(e);
             if( loaded[ name ] ){
                 return null;
             }
@@ -831,7 +861,8 @@ class Builder
     getMainPath(outputname,suffix)
     {
         const config = this._config;
-        return path.resolve( utils.getBuildPath(config, `build${suffix}`), outputname + `${suffix}`);
+        const build_path = utils.mkdir( utils.getBuildPath(config, `build${suffix}`) )
+        return path.resolve( build_path, outputname + `${suffix}`);
     }
 
     emit(file, content)
@@ -861,15 +892,6 @@ class Builder
         const config = this._config;
         const result = [];
         const hash   ={};
-        const requirements = utils.globals.concat(["Internal",'System','Locator','Event']);
-        requirements.forEach( (name)=>{
-            var module = Maker.getLoaclAndGlobalModuleDescription( name ) || {type:'Internal'};
-            if( result.indexOf( module ) < 0 )
-            {
-                result.push( module );
-            }
-        });
-
         enterModules.forEach( ({module,dependencies})=>{
             Compile.getAllModules( module, result, hash, 'javascript' )
             dependencies.forEach( ( module )=>Compile.getAllModules( module, result, hash, 'javascript' ) )
@@ -895,7 +917,7 @@ class Builder
 
                 if( config.source_file )
                 {
-                    outputFiles( config, dependencies,  config.module_suffix );
+                    outputFiles( config, dependencies,  config.module_suffix || ".js" );
                 }
 
                 new Promise((resovle, reject) =>{
@@ -907,7 +929,7 @@ class Builder
                         enterModules.forEach( ({module})=>{
                             if( module.isApplication )
                             {
-                                const identifier = utils.getRequireIdentifier(config, module, '.es');
+                                const identifier = utils.getRequireIdentifier(config, module, "javascript" );
                                 const output = this.outputMap.get( module ) || [];
                                 const script = output.filter( (item)=>{ return item.suffix ===".js" });
                                 const css = output.filter( (item)=>{ return item.suffix ===".css" });
@@ -920,6 +942,7 @@ class Builder
                             }
                         });
 
+                        
                         const scriptContent = this.runtime(config, bootstrap , buildModules, this.routes, requiremnets );
                         this.emit( base, scriptContent );
 
@@ -939,9 +962,11 @@ class Builder
 
                             return;
                         }
-                    }
 
-                    resovle();
+                    }else
+                    {
+                       resovle();
+                    }
         
                 }).then( (content)=>{
         
@@ -963,34 +988,34 @@ class Builder
                                 BASE_STYLE_FILE:content ? utils.getLoadFileRelativePath(config, this.getMainPath('common','.css') ) : null,
                             }))
                         );
-
-                    }else
-                    {
-                        enterModules.forEach( ({module})=>{
-                            if( module.isApplication )
-                            {
-                                const output = this.outputMap.get( module ) || [];
-                                const script = output.filter( (item)=>{ return item.suffix ===".js" });
-                                const css = output.filter( (item)=>{ return item.suffix ===".css" });
-                                const require = output.filter( (item)=>{ return item.require });
-                                this.emit(
-                                    path.resolve( utils.getBuildPath(config, 'build.webroot'), module.classname.toLowerCase()  +'.html' ),
-                                    Builder.getBootstrapView(config,this.getViewOptions(config,{
-                                        VIEW_TITLE:module.classname,
-                                        REQUIREMENTS:require,
-                                        HANDLE:this.id,
-                                        VERSION:config.makeVersion,
-                                        DEFAULT_ROUTER:this.chunkFlag && module.defineMetaTypeList && module.defineMetaTypeList.Router ? module.fullclassname + "@" + module.defineMetaTypeList.Router.param.default : null,
-                                        APP_STYLE_FILE:css[0] ? utils.getLoadFileRelativePath(config, css[0].path ) : null,
-                                        BASE_STYLE_FILE:content ? utils.getLoadFileRelativePath(config, this.getMainPath('common','.css') ) : null,
-                                        BASE_SCRIPT_FILE:this.chunkFlag ? utils.getLoadFileRelativePath(config, base ) : null,
-                                        APP_SCRIPT_FILE:script[0] ? utils.getLoadFileRelativePath(config,script[0].path) : null
-                                    }))
-                                );
-                            }
-                        });
                     }
+                    
+                    enterModules.forEach( ({module})=>{
 
+                        if( module.isApplication )
+                        {
+                            const output = this.outputMap.get( module ) || [];
+                            const script = output.filter( (item)=>{ return item.suffix ===".js" });
+                            const css = output.filter( (item)=>{ return item.suffix ===".css" });
+                            const require = output.filter( (item)=>{ return item.require });
+                            
+                            this.emit(
+                                path.resolve( utils.getBuildPath(config, 'build.webroot'), module.classname.toLowerCase()  +'.html' ),
+                                Builder.getBootstrapView(config,this.getViewOptions(config,{
+                                    VIEW_TITLE:module.classname,
+                                    REQUIREMENTS:require,
+                                    HANDLE:this.id,
+                                    VERSION:config.makeVersion,
+                                    DEFAULT_ROUTER:this.chunkFlag && module.defineMetaTypeList && module.defineMetaTypeList.Router ? module.fullclassname + "@" + module.defineMetaTypeList.Router.param.default : null,
+                                    APP_STYLE_FILE:css[0] ? utils.getLoadFileRelativePath(config, css[0].path ) : null,
+                                    BASE_STYLE_FILE:content ? utils.getLoadFileRelativePath(config, this.getMainPath('common','.css') ) : null,
+                                    BASE_SCRIPT_FILE:this.chunkFlag ? utils.getLoadFileRelativePath(config, base ) : null,
+                                    APP_SCRIPT_FILE:script[0] ? utils.getLoadFileRelativePath(config,script[0].path) : null
+                                }))
+                            );
+                        }
+                    });
+                
                     callback();
 
                 }).catch( callback );
@@ -1035,17 +1060,52 @@ class Builder
 
     runtime(config, bootstrap, modules, routes, requirements)
     {
+        const isApp = bootstrap && bootstrap.isApplication;
+        const runTemplate = !isApp ? rootPath+'/runtime.js' : rootPath+'/bootstrap.js';
+        modules = modules.slice(0);
+
+        var runtimeCode = utils.getContents( runTemplate );
+        runtimeCode = runtimeCode.replace(/\[CODE\[REQUIRE_IDENTIFIER\((\w+?)\)\]\]/ig, function (a, b) {
+            const module = loadSystemModuleContentByName( config, b);
+            modules.push( module );
+            return utils.getRequireIdentifier(config, module, "javascript");
+        });
+
+        if( !isApp && bootstrap )
+        {
+            const identifier = utils.getRequireIdentifier( config, bootstrap,"javascript");
+            return replaceContent( runtimeCode , {
+                "BOOTSTRAP_CLASS":identifier,
+                "MODULES":buildModuleToJsonString(config, modules)
+            });
+        }
+
         const workspace = path.relative( config.project.path, config.workspace ).replace(/\\/g,'/').replace(/\.\.\//g,'').replace(/^\/|\/$/g,'');
         const js_load_path = path.relative( utils.getBuildPath(config, 'build.webroot') , utils.getBuildPath(config, 'build.js') ).replace(/\\/g,"/").replace(/^[\/\.]+/g,'');
         const css_load_path = path.relative( utils.getBuildPath(config, 'build.webroot') , utils.getBuildPath(config, 'build.css') ).replace(/\\/g,"/").replace(/^[\/\.]+/g,'');
-        const runTemplate = rootPath+'/bootstrap.js';
+       
         var router_provider = bootstrap && bootstrap.defineMetaTypeList && bootstrap.defineMetaTypeList.Router ? bootstrap.fullclassname + "@" + bootstrap.defineMetaTypeList.Router.param.default : null
         if( !router_provider && bootstrap )
         {
             router_provider = bootstrap.fullclassname;
         }
+        
+        var suffix = config.suffix;
+        if( config.syntax === "node" || (config.syntax === "javascript" && !config.build_pack) )
+        {
+            suffix = ".js";
+        }
+        else if( config.syntax==="php")
+        {
+            suffix = ".php"; 
+        }
+    
+        if( config.module_suffix )
+        {
+            suffix = config.module_suffix;
+        }
 
-        return replaceContent( utils.getContents( runTemplate ) , {
+        return replaceContent( runtimeCode , {
             "namespace": '',
             "MODULES":buildModuleToJsonString(config, modules),
             "MODE":config.mode,
@@ -1054,7 +1114,7 @@ class Builder
             "JS_LOAD_PATH":js_load_path,
             "CSS_LOAD_PATH":css_load_path,
             "NAMESPACE_HASH_MAP": '',
-            "MODULE_SUFFIX":config.suffix,
+            "MODULE_SUFFIX":suffix,
             "WORKSPACE":workspace ? workspace+'/' : '',
             "SERVICE_ROUTE_LIST": routes,
             "BOOTSTRAP_CLASS_FILE_NAME": bootstrap && bootstrap.fullclassname,
@@ -1072,7 +1132,7 @@ class Builder
 
     chunk(config, module, modules)
     {
-        const identifier  = utils.getRequireIdentifier(config, module, '.es');      
+        const identifier  = utils.getRequireIdentifier(config, module, 'javascript');      
         return replaceContent(utils.getContents( rootPath+'/chunk.js' ), {
             "MODULES":buildModuleToJsonString(config, modules ),
             "MODE":config.mode,
@@ -1116,7 +1176,7 @@ class Builder
         {
            Object.assign(this.routes,routes);
         }
-       
+
         var buildModules = null;
         var scriptContent = '';
         const deps =  dependencies.concat( module );
@@ -1154,7 +1214,6 @@ class Builder
             {
                 resovle();
             }
-
 
         }).then( (content)=>{
 

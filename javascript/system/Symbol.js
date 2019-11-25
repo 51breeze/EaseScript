@@ -7,7 +7,6 @@
  * @require System,Internal
  */
 var Internal = require("./Internal.js");
-var System = require("./System.js");
 var hasSymbol = !!Internal.$Symbol;
 var _Symbol = Internal.$Symbol || (function()
 {
@@ -99,3 +98,4 @@ var _Symbol = Internal.$Symbol || (function()
 }());
 
 module.exports =_Symbol;
+var System = require("./System.js");

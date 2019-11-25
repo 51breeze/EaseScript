@@ -1,38 +1,4 @@
-(function(definedModules, undefined){
-
-var httpRoutes = [CODE[SERVICE_ROUTE_LIST]];
-
-/**
- * 运行环境相关信息
- */
-var env={
-    "HTTP_DEFAULT_ROUTE":"[CODE[DEFAULT_BOOTSTRAP_ROUTER_PROVIDER]]",
-    "HTTP_ROUTES":httpRoutes,
-    "HTTP_ROUTE_PATH":null,
-    "MODE":[CODE[MODE]],
-    "ORIGIN_SYNTAX":"[CODE[ORIGIN_SYNTAX]]",
-    "URL_PATH_NAME":"[CODE[STATIC_URL_PATH_NAME]]",
-    "HTTP_ROUTE_CONTROLLER":null,
-    "COMMAND_SWITCH":[CODE[COMMAND_SWITCH]],
-    "VERSION":[CODE[VERSION]],
-    "LOAD_JS_PATH":"[CODE[JS_LOAD_PATH]]",
-    "LOAD_CSS_PATH":"[CODE[CSS_LOAD_PATH]]",
-    "WORKSPACE":"[CODE[WORKSPACE]]",
-    "MODULE_SUFFIX":"[CODE[MODULE_SUFFIX]]"
-};
-
-/**
- * 框架信息
- */
-var EaseScript = {
-    "Requirements":[CODE[LOAD_REQUIREMENTS]],
-    "Load":{},
-    "Environments":env
-};
-
-var handle = "[CODE[HANDLE]]";
-EaseScript.Load = (typeof window[ handle ] === "object" &&  window[ handle ].Load) || {};
-window[ handle ]=EaseScript;
+(function(definedModules){
 
 /**
  * 已加载的模块
@@ -70,12 +36,47 @@ require.has=function has( identifier )
 }
 
 var Internal= require("[CODE[REQUIRE_IDENTIFIER(Internal)]]");
-var locator = require("[CODE[REQUIRE_IDENTIFIER(Locator)]]");
+var Locator = require("[CODE[REQUIRE_IDENTIFIER(Locator)]]");
 var Object  = require("[CODE[REQUIRE_IDENTIFIER(Object)]]");
 var System  = require("[CODE[REQUIRE_IDENTIFIER(System)]]");
 var Event   = require("[CODE[REQUIRE_IDENTIFIER(Event)]]");
 var global  = System.getGlobalEvent();
+var httpRoutes = [CODE[SERVICE_ROUTE_LIST]];
+var handle = "[CODE[HANDLE]]";
+var env={
+    "HTTP_DEFAULT_ROUTE":"[CODE[DEFAULT_BOOTSTRAP_ROUTER_PROVIDER]]",
+    "HTTP_ROUTES":httpRoutes,
+    "HTTP_ROUTE_PATH":null,
+    "MODE":[CODE[MODE]],
+    "ORIGIN_SYNTAX":"[CODE[ORIGIN_SYNTAX]]",
+    "URL_PATH_NAME":"[CODE[STATIC_URL_PATH_NAME]]",
+    "HTTP_ROUTE_CONTROLLER":null,
+    "COMMAND_SWITCH":[CODE[COMMAND_SWITCH]],
+    "VERSION":[CODE[VERSION]],
+    "LOAD_JS_PATH":"[CODE[JS_LOAD_PATH]]",
+    "LOAD_CSS_PATH":"[CODE[CSS_LOAD_PATH]]",
+    "WORKSPACE":"[CODE[WORKSPACE]]",
+    "MODULE_SUFFIX":"[CODE[MODULE_SUFFIX]]"
+};
 Object.merge(Internal.env, env);
+var EaseScript = window[ handle ] = {
+    "Requirements":[CODE[LOAD_REQUIREMENTS]],
+    "Load":{},
+    "Environments":env
+};
+
+if( typeof window[ handle ] === "object" )
+{
+    if( window[ handle ].Load )
+    {
+        EaseScript.Load = window[ handle ].Load;
+    }
+    if( window[ handle ].HTTP_DEFAULT_ROUTE )
+    {
+        env.HTTP_DEFAULT_ROUTE =  window[ handle ].HTTP_DEFAULT_ROUTE;
+    }
+}
+
 
 /**
  * 加载指定的脚本文件
@@ -145,7 +146,6 @@ function start(module, method)
     var main = require( module );
     var obj = new main();
     global.dispatchEvent(new Event(Event.INITIALIZING));
-    
     if( method )
     {
         if( typeof obj[method] === "function" )
@@ -155,12 +155,10 @@ function start(module, method)
             throw new ReferenceError( method+" is not exist.");
         }
     }
-
     if (global.hasEventListener(Event.INITIALIZE_COMPLETED)) 
     {
         global.dispatchEvent(new Event(Event.INITIALIZE_COMPLETED));
     }
-    
 }
 
 /**
@@ -197,23 +195,89 @@ function initModule(module)
     }
 }
 
+function match(routes, pathName )
+{
+    if( !routes )
+    {
+        return null;
+    }
+
+    pathName = pathName.replace(/^\/|\/$/g,'');
+    var pathArr = pathName.split('/');
+    for(var p in routes )
+    {
+       var routeName = p.replace(/^\/|\/$/g,'').toLowerCase();
+       var routeArr = routeName.split('/');
+       if( routeArr.length === pathArr.length )
+       {
+           var args = [];
+           var props = [];
+           if( p.indexOf("{") >= 0 )
+           {
+                var index = 0;
+                var len = routeArr.length;
+                while( index < len )
+                {
+                    var name = routeArr[ index ];
+                    if( name.charAt(0) ==="{" && name.charAt(name.length-1) ==="}" )
+                    {
+                       props.push( name.slice(1,-1) )
+                       args.push( pathArr[index] );
+
+                    }else if( name !== pathArr[index].toLowerCase() )
+                    {
+                       break;
+                    }
+                    index++;
+                }
+
+                if( index < len )
+                {
+                    continue;
+                }
+
+           }else if( routeName !== pathName.toLowerCase() )
+           {
+               continue;
+           }
+           return {
+              provider:routes[ p ],
+              props:props,
+              args:args
+           }
+       }
+    }
+    return null;
+}
+
+
 /**
  * 文档加载就绪
  */
 global.addEventListener(Event.READY,function (e) {
  
-    var routeMap = httpRoutes && httpRoutes.get || {};
-    var path = locator.query( env.URL_PATH_NAME );
-    if( !path ){
-        path = '/'+locator.path().join("/");
+    var routeMap = env.HTTP_ROUTES && env.HTTP_ROUTES.get || {};
+    var path = Locator.query( env.URL_PATH_NAME );
+    if( !path )
+    {
+        path = Locator.path().join("/") ;
+    }else{
+        path = path.replace(/^\/|\/$/g,'');
     }
+
     path = path.toLowerCase();
-    //指定需要执行的模块
-    var router = routeMap[ path ] || window[handle+"_HTTP_DEFAULT_ROUTE"] || env.HTTP_DEFAULT_ROUTE;
-    var controller = router ? router.split("@") : [];
+    var matchRouter = path && match( routeMap, path );
+    var router =  matchRouter || {
+        provider:env.HTTP_DEFAULT_ROUTE,
+        props:[],
+        args:[]
+    };
+
+    var controller = router ? router.provider.split("@") : [];
     var module = controller[0];
     var method = controller[1];
     env.HTTP_ROUTE_CONTROLLER=router;
+
     if( typeof routeMap[ path ] !== "undefined"){
         env.HTTP_ROUTE_PATH = path ;
     }else{

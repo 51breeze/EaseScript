@@ -694,6 +694,10 @@ package es.core
             {
                 this.initializing();
                 this.commitPropertyAndUpdateSkin();
+
+            }else if( !this.skin.parent )
+            {
+               this.nowUpdateSkin();
             }
             return this.skin.element;
         };

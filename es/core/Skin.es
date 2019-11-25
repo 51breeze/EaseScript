@@ -40,12 +40,14 @@ package es.core
                 elem = (name as IDisplay).element;
             } 
             super( elem , attr );
+            this.hotUpdate();
         }
 
         /**
          * 实现热替换, 一般用于开发环境中
          * @protected
          */
+        [Env(development)]
         protected hotUpdate():void
         {
             this.addEventListener( SkinEvent.INSTALL, function( e:SkinEvent )
@@ -143,10 +145,7 @@ package es.core
          * 在第一次调用 createChildren 之前调用此函数，用来初始化皮肤需要的一些参数
          * 如需要使用，请在子类中覆盖
          */
-        protected function initializing()
-        {
-             this.hotUpdate();
-        }
+        protected function initializing(){}
 
         /**
         * 当前皮肤重新生成子级列表后调用
