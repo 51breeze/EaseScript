@@ -3,10 +3,10 @@
 	"debug":false,
 	"blockScope":false,
 	"reserved":[],
-	"minify":true,
+	"minify":false,
 	"animate":true,
 	"font":true,
-	"source_file":false,
+	"source_file":true,
 	"compat_version":{
 		"ie":11
 },
@@ -41,7 +41,6 @@
 	"build_pack":true,
 	"hot_replacement":true,
 	"syntax":"javascript",
-	"assets_hash":true,
 	"root_path":"D:/workspace/EaseScript",
 	"build":{
 		"path":"D:/workspace/EaseScript/test/build",

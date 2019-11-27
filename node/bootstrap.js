@@ -23,7 +23,8 @@ const env={
     "HTTP_ROUTE_CONTROLLER":null,
     "COMMAND_SWITCH":[CODE[COMMAND_SWITCH]],
     "VERSION":[CODE[VERSION]],
-    "WORKSPACE":"[CODE[WEBROOT_PATH]]"
+    "WORKSPACE":"[CODE[WEBROOT_PATH]]",
+    "APP_CONFIG":config
 };
 
 Object.merge(Internal.env, env);
@@ -66,74 +67,107 @@ if( config.database )
     }
 }
 
-module.exports=function createRouter( factory , staticAsset )
-{
-    Object.forEach( env.HTTP_SERVER_ROUTES, function(routes, method)
+
+class Bootstrap{
+
+    constructor( app, assetFactory )
     {
-        Object.forEach(routes,function(provider,route){
-            factory(method,route.replace(/\{(\w+)\}/g,':$1'),function(req, res){
-                const route = provider.split("@");
-                const controller = route[0];
-                const method = route[1];
-                try{
+         this.app = app;
+         this.assetFactory = assetFactory;
+    }
 
-                    Internal.env.HTTP_REQUEST ={
-                        "method":req.method,
-                        "path":req.path,
-                        "host":req.get("host"),
-                        "port":req.get("host").split(":")[1] || null,
-                        "protocol":req.protocol,
-                        "cookie":req.cookies || null,
-                        "uri":req.originalUrl,
-                        "url":req.protocol + '://' + req.get('host') + req.originalUrl,
-                    }
-                    
-                    Internal.env.HTTP_RESPONSE =res;
-                    Internal.env.APP_CONFIG = config;
-
-                    const moduleClass = require( Path.join(root_path, controller.replace(/\./g,'/')+".js") );
-                    const obj = new moduleClass();
-                    obj.addEventListener(PipeLineEvent.PIPELINE_DATABASE,function(e){
-                        db( e.getCmd(), function( result ){
-                            e.setData( result );
-                            res.status(200)
-                            res.send( e.valueOf() );
+    router( factory )
+    {
+        bind(routes, method)
+        {
+            Object.forEach(routes,function(provider,route)
+            {
+                factory(method,route.replace(/\{(\w+)\}/g,':$1'),function(req, res)
+                {
+                    const route = provider.split("@");
+                    const controller = route[0];
+                    const method = route[1];
+                    try{
+    
+                        Internal.env.HTTP_REQUEST ={
+                            "method":req.method,
+                            "path":req.path,
+                            "body":req.body,
+                            "query":req.query,
+                            "params":req.params,
+                            "host":req.get("host"),
+                            "port":req.get("host").split(":")[1] || null,
+                            "protocol":req.protocol,
+                            "cookie":req.cookies || null,
+                            "uri":req.originalUrl,
+                            "url":req.protocol + '://' + req.get('host') + req.originalUrl,
+                        }
+                        
+                        Internal.env.HTTP_RESPONSE = res;
+    
+                        const moduleClass = require( Path.join(root_path, controller.replace(/\./g,'/')+".js") );
+                        const obj = new moduleClass();
+                        obj.addEventListener(PipeLineEvent.PIPELINE_DATABASE,function(e){
+                            db( e.getCmd(), function( result ){
+                                e.setData( result );
+                                res.status(200)
+                                res.send( e.valueOf() );
+                            });
                         });
-                    });
-                    obj[ method ].apply(obj, Object.values( req.params ) );
-
-                }catch(e)
-                {
-                    console.log( "Error:"+ e.message );
-                    staticAsset(req, res, "error.html", e);
-                }
-            });
-        });
-    });
-
-    Object.forEach( env.HTTP_VIEW_ROUTES, function(routes, method)
-    {
-        Object.forEach(routes,function(provider,route){
-            factory(method,route.replace(/\{(\w+)\}/g,':$1'),function(req, res){
-                try{
-                    const file = Path.join(__dirname, env.WORKSPACE, "index.html");
-                    if( fs.existsSync(file) )
+                        obj[ method ].apply(obj, Object.values( req.params ) );
+    
+                    }catch(e)
                     {
-                        res.status(200);
-                        res.sendFile( file );
-
-                    }else if( staticAsset )
-                    {
-                        staticAsset(req, res, "index.html");
-                    }else{
-                        throw new Error("Not find source file.")
-                    }  
-                }catch(e)
-                {
-                    console.log( "Error:"+ e.message );
-                    staticAsset(req, res, "error.html", e);
-                }
+                        console.log( "Error:"+ e.message );
+                        if( this.assetFactory )
+                        {
+                            this.assetFactory(req, res, "error.html", e);
+                        }
+                    }
+                });
             });
-        });
-    });
+        }
+
+        Object.forEach( env.HTTP_SERVER_ROUTES,bind,this);
+
+        if( env.ORIGIN_SYNTAX !=="javascript" )
+        {
+            Object.forEach( env.HTTP_VIEW_ROUTES,bind,this);
+        }
+    }
 }
+
+
+module.exports={
+    createRouter(app, factory, staticAsset )
+    {
+       
+        Object.forEach( env.HTTP_VIEW_ROUTES, function(routes, method)
+        {
+            Object.forEach(routes,function(provider,route){
+                factory(method,route.replace(/\{(\w+)\}/g,':$1'),function(req, res){
+                    try{
+
+                        const file = Path.join(__dirname, env.WORKSPACE, "index.html");
+                        if( fs.existsSync(file) )
+                        {
+                            res.status(200);
+                            res.sendFile( file );
+
+                        }else if( staticAsset )
+                        {
+                            staticAsset(req, res, "index.html");
+                        }else{
+                            throw new Error("Not find source file.")
+                        }
+
+                    }catch(e)
+                    {
+                        console.log( "Error:"+ e.message );
+                        staticAsset(req, res, "error.html", e);
+                    }
+                });
+            });
+        });
+    }
+};

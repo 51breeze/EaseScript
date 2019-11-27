@@ -147,9 +147,9 @@ package es.core
          * 设置对象的属性
          * @param name
          * @param value
-         * @returns {Object}
+         * @returns {*}
          */
-        public function property(name:String,value:*=null):Object
+        public function property(name:String,value:String=null):*
         {
             return _element.property(name,value);
         }

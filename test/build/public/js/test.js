@@ -1,1 +1,12740 @@
-!function(e){function t(n){if(s[n])return s[n].exports;if(!e.hasOwnProperty(n))throw new ReferenceError(n+" is not define.");var i=s[n]={id:n,exports:{}};return e[n].call(i.exports,i,t),i.exports}function n(e,t){if(y[e])return"function"==typeof t&&t(),y[e];var n=null,i=e.match(/\.(css|js)[$|\?]/i);switch(i&&i[1].toLowerCase()){case"js":(n=document.createElement("script")).setAttribute("type","text/javascript"),n.setAttribute("src",e);break;case"css":(n=document.createElement("link")).setAttribute("rel","stylesheet"),n.setAttribute("href",e)}if(!n)throw new TypeError("Invalid script file. only support css or js for the '"+e+"'");if(y[e]=n,t){var r=!1;n.onreadystatechange=n.onload=function(e){("loaded"==n.readyState||"complete"==n.readyState||4==n.readyState||e&&"load"===e.type)&&(n.onreadystatechange=n.onload=null,!1===r&&(t(e),r=!0))}}var s=document.head||document.getElementsByTagName("head")[0];if(!s||!s.parentNode)throw new ReferenceError("Head element is not exist.");return s.appendChild(n),n}function i(e,n){var i=new(t(e));if(p.dispatchEvent(new c(c.INITIALIZING)),n){if("function"!=typeof i[n])throw new ReferenceError(n+" is not exist.");i[n]()}p.hasEventListener(c.INITIALIZE_COMPLETED)&&p.dispatchEvent(new c(c.INITIALIZE_COMPLETED))}function r(n){if("function"==typeof d.Load[n]&&!0!==d.Load[n].init){d.Load[n].init=!0;var i=d.Load[n].call(d,t);l.forEach(i,function(t,n){e.hasOwnProperty(n)||(e[n]=t)})}}var s={};t.has=function(t){return e.hasOwnProperty(t)};var o=t("system/Internal.js"),a=t("system/Locator.js"),l=t("system/Object.js"),u=t("system/System.js"),c=t("system/Event.js"),p=u.getGlobalEvent(),h="eaee5da76ca8ec30",f={HTTP_DEFAULT_ROUTE:"Test@index",HTTP_ROUTES:{get:{Test:"Test@index"}},HTTP_ROUTE_PATH:null,MODE:3,ORIGIN_SYNTAX:"javascript",URL_PATH_NAME:"PATH",HTTP_ROUTE_CONTROLLER:null,COMMAND_SWITCH:0,VERSION:1574661517365,LOAD_JS_PATH:"js",LOAD_CSS_PATH:"css",WORKSPACE:"src/",MODULE_SUFFIX:".es"};l.merge(o.env,f);var d=window[h]={Requirements:[],Load:{},Environments:f};"object"==typeof window[h]&&(window[h].Load&&(d.Load=window[h].Load),window[h].HTTP_DEFAULT_ROUTE&&(f.HTTP_DEFAULT_ROUTE=window[h].HTTP_DEFAULT_ROUTE));var y={};p.addEventListener(c.READY,function(e){var s=f.HTTP_ROUTES&&f.HTTP_ROUTES.get||{},o=a.query(f.URL_PATH_NAME),u=(o=(o=o?o.replace(/^\/|\/$/g,""):a.path().join("/")).toLowerCase())&&function(e,t){if(!e)return null;var n=(t=t.replace(/^\/|\/$/g,"")).split("/");for(var i in e){var r=i.replace(/^\/|\/$/g,"").toLowerCase(),s=r.split("/");if(s.length===n.length){var o=[],a=[];if(i.indexOf("{")>=0){for(var l=0,u=s.length;l<u;){var c=s[l];if("{"===c.charAt(0)&&"}"===c.charAt(c.length-1))a.push(c.slice(1,-1)),o.push(n[l]);else if(c!==n[l].toLowerCase())break;l++}if(l<u)continue}else if(r!==t.toLowerCase())continue;return{provider:e[i],props:a,args:o}}}return null}(s,o)||{provider:f.HTTP_DEFAULT_ROUTE,props:[],args:[]},c=u?u.provider.split("@"):[],p=c[0],h=c[1];f.HTTP_ROUTE_CONTROLLER=u,"undefined"!=typeof s[o]?f.HTTP_ROUTE_PATH=o:l.forEach(s,function(e,t){if(e===u)return f.HTTP_ROUTE_PATH=t,!1}),(f.HTTP_DISPATCHER=function(e,s,o){if(e=f.WORKSPACE+e+f.MODULE_SUFFIX,r(e),t.has(e))"function"==typeof o?o(i(e,s)):i(e,s);else{var a=d.Requirements[e];if(!a||!a.script)throw new ReferenceError("Not found the '"+e+"'.");a.css&&n(a.css),function(e,t){if(!(e&&e.length>0))return t();e=e.slice(0),function i(){e.length>0?n(e.shift(),i):t()}()}(a.require,function(){n(a.script,function(){r(e),"function"==typeof o?o(i(e,s)):i(e,s)})})}})(p,h)},!1,-500)}({"src/Test.es":function(e,t){function n(){a.defineProperty(this,u,{value:{}}),i.call(this),s.log("test")}e.exports=n;var i=t("es/core/Application.es"),r=t("src/view/TestView.html"),s=t("system/Console.js"),o=t("system/Symbol.js"),a=t("system/Object.js"),l=t("system/Internal.js"),u=o("Test").valueOf(),c={constructor:{value:n},index:{value:function(){this.render(new r(this))},type:1}};n.prototype=a.create(i.prototype,c),l.defineClass("Test",n,{"extends":i,classname:"Test",uri:["o53","z31","O54"],privateSymbol:u,method:{},proto:c},1)},"es/core/Application.es":function(e,t){function n(){l.defineProperty(this,h,{value:{appContainer:null,initiated:!1,_dataset:{},_async:!0}}),s.call(this,document),this[h].appContainer=o.createElement("div"),this[h].appContainer.className="application"}e.exports=n;t("es/core/View.es"),t("es/core/Interaction.es");var i=t("es/events/ApplicationEvent.es"),r=t("es/interfaces/IDisplay.es"),s=t("system/EventDispatcher.js"),o=t("system/Element.js"),a=t("system/System.js"),l=t("system/Object.js"),u=t("system/Reflect.js"),c=t("system/Symbol.js"),p=t("system/Internal.js"),h=c("es.core.Application").valueOf(),f={L30_lastApp:{writable:!0,value:null,type:8}};for(var d in f)l.defineProperty(n,d,f[d]);var y={constructor:{value:n},L30_appContainer:{writable:!0,value:null,type:8},L30_initiated:{writable:!0,value:!1,type:8},getContainer:{value:function(){var e,t=this[h].appContainer;return!1===this[h].initiated&&((e=new i(i.FETCH_ROOT_CONTAINER)).setContainer(t),this.dispatchEvent(e)&&(t=a.is(e.getContainer(),r)?u.get(n,e.getContainer().getElement(),0):e.getContainer(),e.defaultPrevented||(n.L30_lastApp&&document.body.removeChild(n.L30_lastApp),document.body.appendChild(t),n.L30_lastApp=t)),this[h].initiated=!0,this[h].appContainer=t),t},type:1},assign:{value:function(e,t){return void 0===t&&(t=null),null==t?this[h]._dataset[e]:this[h]._dataset[e]=t},type:1},L30__dataset:{writable:!0,value:{},type:8},getDataset:{value:function(){return this[h]._dataset},type:2},setDataset:{value:function(e){this[h]._dataset=e},type:4},getTitle:{value:function(){return this[h]._dataset.title},type:2},setTitle:{value:function(e){this[h]._dataset.title=e,document.title=e},type:4},L30__async:{writable:!0,value:!0,type:8},getAsync:{value:function(){return!0},type:2},setAsync:{value:function(e){this[h]._async=e},type:4},getComponentId:{value:function(e){return void 0===e&&(e=""),""},type:1},render:{value:function(e){return e.display(),e},type:1}};n.prototype=l.create(s.prototype,y),p.defineClass("es.core.Application",n,{"extends":null,"package":"es.core",classname:"Application",uri:["L30","z31","n5"],privateSymbol:h,method:f,proto:y},1)},"system/Internal.js":function(module,require){module.exports=function(Internal,$Object,$Array,$String,$Number,$Function,$RegExp,$Boolean,$Date,$Math,$Error,$SyntaxError,$TypeError,$EvalError,$ReferenceError,$JSON,$Symbol,$console){var env=Internal.env={BROWSER_IE:"IE",BROWSER_FIREFOX:"FIREFOX",BROWSER_CHROME:"CHROME",BROWSER_OPERA:"OPERA",BROWSER_SAFARI:"SAFARI",BROWSER_MOZILLA:"MOZILLA",NODE_JS:"NODE_JS",IS_CLIENT:!1},_platform=[];if("undefined"!=typeof navigator){var ua=navigator.userAgent.toLowerCase(),s;(s=ua.match(/msie ([\d.]+)/))?_platform=[env.BROWSER_IE,parseFloat(s[1])]:(s=ua.match(/firefox\/([\d.]+)/))?_platform=[env.BROWSER_FIREFOX,parseFloat(s[1])]:(s=ua.match(/chrome\/([\d.]+)/))?_platform=[env.BROWSER_CHROME,parseFloat(s[1])]:(s=ua.match(/opera.([\d.]+)/))?_platform=[env.BROWSER_OPERA,parseFloat(s[1])]:(s=ua.match(/version\/([\d.]+).*safari/))?_platform=[env.BROWSER_SAFARI,parseFloat(s[1])]:(s=ua.match(/^mozilla\/([\d.]+)/))&&(_platform=[env.BROWSER_MOZILLA,parseFloat(s[1])]),env.IS_CLIENT=!0}else{var nodejs=eval("(typeof process !== 'undefined' ? process.versions.node : 0)");_platform=[env.NODE_JS,nodejs]}env.platform=function(e,t){return"string"==typeof e?(e=e.toUpperCase(),t>0?e==_platform[0]&&env.version(t):e==_platform[0]):_platform[0]},env.version=function(e,t){var n=_platform[1];if(null==e)return n;switch(e=parseFloat(e),t){case"=":return n==e;case"!=":return n!=e;case">":return n>e;case">=":return n>=e;case"<=":return n<=e;case"<":return n<e;default:return n<=e}},Internal.defineProperty=$Object.defineProperty,Internal.defineProperty&&!Internal.env.version(Internal.env.BROWSER_IE,8)||(Internal.defineProperty=function(e,t,n){if(null==e)throw new TypeError("target is non-object");return e[t]=n.value}),Internal.createSymbolStorage=function(e){return function(t,n,i){if(!0===n)return t[e]=i,i;var r=t[e];if(r||(r={},t[e]=r),void 0!==i){if("number"==typeof r[n]){if("increment"===i)return r[n]++;if("decrement"===i)return r[n]--}return r[n]=i,i}return null==n?r:r[n]}};var classValueMap={1:"Class",2:"Interface",3:"Namespace"},modules={};return Internal.defineClass=function(e,t,n,i){return Internal.defineProperty(t,"name",{enumerable:!1,value:e,configurable:!1}),3!=i&&Internal.defineProperty(t,"valueOf",{enumerable:!1,value:function(){return"["+classValueMap[i]+" "+e+"]"},configurable:!1}),Internal.defineProperty(t,"toString",{enumerable:!1,value:function(){return"["+classValueMap[i]+" "+e+"]"},configurable:!1}),Internal.defineProperty(t,"constructor",{enumerable:!1,value:t,configurable:!1}),Internal.defineProperty(t,"__CLASS__",{enumerable:!1,value:e,configurable:!1}),Internal.defineProperty(t,"__RESOURCETYPE__",{enumerable:!1,value:i,configurable:!1}),Internal.defineProperty(t,"__T__",{enumerable:!1,value:n,configurable:!1}),modules[e]=t,t},Internal.getClassModule=function(e){return modules.hasOwnProperty(e)?modules[e]:null},Internal.$Object=$Object,Internal.$Array=$Array,Internal.$String=$String,Internal.$Number=$Number,Internal.$Function=$Function,Internal.$RegExp=$RegExp,Internal.$Boolean=$Boolean,Internal.$Date=$Date,Internal.$Error=$Error,Internal.$Math=$Math,Internal.$SyntaxError=$SyntaxError,Internal.$TypeError=$TypeError,Internal.$SyntaxError=$SyntaxError,Internal.$EvalError=$EvalError,Internal.$ReferenceError=$ReferenceError,Internal.$JSON=$JSON,Internal.$Symbol=$Symbol,Internal.$console=$console,Internal.iteratorClassName="es.interfaces.IListIterator",Internal}({},Object,Array,String,Number,Function,RegExp,Boolean,Date,Math,Error,SyntaxError,TypeError,EvalError,ReferenceError,JSON,Symbol,console)},"system/Array.js":function(e,t){function n(e){if(!(this instanceof n)){var t=new n;return o.apply(t,n.prototype.slice.call(arguments,0)),t}return o.call(this),arguments.length>0&&("number"==typeof e&&1===arguments.length?this.length=e:n.prototype.splice.apply(this,[0,0].concat(n.prototype.slice.call(arguments,0)))),this}e.exports=n;var i=t("system/Internal.js"),r=t("system/System.js"),s=t("system/Object.js"),o=i.$Array;s.defineProperty(n,"from",{value:o.from}),s.defineProperty(n,"of",{value:o.of}),s.defineProperty(n,"isArray",{value:o.isArray}),(n.prototype=s.create(o.prototype,{constructor:{value:n},toString:{value:function(){return this.constructor===n?"[object Array]":s.prototype.toString.call(this)}},valueOf:{value:function(){return this.constructor===n?this.slice(0):s.prototype.valueOf.call(this)}},length:{value:0,writable:!0},hasOwnProperty:{value:s.prototype.hasOwnProperty},propertyIsEnumerable:{value:s.prototype.propertyIsEnumerable},unique:{value:function(){if(null==this)throw new ReferenceError("this is null or not defined");for(var e,t=r.Object(this),i=n.prototype.slice.call(t,0),s=0,o=i.length>>0;s<o;s++)for(e=s+1;e<o;e++)i[s]===i[e]&&i.splice(e,1);return i}}})).fill||s.defineProperty(n.prototype,"fill",{value:function(e,t,i){if(null==this)throw new ReferenceError("this is null or not defined");if(!r.is(this,n)&&!r.isArray(this))throw new ReferenceError("this is not Array");for(var s=this.length>>0,o=t>>0,a=o<0?Math.max(s+o,0):Math.min(o,s),l=null==i?s:i>>0,u=l<0?Math.max(s+l,0):Math.min(l,s);a<u;)this[a]=e,a++;return this}}),n.prototype.find||s.defineProperty(n.prototype,"find",{value:function(e,t){if("function"!=typeof e)throw new TypeError("callback must be a function");if(null==this)throw new ReferenceError("this is null or not defined");var n=r.Object(this),i=n.length>>0,s=0;for(t=t||this;s<i;)if(s in n&&e.call(t,n[s++],s,n))return n[s]}}),n.from||s.defineProperty(n,"from",{value:function(){var e=s.prototype.toString,t=function(t){return"function"==typeof t||"[object Function]"===e.call(t)},i=Math.pow(2,53)-1,r=function(e){var t=function(e){var t=Number(e);return isNaN(t)?0:0!==t&&isFinite(t)?(t>0?1:-1)*Math.floor(Math.abs(t)):t}(e);return Math.min(Math.max(t,0),i)};return function(e){var i=s(e);if(null==e)throw new TypeError("Array.from requires an array-like object - not null or undefined");var o,a=arguments.length>1?arguments[1]:void undefined;if(void 0!==a){if(!t(a))throw new TypeError("Array.from: when provided, the second argument must be a function");arguments.length>2&&(o=arguments[2])}for(var l,u=r(i.length),c=t(this)?s(new this(u)):new n(u),p=0;p<u;)l=i[p],c[p]=a?void 0===o?a(l,p):a.call(o,l,p):l,p+=1;return c.length=u,c}}()}),n.of||s.defineProperty(n,"of",{value:function(){return n.prototype.slice.call(arguments)}})},"system/JSON.js":function(module,require){var Internal=require("system/Internal.js"),_JSON=Internal.$JSON||function(){function JSON(){if(this instanceof JSON)throw new TypeError("JSON is not constructor.")}function escFunc(e){return escMap[e]||"\\u"+(e.charCodeAt(0)+65536).toString(16).substr(1)}var escMap={'"':'\\"',"\\":"\\\\","\b":"\\b","\f":"\\f","\n":"\\n","\r":"\\r","\t":"\\t"},escRE=/[\\"\u0000-\u001F\u2028\u2029]/g;return JSON.parse=function(strJson){return eval("("+strJson+")")},JSON.stringify=function(e){if(null==e)return"null";var t=typeof e;if("number"===t)return System.isFinite(e)?e.toString():"null";if("boolean"===t)return e.toString();if("object"===t){var n=[];if("function"==typeof e.toJSON)return JSON.stringify(e.toJSON());if(System.instanceOf(e,Array)){for(s=0;s<e.length;s++)n.push(JSON.stringify(e[s]));return"["+n.join(",")+"]"}if(System.isObject(e)){for(var i in e)n.push(JSON.stringify(i)+":"+JSON.stringify(e[i]));return"{"+n.join(",")+"}"}for(var r=Object.prototype.getEnumerableProperties.call(e),s=0;s<r.length;s++)n.push(JSON.stringify(r[s].key)+":"+JSON.stringify(r[s].value));return"{"+n.join(", ")+"}"}return'"'+e.toString().replace(escRE,escFunc)+'"'},JSON}();module.exports=_JSON;var Object=require("system/Object.js"),Array=require("system/Array.js"),System=require("system/System.js")},"system/Symbol.js":function(e,t){var n=t("system/Internal.js"),i=!!n.$Symbol,r=n.$Symbol||function(){function e(t){if(this instanceof e)throw new TypeError("is not constructor");return new u(t)}var t={},n={},r="@@symbol",o=r.length,a=r+"(SYMBOL_KEY_NAME)",l=r+"(SYMBOL_KEY_VALUE)",u=function(e){this[a]=e||"",this[l]=r+"("+s.uid()+")"};return e.prototype.constructor=e,u.prototype=e.prototype,e.prototype.toString=function(){return this[l]},e.prototype.valueOf=function(){return this[l]},e["for"]=function(i){return t[i]?t[i]:(t[i]=e(i),n[t[i][l]]=i,t[i])},e.keyFor=function(t){return t instanceof e?n[t[l]]:undefined},e.isSymbolPropertyName=function(e){return null!=e&&!0!==i&&(e=e.toString()).substr(0,o)===r+"("&&")"===e.substr(-1)},e}();e.exports=r;var s=t("system/System.js")},"system/Namespace.js":function(e,t){function n(e,t){o(this,!0,{prefix:e||"",uri:t||""})}e.exports=n;var i=t("system/Object.js"),r=t("system/Symbol.js"),s=t("system/System.js"),o=t("system/Internal.js").createSymbolStorage(r("Namespace")),a={};i.defineProperty(n,"getCodeByUri",{value:function(e){return a[e]||""}}),i.defineProperty(n,"valueOf",{value:function(){return"[Namespace object]"}}),i.defineProperty(n,"toString",{value:function(){return"[Namespace object]"}}),n.prototype=i.create(i.prototype,{constructor:{value:n},toString:{value:function(){return this.valueOf()}},valueOf:{value:function(){var e=o(this);return e.prefix+e.uri}}}),s.Namespace=n},"system/Reflect.js":function(e,t){function n(){throw new SyntaxError("Reflect is not constructor.")}function r(e,t,n,i,r){if(r&&f[i.type]===r){var s={prop:t,desc:i};return s[r]=i.value,s}return{target:e,prop:t,value:n,desc:i}}function s(e,t,n,i,o,a,l){var u=a?function(e,t){return t+(e.substr(0,1).toUpperCase()+e.substr(1))}(i,a):i;if(u=l?l+"_"+u:u,h.call(t,u)){var c=t[u];if(o)return r(n,u,n[u],c,a);if(e&&e.__T__.uri[0]===l){var p=e.__T__.privateSymbol.valueOf();if(h.call(n[p],i))return r(n[p],i,n[p][i],c,a)}return r(t,u,c.value,c,a)}return a?s(e,t,n,i,o,"",l):null}function o(e,t){if(!(t&&t.length>0))return e?e.__T__.uri:[];for(var n=e.__T__.uri.slice(0),r=t.length;i<r;i++){var s=t[i];s instanceof u&&n.push(u.getCodeByUri(s.valueOf()))}return n}function a(e,t,n,i,r,a){if(c.isClass(t.constructor)){var u=(!i||i===t)&&c.isClass(t),p=u?t:t.constructor,h=c.isClass(e)?e:null,f=u?p.__T__.method:p.__T__.proto,d=s(h,f,t,n,u,a,"");if(d)return d;var y=o(h,r);do{var v=y.length;for(f=u?p.__T__.method:p.__T__.proto;f&&v-- >0;)if(d=s(h,f,t,n,u,a,y[v]))return d}while(!u&&c.isClass(p=p.__T__["extends"]));if(a&&"set"===a)return{writable:!1};var m=(p=(p||l).prototype)[n];if(m)return{target:p,prop:n,value:m,desc:{value:m}}}return null}e.exports=n;var l=t("system/Object.js"),u=t("system/Namespace.js"),l=t("system/Object.js"),c=t("system/System.js"),p=t("system/Internal.js").$Reflect,h=l.prototype.hasOwnProperty,f={1:"function",2:"get",4:"set",8:"var",16:"const",32:"namespace"},d=p?p.construct:function(e,t){if(!c.isFunction(e))throw new TypeError("is not function");switch(t.length){case 0:return new e;case 1:return new e(t[0]);case 2:return new e(t[0],t[1]);case 3:return new e(t[0],t[1],t[2]);default:return Function("f,a","return new f(a["+c.range(0,t.length).join("],a[")+"]);")(e,t)}},y=p?p.apply:function(e,t,n){if("function"!==c.typeOf(e))throw new TypeError("is not function");return t=t===e?undefined:t,null!=n?e.apply(t===e?undefined:t,n):null!=t?e.call(t):e()};n.apply=function(e,t,n){if(!c.isFunction(e)||c.isClass(e))throw new TypeError("target is not function");return c.isArray(n)||(n=void 0!==n?[n]:[]),y(e,t,n)},n.call=function(e,t,i,r,s,o){if(null==t)throw new ReferenceError("target is null or undefined");if(null==i)return n.apply(t,s,r);var a=n.get(e,t,i,s,o);if("function"!=typeof a)throw new TypeError("target."+i+" is not function");return y(a,s||t,r||[])},n.construct=function(e,t){if(c.isClass(e)&&e.__T__["abstract"])throw new TypeError("Abstract class cannot be instantiated");return d(e,t||[])},n.deleteProperty=function(e,t){if(!e||null==t)return!1;if("__proto__"===t)return!1;if(c.isClass(e)){if(!0!==e.__T__.dynamic)return!1;if(e.__T__.privateSymbol===t)return!1}return!!h.call(e,t)&&delete e[t]},n.has=function(e,t,n){return null!=n&&null!=t&&("__proto__"!==n&&(c.isClass(t.constructor)?!!a(e,t,n,null,null,"get"):n in t))},n.type=function(e,t){if("string"==typeof t){var n=e;switch(t=t.toLowerCase()){case"integer":case"int":case"number":case"uint":if(e=parseInt(e),"number"!==t){if("uint"===t&&e<0)throw new c.RangeError(n+" convert failed. can only be an unsigned Integer");if(e>2147483647||e<-2147483648)throw new c.RangeError(n+" convert failed. the length of overflow Integer")}break;case"double":case"float":e=parseFloat(e);break;case"class":if(!c.isClass(e))throw new TypeError(n+" is not Class.")}return e}if(null==e||t===l)return e;if(t&&!c.is(e,t)){var i=c.isClass(t.constructor)?t.constructor.__CLASS__:c.typeOf(t);throw new TypeError(e+' can not be convert for "'+i+'"')}return e},n.get=function(e,t,n,i,r){if(null==n)return t;if(null==t)throw new ReferenceError("target is null or undefined");var s=a(e,t,n,i,r,"get");return i=i||t,s?s.get?s.get.call(c.isClass(i)?null:i):s.value:"__proto__"===n?undefined:t[n]},n.set=function(e,t,n,i,r,s){if(null==n)return t;if(null==t)throw new ReferenceError("target is null or undefined");var o=a(e,t,n,r,s,"set"),l=c.isClass(t);if(r=r||t,!o){if("__proto__"===n)throw new ReferenceError("__proto__ is not writable");if(l)throw new ReferenceError(n+" is not exists");var u=t.constructor;if(c.isClass(u)){if(!0!==u.__T__.dynamic)throw new ReferenceError(n+" is not exists");if(t[n]&&!h.call(t,n))throw new TypeError(n+" is not configurable")}else if("function"==typeof t)throw new TypeError(n+" is not configurable");return t[n]=i}if(o.set)return o.set.call(l?null:r,i);if(!1===o.writable)throw new ReferenceError(n+" is not writable");if("object"==typeof o.target||"function"==typeof o.target)return o.target[o.prop]=i;throw new ReferenceError(n+" is not writable")},n.incre=function(e,t,i,r,s){r=!1!==r;var o=n.get(e,t,i,undefined,s),a=o+1;return n.set(e,t,i,a,undefined,s),r?o:a},n.decre=function(e,t,i,r,s){r=!1!==r;var o=n.get(e,t,i,undefined,s),a=o-1;return n.set(e,t,i,a,undefined,s),r?o:a}},"system/Function.js":function(e,t){function n(){return s.apply(this,r.prototype.slice.call(arguments,0))}e.exports=n;var i=t("system/Object.js"),r=t("system/Array.js"),s=t("system/Internal.js").$Function;(n.prototype=i.create(i.prototype)).apply=s.prototype.apply,n.prototype.call=s.prototype.call,n.prototype.bind=s.prototype.bind},"system/System.js":function(e,t){function n(e,t){if(e===t)return!0;if(e=e.__T__["extends"]){if(!(e instanceof o))return n(e,t);for(var i=e.length,r=0;r<i;r++)if(n(e[r],t))return!0}return!1}var i={},r=t("system/Internal.js");i.env=r.env,i.environments=function(e){return"string"==typeof e?r.env[e]||null:s.merge({},r.env)},e.exports=i;var s=t("system/Object.js"),o=t("system/Array.js"),a=t("system/JSON.js"),l=t("system/Reflect.js"),u=t("system/Function.js"),c=t("system/EventDispatcher.js"),p=r.$Object,h=r.$Array,f=r.$Function;i.isFinite=isFinite,i.decodeURI=decodeURI,i.decodeURIComponent=decodeURIComponent,i.encodeURI=encodeURI,i.encodeURIComponent=encodeURIComponent,i.isNaN=isNaN,i.Infinity=Infinity,i.parseFloat=parseFloat,i.parseInt=parseInt,function(e){i.setTimeout=e(setTimeout),i.setInterval=e(setInterval)}(function(e){return function(t,n){var i=[].slice.call(arguments,2);return e(function(){t.apply(this,i)},n)}}),i.clearTimeout=function(e){return clearTimeout(e)},i.clearInterval=function(e){return clearInterval(e)},i.typeOf=function(e){return null==e?null===e?"object":"undefined":i.isClass(e)?"class":i.isInterface(e)?"interface":i.isNamespace(e)?"namespace":typeof e},i.instanceOf=function(e,t){return null==e?t===s||t===p:"class"===t?i.isClass(e):t===a?i.isObject(e):i.isClass(t)?e instanceof t:t===o?i.isArray(e):t===s?"object"==typeof e:t===u?i.isFunction(e):s(e)instanceof t},i.is=function(e,t){if(null==e)return t===s||t===p;if("class"===t)return i.isClass(e);if(i.isClass(e.constructor)&&i.isInterface(t)){for(var r=e.constructor;r&&i.isClass(r);){var o=r.__T__["implements"];if(o&&o.length>0)for(var a=0,l=o.length;a<l;a++)if(n(o[a],t))return!0;r=r.__T__["extends"]}return!1}return i.instanceOf(e,t)},i.isClass=function(e){return e&&"function"==typeof e&&e.__CLASS__&&1===e.__RESOURCETYPE__},i.isInterface=function(e){return e&&"function"==typeof e&&e.__CLASS__&&2===e.__RESOURCETYPE__},i.isNamespace=function(e){return e&&"function"==typeof e&&e.__CLASS__&&3===e.__RESOURCETYPE__},i.isObject=function(e,t){if(!e||"object"!=typeof e)return!1;var n=s.getPrototypeOf(e);return n===s.prototype||n===p.prototype||t&&e instanceof s},i.isDefined=function(){for(var e=arguments.length;e>0;)if("undefined"==typeof arguments[--e])return!1;return!0},i.isArray=function(e){if(!e||"object"!=typeof e)return!1;var t=s.getPrototypeOf(e);return t===o.prototype||t===h.prototype},i.isFunction=function(e){return!!e&&("function"===i.typeOf(e)||e instanceof u||s.getPrototypeOf(e)===f.prototype)},i.isBoolean=function(e){return"boolean"==typeof e},i.isString=function(e){return"string"==typeof e},i.isScalar=function(e){var t=typeof e;return"string"===t||"number"===t||"float"===t||"boolean"===t},i.isNumber=function(e){return"number"==typeof e},i.isEmpty=function(e,t){if(!e)return!0!==t||0!==e;if(i.isObject(e)||i.isArray(e)){var n;for(n in e)break;return void 0===n}return!1},i.trim=function(e){return"string"==typeof e?e.replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g,""):""},i.range=function(e,t,n){if(t>=e){var r=[];for(i.isNumber(n)||(n=1),n=Math.max(n,1);e<=t;e+=n)r.push(e);return r}return[]},i.ucfirst=function(e){return"string"==typeof e?e.charAt(0).toUpperCase()+e.substr(1):e},i.lcfirst=function(e){return"string"==typeof e?e.charAt(0).toLowerCase()+e.substr(1):e},i.repeat=function(e,t){return"string"==typeof e?new o((parseInt(t)||0)+1).join(e):""},i.compare=function(e,t){var n=i.parseFloat(e),r=i.parseFloat(t);return i.isNaN(n)&&i.isNaN(r)?e.localeCompare(t):i.isNaN(n)||i.isNaN(r)?i.isNaN(n)?1:-1:n>r?1:n<r?-1:0},i.sprintf=function(){var e,t="",n=1,r=arguments.length;if(r>0&&"string"==typeof(t=arguments[0])){for(;n<r;n++)e=arguments[n],t=t.replace(/%(s|d|f|v)/,function(t,n){return"d"===n?(e=i.parseInt(e),i.isNaN(e)?"":e):"f"===n?(e=i.parseFloat(e),i.isNaN(e)?"":e):"v"===n?s.prototype.valueOf.call(e):s.prototype.toString.call(e)});t.replace(/%(s|d|f|v)/g,"")}return t},i.serialize=function(e,t,n){if("string"==typeof e||!e)return e;var r,s=[],o="&",a="=",l="",u=i.isBoolean(n)?null:n;if(t=t||"url",n=!1!==n,"style"===t?(o=";",a=":",n=!1):"attr"===t&&(a="=",o=" ",n=!1),i.isObject(e))for(r in e)l="attr"===t?'"'+e[r]+'"':e[r],r=u?u+"["+r+"]":r,s=s.concat("object"==typeof l?i.serialize(l,t,!!n&&r):r+a+l);return s.join(o)},i.unserialize=function(e){var t,n,i,r,s={},o="&",a="=",l=!1;/[\w\-]+\s*\=.*?(?=\&|$)/.test(e)?(e=e.replace(/^&|&$/,""),l=!0):/[\w\-\_]+\s*\:.*?(?=\;|$)/.test(e)&&(o=";",a=":",e=e.replace(/^;|;$/,"")),e=e.split(o);for(t in e)n=e[t].split(a),l&&/\]\s*$/.test(n[0])?(i=s,n[0].replace(/\w+/gi,function(e){r=i,i=i[e]?i[e]:i[e]={}}),r&&(r[RegExp.lastMatch]=n[1])):s[n[0]]=n[1];return s};var d=1;i.uid=function(){return d+++""+1e5*Math.random()>>>0},i.storage=function(e,t,n){if(null==e)throw new TypeError("target can not is null or undefined");if("string"!=typeof t)throw new TypeError("name can only is string");for(var i=t.split("."),r=0,s=i.length-1;r<s;)e=e[t=i[r++]]||(e[t]={});if(t=i[s],n!==undefined)return e[t]=n;if(n===undefined){var o=e[t];return delete e[t],o}return e[t]};var y=null;i.getGlobalEvent=function(){return null===y&&(y=new c(window)),y},i.getDefinitionByName=function(e){var t=r.getClassModule(e);if(t)return t;throw new TypeError('"'+e+'" is not defined.')},i.hasClass=function(e){return!!r.getClassModule(e)},i.getQualifiedClassName=function(e){if(null==e)throw new ReferenceError("target is null or undefined");if(e===i)return"System";if(e===a)return"JSON";if(e===l)return"Reflect";if("function"==typeof e&&e.prototype){var t=e.valueOf();if(0===t.indexOf("[Class"))return t.slice(7,-1);if(0===t.indexOf("[Namespace"))return t.slice(11,-1);if(0===t.indexOf("[Interface"))return t.slice(11,-1);var n=con.toString();return(n=n.substr(0,n.indexOf("("))).substr(n.lastIndexOf(" ")+1)}throw new ReferenceError("target is not Class")},i.getQualifiedObjectName=function(e){if(null==e||"object"!=typeof e)throw new ReferenceError("target is not object or is null");return i.getQualifiedClassName(s.getPrototypeOf(e).constructor)},i.getQualifiedSuperclassName=function(e){if(null==e)throw new ReferenceError("target is null or undefined");var t=i.getQualifiedClassName(s.getPrototypeOf(e).constructor),n=r.getClassModule(t);return n?i.getQualifiedClassName(n["extends"]||s):null}},"system/ListIterator.js":function(e,t){function n(e){if(e instanceof n)return e;if(!(this instanceof n))return new n(e);var t=o.getClassModule(o.iteratorClassName),i=e&&t&&System.is(e,t);a(this,!0,{isIterator:i,target:e,items:i?null:r.prototype.getEnumerableProperties.call(e),cursor:-1,key:undefined,current:undefined})}function i(e,t){return(e=a(e,"target"))[t]()}e.exports=n;var r=t("system/Object.js"),s=t("system/Symbol.js"),o=t("system/Internal.js"),a=o.createSymbolStorage(s("ListIterator"));n.prototype=r.create(r.prototype,{constructor:{value:n},key:{value:function(){return a(this,"isIterator")?i(this,"key"):a(this,"key")}},current:{value:function(){return a(this,"isIterator")?i(this,"current"):a(this,"current")}},next:{value:function(){if(a(this,"isIterator"))return i(this,"next");var e=a(this,"items"),t=!1;if(e&&e.length>0){var n=a(this,"cursor","increment")+1;if(t=n<e.length){var r=e[n];a(this,"current",r.value),a(this,"key",r.key)}else n>0&&this.rewind()}return t}},rewind:{value:function(){a(this,"isIterator")?i(this,"rewind"):(a(this,"current",undefined),a(this,"key",undefined),a(this,"cursor",-1))}}})},"system/Object.js":function(e,t){function n(e){return null!=e?s(e):this instanceof n?this:new n}function i(e,t,n,i){switch(i){case-1:e.push(n);break;case 1:e.push(t);break;case 2:e[n]=t;break;default:e.push({key:n,value:t})}}var r=t("system/Internal.js"),s=r.$Object;r.defineProperty(n,"defineProperty",{value:r.defineProperty}),n.defineProperty(n,"create",{value:s.create}),n.defineProperty(n,"entries",{value:function(e){var t=n.prototype.getEnumerableProperties(2),i=new l;for(var r in t)i.push([r,t[r]]);return i}}),n.defineProperty(n,"merge",{value:function(){var e,t,i,r,a,l,u=arguments[0]||{},c=1,p=arguments.length,h=!1;if("boolean"==typeof u&&(h=u,u=arguments[1]||{},c++),p===c?(u={},--c):"object"!=typeof u&&"function"!=typeof u&&(u={}),o.isClass(u.constructor)&&!0!==u.constructor.__T__.dynamic||o.isClass(u))return u;for(var f=o.isArray(u);c<p;c++)if(null!=(e=arguments[c])){if(o.isClass(e))continue;o.isClass(e.constructor)&&(e=n.prototype.getEnumerableProperties.call(e,2));for(t in e)s.prototype.hasOwnProperty.call(e,t)&&u!==(r=e[t])&&(h&&r&&(o.isObject(r)||(a=o.isArray(r)))?(i=u[t],a?(a=!1,l=i&&o.isArray(i)?i:[]):l=i&&o.isObject(i)?i:{},f?u.push(n.merge(h,l,r)):u[t]=n.merge(h,l,r)):void 0!==r&&(f?u.push(r):u[t]=r))}return u}}),n.defineProperty(n,"forEach",{value:function(e,t,n){if(null!=e&&!o.isClass(e)&&"function"==typeof t){var i=null,l=r.getClassModule(r.iteratorClassName),c=e instanceof u||l&&o.is(e,l);if(n=n||e,c&&"function"==typeof e.next){var p=e.next,h=e.current,f=e.key;for(e.rewind.call(e);p.call(e);)if(i=h.call(e),!1===t.call(n,i,f.call(e)))return i}else{var d=null;if(o.isClass(e.constructor)){if(!0!==e.constructor.__T__.dynamic)return;d=e.constructor.__T__.uri[0]}for(var y in e)if((!a.isSymbolPropertyName||!a.isSymbolPropertyName(y))&&y!==d&&s.prototype.propertyIsEnumerable.call(e,y)&&(i=e[y],!1===t.call(n,i,y)))return i}}}}),n.defineProperty(n,"getPrototypeOf",{value:s.getPrototypeOf||function(e){if(null==e)throw new TypeError("non-object");return o.isClass(e.constructor)?null:e.__proto__?e.__proto__:e.constructor?e.constructor.prototype:null}}),n.defineProperty(n,"setPrototypeOf",{value:s.setPrototypeOf||function(e,t){if(null==e)throw new TypeError("non-object");return!o.isClass(e.constructor)&&(e.__proto__=t,e)}}),n.defineProperty(n,"setPrototypeOf",{value:s.setPrototypeOf||function(e,t){if(null==e)throw new TypeError("non-object");return!o.isClass(e.constructor)&&(e.__proto__=t,e)}}),n.defineProperty(n,"keys",{value:function(e){return n.prototype.getEnumerableProperties.call(e,-1)}}),n.defineProperty(n,"values",{value:function(e){return n.prototype.getEnumerableProperties.call(e,1)}}),n.prototype=n.create(s.prototype,{valueOf:{value:function(){if(o.isClass(this.constructor)){var e=this.constructor,t=e.__T__["package"];return"[object "+(t?t+".":"")+e.__T__.classname+"]"}return s.prototype.valueOf.call(this)}},toString:{value:function(){if(o.isClass(this.constructor)){var e=this.constructor,t=e.__T__["package"];return"[object "+(t?t+".":"")+e.__T__.classname+"]"}return s.prototype.toString.call(this)}},hasOwnProperty:{value:function(e){if(null==this)throw new TypeError("non-object");if(o.isClass(this))return!1;if(o.isClass(this.constructor)){if(!0!==this.constructor.__T__.dynamic)return!1;if(this.constructor.__T__.uri[0]===e)return!1}return s.prototype.hasOwnProperty.call(this,e)}},propertyIsEnumerable:{value:function(e){if(null==this)throw new TypeError("non-object");if(o.isClass(this))return!1;if(o.isClass(this.constructor)){if(!0!==this.constructor.__T__.dynamic)return!1;if(this.constructor.__T__.uri[0]===e)return!1}return(!a.isSymbolPropertyName||!a.isSymbolPropertyName(e))&&s.prototype.propertyIsEnumerable.call(this,e)}},getEnumerableProperties:{value:function(e){if(null==this)throw new TypeError("non-object");var t=2===e?{}:[];if(o.isClass(this))return t;if(o.isArray(this)&&2!==e)return this;var n=r.getClassModule(r.iteratorClassName);if((this instanceof u||n&&o.is(this,n))&&"function"==typeof this.next){var l=this.next,c=this.current,p=this.key;for(this.rewind.call(this);l.call(this);)i(t,c.call(this),p.call(this),e)}else{var h=null;if(o.isClass(this.constructor)){if(!0!==this.constructor.__T__.dynamic)return t;h=this.constructor.__T__.uri[0]}for(var f in this)a.isSymbolPropertyName&&a.isSymbolPropertyName(f)||f!==h&&s.prototype.propertyIsEnumerable.call(this,f)&&i(t,this[f],f,e)}return t}},constructor:{value:n}}),e.exports=n;var o=t("system/System.js"),a=t("system/Symbol.js"),l=t("system/Array.js"),u=t("system/ListIterator.js")},"system/Event.js":function(e,t){function n(e,t,n){if(e&&"string"!=typeof e)throw new TypeError("event type is not string");this.type=e,this.bubbles=!(!1===t),this.cancelable=!(!1===n)}e.exports=n;var i=t("system/Object.js"),r=t("system/System.js");n.SUBMIT="submit",n.RESIZE="resize",n.SELECT="fetch",n.UNLOAD="unload",n.LOAD="load",n.LOAD_START="loadstart",n.PROGRESS="progress",n.RESET="reset",n.FOCUS="focus",n.BLUR="blur",n.ERROR="error",n.COPY="copy",n.BEFORECOPY="beforecopy",n.CUT="cut",n.BEFORECUT="beforecut",n.PASTE="paste",n.BEFOREPASTE="beforepaste",n.SELECTSTART="selectstart",n.READY="ready",n.SCROLL="scroll",n.INITIALIZE_COMPLETED="initializeCompleted",n.ANIMATION_START="animationstart",n.ANIMATION_END="animationend",n.ANIMATION_ITERATION="animationiteration",n.TRANSITION_END="transitionend",(n.prototype=i.create(i.prototype,{constructor:{value:n},toString:function(){return"[object Event]"},valueOf:function(){return"[object Event]"}})).bubbles=!0,n.prototype.cancelable=!0,n.prototype.currentTarget=null,n.prototype.target=null,n.prototype.defaultPrevented=!1,n.prototype.originalEvent=null,n.prototype.type=null,n.prototype.propagationStopped=!1,n.prototype.immediatePropagationStopped=!1,n.prototype.altkey=!1,n.prototype.button=!1,n.prototype.ctrlKey=!1,n.prototype.shiftKey=!1,n.prototype.metaKey=!1,n.prototype.preventDefault=function(){!0===this.cancelable&&(this.defaultPrevented=!0,this.originalEvent&&(this.originalEvent.preventDefault?this.originalEvent.preventDefault():this.originalEvent.returnValue=!1))},n.prototype.stopPropagation=function(){this.originalEvent&&(this.originalEvent.stopPropagation?this.originalEvent.stopPropagation():this.originalEvent.cancelBubble=!0),this.propagationStopped=!0},n.prototype.stopImmediatePropagation=function(){this.originalEvent&&this.originalEvent.stopImmediatePropagation&&this.originalEvent.stopImmediatePropagation(),this.stopPropagation(),this.immediatePropagationStopped=!0},(n.fix={map:{},hooks:{},prefix:"",cssprefix:"",cssevent:{},eventname:{DOMContentLoaded:!0}}).map[n.READY]="DOMContentLoaded",n.fix.cssevent[n.ANIMATION_START]="AnimationStart",n.fix.cssevent[n.ANIMATION_END]="AnimationEnd",n.fix.cssevent[n.ANIMATION_ITERATION]="AnimationIteration",n.fix.cssevent[n.TRANSITION_END]="TransitionEnd",n.type=function(e,t){if("string"!=typeof e)return e;if(!0===t){var i=(e="on"===n.fix.prefix?e.replace(/^on/i,""):e).toLowerCase();if(n.fix.cssprefix&&i.substr(0,n.fix.cssprefix.length)===n.fix.cssprefix)return i.substr(n.fix.cssprefix.length);for(var r in n.fix.map)if(n.fix.map[r].toLowerCase()===i)return r;return e}return n.fix.cssevent[e]?n.fix.cssprefix?n.fix.cssprefix+n.fix.cssevent[e]:e:!0===n.fix.eventname[e]?e:n.fix.map[e]?n.fix.map[e]:n.fix.prefix+e.toLowerCase()};var s=[];n.registerEvent=function(e){s.push(e)},n.create=function(e){var t=null,i=0;if(!(e=e||("object"==typeof window?window.event:null)))throw new TypeError("Invalid event");var o=e.type,a=e.srcElement||e.target;a=a&&3===a.nodeType?a.parentNode:a;var l=e.currentTarget||a;if("string"!=typeof o)throw new TypeError("Invalid event type");if(r.instanceOf(e,n))t=e;else for(o=n.type(o,!0);i<s.length&&!(t=s[i++](o,a,e)););return t instanceof n||(t=new n(o)),t.type=o,t.target=a,t.currentTarget=l,t.bubbles=!1!==e.bubbles,t.cancelable=!1!==e.cancelable,t.originalEvent=e,t.timeStamp=e.timeStamp,t.relatedTarget=e.relatedTarget,t.altkey=!!e.altkey,t.button=e.button,t.ctrlKey=!!e.ctrlKey,t.shiftKey=!!e.shiftKey,t.metaKey=!!e.metaKey,e.animationName&&(t.animationName=e.animationName,t.elapsedTime=e.elapsedTime,t.eventPhase=e.eventPhase,t.isTrusted=e.isTrusted),t},n.fix.hooks[n.READY]=function(e,t){var i=this,r=this.contentWindow?this.contentWindow.document:this.ownerDocument||this.document||this;if((r&&9===r.nodeType?r.defaultView||r.parentWindow:window)||r){var s=null,o=!1,a=function(e){if(!e)switch(r.readyState){case"loaded":case"complete":case"4":e=new n(n.READY)}e&&!1===o&&(o=!0,s&&(window.clearInterval(s),s=null),(e=e instanceof n?e:n.create(e)).currentTarget=i,e.target=i,t(e))},l=n.type(n.READY);return r.addEventListener?r.addEventListener(l,a):r.attachEvent(l,a),s=window.setInterval(a,50),!0}}},"system/EventDispatcher.js":function(e,t){function n(e){if(!(this instanceof n))return e&&e instanceof n?e:new n(e);null==e||"function"==typeof e.addEventListener||"function"===c.typeOf(e.attachEvent)||"undefined"!==c.typeOf(e.onreadystatechange)||e instanceof n||(e=null),d(this,!0,{target:e||this,events:{}})}function i(e,t,n){var i="function"==typeof n,r=d(e,"events");if(r&&u.prototype.hasOwnProperty.call(r,t)){var s=(r=r[t]).length;if(!i)return s>0;for(;s>0;)if(--s,r[s].callback===n)return!0}return!1}function r(e,t){if(null==e)throw new ReferenceError("this is null or not define");var i=t.type,r=d(e),s=r.events||(r.events={});if(0===(s=s[i]||(s[i]=[])).length&&!(e instanceof n))if(u.prototype.hasOwnProperty.call(f.fix.hooks,i))f.fix.hooks[i].call(e,t,a);else{i=f.type(i);try{e.addEventListener?e.addEventListener(i,a,t.useCapture):(t.proxyType=[i],t.proxyTarget=e,t.proxyHandle=function(t){a(t,e)},e.attachEvent(i,t.proxyHandle))}catch(o){}}return s.push(t),s.length>1&&s.sort(function(e,t){return e.priority===t.priority?0:e.priority<t.priority?1:-1}),!0}function s(e,t,i,r){if(null==e)throw new ReferenceError("this is null or not define");var s=d(e,"events");if(!s||!u.prototype.hasOwnProperty.call(s,t))return!1;for(var l=(s=s[t]).length,c=l,p="function"==typeof i;l>0;)if(--l,(!p||s[l].callback===i)&&s[l].dispatcher===r){var h=s.splice(l,1);if(h[0]&&h[0].proxyHandle&&h[0].proxyType)for(var f=h[0].proxyType,y=f.length;y>0;)o(h[0].proxyTarget||e,f[--y],h[0].proxyHandle)}return s.length<1&&!(e instanceof n)&&o(e,t,a),s.length!==c}function o(e,t,n){var i=f.type(t);e.removeEventListener?(e.removeEventListener(i,n,!1),e.removeEventListener(i,n,!0)):e.detachEvent&&e.detachEvent(i,n)}function a(e,t){if(e instanceof f||(e=f.create(e),t&&(e.currentTarget=t)),!e||!e.currentTarget)throw new Error("invalid event target");var n=e.currentTarget,i=d(n,"events");if(!i||!u.prototype.hasOwnProperty.call(i,e.type))return!0;for(var r,s,o=0,a=(i=i[e.type].slice(0)).length;o<a;)if(r=i[o++],s=r.reference||r.dispatcher,r.callback.call(s,e),!0===e.immediatePropagationStopped)return!1;return!0}function l(e,t,n,i,r,s){this.type=e,this.callback=t,this.useCapture=!!n,this.priority=i>>0,this.reference=r||null,this.dispatcher=s}e.exports=n;var u=t("system/Object.js"),c=t("system/System.js"),p=t("system/Internal.js"),h=t("system/Symbol.js"),f=t("system/Event.js"),d=p.createSymbolStorage(h("EventDispatcher"));(n.prototype=u.create(u.prototype,{constructor:{value:n}})).hasEventListener=function(e,t){var r=d(this,"target")||this;if(r instanceof n&&r!==this)return r.hasEventListener(e,t);var s=r.length>>0;if(s>0){for(;s>0&&r[--s];)if(i(r[s],e,t))return!0;return!1}return i(r,e,t)},n.prototype.addEventListener=function(e,t,i,s,o){if("string"!=typeof e)throw new TypeError("Invalid event type");if("function"!=typeof t)throw new TypeError("Invalid callback function");var a=d(this,"target")||this;if(a instanceof n&&a!==this)return a.addEventListener(e,t,i,s,o||this),this;var u=new l(e,t,i,s,o,this),c=a.length>>0;if(c>0){for(;c>0&&a[--c];)r(a[c],u);return this}return r(a,u),this},n.prototype.removeEventListener=function(e,t){var i=d(this,"target")||this;if(i instanceof n&&i!==this)return i.removeEventListener(e,t);var r=i.length>>0;if(r>0){for(;r>0&&i[--r];)s(i[r],e,t,this);return!0}return s(i,e,t,this)},n.prototype.dispatchEvent=function(e){if(!c.is(e,f))throw new TypeError("Invalid event");var t=d(this,"target")||this;if(t instanceof n&&t!==this)return t.dispatchEvent(e);var i=t.length>>0;if(i>0){for(;i>0&&t[--i];)e.target=e.currentTarget=t[i],a(e);return!e.immediatePropagationStopped}return e.target=e.currentTarget=t,a(e)},u.defineProperty(l.prototype,"constructor",{value:l}),l.prototype.useCapture=!1,l.prototype.dispatcher=null,l.prototype.reference=null,l.prototype.priority=0,l.prototype.callback=null,l.prototype.currentTarget=null,l.prototype.type=null,l.prototype.proxyHandle=null,l.prototype.proxyTarget=null,l.prototype.proxyType=null},"system/PropertyEvent.js":function(e,t){function n(e,t,r){return this instanceof n?(i.call(this,e,t,r),this):new n(e,t,r)}e.exports=n;var i=t("system/Event.js"),r=t("system/Object.js");(n.prototype=r.create(i.prototype,{constructor:{value:n}})).property=null,n.prototype.newValue=null,n.prototype.oldValue=null,n.CHANGE="propertychange",n.COMMIT="propertycommit",i.fix.map[n.CHANGE]="input";var s="lastValue_"+(new Date).getTime()+"_"+1e4*Math.random();i.registerEvent(function(e,t,r){switch(e){case n.CHANGE:case n.COMMIT:if(r instanceof i)return r;var o=new n(e),a="string"==typeof r.propertyName?r.propertyName:null;if(a===s)return null;var l=t&&"string"==typeof t.nodeName?t.nodeName.toLowerCase():"";if(!a&&l)switch(l){case"select":case"input":case"textarea":a="value";break;default:a="textContent"}return a&&(o.property=a,o.oldValue=t[s]||undefined,o.newValue=t[a],t[s]=o.newValue),o}})},"system/StyleEvent.js":function(e,t){function n(e,t,i){return this instanceof n?(r.call(this,e,t,i),this):new n(e,t,i)}e.exports=n;var i=t("system/Object.js"),r=t("system/PropertyEvent.js");n.prototype=i.create(r.prototype,{constructor:{value:n}}),n.CHANGE="styleChange"},"system/ScrollEvent.js":function(e,t){function n(e,t,i){return this instanceof n?(r.call(this,e,t,i),this):new n(e,t,i)}e.exports=n;var i=t("system/Object.js"),r=t("system/PropertyEvent.js"),s=t("system/Event.js");n.prototype=i.create(r.prototype,{constructor:{value:n}}),n.CHANGE="scrollChange",s.registerEvent(function(e,t,i){return i instanceof n?i:e===n.CHANGE?new n(n.CHANGE):void 0})},"system/ElementEvent.js":function(e,t){function n(e,t,i){return s.instanceOf(this,n)?(r.call(this,e,t,i),this):new n(e,t,i)}e.exports=n;var i=t("system/Object.js"),r=t("system/Event.js"),s=t("system/System.js");(n.prototype=i.create(r.prototype,{constructor:{value:n}})).parent=null,n.prototype.child=null,n.ADD="elementAdd",n.ADD_TO_DOCUMENT="elementAddToDocument",n.REMOVE="elementRemove",n.CHANGE="elementChildrenChange",r.registerEvent(function(e,t,i){if(i instanceof n)return i})},"system/Element.js":function(e,t){function n(e,t){if(!(this instanceof n))return new n(e,t);t&&(t=t instanceof n?t[0]:t),P(this,!0,{context:t,forEachCurrentItem:null,forEachCurrentIndex:NaN});var i=null;e&&(e instanceof n?i=I.prototype.slice.call(e,0):C.isArray(e)?i=v(e):"string"==typeof e?i="<"===(e=C.trim(e)).charAt(0)&&">"===e.charAt(e.length-1)?[p(e)]:R(e,t):(n.isNodeElement(e)||n.isWindow(e))&&(i=[e])),E.defineProperty(this,"length",{value:0,writable:!0}),i&&a(this,i),T.call(this)}function i(e,t,n,i,r){var s=void 0!==n,o=k[e].get,a=k[e].set;if(L.fnHooks[e]&&(o="function"==typeof L.fnHooks[e].get?L.fnHooks[e].get:o,a="function"==typeof L.fnHooks[e].set?L.fnHooks[e].set:a),!s){var l=this.current();return!!l&&o.call(l,t,this)}return this.forEach(function(e){var s=o.call(e,t,this);if(i){var l=P(e,"data")||P(e,"data",{});r?l["---display---"]=s:(n=l["---display---"])&&"none"!==n.toLowerCase()||(n=function(e){switch(e.nodeName.toLowerCase()){case"table":return"table";case"thead":return"table-header-group";case"tbody":return"table-row-group";case"tfoot":return"table-footer-group";case"tr":return"table-row";case"td":return"table-cell";case"col":return"table-column";case"caption":return"table-caption";case"colgroup":return"table-column-group";case"div":case"ul":case"li":case"p":case"address":case"dl":case"dd":case"dt":case"ol":case"fieldset":case"form":case"h1":case"h2":case"h3":case"h4":case"h5":case"h6":return"block";default:return"inline"}}(e))}if(s!==n){var u=a.call(e,t,n,this);u&&("string"==typeof u&&((u=u===O.CHANGE?new O(O.CHANGE):new N(N.CHANGE)).property=t),u instanceof N&&(u.property=u.property||t,u.newValue=u.newValue||n,u.oldValue=u.oldValue||s,this.dispatchEvent(u)))}})}function r(e){var t=[];if(!n.isFrame(e)&&e.hasChildNodes())for(var i,r=e.childNodes.length,s=0;s<r;)i=e.childNodes.item(s),"#text"!==n.getNodeName(i)&&t.push(i),++s;return t}function s(e,t,n,i){if(e.hasEventListener(t)){var r=new x(t);return r.parent=n,r.child=i,e.dispatchEvent(r)}return!0}function o(e,t,i,r){var s,o,a=new I,l="";return this.forEach(function(t){if(t&&t.nodeType){s=t;do{if(o=s,s=s[e],r&&(t===r||s===r))return;s&&"#text"!==(l=n.getNodeName(s))&&a.indexOf(s)<0&&a.push(s)}while(s&&o!==s&&(!0===i||"#text"===l))}}),t?"function"==typeof t?I.prototype.filter.call(a,function(e){return this.current(e),t.call(this,e)},this):R(t,null,null,a):a}function a(e,t,n){return"function"==typeof t.valueOf&&(t=t.valueOf()),I.prototype.splice.apply(e,[].concat.apply([n||0,0],t)),e}function l(e){return"string"!=typeof e?e:"cssText"===e?e:(e=L.cssMap[e]||e,e=e.replace(/^-ms-/,"ms-").replace(L.cssCamelRegex,L.cssCamelCase),e=e.replace(L.cssUpperRegex,"-$1").toLowerCase(),!0===L.cssPrefix[e]?L.cssPrefixName+e:e)}function u(e,t,n,i){if("object"===t){var r=[];for(var s in e){var o=c(s,e[s],n,i);!1!==o&&(o="object"==typeof o?C.serialize(o,"style"):l(s)+":"+o,r.push(o))}return r.join(";")}return e.replace(/([\w\-]+)\s*\:([^\;\}]*)/g,function(e,t,r){return(r=c(t,r,n,i))?"object"==typeof r?C.serialize(r,"style"):l(t)+":"+r:""})}function c(e,t,n,i,r){var s=typeof t;if("string"===s&&(t=C.trim(t),s=/^\d+$/.test(t)?"number":s),"string"===s){var o=/^([\-+])=([\-+.\de]+)/.exec(t);if(o){var a=k.style.get.call(n||{},e,i);a=parseFloat(a)||0,t=+(o[1]+1)*+o[2]+a,s="number"}else C.env.platform("IE",8)&&"rgba("===t.substr(0,5)&&(t=t.replace(/rgba\(.*?\)/i,J(t)))}if("number"===s&&isNaN(t))return!1;if("number"!==s||L.cssNumber[e]||(t+="px"),L.cssHooks[e]&&"function"==typeof L.cssHooks[e].set){if(!r){var u={};return L.cssHooks[e].set.call(n||{},u,t,i),u}var c=l(e);L.cssHooks[e].set.call(n,n.style,t,c)||(n.style[c]=t)}else{if(!r)return t;n.style[l(e)]=t}}function p(e,t,i){if(C.isString(e)){if(e=C.trim(e).replace(/[\r\n]+/g,"")){if(!0===t)return document.createTextNode(e);var r;if("<"===e.charAt(0)&&(r=M.exec(e))){var s=document.createElement(r[1]),o=function(e){if("string"==typeof e&&/[\S]*/.test(e)){var t="<"===e.charAt(0)?1:0,n=e.replace(/=\s*(\w+)/g,'="$1"').match(H);if(e={},n&&n.length>0)for(var i;i=n[t++];){var r=i.split("=");if(r.length>0){var s=C.trim(r[0]);e[s]="","string"==typeof r[1]&&(e[s]=r[1].replace(D,"").replace(/\\([\'\"])/g,"$1"))}}return e}return null}(e);for(var a in o)k.property.set.call(s,a,o[a]);return s}if(e.length>=1&&/^[^\d+][a-zA-Z0-9]+$/.test(e))try{return document.createElement(e)}catch(d){}var l=document.createElement("div"),u=e.match(/^\<(tr|th|td|tbody|thead|tfoot)(?:[\s\>]+)/i);if(u){var c=1;switch(u[1]){case"td":e="<table><tbody><tr>"+e+"</tr></tbody></table>",c=3;break;case"th":e="<table><thead><tr>"+e+"</tr></thead></table>",c=3;break;case"tr":e="<table><tbody>"+e+"</tbody></table>",c=2;break;default:e="<table>"+e+"</table>",c=1}l.innerHTML=e;for(var p=0;p<c;p++)(l=l.childNodes.item(0)).parentNode.removeChild(l);if(!l)throw new Error("Invalid html");if(i)return l}else l.innerHTML=e;var h=l.childNodes.length;if(h>1){for(var f=document.createDocumentFragment();h>0;)--h,f.appendChild(l.childNodes.item(0));return f}return(l=l.childNodes.item(0)).parentNode.removeChild(l)}}else if(n.isNodeElement(e))return e.parentNode?y(e,!0):e;throw new Error("createElement param invalid")}function h(e,t){var i=n.isNodeElement(e);if(C.isObject(t))for(var r in t)t[r]&&""!=t[r]&&(i?k.property.set.call(e,r,t[r]):e[r]=t[r]);else for(var s,o=0,a=t.attributes.length;o<a;)(s=t.attributes.item(o++)).nodeValue&&""!=s.nodeValue&&(i?k.property.set.call(e,s.nodeName,s.nodeValue):e[s.nodeName]=s.nodeValue);return e}function f(e){return e&&e.nodeType&&e.style&&!(3===e.nodeType||8===e.nodeType||9===e.nodeType||11===e.nodeType)}function d(e){return f(e)?document.defaultView&&document.defaultView.getComputedStyle?document.defaultView.getComputedStyle(e,null):e.currentStyle||e.style:{}}function y(e,t){if(e.cloneNode)return e.cloneNode(!!t);if("string"==typeof e.nodeName){var n=document.createElement(e.nodeName);return n&&h(n,e),n}return null}function v(e){return I.prototype.filter.call(e,function(e){return n.isNodeElement(e)||n.isWindow(e)})}function m(e,t,n){var i=P(this,"forEachCurrentItem"),r=this.current();this.current(r.parentNode);var s=this.getBoundingRect();return this.current(i),e=e||0,t=t||0,!0===n?{left:s.left+e,top:s.top+t}:{left:e-s.left,top:t-s.top}}function g(e,t){var i=n.getNodeName(e);new RegExp("^<"+i,"i").exec(t)||(t="<"+i+">"+t+"</"+i+">");var r=p(t,!1,!0);n.getNodeName(r.childNodes[0])===i&&(r=r.childNodes[0]).parentNode.removeChild(r),h(r,e);var s=e.parentNode;return s?s.replaceChild(r,e):((s=document.createElement("div")).appendChild(e),s.replaceChild(r,e),s.removeChild(r)),r}function _(e,t){if(s(new T(t),x.ADD_TO_DOCUMENT,e,t),t.hasChildNodes()&&t.childNodes.length>0)for(var n=0;n<t.childNodes.length;n++)_(t,t.childNodes.item(n))}function w(e,t){if(s(new T(t),x.REMOVE,e,t),t.hasChildNodes()&&t.childNodes.length>0)for(var n=0;n<t.childNodes.length;n++)w(t,t.childNodes.item(n))}e.exports=n;var E=t("system/Object.js"),S=t("system/Internal.js"),b=t("system/Symbol.js"),C=t("system/System.js"),I=t("system/Array.js"),T=t("system/EventDispatcher.js"),O=t("system/StyleEvent.js"),N=t("system/PropertyEvent.js"),j=t("system/ScrollEvent.js"),x=t("system/ElementEvent.js"),A=t("system/Event.js"),P=S.createSymbolStorage(b("Element")),k={},L={attrMap:{tabindex:"tabIndex",readonly:"readOnly","for":"htmlFor",maxlength:"maxLength",cellspacing:"cellSpacing",cellpadding:"cellPadding",rowspan:"rowSpan",colspan:"colSpan",usemap:"useMap",frameborder:"frameBorder","class":"className",contenteditable:"contentEditable"},attrtrue:{className:!0,innerHTML:!0,value:!0},cssPrefixName:"",cssPrefix:{"box-shadow":!0,"border-radius":!0,"border-top-left-radius":!0,"border-top-right-radius":!0,"border-bottom-left-radius":!0,"border-bottom-right-radius":!0,"focus-ring-color":!0,"user-select":!0,"radial-gradient":!0,"linear-gradient":!0,transform:!0,transition:!0,animation:!0,"animation-name":!0,"animation-duration":!0,"animation-iteration-count":!0,"animation-delay":!0,"animation-fill-mode":!0,"animation-direction":!0,"animation-timing-function":!0,"animation-play-state":!0},cssUpperRegex:/([A-Z]|^ms)/g,cssCamelRegex:/-([a-z]|[0-9])/gi,cssCamelCase:function(e,t){return(t+"").toUpperCase()},cssNumber:{fillOpacity:!0,fontWeight:!0,lineHeight:!0,opacity:!0,orphans:!0,widows:!0,zIndex:!0,zoom:!0},cssHooks:{},cssMap:{},fnHooks:{},cssDisplayRegex:/^(none|table(?!-c[ea]).+)/,cssDisplayMap:{position:"absolute",visibility:"hidden",display:"block"},getsizeval:function(e){if(n.isWindow(this)){t=Math.max(this["inner"+e]||0,this["offset"+e]||0,this["client"+e]||0)||document.documentElement["client"+e];return"BackCompat"===document.compatMode&&(t=document.body["client"+e]),t}if(n.isDocument(this))return Math.max(this.body["scroll"+e]||0,this.documentElement["scroll"+e]||0,this.body["offset"+e]||0,this["offset"+e]||0,this.body["client"+e]||0,this["client"+e]||0)+(this.documentElement["Height"===e?"clientTop":"clientLeft"]||0);var t;if((t=this["offset"+e]||0)<1){var i=d(this);if((t=parseFloat("Width"===e?i.width:i.height)||0)<1&&L.cssDisplayRegex.test(i.display)){var r,s={};for(r in L.cssDisplayMap)s[r]=i[r],this.style[r]=L.cssDisplayMap[r];t=this["offset"+e]||0;for(r in s)this.style[r]=s[r]}}return t}},R="function"==typeof Sizzle?Sizzle:function(e,t,i,r){if(!i||!C.isArray(i)){if(t){if(n.isWindow(t))t=document;else if("string"==typeof t&&!(t=document.querySelector(t)))return[];if(!n.isHTMLContainer(t))throw new TypeError("Invalid context in Element.querySelector")}i=I.prototype.slice.call((t||document).querySelectorAll(e))}if(r&&C.isArray(r)){for(var s=0,o=[];s<r.length;)I.prototype.indexOf.call(i,r[s])>=0&&I.prototype.indexOf.call(o,r[s])<0&&o.push(r[s]),s++;return o}return i},M=/^<(\w+)(.*?)\/\s*>$/,H=/(\w+)(\s*=\s*([\"\'])([^\3]*?)[^\\]\3)?/g,D=/^[\'\"]|[\'\"]$/g;(n.prototype=E.create(T.prototype,{constructor:{value:n},toString:{value:function(){return this.constructor===n?"[object Element]":T.prototype.toString.call(this)}},valueOf:{value:function(){return this.constructor===n?this.slice(0):T.prototype.valueOf.call(this)}}})).setCurrentElementTarget=!0,n.prototype.slice=I.prototype.slice,n.prototype.splice=function(e,t){var i=n.prototype.concat.apply([],n.prototype.slice.call(arguments,2)),r=I.prototype.splice.call(this,e,t);return I.prototype.splice.apply(this,I.prototype.concat.apply([0,this.length],this.concat(i))),r},n.prototype.concat=function(){for(var e=this.slice(0),t=0;arguments.length>t;){var i=[];i=arguments[t]instanceof n?arguments[t].slice(0):v(C.isArray(arguments[t])?arguments[t]:[arguments[t]]),e=I.prototype.concat.apply(e,i),t++}return I.prototype.unique.call(e)},n.prototype.indexOf=I.prototype.indexOf,n.prototype.forEach=function(e,t){var n=null;t=t||this;var i=P(this,"forEachCurrentItem");if(i)n=e.call(t,i,P(this,"forEachCurrentIndex"));else{for(var r=this.slice(0),s=0,o=r.length;s<o&&(i=r[s],P(this,"forEachCurrentItem",i),P(this,"forEachCurrentIndex",s),null==(n=e.call(t,i,s)));s++);P(this,"forEachCurrentItem",null),P(this,"forEachCurrentIndex",NaN)}return null==n?this:n},n.prototype.current=function(e){return void 0===e?P(this,"forEachCurrentItem")||this[0]:(e&&("string"==typeof e&&(e=(e=R(e,this.context||document))&&e.length>0?e[0]:null),e=e&&(n.isNodeElement(e)||n.isWindow(e))?e:null),P(this,"forEachCurrentIndex",NaN),P(this,"forEachCurrentItem",e),this)},k.property={get:function(e){return e=L.attrMap[e]||e,(L.attrtrue[e]||!this.getAttribute?this[e]:this.getAttribute(e))||null},set:function(e,t){return e=L.attrMap[e]||e,!0===L.attrtrue[e]&&null===t&&(t=""),null===t?L.attrtrue[e]||!this.removeAttribute?delete this[e]:this.removeAttribute(e):L.attrtrue[e]||!this.setAttribute?this[e]=t:this.setAttribute(e,t),N.CHANGE}},n.prototype.property=function(e,t){return i.call(this,"property",e,t)},n.prototype.properties=function(e){if(e&&"object"==typeof e)return E.forEach(e,function(e,t){i.call(this,"property",t,e)},this),this;var t=this.current(),n={};if(t.hasAttributes())for(var r=t.attributes,s=0;s<r.length;s++)n[r[s].name]=r[s].value;return n},n.prototype.hasProperty=function(e){var t=this.current();return!!t&&(!0===L.attrtrue[e]?"undefined"!=typeof t[e]:"function"==typeof t.hasAttribute?t.hasAttribute(e):"undefined"!=typeof t[e])},n.prototype.data=function(e,t){var n,i=typeof e,r=void 0!==t;return this.forEach(function(s){if("object"===i)P(s,"data",e);else{if("string"!==i||!r)return n=P(s,"data"),"string"===i&&n?n[e]:n||null;n=P(s,"data")||P(s,"data",{}),n[e]=t}})};var U=/\s*rgba\(\s*(\d+)\,\s*(\d+)\,\s*(\d+)/i,J=function(e){var t=e.match(U);return t?["#",("0"+Number(t[1]>>0).toString(16)).slice(-2),("0"+Number(t[2]>>0).toString(16)).slice(-2),("0"+Number(t[3]>>0).toString(16)).slice(-2)].join(""):e};k.style={get:function(e){var t=L.cssHooks[e]&&"function"==typeof L.cssHooks[e].get?L.cssHooks[e].get:null,n=this.currentStyle||this.style;return"cssText"!==e&&(n=d(this)),t?t.call(this,n,e):n[e]||""},set:function(e,t,n){var i=typeof t;if("object"===i)for(var r in t)c(r,t[r],this,n,!0);else{if("cssText"===e)if(null==t)t="";else if("string"===i){var s=this.style.cssText;t=(s?s+";":"")+u(t,i,this,n)}c(e,t,this,n,!0)}return O.CHANGE}},n.prototype.style=function(e,t){return i.call(this,"style",e,t)},n.prototype.show=function(){return i.call(this,"style","display","",!0,!1),this},n.prototype.hide=function(){return i.call(this,"style","display","none",!0,!0),this},k.text={get:function(){return"string"==typeof this.textContent?this.textContent:this.innerText},set:function(e,t){return"string"==typeof this.textContent?this.textContent=t:this.innerText=t,N.CHANGE}},n.prototype.text=function(e){return i.call(this,"text","text",e)},k.value={get:function(){return this.value||null},set:function(e,t){return this.value=t,N.CHANGE}},n.prototype.value=function(e){return i.call(this,"value","value",e)},n.prototype.hasClass=function(e){if("string"!=typeof e)throw new Error("className is not String");var t=this.property("class");return!!t&&new RegExp("(\\s|^)"+e+"(\\s|$)").test(C.trim(t))},n.prototype.addClass=function(e,t){if("string"!=typeof e)throw new Error("className is not String");e=C.trim(e);var n=!0===t?null:new RegExp("(\\s|^)"+e+"(\\s|$)");return this.forEach(function(i){if(f(i)){var r=C.trim(this.property("class")||"");if(!(r&&n&&n.test(r))){var s=[r],o=e;if(!0!==t&&(s.push(e),o=s.join(" ")),i.className=o,this.hasEventListener(O.CHANGE)){var a=new O(O.CHANGE);a.property="class",a.newValue=o,a.oldValue=r,this.dispatchEvent(a)||(i.className=r)}try{i.offsetWidth=i.offsetWidth}catch(l){}}}}),this},n.prototype.removeClass=function(e){var t=!e||"string"!=typeof e;return this.forEach(function(n){if(f(n)){var i=n.className||"",r=!t&&i?i.replace(new RegExp("(\\s|^)"+e+"(\\s|$)")," "):"";this.addClass(r,!0)}})},n.prototype.width=function(e){return null==e?parseFloat(L.getsizeval.call(this.current(),"Width")):(i.call(this,"style","width",e),this)},n.prototype.height=function(e){return null==e?parseFloat(L.getsizeval.call(this.current(),"Height")):(i.call(this,"style","height",e),this)},n.prototype.animation=function(e,t,n,i,r,s,o){var a=e+" "+(t||3)+"s "+(n||"ease");return i>0&&(a+=" "+i+"s"),r>1&&(a+=" "+r),s&&(a+=" alternate"),o||(o="both"),a+=" "+o,this.style("animation","unset"),this.style("animation",a),this},n.prototype.fadeIn=function(e,t){var i="fadeIn";return t>0&&t<1&&(i=n.createAnimationStyleSheet("fadeIn_0_"+t,{from:{opacity:0},to:{opacity:t}})),this.animation(i,e,"linear"),this},n.prototype.fadeOut=function(e,t){var i="fadeOut";return t>0&&t<1&&(i=n.createAnimationStyleSheet("fadeOut_"+t+"_0",{from:{opacity:t},to:{opacity:0}})),this.animation(i,e,"linear"),this},k.scroll={get:function(e){var t=this.defaultView||this.parentWindow||this,i="scroll"+e;return parseInt(n.isWindow(t)?t["top"===e.toLowerCase()?"pageYOffset":"pageXOffset"]||t.document.documentElement[i]||t.document.body[i]:t[i])},set:function(e,t,n){var i=this.defaultView||this.parentWindow||this,r=k.scroll.get.call(this,e);if(t!=r){if("static"===n.style("position")&&n.style("position","relative"),"function"==typeof i.scrollTo){var s=[t,NaN];"top"===e.toLowerCase()&&(s=s.reverse()),i.scrollTo.apply(i,s)}else i["scroll"+e]=t;if(this.hasEventListener.call(j.CHANGE)){var o=new j(j.CHANGE);return o.property=e.toLowerCase(),o.newValue=t,o.oldValue=r,o}}}},n.prototype.scrollTop=function(e){return i.call(this,"scroll","Top",e)},n.prototype.scrollLeft=function(e){return i.call(this,"scroll","Left",e)},n.prototype.scrollWidth=function(){return i.call(this,"scroll","Width")},n.prototype.scrollHeight=function(){return i.call(this,"scroll","Height")},n.prototype.getBoundingRect=function(e){var t={top:0,left:0,right:0,bottom:0,width:0,height:0},i=this.current();if(n.isWindow(i))return t.left=i.screenLeft||i.screenX,t.top=i.screenTop||i.screenY,t.width=this.width(),t.height=this.height(),t.right=t.width+t.left,t.bottom=t.height+t.top,t;if(!n.isNodeElement(i))throw new Error("invalid elem. elem not is NodeElement");var r=i.ownerDocument||i,s=r.documentElement;this.current(n.getWindow(r));var o=this.scrollTop(),a=this.scrollLeft();if(this.current(i),"getBoundingClientRect"in document.documentElement){var l=i.getBoundingClientRect(),u=s.clientTop||r.body.clientTop||0,c=s.clientLeft||r.body.clientLeft||0;t.top=l.top+o-u,t.left=l.left+a-c,t.right=l.right+a-c,t.bottom=l.bottom+o-u,t.width=l.width||l.right-l.left,t.height=l.height||l.bottom-l.top}else{t.width=this.width(),t.height=this.height();do{t.top+=i.offsetTop,t.left+=i.offsetLeft,i=i.offsetParent}while(i);t.right=t.width+t.left,t.bottom=t.height+t.top}return"fixed"!==this.style("position")&&!0!==e||(t.top-=o,t.left-=a,t.right-=a,t.bottom-=o),t};var z={absolute:!0,relative:!0,fixed:!0};k.position={get:function(e,t){return t.getBoundingRect()[e]},set:function(e,t,n){var i=k.style.get.call(this,"position");return i&&!z[i]&&k.style.set.call(this,"position","relative"),k.style.set.call(this,e,t,n)}},n.prototype.left=function(e){return i.call(this,"position","left",e)},n.prototype.top=function(e){return i.call(this,"position","top",e)},n.prototype.right=function(e){return i.call(this,"position","right",e)},n.prototype.bottom=function(e){return i.call(this,"position","bottom",e)},n.prototype.localToGlobal=function(e,t){return m.call(this,e,t,!0)},n.prototype.globalToLocal=function(e,t){return m.call(this,e,t)},n.prototype.find=function(e){if(null==e)throw new TypeError("selector is null or is undefined");var t=[];return"function"==typeof e?t=I.prototype.filter.call(this.slice(0),function(t){return this.current(t),e.call(this,t)},this):this.forEach(function(n){if(n===e)return t=[n],n;t=[].concat.apply(t,R(e,n))}),a(new n,t)},n.prototype.parent=function(e){return a(new n,o.call(this,"parentNode",e))},n.prototype.parents=function(e){return a(new n,o.call(this,"parentNode",e,!0,document.body))},n.prototype.prevAll=function(e){return a(new n,o.call(this,"previousSibling",e,!0))},n.prototype.prev=function(e){return a(new n,o.call(this,"previousSibling",e))},n.prototype.nextAll=function(e){return a(new n,o.call(this,"nextSibling",e,!0))},n.prototype.next=function(e){return a(new n,o.call(this,"nextSibling",e))},n.prototype.siblings=function(e){var t=a(new n,o.call(this,"previousSibling",e,!0));return a(t,o.call(this,"nextSibling",e,!0),t.length),t},n.prototype.children=function(e){var t=[];return this.forEach(function(e){t=t.concat(r(e))}),"function"==typeof e?t=I.prototype.filter.call(t,e):e&&(t=R(e,null,null,t)),a(new n,t)},n.prototype.html=function(e){var t=!0===e,i=!t&&void 0!==e;if(!i&&this.length<1)return"";var r=!1;return i&&e&&("string"==typeof e?e=C.trim(e).replace(/[\r\n\t]+/g,""):e instanceof n?(e=e.current(),r=!0):n.isNodeElement(e)&&(r=!0)),this.forEach(function(s){if(!i){if(e=s.innerHTML,t)if("string"==typeof s.outerHTML)e=s.outerHTML;else{var o=y(s,!0);o&&(e=document.createElement("div").appendChild(o).innerHTML)}return e}for(;s.hasChildNodes();)this.removeChild(s.childNodes.item(0));if(r)return this.addChild(e);try{if(s.innerHTML=e,C.env.platform(C.env.BROWSER_IE,8))switch(n.getNodeName(s)){case"thead":case"tbody":case"tfoot":case"table":case"tr":case"th":case"td":this[this.indexOf(s)]=g(s,e)}}catch(a){this[this.indexOf(s)]=g(s,e)}})},n.prototype.addChild=function(e){return this.addChildAt(e,-1)},n.prototype.addChildAt=function(e,t){if(C.isNaN(t))throw new Error("Invalid param the index in addChildAt");if(C.instanceOf(e,n))return e.forEach(function(e,n){this.addChildAt(e,isNaN(n)?t:n+t)},this),e;if(!n.isNodeElement(e))throw new TypeError("is not Element in addChildAt");var i=this.current();if(!n.isHTMLElement(i))throw new Error("parent is null of child elemnet in addChildAt");var r=-1===t?null:this.getChildAt(t);return e.parentNode&&this.removeChild(e),i.insertBefore(e,r||null),"#document-fragment"===n.getNodeName(e)&&(e["parent-element"]=i),s(new T(e),x.ADD,i,e),s(new T(i),x.CHANGE,i,e),this.isNodeInDocumentChain()&&_(i,e),e},n.prototype.getChildAt=function(e){if("number"!=typeof e)throw new TypeError("index is not Number");var t=this.current();if(!t||!t.hasChildNodes())return null;var n=r(t);return(e=e<0?e+n.length:e)>=0&&e<n.length?n[e]:null},n.prototype.getChildIndex=function(e){if(e instanceof n&&(e=e.current()),!n.isNodeElement(e))throw new TypeError("is not HTMLElement in getChildIndex");var t=e.parentNode;if(!t||!t.hasChildNodes())return-1;var i=r(t);return I.prototype.indexOf.call(i,e)},n.prototype.removeChild=function(e){if(C.instanceOf(e,n)&&(e=e.current()),!n.isNodeElement(e))throw new TypeError("is not HTMLElement in removeChild");var t=e.parentNode;if(!t&&"#document-fragment"===n.getNodeName(e)){if(t=e["parent-element"])for(var i=new n(t);t.childNodes.length>0;)i.removeChild(t.childNodes[0]);return e}if(t===this.current()){t.removeChild(e);w(t,e),s(new T(t),x.CHANGE,t,e),null}return e},n.prototype.removeChildAt=function(e){var t=this.getChildAt(e);if(!t)throw new Error("Not found child. in removeChildAt");return this.removeChild(t)},n.prototype.isEmpty=function(){return!(this.length>0)},n.prototype.isNodeInDocumentChain=function(){var e=this.current();return e&&n.contains(document.documentElement,e)},n.contains=function(e,t){if(!e||!t)return!1;if(e instanceof n&&(e=e.current()),t instanceof n&&(t=t.current()),n.isWindow(e)&&(e=document.documentElement),n.isNodeElement(t)&&n.isNodeElement(e)){if("contains"in e)return e.contains(t)&&e!==t;if(e.compareDocumentPosition)return!!(16&e.compareDocumentPosition(t))&&e!==t}return R(t,e).length>0},n.equal=function(e,t){if(e===t)return!0;if(!e||!t)return!1;var i=e instanceof n?e.slice(0):[e],r=t instanceof n?t.slice(0):[t];if(i.length!=r.length)return!1;for(var s=0,o=i.concat(r),a=o.length;s<a;s++)if(n.isNodeElement(o[s])&&(i.indexOf(o[s])<0||r.indexOf(o[s])<0))return!1;return!0};var B="object"==typeof HTMLElement;n.isHTMLElement=function(e){return!!e&&(B?e instanceof HTMLElement:(1===e.nodeType||11===e.nodeType)&&"string"==typeof e.nodeName)},n.isForm=function(e,t){if(e){var i=n.getNodeName(e);switch(i){case"select":case"input":case"textarea":case"button":return!t||"string"!=typeof t||t.toLowerCase()!==i}}return!1};var G="undefined"!=typeof Node;n.isNodeElement=function(e){return!(!e||"object"!=typeof e)&&(G?e instanceof Node:e.nodeType&&("string"==typeof e.nodeName||"string"==typeof e.tagName||"#document-fragment"===e.nodeName))},n.isHTMLContainer=function(e){return e&&(n.isHTMLElement(e)||n.isDocument(e))},n.isEventElement=function(e){return e&&("function"==typeof e.addEventListener||"function"==typeof e.attachEvent||"undefined"!=typeof e.onreadystatechange)},n.isWindow=function(e){return e&&e==n.getWindow(e)},n.isDocument=function(e){return e&&9===e.nodeType},n.isFrame=function(e){var t=n.getNodeName(e);return"iframe"===t||"frame"===t},n.getWindow=function(e){return e&&"object"==typeof e?(e=e.ownerDocument||e).window||e.defaultView||e.contentWindow||e.parentWindow||window||null:null},n.getNodeName=function(e){return e&&e.nodeName&&"string"==typeof e.nodeName?e.nodeName.toLowerCase():""},C.env.platform(C.env.BROWSER_FIREFOX)&&C.env.version(4)?L.cssPrefixName="-moz-":C.env.platform(C.env.BROWSER_SAFARI)||C.env.platform(C.env.BROWSER_CHROME)?L.cssPrefixName="-webkit-":C.env.platform(C.env.BROWSER_OPERA)?L.cssPrefixName="-o-":C.env.platform(C.env.BROWSER_IE)&&C.env.version(9,">=")&&(L.cssPrefixName="-ms-"),"-webkit-"===L.cssPrefixName&&void 0!==A&&(A.fix.cssprefix="webkit"),L.cssHooks.userSelect={get:function(e){return e[l("userSelect")]||""},set:function(e,t){return e[l("userSelect")]=t,e["-moz-user-fetch"]=t,e["-webkit-touch-callout"]=t,e["-khtml-user-fetch"]=t,!0}},L.cssHooks.radialGradient=L.cssHooks.linearGradient={get:function(e,t){return P(this,t)||""},set:function(e,t,n){if(t=C.trim(t),P(this,n,t),C.env.platform(C.env.BROWSER_SAFARI)&&C.env.version(5.1,"<")||C.env.platform(C.env.BROWSER_CHROME)&&C.env.version(10,"<")){var i="",r=0;if("radialGradient"===n)(i=t.match(/([^\#]*)/))&&(i=i[1].replace(/\,\s*$/,""),t=t.replace(/([^\#]*)/,"")),t=t.split(",");else{r=t.match(/^(\d+)deg/);t=t.split(","),r&&(r=r[1],t.splice(0,1)),r=C.parseFloat(r)||0}for(var s=[],o=0;o<t.length;o++){y=C.trim(t[o]).split(/\s+/,2);if(0===o&&s.push("from("+y[0]+")"),0!==o&&o!==t.length-1||"undefined"!=typeof y[1]){var a=(y[1]>>0)/100;s.push("color-stop("+a+","+y[0]+")")}o===t.length-1&&s.push("to("+y[0]+")")}var u=L.getsizeval.call(this,"Width"),c=L.getsizeval.call(this,"Height");if("radialGradient"===n){i=i.split(/\,/,2);p=C.trim(i[0]).split(/\s+/,2);1===p.length&&p.push("50%");var p;i=(p=p.join(" "))+",0, "+p+", "+u/2,t=C.sprintf("%s,%s,%s","radial",i,s.join(","))}else{var h=Math.cos(r*(Math.PI/180)),f=Math.sin(r*(Math.PI/180));t=C.sprintf("%s,0% 0%,%s %s,%s","linear",Math.round(h*u),Math.round(f*c),s.join(","))}n="gradient"}else t.match(/^(left|top|right|bottom|\d+)/)||"linearGradient"!==n?"linearGradient"===n&&(t=t.replace(/^(\d+)(deg)?/,"$1deg")):t="0deg,"+t;var d="background-image";if(C.env.platform(C.env.BROWSER_IE,9)){r=(t=t.split(",")).splice(0,1).toString();r=parseFloat(r)||0;for(var s=[],o=0;o<t.length;o++){var y=C.trim(t[o]).split(/\s+/,2);s.push(o%1==1?"startColorstr='"+y[0]+"'":"endColorstr='"+y[0]+"'")}var v=r%90==0?"1":"0";t="alpha(opacity=100 style="+("linearGradient"===n?"1":"2")+" startx=0,starty=5,finishx=90,finishy=60);",t=e.filter||"",t+=C.sprintf(";progid:DXImageTransform.Microsoft.gradient(%s, GradientType=%s);",s.join(","),v),t+="progid:DXImageTransform.Microsoft.gradient(enabled = false);",d="filter"}else t=C.sprintf("%s(%s)",l(n),t);return e[d]=t,!0}},n.fix=L,n.createElement=p,n.querySelector=R;var V=null;n.isAnimationSupport=function(){if(null===V){var e=L.cssPrefixName,t=n.createElement("div"),i=e+"animation-play-state";t.style[i]="paused",V="paused"===t.style[i]}return V};var F={};n.createAnimationStyleSheet=function(e,t){if(!n.isAnimationSupport())return!1;e=e.replace(".","_");var i=["{"];if(!0===F[e])return e;F[e]=!0;for(var r in t)i.push(r+" {"),C.isObject(t[r])?i.push(C.serialize(t[r],"style")):i.push(t[r]),i.push("}");return i.push("}"),n.addStyleSheet("@"+L.cssPrefixName+"keyframes "+e,i.join("\r\n"))?e:null};var W=null;n.addStyleSheet=function(e,t){if(null===W){var n=document.getElementsByTagName("head")[0];W=document.createElement("style"),n.appendChild(W)}if(t=C.isObject(t)?u(t,"object"):u(C.trim(t),"string"),C.env.platform(C.env.BROWSER_IE,8)){var e=e.split(","),i=W.styleSheet;t=t.replace(/^\{/,"").replace(/\}$/,"");try{for(var r=0;r<e.length;r++)i.insertRule?i.insertRule(e+"{"+t+"}",i.cssRules.length):i.addRule(e[r],t,-1)}catch(s){}}else"{"!==t.charAt(0)&&(t="{"+t+"}"),W.appendChild(document.createTextNode(e+t));return!0}},"es/events/ApplicationEvent.es":function(e,t){function n(e,t,n){s.defineProperty(this,a,{value:{container:undefined}}),void 0===n&&(n=!0),void 0===t&&(t=!0),i.call(this,e,t,n)}e.exports=n;var i=t("system/Event.js"),r=t("system/Symbol.js"),s=t("system/Object.js"),o=t("system/Internal.js"),a=r("es.events.ApplicationEvent").valueOf(),l={FETCH_ROOT_CONTAINER:{value:"applicationFetchRootContainer",type:16}};for(var u in l)s.defineProperty(n,u,l[u]);var c={constructor:{value:n},getContainer:{value:function(){return this[a].container},type:2},setContainer:{value:function(e){return this[a].container=e},type:2}};n.prototype=s.create(i.prototype,c),o.defineClass("es.events.ApplicationEvent",n,{"extends":null,"package":"es.events",classname:"ApplicationEvent",uri:["T32","y33","X22"],privateSymbol:a,method:l,proto:c},1)},"es/interfaces/IDisplay.es":function(e,t){function n(){throw new TypeError('"es.interfaces.IDisplay" is not constructor.')}e.exports=n;t("es/core/es_internal.es"),t("es/interfaces/IContainer.es");var i=t("system/Symbol.js"),r=(t("system/Object.js"),t("system/Internal.js"));i("es.interfaces.IDisplay").valueOf();r.defineClass("es.interfaces.IDisplay",n,{"package":"es.interfaces",classname:"IDisplay"},2)},"es/core/View.es":function(e,t){function n(e){o.defineProperty(this,l,{value:{_context:undefined}}),i.call(this,e.getContainer()),this[l]._context=e}e.exports=n;t("es/core/Application.es");var i=t("es/core/Skin.es"),r=(t("system/Element.js"),t("system/Event.js")),s=t("system/Symbol.js"),o=t("system/Object.js"),a=t("system/Internal.js"),l=s("es.core.View").valueOf(),u={CHARSET_GB2312:{value:"GB2312",type:16},CHARSET_GBK:{value:"GBK",type:16},CHARSET_UTF8:{value:"UTF-8",type:16}};for(var c in u)o.defineProperty(n,c,u[c]);var p={constructor:{value:n},O4__context:{writable:!0,value:undefined,type:8},getContext:{value:function(){return this[l]._context},type:2},getTitle:{value:function(){return this[l]._context.getTitle()},type:2},setTitle:{value:function(e){this[l]._context.setTitle(e)},type:4},display:{value:function(){var e=this.w2_getInitialized(),t=i.prototype.display.call(this);return!e&&this.hasEventListener("INTERNAL_BEFORE_CHILDREN")&&this.dispatchEvent(new r("INTERNAL_BEFORE_CHILDREN")),t},type:1}};n.prototype=o.create(i.prototype,p),a.defineClass("es.core.View",n,{"extends":i,"package":"es.core",classname:"View",uri:["O4","w2","n5"],privateSymbol:l,method:u,proto:p},1)},"es/core/Skin.es":function(e,t){function n(e,t){c.defineProperty(this,_,{value:{_bindable:null,_currentStateGroup:null,initialized:!1,invalidate:!1,bindEventMaps:{},elementMaps:{},timeoutId:null,callback:null,_dataset:{},_installer:null,_watchMap:null,_children:[],statesGroup:{},_currentState:null}}),void 0===t&&(t=null);var n=null;"string"===l.typeOf(e)?n=new u(document.createElement(e)):l.instanceOf(e,u)?n=e:u.isNodeElement(e)?n=new u(e):l.is(e,o)&&(n=e.getElement()),r.call(this,n,t)}e.exports=n;var i=t("es/core/SkinComponent.es"),r=t("es/core/Container.es"),s=t("es/events/SkinEvent.es"),o=(t("es/core/State.es"),t("es/interfaces/IDisplay.es")),a=(t("es/interfaces/IContainer.es"),t("es/interfaces/IBindable.es")),l=t("system/System.js"),u=t("system/Element.js"),c=t("system/Object.js"),p=t("system/Array.js"),h=t("system/Bindable.js"),f=t("system/EventDispatcher.js"),d=t("system/Reflect.js"),y=t("system/ElementEvent.js"),v=(t("system/Function.js"),t("system/Map.js")),m=t("system/Symbol.js"),g=t("system/Internal.js"),_=m("es.core.Skin").valueOf(),w={constructor:{value:n},w2_render:{value:function(){return this.getChildren().slice(0)},type:1},w6__bindable:{writable:!0,value:null,type:8},w2_getBindable:{value:function(){var e=this[_]._bindable;return e||(e=new h(this,"*"),this[_]._bindable=e),e},type:2},w6__currentStateGroup:{writable:!0,value:null,type:8},w2_getCurrentStateGroup:{value:function(){var e,t=this[_]._currentState;if(!t)throw new ReferenceError("State is not define.");if(this[_]._currentStateGroup)return this[_]._currentStateGroup;var n=null,i=this[_].statesGroup;if(i.hasOwnProperty(t))return n=i[t],this[_]._currentStateGroup=n,n;for(e in i)if((n=i[e]).includeIn(t))return this[_]._currentStateGroup=n,n;throw new ReferenceError('"'+t+'" is not define')},type:1},w2_initializing:{value:function(){},type:1},w2_updateDisplayList:{value:function(){},type:1},w2_getInitialized:{value:function(){return this[_].initialized},type:2},w2_setInitialized:{value:function(e){return this[_].initialized=e},type:2},w6_invalidate:{writable:!0,value:!1,type:8},w2_createChildren:{value:function(){var e,t;!1===this[_].invalidate&&(this[_].timeoutId&&(l.clearTimeout(this[_].timeoutId),this[_].timeoutId=null),this[_].invalidate=!0,t=this.w2_render(),this.w2_updateChildren(this,t),this.w6_updateInstallState(),this.w2_updateDisplayList(),this.hasEventListener(s.UPDATE_DISPLAY_LIST)&&((e=new s(s.UPDATE_DISPLAY_LIST)).setChildren(t),this.dispatchEvent(e)))},type:1},w6_bindEventMaps:{writable:!0,value:{},type:8},w2_bindEvent:{value:function(e,t,i,r){var s,o=e+""+t,a=this[_].bindEventMaps[o];a||(a={items:{},origin:i},this[_].bindEventMaps[o]=a,l.instanceOf(i,f)?a.eventTarget=i:a.eventTarget=new f(i));for(s in r)d.get(n,a.items,s)!==r[s]&&(d.get(n,a.items,s)&&d.call(n,a.eventTarget,"removeEventListener",[s,d.get(n,a.items,s)]),r[s]&&(d.set(n,a.items,s,r[s]),d.call(n,a.eventTarget,"addEventListener",[s,r[s],!1,0,this])))},type:1},w6_elementMaps:{writable:!0,value:{},type:8},w2_createElement:{value:function(e,t,n,i,r,s,o){void 0===o&&(o=null),void 0===s&&(s=null),void 0===r&&(r=null),void 0===i&&(i=null);var a=t+""+e,u=this[_].elementMaps[a];return u||(u=document.createElement(n),this[_].elementMaps[a]=u,r&&this.attributes(u,r)),i&&("object"===l.typeOf(i)?(l.instanceOf(i,p)||(i=[i]),this.w2_updateChildren(u,i)):u.textContent=i+""),s&&this.attributes(u,s),o&&this.w2_bindEvent(e,t,u,o),u},type:1},w2_createComponent:{value:function(e,t,n,r,s,o,a,c){void 0===c&&(c=null),void 0===a&&(a=null),void 0===o&&(o=null),void 0===s&&(s=null),void 0===r&&(r=null);var h=t+""+e,f=this[_].elementMaps[h];return f||(f=new n(r?new u(u.createElement(r)):h),this[_].elementMaps[h]=f,o&&this.attributes(f.getElement(),o)),s&&(l.instanceOf(s,p)||(s=["object"===l.typeOf(s)?s:s+""]),l.instanceOf(f,i)?f.setChildren(s):this.w2_updateChildren(f,s)),a&&this.attributes(f.getElement(),a),c&&this.w2_bindEvent(e,t,f,c),f},type:1},w6_meregChildren:{value:function(e){for(var t,n=e.length,i=0,r=[];i<n;i++)t=e[i],l.instanceOf(t,p)?r=r.concat(this.w6_meregChildren(t)):r.push(t);return r},type:1},w2_updateChildren:{value:function(e,t){var n,r,s,a,c,p,h,f,d,v,m;if(e){var g=null;if(l.instanceOf(e,i))e.setChildren(t);else{l.is(e,o)&&(g=e,e=e.getElement().current()),t=this.w6_meregChildren(t);for(var _=e,w=_.childNodes.length,E=t.length,S=Math.max(E,w),b=0,C=0;b<S;){if(h=null,v=_.childNodes[b-C],d=t[b],f=l.is(d,o)){if(s=d.display(),r=d.getOwner()){this.w6_installer(d,r),C++,b++;continue}h=s.current()}else d?"string"===l.typeOf(d)?"text"===u.getNodeName(v)?(v.textContent!==d&&(v.textContent=d),h=v):(h=u.createElement("text")).textContent=d:h=d:C++;if(h!==v){if(h&&v)_.replaceChild(h,v),this.w6_removeEvent(_,v);else{if(v){for(c=b,a=null,n=null;c<S&&!(a=t[++c]););a&&(n=l.is(a,o)?a.display().current():"string"===l.typeOf(a)&&"text"===u.getNodeName(v)?v:a),n!==v&&(_.removeChild(v),this.w6_removeEvent(_,v))}h&&_.appendChild(h)}h&&f&&(p=d,g&&p.Y7_setParentDisplay(g),(m=new y(y.ADD)).parent=g||_,m.child=h,p.getElement().dispatchEvent(m))}b++}}}},type:1},w6_removeEvent:{value:function(e,t){var n=new y(y.REMOVE);n.parent=e,n.child=t,new f(t).dispatchEvent(n)},type:1},w6_timeoutId:{writable:!0,value:null,type:8},w6_callback:{writable:!0,value:null,type:8},w2_nowUpdate:{value:function(e){void 0===e&&(e=200),this[_].invalidate=!1,this[_].timeoutId&&l.clearTimeout(this[_].timeoutId);var t=this[_].callback;t||(t=this.w2_createChildren.bind(this),this[_].callback=t),this[_].timeoutId=l.setTimeout(t,e)},type:1},assign:{value:function(e,t){void 0===t&&(t=null);var n=this[_]._dataset;return null===t?n[e]:(n[e]!==t&&(n[e]=t,this.w2_getInitialized()&&this.w2_nowUpdate()),t)},type:1},w6__dataset:{writable:!0,value:{},type:8},getDataset:{value:function(){return this[_]._dataset},type:2},setDataset:{value:function(e){this[_]._dataset=e,this.w2_getInitialized()&&this.w2_nowUpdate()},type:4},attributes:{value:function(e,t){if(null!=e){var i=l.instanceOf(e,u);c.forEach(t,function(r,s){var o,a;i?(a=e,"content"===s&&a.text()!==r?a.text(r):"innerHTML"===s&&e.innerHTML!==r?a.html(r):a.property(s)!=r&&a.property(s,r)):"content"===s?(o="string"===l.typeOf(e.textContent)?"textContent":"innerText",e[o]!==r&&(e[o]=r)):"innerHTML"===s&&e.innerHTML!==r?e.innerHTML=r:"class"===s||"className"===s?e.className!==t[s]&&(e.className=t[s]):d.call(n,e,"getAttribute",[s])!=t[s]&&d.call(n,e,"setAttribute",[s,t[s]])})}},type:1},w6__installer:{writable:!0,value:null,type:8},w6_installer:{value:function(e,t){var n=this[_]._installer;null===n&&(n=new v,this[_]._installer=n);var i=n.get(e);i||(i={viewport:t},n.set(e,i)),i.state||t.addChild(e),i.state=!0},type:1},w6_updateInstallState:{value:function(){var e=this[_]._installer;e&&e.forEach(function(e,t){!0!==e.state&&t.getParent()&&e.viewport.removeChild(t),e.state=!1})},type:1},w6__watchMap:{writable:!0,value:null,type:8},w6_getWatchMap:{value:function(){var e=this[_]._watchMap;return null===e&&(e=new v,this[_]._watchMap=e),e},type:2},watch:{value:function(e,t,n,i){void 0===i&&(i=null);var r,s=this.w2_getBindable();i&&((s=(r=this.w6_getWatchMap()).get(i))||(s=new h(i,"*"),r.set(i,s))),s.bind(t,n,e)},type:1},unwatch:{value:function(e,t,n){void 0===n&&(n=null),void 0===t&&(t=null);var i,r;n?(i=(r=this.w6_getWatchMap()).get(n))&&(i.unbind(e,t),r["delete"](n)):this.w2_getBindable().unbind(e,t)},type:1},w6__children:{writable:!0,value:[],type:8},getChildren:{value:function(){return this[_]._children.slice(0)},type:2},setChildren:{value:function(e){this[_]._children=e.slice(0),this.w2_getInitialized()&&this.w2_nowUpdate()},type:4},getChildAt:{value:function(e){var t=this[_]._children;if(e=e<0?e+t.length:e,!t[e])throw new RangeError("The index out of range");return d.get(n,t[e],"target")},type:1},getChildIndex:{value:function(e){for(var t=this[_]._children,i=t.length,r=0;r<i;r++)if(d.get(n,t[r],"target")===e)return r;return-1},type:1},addChildAt:{value:function(e,t){var n=e.getParent();n&&n.removeChild(e);var i=this[_]._children;return t=t<0?t+i.length+1:t,i.splice(t,0,e),e.Y7_setParentDisplay(this),this.w2_getInitialized()&&this.w2_nowUpdate(),e},type:1},removeChild:{value:function(e){this[_]._children;var t=this.getChildIndex(e);if(t>=0)return this.removeChildAt(t);throw new ReferenceError("The child is not added.")},type:1},removeChildAt:{value:function(e){var t=this[_]._children;if(e=e<0?e+t.length:e,!(t.length>e))throw new RangeError("The index out of range");var n=t[e];return t.splice(e,1),n.getParent()&&n.getParent().removeChild(n),n.Y7_setParentDisplay(null),this.w2_getInitialized()&&this.w2_nowUpdate(),n},type:1},removeAllChild:{value:function(){for(var e=this[_]._children.length;e>0;)this.removeChildAt(--e)},type:1},w6_statesGroup:{writable:!0,value:{},type:8},setStates:{value:function(e){for(var t,n,i=e.length,r=0,s=this[_].statesGroup;r<i;r++){if(n=e[r],!(t=n.getName()))throw new TypeError("name is not define in Skin.states");if(s.hasOwnProperty(t))throw new TypeError('"'+t+'" has already been declared in Skin.states');s[t]=n}},type:4},w6__currentState:{writable:!0,value:null,type:8},getCurrentState:{value:function(){return this[_]._currentState},type:2},setCurrentState:{value:function(e){this[_]._currentState!==e&&(this[_]._currentState=e,this[_]._currentStateGroup=null,this.w2_getInitialized()&&this.w2_nowUpdate())},type:4},display:{value:function(){return!1===this.w2_getInitialized()&&(this.w2_setInitialized(!0),this.w2_initializing()),r.prototype.display.call(this),this.w2_nowUpdate(0),this.getElement()},type:1}};n.prototype=c.create(r.prototype,w),g.defineClass("es.core.Skin",n,{"extends":r,"package":"es.core",classname:"Skin","implements":[a],uri:["w6","w2","n5"],privateSymbol:_,method:{},proto:w},1)},"es/core/Container.es":function(e,t){function n(e,t){if(u.defineProperty(this,p,{value:{_children:[],_layout:null}}),void 0===t&&(t=null),!o.isHTMLContainer(e[0]))throw new TypeError("Invalid container element");i.call(this,e,t)}e.exports=n;var i=t("es/core/Display.es"),r=t("es/interfaces/IDisplay.es"),s=t("es/interfaces/IContainer.es"),o=(t("es/components/layout/BaseLayout.es"),t("system/Element.js")),a=(t("system/Array.js"),t("system/System.js")),l=t("system/Symbol.js"),u=t("system/Object.js"),c=t("system/Internal.js"),p=l("es.core.Container").valueOf(),h={constructor:{value:n},j8__children:{writable:!0,value:[],type:8},getChildren:{value:function(){return this[p]._children.slice(0)},type:2},setChildren:{value:function(e){this.removeAllChild();for(var t=e.length,n=0;n<t;n++)a.is(e[0],r)&&this.addChild(e[0])},type:4},getChildAt:{value:function(e){var t=this[p]._children,n=t[e=e<0?e+t.length:e];if(null==n)throw new RangeError("The index out of range");return n},type:1},getChildIndex:{value:function(e){return this[p]._children.indexOf(e)},type:1},addChild:{value:function(e){return this.addChildAt(e,-1)},type:1},addChildAt:{value:function(e,t){var n=e.getParent();n&&n.removeChild(e);var i=this[p]._children,r=t<0?t+i.length+1:t;return i.splice(r,0,e),e.Y7_setParentDisplay(this),this.getElement().addChildAt(e.getElement(),t),e},type:1},removeChild:{value:function(e){var t=this.getChildIndex(e);if(t>=0)return this.removeChildAt(t);throw new ReferenceError("The child is not added.")},type:1},removeChildAt:{value:function(e){var t=this[p]._children;if(e=e<0?e+t.length:e,!(t.length>e))throw new RangeError("The index out of range");var n=t[e];return t.splice(e,1),this.getElement().removeChild(n.getElement()),n.Y7_setParentDisplay(null),n},type:1},removeAllChild:{value:function(){for(var e=this[p]._children.length;e>0;)this.removeChildAt(--e);this.getElement().html("")},type:1},contains:{value:function(e){return o.contains(this.getElement(),e.getElement())},type:1},j8__layout:{writable:!0,value:null,type:8},getLayout:{value:function(){return this[p]._layout},type:2},setLayout:{value:function(e){e.setTarget(this),this[p]._layout=e},type:4}};n.prototype=u.create(i.prototype,h),c.defineClass("es.core.Container",n,{"extends":i,"package":"es.core",classname:"Container","implements":[s],uri:["j8","w2","n5"],privateSymbol:p,method:{},proto:h},1)},"es/core/Display.es":function(e,t){function n(e,t){if(o.defineProperty(this,c,{value:{_element:undefined,_width:NaN,_height:NaN,_visible:!1,_visibleFlag:!1,parentDisplay:null,_owner:null}}),void 0===t&&(t=null),null==e||1!=e.length)throw new TypeError("The selector elements can only is a single element");if(!i.isNodeElement(e[0]))throw new TypeError("Invalid node element");this[c]._element=e,t&&(t.innerHTML?(e.html(t.innerHTML),delete t.innerHTML):t.content&&(e.text(t.content),delete t.content),e.properties(t)),s.call(this,e)}e.exports=n;var i=t("system/Element.js"),r=t("es/interfaces/IDisplay.es"),s=(t("es/core/es_internal.es"),t("es/interfaces/IContainer.es"),t("system/EventDispatcher.js")),o=t("system/Object.js"),a=t("system/System.js"),l=t("system/Symbol.js"),u=t("system/Internal.js"),c=l("es.core.Display").valueOf(),p={constructor:{value:n},s9__element:{writable:!0,value:undefined,type:8},getElement:{value:function(){return this[c]._element},type:2},s9__width:{writable:!0,value:NaN,type:8},getWidth:{value:function(){return a.isNaN(this[c]._width)?this[c]._element.width():this[c]._width},type:2},setWidth:{value:function(e){a.isNaN(e)||(this[c]._width=e,this[c]._element.width(e))},type:4},s9__height:{writable:!0,value:NaN,type:8},getHeight:{value:function(){return a.isNaN(this[c]._height)?this[c]._element.height():this[c]._height},type:2},setHeight:{value:function(e){a.isNaN(e)||(this[c]._height=e,this[c]._element.height(e))},type:4},s9__visible:{writable:!0,value:!1,type:8},s9__visibleFlag:{writable:!0,value:!1,type:8},getVisible:{value:function(){return!1===this[c]._visibleFlag?!("none"===this[c]._element.style("display")):this[c]._visible},type:2},setVisible:{value:function(e){this[c]._visible=e,this[c]._visibleFlag=!0,!1===e?this[c]._element.hide():this[c]._element.show()},type:4},property:{value:function(e,t){return void 0===t&&(t=null),this[c]._element.property(e,t)},type:1},style:{value:function(e,t){return void 0===t&&(t=null),this[c]._element.style(e,t)},type:1},getScrollTop:{value:function(){return this[c]._element.scrollTop()},type:2},setScrollTop:{value:function(e){a.isNaN(e)||this[c]._element.scrollTop(e)},type:4},getScrollLeft:{value:function(){return this[c]._element.scrollTop()},type:2},setScrollLeft:{value:function(e){a.isNaN(e)||this[c]._element.scrollTop(e)},type:4},getScrollWidth:{value:function(){return this[c]._element.scrollWidth()},type:2},getScrollHeight:{value:function(){return this[c]._element.scrollHeight()},type:2},getBoundingRect:{value:function(e){return void 0===e&&(e=!1),this[c]._element.getBoundingRect(e)},type:1},getLeft:{value:function(){return this[c]._element.left()},type:2},setLeft:{value:function(e){a.isNaN(e)||this[c]._element.left(e)},type:4},getTop:{value:function(){return this[c]._element.top()},type:2},setTop:{value:function(e){a.isNaN(e)||this[c]._element.top(e)},type:4},getRight:{value:function(){return this[c]._element.right()},type:2},setRight:{value:function(e){a.isNaN(e)||this[c]._element.right(e)},type:4},getBottom:{value:function(){return this[c]._element.bottom()},type:2},setBottom:{value:function(e){a.isNaN(e)||this[c]._element.bottom(e)},type:4},localToGlobal:{value:function(e,t){return this[c]._element.localToGlobal(e,t)},type:1},globalToLocal:{value:function(e,t){return this[c]._element.globalToLocal(e,t)},type:1},s9_parentDisplay:{writable:!0,value:null,type:8},Y7_setParentDisplay:{value:function(e){void 0===e&&(e=null),this[c].parentDisplay=e},type:1},getParent:{value:function(){return this[c].parentDisplay},type:2},inDocumentChain:{value:function(){return i.contains(document,this[c]._element[0])},type:1},display:{value:function(){return this[c]._element},type:1},s9__owner:{writable:!0,value:null,type:8},getOwner:{value:function(){return this[c]._owner},type:2},setOwner:{value:function(e){this[c]._owner=e},type:4}};n.prototype=o.create(s.prototype,p),u.defineClass("es.core.Display",n,{"extends":null,"package":"es.core",classname:"Display","implements":[r],uri:["s9","w2","n5"],privateSymbol:c,method:{},proto:p},1)},"es/core/es_internal.es":function(e,t){function n(e,t){s.call(this,e,t)}e.exports=n;var i=t("system/Object.js"),r=t("system/Internal.js"),s=t("system/Namespace.js");i.defineProperty(n,"valueOf",{value:function(){return"es.core/public:es_internal"}}),r.defineClass("es.core.es_internal",n,{ns:"Y7","package":"es.core",classname:"es_internal"},3)},"es/interfaces/IContainer.es":function(e,t){function n(){throw new TypeError('"es.interfaces.IContainer" is not constructor.')}e.exports=n;t("es/interfaces/IDisplay.es");var i=t("system/Symbol.js"),r=(t("system/Object.js"),t("system/Internal.js"));i("es.interfaces.IContainer").valueOf();r.defineClass("es.interfaces.IContainer",n,{"package":"es.interfaces",classname:"IContainer"},2)},"es/components/layout/BaseLayout.es":function(e,t){function n(){c.defineProperty(this,f,{value:{_target:null,_children:[],_parent:null,_viewport:null,_gap:0}}),i.call(this)}e.exports=n;t("es/interfaces/IDisplay.es");var i=t("system/EventDispatcher.js"),r=(t("system/Array.js"),t("system/System.js")),s=t("system/Event.js"),o=t("system/Element.js"),a=t("system/ElementEvent.js"),l=t("system/Reflect.js"),u=t("system/StyleEvent.js"),c=t("system/Object.js"),p=t("system/Symbol.js"),h=t("system/Internal.js"),f=p("es.components.layout.BaseLayout").valueOf(),d={A15_rootLayouts:{writable:!0,value:[],type:8},A15_initialize:{writable:!0,value:!1,type:8},A15_initRootLayout:{value:function(){!1===n.A15_initialize&&(n.A15_initialize=!0,r.getGlobalEvent().addEventListener(s.INITIALIZE_COMPLETED,n.A15_nowUpdateLayout),r.getGlobalEvent().addEventListener(s.RESIZE,n.A15_nowUpdateLayout))},type:1},A15_nowUpdateLayout:{value:function(){for(var e,t=n.A15_rootLayouts.length,i=0;i<t;i++)(e=n.A15_rootLayouts[i]).O16_nowUpdateChildren(parseInt(e.getViewport().width()),parseInt(e.getViewport().height()))},type:1},A15_findLayoutByTarget:{value:function(e,t){for(var i,r,s=e.length,o=0;o<s;o++){if((r=e[o]).getTarget()===t)return r;if(i=n.A15_findLayoutByTarget(r[f]._children,t))return i}return null},type:1},A15_findParentLayout:{value:function(e,t){for(var i,r,s=e.length,a=0;a<s;a++){if(r=e[a],i=n.A15_findParentLayout(r[f]._children,t))return i;if(o.contains(r.getTarget().getElement(),t))return r}return null},type:1},A15_findChildrenLayout:{value:function(e,t){for(var n,i=e.length,r=0,s=[];r<i;r++)n=e[r],o.contains(t,n.getTarget().getElement())&&s.push(n);return s},type:1},A15_assignParentForLayoutChildren:{value:function(e,t){var i,r=n.A15_findChildrenLayout(e,t.getTarget().getElement());if(r.length>0){for(i=0;i<r.length;i++)e.splice(e.indexOf(r[i]),1),t[f]._children.push(r[i]),r[i][f]._parent=t;return!0}return!1},type:1},A15_addLayout:{value:function(e){var t=n.A15_findParentLayout(n.A15_rootLayouts,e.getTarget().getElement());t?(n.A15_assignParentForLayoutChildren(t[f]._children,e),t[f]._children.indexOf(e)<0&&(t[f]._children.push(e),e[f]._parent=t)):(n.A15_assignParentForLayoutChildren(n.A15_rootLayouts,e),n.A15_rootLayouts.indexOf(e)<0&&n.A15_rootLayouts.push(e)),n.A15_initRootLayout()},type:1},A15_removeLayout:{value:function(e){var t=n.A15_rootLayouts;e[f]._parent&&(t=e[f]._parent[f]._children);t.indexOf(e)>=0&&delete t.splice},type:1},A15_updateRootLayout:{value:function(e){for(var t,i,r,s,a,l=0;e.length>1&&l<e.length;){for(s=(a=e[l])[f]._target.getElement(),r=l+1;r<e.length;r++)if(i=e[r],t=i[f]._target.getElement(),o.contains(s,t))a[f]._children.push(i),i[f]._parent=a,e.splice(r,1),r--,n.A15_updateRootLayout(a[f]._children);else if(o.contains(t,s)){i[f]._children.push(a),a[f]._parent=i,e.splice(l,1),n.A15_updateRootLayout(i[f]._children);break}l++}},type:1},A15_rectangle:{writable:!0,value:["Top","Bottom","Left","Right"],type:8}};for(var y in d)c.defineProperty(n,y,d[y]);var v={constructor:{value:n},A15__target:{writable:!0,value:null,type:8},A15__children:{writable:!0,value:[],type:8},A15__parent:{writable:!0,value:null,type:8},getTarget:{value:function(){return this[f]._target},type:2},setTarget:{value:function(e){var t,i;e!==this[f]._target&&(this[f]._target&&(i=n.A15_findLayoutByTarget(n.A15_rootLayouts,this[f]._target))&&n.A15_removeLayout(i),t=this,e.getElement().addEventListener(a.ADD,function(e){"static"===l.call(n,this,"style",["position"])&&l.call(n,this,"style",["position","relative"]),n.A15_addLayout(t)}),e.getElement().removeEventListener(a.REMOVE,function(e){l.call(n,this,"removeEventListener",[a.REMOVE]),n.A15_removeLayout(t)}),this[f]._target=e)},type:4},A15__viewport:{writable:!0,value:null,type:8},getViewport:{value:function(){return null===this[f]._viewport&&(this[f]._viewport=this[f]._target.getElement().parent(),this.A15_styleChange(this[f]._viewport)),this[f]._viewport},type:2},setViewport:{value:function(e){this[f]._viewport=e,this.A15_styleChange(this[f]._viewport)},type:4},A15_styleChange:{value:function(e){var t=this,n=NaN,i=NaN;e.addEventListener(u.CHANGE,function(r){var s=e.width(),o=e.height();n===s&&i===o||(n=s,i=o,t.O16_nowUpdateChildren(s,o))})},type:1},O16_getChildByNode:{value:function(e){for(var t,i=this[f]._children.length,r=0;r<i;r++)if(t=this[f]._children[r],l.get(n,t.getTarget().getElement(),0)===e)return t;return null},type:1},A15__gap:{writable:!0,value:0,type:8},getGap:{value:function(){return this[f]._gap},type:2},setGap:{value:function(e){this[f]._gap=e},type:4},O16_calculateWidth:{value:function(e,t){var i,r;e.hasProperty("init-layout-width")||(e.hasProperty("percentWidth")||e.hasProperty("explicitWidth")||(r=e.current(),(i=l.get(n,r.currentStyle||r.style,"width"))&&"%"===i.charAt(i.length-1)?e.property("percentWidth",parseInt(i)):e.property("explicitWidth",parseInt(e.width()))),e.property("init-layout-width",1));var s=0;e.hasProperty("explicitWidth")?s=parseInt(e.property("explicitWidth")):e.hasProperty("percentWidth")&&(s=(s=parseInt(e.property("percentWidth")))>0?s*t/100:0);var o=1e6,a=0;return e.hasProperty("maxWidth")&&(o=parseInt(e.property("maxWidth"))),e.hasProperty("minWidth")&&(a=parseInt(e.property("minWidth"))),Math.max(Math.min(s,o),a)},type:1},O16_calculateHeight:{value:function(e,t){var i,r;e.hasProperty("init-layout-height")||(e.hasProperty("percentHeight")||e.hasProperty("explicitHeight")||(r=e.current(),(i=l.get(n,r.currentStyle||r.style,"height"))&&"%"===i.charAt(i.length-1)?e.property("percentHeight",parseInt(i)):e.property("explicitHeight",parseInt(e.height()))),e.property("init-layout-height",1));var s=0;e.hasProperty("explicitHeight")?s=parseInt(e.property("explicitHeight")):e.hasProperty("percentHeight")&&(s=(s=parseInt(e.property("percentHeight")))>0?s*t/100:0);var o=1e6,a=0;return e.hasProperty("maxHeight")&&(o=parseInt(e.property("maxHeight"))),e.hasProperty("minHeight")&&(a=parseInt(e.property("minHeight"))),Math.max(Math.min(s,o),a)},type:1},O16_getRectangleBox:{value:function(e){for(var t,i,r={},s=0;s<4;s++)r[t=(i=n.A15_rectangle[s]).toLowerCase()]=parseInt(e.property(t)),r["margin"+i]=parseInt(e.style("margin"+i));return r},type:1},O16_setLayoutSize:{value:function(e,t){this.getTarget().getElement().style("cssText",{width:e,height:t})},type:1},O16_nowUpdateChildren:{value:function(e,t){var n,i,r,s;e=this.O16_calculateWidth(this.getTarget().getElement(),e),t=this.O16_calculateHeight(this.getTarget().getElement(),t);for(var o=this[f]._children.length,a=0,l=this.getTarget().getElement().current();a<o;a++){if(s=this[f]._children[a],r=s.getTarget().getElement().current(),i=!1,l.hasChildNodes())for(n=0;n<l.childNodes.length;n++)if(l.childNodes.item(n)===r){i=!0;break}i?s.O16_nowUpdateChildren(e,t):s.O16_nowUpdateChildren(s.getViewport().width(),s.getViewport().height())}this.O16_calculateChildren(e,t)},type:1},O16_calculateChildren:{value:function(e,t){},type:1}};n.prototype=c.create(i.prototype,v),h.defineClass("es.components.layout.BaseLayout",n,{"extends":null,"package":"es.components.layout",classname:"BaseLayout",uri:["A15","O16","K17"],privateSymbol:f,method:d,proto:v},1)},"es/interfaces/IBindable.es":function(e,t){function n(){throw new TypeError('"es.interfaces.IBindable" is not constructor.')}e.exports=n;var i=t("system/Symbol.js"),r=(t("system/Object.js"),t("system/Internal.js"));i("es.interfaces.IBindable").valueOf();r.defineClass("es.interfaces.IBindable",n,{"package":"es.interfaces",classname:"IBindable"},2)},"es/events/SkinEvent.es":function(e,t){function n(e,t,n){s.defineProperty(this,a,{value:{children:null,oldSkin:null,newSkin:null}}),void 0===n&&(n=!0),void 0===t&&(t=!0),i.call(this,e,t,n)}e.exports=n;var i=t("system/Event.js"),r=t("system/Symbol.js"),s=t("system/Object.js"),o=t("system/Internal.js"),a=r("es.events.SkinEvent").valueOf(),l={UPDATE_DISPLAY_LIST:{value:"skinUpdateDisplayList",type:16},INSTALL:{value:"skinInstall",type:16},UNINSTALL:{value:"skinUnInstall",type:16}};for(var u in l)s.defineProperty(n,u,l[u]);var c={constructor:{value:n},getChildren:{value:function(){return this[a].children},type:2},setChildren:{value:function(e){return this[a].children=e},type:2},getOldSkin:{value:function(){return this[a].oldSkin},type:2},setOldSkin:{value:function(e){return this[a].oldSkin=e},type:2},getNewSkin:{value:function(){return this[a].newSkin},type:2},setNewSkin:{value:function(e){return this[a].newSkin=e},type:2}};n.prototype=s.create(i.prototype,c),o.defineClass("es.events.SkinEvent",n,{"extends":null,"package":"es.events",classname:"SkinEvent",uri:["T20","f21","X22"],privateSymbol:a,method:l,proto:c},1)},"system/Map.js":function(e,t){function n(){if(!(this instanceof n))return new n;l(this,!0,{map:[]})}function i(e,t){for(var n=0,i=e.length;n<i;n++)if(e[n].key===t)return n;return-1}e.exports=n;var r=t("system/Object.js"),s=t("system/Internal.js"),o=t("system/Symbol.js"),a=t("system/ListIterator.js"),l=s.createSymbolStorage(o("Map"));n.prototype=r.create(r.prototype,{set:{value:function(e,t){var n=l(this,"map"),r=i(n,e);return r<0?n.push({key:e,value:t}):n[r].value=t,t}},get:{value:function(e,t){var n=l(this,"map"),r=i(n,e);return r>=0?n[r].value:void 0!==t?(n.push({key:e,value:t}),t):undefined}},entries:{value:function(){return new a(l(this,"map"))}},forEach:{value:function(e,t){for(var n=l(this,"map"),i=n.length,r=0;r<i;){var s=n[r++];e.call(t||null,s.value,s.key,this)}}},keys:{value:function(){var e,t=l(this,"map"),n=[];for(e in t)n.push(t[e].key);return n}},values:{value:function(){var e,t=l(this,"map"),n=[];for(e in t)n.push(t[e].value);return n}},"delete":{value:function(e){var t=l(this,"map"),n=i(t,e);return n>=0&&(t.splice(n,1),!0)}},size:{value:function(){return l(this,"map").length}},has:{value:function(){return i(l(this,"map"),key)>=0}},clear:{value:function(){for(var e=l(this,"map"),t=e.length;0<t;)e.splice(0,1)}}}),r.defineProperty(n.prototype["delete"],"name",{value:"delete"})},"system/Bindable.js":function(e,t){function n(e){var t=f.get(null,e,"property"),n=d(this,"binding"),r=d(this,"hash"),s=n[t];if(s){var o=f.get(null,e,"newValue");if(void 0!==o&&o!==r[t]){r[t]=o;var a,l;for(a in s)i((l=s[a]).item.element,l.name,o)}}}function i(e,t,n){e instanceof r?r.prototype.property.call(e,t,n):h.isNodeElement(e)?"undefined"!=typeof e[t]&&(e[t]=n):e instanceof h?("content"===t&&(t="text"),"function"==typeof e[t]?e[t](n):h.prototype.property.call(e,t,n)):f.has(null,e,t)&&f.set(null,e,t,n)}function r(e,t){if(!(this instanceof r))return new r(e);if(o.call(this,e),"string"==typeof t&&(t=[t]),!l.isArray(t))throw new TypeError("Invalid properties must is be String or Array. in Bindable");d(this,!0,{source:e,properties:t,hash:{},subscriber:new p,binding:{}}),this.addEventListener(u.CHANGE,n)}function s(e,t,n){for(var i=0;i<e.length;i++)e[i].item!==t||n&&e[i].name!==n||e.splice(i--,1)}e.exports=r;var o=t("system/EventDispatcher.js"),a=t("system/Object.js"),l=t("system/System.js"),u=t("system/PropertyEvent.js"),c=t("system/Symbol.js"),p=t("system/Map.js"),c=t("system/Symbol.js"),h=t("system/Element.js"),f=t("system/Reflect.js"),d=t("system/Internal.js").createSymbolStorage(c("Bindable"));(r.prototype=a.create(o.prototype,{constructor:{value:r}})).bind=function(e,t,n,r){var s=d(this,"subscriber"),a=d(this,"properties"),l=d(this,"binding"),c=s.get(e,{binding:{},dispatcher:null,handle:null,element:e}),p=!1!==r;if(n=n||t,"string"!=typeof t)throw new TypeError("Invalid property must is be a String in Bindable.bind");if(!("*"===a[0]||a.indexOf(n)>=0))throw new TypeError("No binding source property name. in Bindable.bind");p&&null===c.handle&&(c.dispatcher||(p=e,e instanceof h?(c.element=e,p=c.element):h.isNodeElement(e)&&(c.element=new h(e),p=c.element),p!==e||e instanceof o||(p=null),p&&(c.dispatcher=p)),c.dispatcher&&(c.handle=function(e){var t=f.get(null,e,"property"),n=f.get(null,e,"newValue"),i=f.get(null,e,"oldValue");t&&void 0!==n&&n!==i&&c.binding.hasOwnProperty(t)&&this.property(c.binding[t],n)},f.call(null,c.dispatcher,"addEventListener",[u.CHANGE,c.handle,!1,0,this]))),c.binding[t]||(c.binding[t]=n,(l[n]||(l[n]=[])).push({name:t,item:c}));var y=d(this,"source");if(y){if(!f.has(null,y,n))throw new TypeError("target source property is not exists for '"+n+"'");var v=f.get(null,y,n);v&&i(c.element,t,v)}return this},r.prototype.unbind=function(e,t){var n=d(this,"subscriber"),i=n.get(e),r=d(this,"binding");if("string"==typeof t){if(i&&i.binding.hasOwnProperty(t)){var o=i.binding[t];if(r[o])return s(r[o],i,t),delete i.binding[t],l.isEmpty(i.binding)&&i.dispatcher.removeEventListener(u.CHANGE,i.handle),!0}return!1}if(i){for(var a in r)s(r[a],i);i.dispatcher.removeEventListener(u.CHANGE,i.handle)}return!!n["delete"](e)},r.prototype.property=function(e,t){if("string"==typeof e){var n=d(this,"hash")[e],s=d(this,"source");if(void 0!==t&&n!==t){if(!this.hasProperty(e))return!1;i(s,e,t);var o=new u(u.CHANGE);return o.property=e,o.newValue=t,o.oldValue=n,this.dispatchEvent(o),!0}return void 0===n?function(e,t){return e instanceof r?r.prototype.property.call(e,t):h.isNodeElement(e)?e[t]:e instanceof h?"function"==typeof e[t]?e[t]():h.prototype.property.call(e,t):f.has(null,e,t)?f.get(null,e,t):undefined}(s,e):n}return!1},r.prototype.hasProperty=function(e){var t=d(this,"properties");return"*"===t[0]?f.has(null,d(this,"source"),e):t.indexOf(e)>=0}},"es/core/State.es":function(e,t){function n(e){s.defineProperty(this,a,{value:{_name:"",_stateGroup:[]}}),i.call(this),void 0===e&&(e=""),this[a]._name=e}e.exports=n;var i=t("system/EventDispatcher.js"),r=(t("system/Array.js"),t("system/Symbol.js")),s=t("system/Object.js"),o=t("system/Internal.js"),a=r("es.core.State").valueOf(),l={constructor:{value:n},D23__name:{writable:!0,value:"",type:8},D23__stateGroup:{writable:!0,value:[],type:8},getName:{value:function(){return this[a]._name},type:2},setName:{value:function(e){this[a]._name=e},type:4},getStateGroup:{value:function(){return this[a]._stateGroup},type:2},setStateGroup:{value:function(e){this[a]._stateGroup=e},type:4},includeIn:{value:function(e){return e===this[a]._name||this[a]._stateGroup.indexOf(e)>=0},type:1}};n.prototype=s.create(i.prototype,l),o.defineClass("es.core.State",n,{"extends":null,"package":"es.core",classname:"State",uri:["D23","X24","n5"],privateSymbol:a,method:{},proto:l},1)},"es/core/SkinComponent.es":function(e,t){function n(e){p.defineProperty(this,d,{value:{_componentId:undefined,_async:!0,_skin:null,_skinClass:null,properties:{},_parent:null,_children:[],events:{},_owner:null}}),i.call(this),l.isDefined(n.r25_componentIdHash[e]),n.r25_componentIdHash[e]=!0,this[d]._componentId=e}e.exports=n;var i=t("es/core/Component.es"),r=t("es/events/SkinEvent.es"),s=t("es/core/Skin.es"),o=t("es/interfaces/IContainer.es"),a=t("es/interfaces/IDisplay.es"),l=(t("es/core/es_internal.es"),t("system/System.js")),u=t("system/Reflect.js"),c=t("system/PropertyEvent.js"),p=t("system/Object.js"),h=(t("system/Element.js"),t("system/Array.js"),t("system/Function.js"),t("system/EventDispatcher.js"),t("system/Event.js"),t("system/Symbol.js")),f=t("system/Internal.js"),d=h("es.core.SkinComponent").valueOf(),y={r25_componentIdHash:{writable:!0,value:{},type:8}};for(var v in y)p.defineProperty(n,v,y[v]);var m={constructor:{value:n},r25__componentId:{writable:!0,value:undefined,type:8},getComponentId:{value:function(e){return void 0===e&&(e=""),e?e+"-"+this[d]._componentId:this[d]._componentId},type:1},r25__async:{writable:!0,value:!0,type:8},getAsync:{value:function(){return!0},type:2},setAsync:{value:function(e){this[d]._async=e},type:4},isNeedCreateSkin:{value:function(){return!0},type:1},r25__skin:{writable:!0,value:null,type:8},getSkin:{value:function(){var e,t;if(null===this[d]._skin){if(null===(t=this.getSkinClass()))throw new TypeError('the "'+l.getQualifiedObjectName(this)+'" skinClass is not defined.');e=u.type(new t(this),s),this[d]._skin=e}return this[d]._skin},type:2},setSkin:{value:function(e){var t,n,i,s=this[d]._skin;e!==s&&(this[d]._skin=e,this.J26_getInitialized()&&(this.hasEventListener(c.CHANGE)&&((i=new c(c.CHANGE)).oldValue=s,i.newValue=e,i.property="skin",this.dispatchEvent(i)),s&&s.hasEventListener(r.UNINSTALL)&&((n=new r(r.UNINSTALL)).setOldSkin(s),n.setNewSkin(e),s.dispatchEvent(n)),this.r25_installChildren(),this.J26_commitProperty(),this.J26_nowUpdateSkin(),e.hasEventListener(r.INSTALL)&&((t=new r(r.INSTALL)).setOldSkin(s),t.setNewSkin(e),e.dispatchEvent(t))))},type:4},r25__skinClass:{writable:!0,value:null,type:8},getSkinClass:{value:function(){return this[d]._skinClass},type:2},setSkinClass:{value:function(e){var t,n=this[d]._skinClass;n!==e&&(this[d]._skinClass=e,this.J26_getInitialized()&&(this.hasEventListener(c.CHANGE)&&((t=new c(c.CHANGE)).oldValue=n,t.newValue=e,t.property="skinClass",this.dispatchEvent(t)),this.setSkin(u.type(new e(this),s))))},type:4},J26_getProperties:{value:function(){return this[d].properties},type:2},J26_setProperties:{value:function(e){return this[d].properties=e},type:2},getHeight:{value:function(){return this.J26_getInitialized()?this.getSkin().getHeight():this.J26_getProperties().height},type:2},setHeight:{value:function(e){this.J26_getInitialized()&&this.getSkin().setHeight(e),this.J26_getProperties().height=e},type:4},getWidth:{value:function(){return this.J26_getInitialized()?this.getSkin().getWidth():this.J26_getProperties().width},type:2},setWidth:{value:function(e){this.J26_getInitialized()&&this.getSkin().setWidth(e),this.J26_getProperties().width=e},type:4},getElement:{value:function(){return this.J26_getInitialized()?this.getSkin().getElement():null},type:2},getVisible:{value:function(){return this.J26_getInitialized()?this.getSkin().getVisible():!!this.J26_getProperties().visible},type:2},setVisible:{value:function(e){this.J26_getInitialized()&&this.getSkin().setVisible(e),this.J26_getProperties().visible=e},type:4},getLeft:{value:function(){return this.J26_getInitialized()?this.getSkin().getLeft():this.J26_getProperties().left},type:2},setLeft:{value:function(e){this.J26_getInitialized()&&this.getSkin().setLeft(e),this.J26_getProperties().left=e},type:4},getTop:{value:function(){return this.J26_getInitialized()?this.getSkin().getTop():this.J26_getProperties().top},type:2},setTop:{value:function(e){this.J26_getInitialized()&&this.getSkin().setTop(e),this.J26_getProperties().top=e},type:4},getRight:{value:function(){return this.J26_getInitialized()?this.getSkin().getRight():this.J26_getProperties().right},type:2},setRight:{value:function(e){this.J26_getInitialized()&&this.getSkin().setRight(e),this.J26_getProperties().right=e},type:4},getBottom:{value:function(){return this.J26_getInitialized()?this.getSkin().getBottom():this.J26_getProperties().bottom},type:2},setBottom:{value:function(e){this.J26_getInitialized()&&this.getSkin().setBottom(e),this.J26_getProperties().bottom=e},type:4},r25__parent:{writable:!0,value:null,type:8},Y7_setParentDisplay:{value:function(e){void 0===e&&(e=null),this.J26_getInitialized()&&this.getSkin().Y7_setParentDisplay(e),this[d]._parent=e},type:1},getParent:{value:function(){return this.J26_getInitialized()?this.getSkin().getParent():this[d]._parent},type:2},r25__children:{writable:!0,value:[],type:8},getChildren:{value:function(){return this.J26_getInitialized()?this.getSkin().getChildren().slice(0):this[d]._children.slice(0)},type:2},setChildren:{value:function(e){this.J26_getInitialized()?this.getSkin().setChildren(e.slice(0)):this[d]._children=e.slice(0)},type:4},getChildAt:{value:function(e){return this.J26_getInitialized()?this.getSkin().getChildAt(e):(e<0&&(e+=this[d]._children.length),this[d]._children[e])},type:1},getChildIndex:{value:function(e){return this.J26_getInitialized()?this.getSkin().getChildIndex(e):this[d]._children.indexOf(e)},type:1},addChild:{value:function(e){return this.J26_getInitialized()?this.getSkin().addChild(e):(this[d]._children.push(e),e)},type:1},addChildAt:{value:function(e,t){return this.J26_getInitialized()?this.getSkin().addChildAt(e,t):(t<0&&(t+=this[d]._children.length),this[d]._children.splice(t,0,e),e)},type:1},removeChild:{value:function(e){var t;if(this.J26_getInitialized())return this.getSkin().removeChild(e);if(!((t=this[d]._children.indexOf(e))>=0))throw new ReferenceError("child is not exists.");this.removeChildAt(t)},type:1},removeChildAt:{value:function(e){if(this.J26_getInitialized())return this.getSkin().removeChildAt(e);if(e<0&&(e+=this[d]._children.length),this[d]._children[e])return this[d]._children.splice(e,1);throw new ReferenceError("Index is out of range")},type:1},removeAllChild:{value:function(){this.J26_getInitialized()?this.getSkin().removeAllChild():this[d]._children=[]},type:1},contains:{value:function(e){return!!this.J26_getInitialized()&&this.getSkin().contains(e)},type:1},r25_events:{writable:!0,value:{},type:8},addEventListener:{value:function(e,t,r,s,o){return void 0===o&&(o=null),void 0===s&&(s=0),void 0===r&&(r=!1),i.prototype.addEventListener.call(this,e,t,r,s,o),this.J26_getInitialized()?this.getSkin().addEventListener(e,t,r,s,o):(this[d].events.hasOwnProperty(e)||(this[d].events[e]=[]),u.call(n,this[d].events[e],"push",[{callback:t,useCapture:r,priority:s,reference:o}])),this},type:1},removeEventListener:{value:function(e,t){void 0===t&&(t=null);var r,s,o=i.prototype.removeEventListener.call(this,e,t);if(this.J26_getInitialized())return this.getSkin().removeEventListener(e,t);if(this[d].events.hasOwnProperty(e)){if(!t)return delete this[d].events[e],!0;for(r=(s=this[d].events[e]).length;r>0;)if(u.get(n,s[--r],"callback")===t)return s.splice(r,1),!0}return o},type:1},dispatchEvent:{value:function(e){return i.prototype.dispatchEvent.call(this,e)},type:1},hasEventListener:{value:function(e,t){return void 0===t&&(t=null),i.prototype.hasEventListener.call(this,e,t)},type:1},display:{value:function(){return this.J26_getInitialized()?this.getSkin().getParent()||this.J26_nowUpdateSkin():(this.J26_initializing(),this.J26_commitPropertyAndUpdateSkin()),this.getSkin().getElement()},type:1},J26_initializing:{value:function(){this.J26_getInitialized()||(i.prototype.J26_initializing.call(this),this.r25_installChildren(),this.J26_commitProperty())},type:1},r25_installChildren:{value:function(){this[d]._children.length>0&&this.getSkin().setChildren(this[d]._children)},type:1},J26_commitProperty:{value:function(){var e=this.getSkin();p.forEach(this.J26_getProperties(),function(t,i){u.has(n,e,i)&&u.set(n,e,i,t)}),p.forEach(this[d].events,function(t,n){for(var i,r=t.length,s=0;s<r;s++)i=t[s],e.removeEventListener(n,i.callback),e.addEventListener(n,i.callback,i.useCapture,i.priority,i.reference)},this),this[d]._parent&&e.Y7_setParentDisplay(this[d]._parent)},type:1},J26_commitPropertyAndUpdateSkin:{value:function(){this.J26_getInitialized()&&this.J26_nowUpdateSkin()},type:1},J26_nowUpdateSkin:{value:function(){this.getSkin().display()},type:1},J26_push:{value:function(e,t){this.J26_getProperties()[e]=t},type:1},J26_pull:{value:function(e){return this.J26_getProperties()[e]},type:1},r25__owner:{writable:!0,value:null,type:8},getOwner:{value:function(){return this[d]._owner},type:2},setOwner:{value:function(e){this[d]._owner=e},type:4}};n.prototype=p.create(i.prototype,m),f.defineClass("es.core.SkinComponent",n,{"extends":i,"package":"es.core",classname:"SkinComponent","implements":[a,o],uri:["r25","J26","n5"],privateSymbol:d,method:y,proto:m},1)},"es/core/Component.es":function(e,t){function n(){o.defineProperty(this,l,{value:{initialized:!1}}),r.call(this)}e.exports=n;var i=t("es/events/ComponentEvent.es"),r=t("system/EventDispatcher.js"),s=t("system/Symbol.js"),o=t("system/Object.js"),a=t("system/Internal.js"),l=s("es.core.Component").valueOf(),u={constructor:{value:n},J26_getInitialized:{value:function(){return this[l].initialized},type:2},J26_setInitialized:{value:function(e){return this[l].initialized=e},type:2},J26_initializing:{value:function(){!1===this.J26_getInitialized()&&(this.J26_setInitialized(!0),this.hasEventListener(i.INITIALIZING)&&this.dispatchEvent(new i(i.INITIALIZING)))},type:1}};n.prototype=o.create(r.prototype,u),a.defineClass("es.core.Component",n,{"extends":null,"package":"es.core",classname:"Component",uri:["P27","J26","n5"],privateSymbol:l,method:{},proto:u},1)},"es/events/ComponentEvent.es":function(e,t){function n(e,t,n){s.defineProperty(this,a,{value:{hostComponent:null,hotUpdateModule:null}}),void 0===n&&(n=!0),void 0===t&&(t=!0),i.call(this,e,t,n)}e.exports=n;var i=t("system/Event.js"),r=t("system/Symbol.js"),s=t("system/Object.js"),o=t("system/Internal.js"),a=r("es.events.ComponentEvent").valueOf(),l={INITIALIZING:{value:"componentInitializing",type:16},INITIALIZED:{value:"componentInitialized",type:16},COMPONENT_HOT_UPDATE:{value:"componentHotUpdate",type:16},COMPONENT_INSTALL:{value:"componentInstall",type:16},COMPONENT_UNINSTALL:{value:"componentUnInstall",type:16}};for(var u in l)s.defineProperty(n,u,l[u]);var c={constructor:{value:n},getHostComponent:{value:function(){return this[a].hostComponent},type:2},setHostComponent:{value:function(e){return this[a].hostComponent=e},type:2},getHotUpdateModule:{value:function(){return this[a].hotUpdateModule},type:2},setHotUpdateModule:{value:function(e){return this[a].hotUpdateModule=e},type:2}};n.prototype=s.create(i.prototype,c),o.defineClass("es.events.ComponentEvent",n,{"extends":null,"package":"es.events",classname:"ComponentEvent",uri:["K28","w29","X22"],privateSymbol:a,method:l,proto:c},1)},"es/core/Interaction.es":function(e,t){function n(){throw new TypeError('"es.core.Interaction" is not constructor.')}e.exports=n;var i=t("system/System.js"),r=t("system/Reflect.js"),s=t("system/Object.js"),o=t("system/Symbol.js"),a=t("system/Internal.js"),l=o("es.core.Interaction").valueOf(),u={key:{writable:!0,value:"FJH9-H3EW-8WI0-YT2D",type:8},U34_properties:{writable:!0,value:{},type:8},getProperties:{value:function(){return n.U34_properties},type:1},U34_initialized:{writable:!0,value:!1,type:8},pull:{value:function(e){return!1===n.U34_initialized&&(n.U34_initialized=!0,i.isObject(r.get(n,window,n.key))&&(n.U34_properties=r.get(n,window,n.key))),i.isDefined(n.U34_properties[e])?n.U34_properties[e]:null},type:1},push:{value:function(e,t){i.isDefined(n.U34_properties[e])?n.U34_properties[e]=s.merge(n.U34_properties[e],t):n.U34_properties[e]=t},type:1}};for(var c in u)s.defineProperty(n,c,u[c]);s.defineProperty(n,"prototype",{value:{}}),a.defineClass("es.core.Interaction",n,{"package":"es.core",classname:"Interaction",uri:["U34","x35","n5"],privateSymbol:l,method:u,proto:{}},1)},"system/Console.js":function(e,t){function n(){throw new SyntaxError("console object is not constructor or function")}function i(e){for(var t=[a],n=0;n<e.length;n++)e[n]&&(s.isObject(e[n],!0)||"function"==typeof e[n])?t.push(e[n].valueOf()):t.push(e[n]);return t}e.exports=n;var r=t("system/Internal.js"),s=t("system/System.js"),o=t("system/Function.js").prototype.call,a=r.$console;n.log=function(){o.apply(a.log,i(arguments))},n.info=function(){o.apply(a.info,i(arguments))},n.trace=function(){o.apply(a.trace,i(arguments))},n.warn=function(){o.apply(a.warn,i(arguments))},n.error=function(){o.apply(a.error,i(arguments))},n.dir=function(){o.apply(a.dir,i(arguments))},n.assert=function(){o.apply(a.assert,i(arguments))},n.time=function(){o.apply(a.time,i(arguments))},n.timeEnd=function(){o.apply(a.timeEnd,i(arguments))}},"src/view/TestView.html":function(e,t){function n(e){h.defineProperty(this,y,{value:{properties:{},answer:null,dataGrid:null,_hostComponent:undefined,_inputValue:""}}),void 0===e&&(e=null),this[y]._hostComponent=e,i.call(this,e);var t=new o;t.setName("show"),t.setStateGroup(["fail","success"]);var n=new o;n.setName("grid"),n.setStateGroup(["grid"]);var r=new o;r.setName("none");var s=new o;s.setName("text"),this.setStates([t,n,r,s]),this.setCurrentState("none");var l={__var61__:{style:"margin: 15px;","class":"title-list"},__var65__:{style:"text-align: center;"},__var67__:{style:"cursor: pointer;"},__var70__:{style:"color: red;margin: 0px 12px;"},__var74__:{placeholder:"在里输入,看下面会发生什么"},__var78__:{placeholder:"在里输入,看上面会发生什么"},__var84__:{style:"color: red;"},__var87__:{style:"text-align: center;margin: 15px auto;"},__var93__:{style:"width: 80%; margin: 0px auto; margin-top: 50px;"}};this[y].properties=l;var u=this.w2_createElement(0,20,"span",null,l.__var70__);this.setAnswer(u);var c=this.w2_createComponent(0,32,a);this.setDataGrid(c)}e.exports=n;var i=t("es/core/View.es"),r=t("es/components/PopUp.es"),s=t("system/PropertyEvent.js"),o=(t("es/interfaces/IDisplay.es"),t("es/core/State.es")),a=(t("es/core/Application.es"),t("src/Test.es"),t("es/components/DataGrid.es")),l=(t("es/core/SkinComponent.es"),t("es/core/Container.es")),u=t("es/skins/PopUpSkin.html"),c=t("es/skins/DataGridSkin.html"),p=t("system/Array.js"),h=(t("system/System.js"),t("system/Reflect.js"),t("system/Function.js"),t("system/Object.js")),f=t("system/Symbol.js"),d=t("system/Internal.js"),y=f("view.TestView").valueOf(),v={constructor:{value:n},K1_properties:{writable:!0,value:{},type:8},getAnswer:{value:function(){return this[y].answer},type:2},setAnswer:{value:function(e){return this[y].answer=e},type:2},getDataGrid:{value:function(){return this[y].dataGrid},type:2},setDataGrid:{value:function(e){return this[y].dataGrid=e},type:2},K1__hostComponent:{writable:!0,value:undefined,type:8},w2_getHostComponent:{value:function(){return this[y]._hostComponent},type:2},w2_render:{value:function(){var e=this.getDataset(),t=this.w2_getCurrentStateGroup();if(!t)throw new TypeError("State group is not defined for 'stateGroup'");var n=e.message||"title is default",i=this[y].properties,s=this.w2_createComponent(0,6,l,"div",[this.w2_createElement(0,7,"div",[this.w2_createElement(0,8,"a","弹框组件",null,null,{click:this.K1_change.bind(this,"show")}),this.w2_createElement(0,9,"a","表格组件",null,null,{click:this.K1_change.bind(this,"grid")}),this.w2_createElement(0,10,"a","双向绑定和变量",null,null,{click:this.K1_change.bind(this,"text")}),this.w2_createElement(0,11,"a","重置状态",null,null,{click:this.K1_change.bind(this,"none")})],i.__var61__)]),o=this.getAnswer(),a=t.includeIn("show")?this.w2_createComponent(0,12,r,null,[this.w2_createElement(0,13,"p",[this.w2_createElement(0,14,"div","这里是弹框内容")],i.__var65__),this.w2_createElement(0,15,"p",[this.w2_createElement(0,16,"a","点我，再来一个问候",i.__var67__,null,{click:this.K1_showTips})],i.__var65__),this.w2_createElement(0,17,"p",[this.w2_createElement(0,18,"div",[this.w2_createElement(0,19,"text","您选择的结果是?"),o])],i.__var65__)]):null,f=this.w2_createElement(0,22,"input",null,i.__var74__),d=this.w2_createElement(0,25,"input",null,i.__var78__),v=t.includeIn("grid")?this.getDataGrid():null;return a&&(a.setTitle("弹框组件"),a.setSkinClass(u)),this.watch("inputValue",f,"value"),this.watch("inputValue",d,"value"),v&&(v.setSkinClass(c),v.setSource(new p(new h({id:1,name:"张三",phone:15302662598}),new h({id:2,name:"李四",phone:1869875696}),new h({id:2,name:"王五",phone:1896325987}))),v.setColumns({id:"ID",name:"名称",phone:"电话"}),this.w2_bindEvent(0,32,v,{click:this.K1_click})),[this.w2_createElement(0,4,"h1","Welcome use EaseScript"),this.w2_createElement(0,5,"div",[s,a,t.includeIn("text")?this.w2_createElement(0,21,"div",[f,this.w2_createElement(0,23,"br"),this.w2_createElement(0,24,"br"),d,this.w2_createElement(0,26,"br"),this.w2_createElement(0,27,"br"),this.w2_createElement(0,28,"button","清空",null,null,{click:this.w2_reset}),this.w2_createElement(0,29,"button","提交并刷新",null,null,{click:this.w2_apply}),this.w2_createElement(0,30,"h3",[this.w2_createElement(0,31,"span",n,i.__var84__)])],i.__var87__):null,v],i.__var93__)]},type:1},K1_click:{value:function(e){r.title("on click grid"),new s},type:1},K1_showTips:{value:function(){var e=this;r.confirm("Are you ok?",function(t){e.getAnswer().innerHTML="submit"===t?"很好":"一般"},{profile:{submitText:"很好",cancelText:"一般",titleText:"向您问候"}})},type:1},K1_change:{value:function(e){this.setCurrentState(e)},type:1},w2_reset:{value:function(){this.setInputValue("")},type:1},w2_apply:{value:function(){this.assign("message",this.getInputValue())},type:1},getInputValue:{value:function(){return this[y]._inputValue},type:2},setInputValue:{value:function(e){var t=this[y]._inputValue;if(t!==e){this[y]._inputValue=e;var n=new s(s.CHANGE);n.property="inputValue",n.oldValue=t,n.newValue=e,this.dispatchEvent(n)}},type:4}};n.prototype=h.create(i.prototype,v),d.defineClass("view.TestView",n,{"extends":i,"package":"view",classname:"TestView",uri:["K1","w2","E3"],privateSymbol:y,method:{},proto:v},1)},"es/components/DataGrid.es":function(e,t){function n(e){o.defineProperty(this,c,{value:{_dataSource:null,_columns:{},_columnProfile:"columns",_dataProfile:"datalist",_radius:5,_rowHeight:25,_headHeight:30,_footHeight:30}}),void 0===e&&(e="10"),i.call(this,e)}e.exports=n;var i=t("es/core/SkinComponent.es"),r=t("system/DataSource.js"),s=t("system/System.js"),o=t("system/Object.js"),a=t("system/Reflect.js"),l=t("system/Symbol.js"),u=t("system/Internal.js"),c=l("es.components.DataGrid").valueOf(),p={constructor:{value:n},f36__dataSource:{writable:!0,value:null,type:8},getDataSource:{value:function(){var e=this[c]._dataSource;return null===e&&(e=new r,this[c]._dataSource=e),e},type:2},getSource:{value:function(){return this.getDataSource().source()},type:2},setSource:{value:function(e){this.getDataSource().source(e)},type:4},f36__columns:{writable:!0,value:{},type:8},getColumns:{value:function(){return this[c]._columns},type:2},setColumns:{value:function(e){this[c]._columns=s.isString(e)?a.call(n,e,"split",[","]):e},type:4},getRows:{value:function(){return this.getDataSource().pageSize()},type:2},setRows:{value:function(e){this.getDataSource().pageSize(e)},type:4},f36__columnProfile:{writable:!0,value:"columns",type:8},getColumnProfile:{value:function(){return this[c]._columnProfile},type:2},setColumnProfile:{value:function(e){this[c]._columnProfile=e},type:4},f36__dataProfile:{writable:!0,value:"datalist",type:8},getDataProfile:{value:function(){return this[c]._dataProfile},type:2},setDataProfile:{value:function(e){this[c]._dataProfile=e},type:4},f36__radius:{writable:!0,value:5,type:8},getRadius:{value:function(){return this[c]._radius},type:2},setRadius:{value:function(e){this[c]._radius=e,this.J26_commitPropertyAndUpdateSkin()},type:4},f36__rowHeight:{writable:!0,value:25,type:8},getRowHeight:{value:function(){return this[c]._rowHeight},type:2},setRowHeight:{value:function(e){this[c]._rowHeight=e,this.J26_commitPropertyAndUpdateSkin()},type:4},f36__headHeight:{writable:!0,value:30,type:8},getHeadHeight:{value:function(){return this[c]._headHeight},type:2},setHeadHeight:{value:function(e){this[c]._headHeight=e,this.J26_commitPropertyAndUpdateSkin()},type:4},f36__footHeight:{writable:!0,value:30,type:8},getFootHeight:{value:function(){return this[c]._footHeight},type:2},setFootHeight:{value:function(e){this[c]._footHeight=e,this.J26_commitPropertyAndUpdateSkin()},type:4}};n.prototype=o.create(i.prototype,p),u.defineClass("es.components.DataGrid",n,{"extends":i,"package":"es.components",classname:"DataGrid",uri:["f36","J26","K37"],privateSymbol:c,method:{},proto:p},1)},"system/DataArray.js":function(e,t){function n(){return i.instanceOf(this,n)?(1===arguments.length&&i.instanceOf(arguments[0],s)?s.apply(this,arguments[0]):s.apply(this,s.prototype.slice.call(arguments,0)),this):s.apply(r.create(n.prototype),s.prototype.slice.call(arguments,0))}e.exports=n;var i=t("system/System.js"),r=t("system/Object.js"),s=t("system/Array.js");n.DESC="desc",n.ASC="asc",n.prototype=r.create(s.prototype,{constructor:{value:n},toString:{value:function(){return this.constructor===n?"[object DataArray]":s.prototype.toString.call(this)}},orderBy:{value:function(e,t){if(this.length<2)return this;if((e===n.DESC||e===n.ASC||null==e)&&null==t){if("object"==typeof this[0])throw new ReferenceError("Missing column name.");return this.sort(function(t,r){return e===n.DESC?i.compare(r,t):i.compare(t,r)}),this}var r=e,s=["var a=arguments[0],b=arguments[1],s=0,cp=arguments[2];"];"object"!=typeof e&&((r={})[e]=t);for(var o in r)t=n.DESC===r[o].toLowerCase()?n.DESC:n.ASC,s.push(t===n.DESC?"cp(b['"+o+"'],a['"+o+"']):s;":"cp(a['"+o+"'],b['"+o+"']):s;");s=s.join("s=s==0?"),s+="return s;";var a=new Function(s);return this.sort(function(e,t){return a(e,t,i.compare)}),this}},sum:{value:function(e){var t=0,n=typeof e,r=0,s=this.length>>0;if(0===s)return 0;if("function"!==n)if("string"===n){var o=e;if("undefined"==typeof this[0][o])throw new ReferenceError('assign field does not define. for "'+n+'"');e=function(e){return e[o]>>0}}else{if("object"==typeof this[0])throw new ReferenceError("Missing field name.");e=function(e){return i.isNaN(e)?0:e>>0}}for(;r<s;r++)t+=e.call(this,this[r])>>0;return t}}})},"system/HttpEvent.js":function(e,t){function n(e,t,i){return this instanceof n?(r.call(this,e,t,i),this):new n(e,t,i)}e.exports=n;var i=t("system/Object.js"),r=t("system/Event.js");(n.prototype=i.create(r.prototype,{constructor:{value:n},toString:{value:function(){return"[object HttpEvent]"}},valueOf:{value:function(){return"[object HttpEvent]"}}})).data=null,n.prototype.url=null,n.prototype.loaded=0,n.prototype.total=0,n.LOAD_START="httpLoadStart",n.SUCCESS="httpSuccess",n.PROGRESS="httpProgress",n.ERROR="httpError",n.CANCELED="httpCanceled",n.TIMEOUT="httpTimeout",r.registerEvent(function(e,t,i){if(i instanceof n)return i})},"system/Http.js":function(e,t){function n(e){if(!c)throw new Error("Http the client does not support");if(!(this instanceof n))return new n(e);o.call(this),s.defineProperty(this,"__options__",{value:s.merge(!0,{},d,e)}),(e=this.__options__).xhr=null,e.loading=!1,e.setHeader=!1,e.queues=[],e.param=null,e.responseHeaders={},e.timeoutTimer=null}function i(e){var t=window.XMLHttpRequest?new window.XMLHttpRequest:new window.ActiveXObject("Microsoft.XMLHTTP");return t.onreadystatechange=function(){4===t.readyState&&function(e){var t=this.__options__,i=t.xhr;if(4===i.readyState&&0!=i.status){var r,s=null,o={};if(a.clearTimeout(t.timeoutTimer),t.timeoutTimer=null,"function"==typeof i.getAllResponseHeaders)for(;r=f.exec(i.getAllResponseHeaders());)o[r[1].toLowerCase()]=r[2];if(t.loading=!1,t.responseHeaders=o,i.status>=200&&i.status<300&&(s=i.responseXML,t.dataType.toLowerCase()===n.TYPE_JSON))try{s=l.parse(i.responseText)}catch(c){throw new Error("Invalid JSON the ajax response")}var c=new u(u.SUCCESS);if(c.originalEvent=e,c.data=s||{},c.status=i.status,c.url=t.url,c.param=t.param,this.dispatchEvent(c),t.queues.length>0){var p=t.queues.shift();this.load.apply(this,p)}}}.call(e)},t}function r(e){if(!(this instanceof r))return new r;var t=document.createElement("script");t.setAttribute("type","text/javascript"),o.call(this,t),y.push(this),this.__key__="s"+y.length+a.uid(),this.__target__=t,this.__async__=!!e}e.exports=n;var s=t("system/Object.js"),o=t("system/EventDispatcher.js"),a=t("system/System.js"),l=t("system/JSON.js"),u=t("system/HttpEvent.js"),c=!1,p=null,h="",f=/^(.*?):[ \t]*([^\r\n]*)\r?$/gm,d={async:!0,dataType:"html",method:"GET",timeout:30,charset:"UTF-8",header:{contentType:"application/x-www-form-urlencoded",Accept:"text/html","X-Requested-With":"XMLHttpRequest"}};"undefined"!=typeof window&&(p=window.XMLHttpRequest||window.ActiveXObject,c=!!p,h=window.location.href,/^([\w\+\.\-]+:)(?:\/\/([^\/?#:]*)(?::(\d+))?)?/.exec(h.toLowerCase())),n.ACCEPT_XML="application/xml,text/xml",n.ACCEPT_HTML="text/html",n.ACCEPT_TEXT="text/plain",n.ACCEPT_JSON="application/json, text/javascript",n.ACCEPT_ALL="*/*",n.HEADER_TYPE_URLENCODED="application/x-www-form-urlencoded",n.HEADER_TYPE_FORM_DATA="multipart/form-data",n.HEADER_TYPE_PLAIN="text/plain",n.HEADER_TYPE_JSON="application/json",n.TYPE_HTML="html",n.TYPE_XML="xml",n.TYPE_JSON="json",n.TYPE_JSONP="jsonp",n.METHOD_GET="GET",n.METHOD_POST="POST",n.METHOD_PUT="PUT",n.METHOD_DELETE="DELETE",n.prototype=s.create(o.prototype,{constructor:{value:n}}),s.defineProperty(n.prototype,"option",{value:function(e,t){var n=this.__options__;return null==t?n[e]:(n[e]=t,this)}}),s.defineProperty(n.prototype,"abort",{value:function(){var e=this.__options__;if(e.xhr){try{e.xhr.abort()}catch(n){}var t=new u(u.CANCELED);return t.data=null,t.status=-1,t.url=this.__url__,this.dispatchEvent(t),!0}return!1}}),s.defineProperty(n.prototype,"load",{value:function(e,t,s){if("string"!=typeof e)throw new Error("Invalid url");var o,l=this.__options__,s=s||l.method,c=!!l.async;if(!0===l.loading)return l.queues.push([e,t,s]),!1;if(l.loading=!0,l.url=e,l.param=t,"string"==typeof s&&(s=s.toUpperCase(),n["METHOD_"+s]!==s))throw new Error("Invalid method for "+s);try{if(l.dataType.toLowerCase()===n.TYPE_JSONP)(o=new r(c)).addEventListener(u.SUCCESS,function(e){l.timeoutTimer&&(a.clearTimeout(l.timeoutTimer),l.timeoutTimer=null),l.loading=!1,e.url=l.url,this.dispatchEvent(e)},!1,0,this),o.send(e,t,s);else{if(o=l.xhr=i(this),t=null!=t?a.serialize(t,"url"):null,s===n.METHOD_GET&&t&&(""!=t&&(e+=/\?/.test(e)?"&"+t:"?"+t),t=null),l.url=e,o.open(s,e,c),!1===l.setHeader){s===n.METHOD_POST&&(l.header.contentType=n.HEADER_TYPE_URLENCODED),/charset/i.test(l.header.contentType)||(l.header.contentType+=";"+l.charset);try{var p;for(p in l.header)o.setRequestHeader(p,l.header[p])}catch(h){}try{o.overrideMimeType(l.header.Accept)}catch(h){}}l.setHeader=!0,o.send(t)}}catch(h){throw new Error("Http the client does not support("+h.message+")")}return l.timeoutTimer=a.setTimeout(function(e,t){return function(){if(t.abort(),t.hasEventListener(u.TIMEOUT)){var n=new u(u.TIMEOUT);n.data=null,n.status=408,n.url=e,t.dispatchEvent(n)}t.__timeoutTimer__&&(a.clearTimeout(t.__timeoutTimer__),l.timeoutTimer=null)}}(e,this),1e3*l.timeout),!0}}),s.defineProperty(n.prototype,"setRequestHeader",{value:function(e,t){var n=this.__options__;return void 0!==t&&(n.header[e]=t),this}}),s.defineProperty(n.prototype,"getResponseHeader",{value:function(e){var t=this.__options__;return t.responseHeaders?"string"==typeof e?t.responseHeaders[e.toLowerCase()]||"":t.responseHeaders:""}});var y=[];(r.prototype=s.create(o.prototype,{constructor:{value:r}})).__key__=null,r.prototype.__target__=null,r.prototype.__async__=null,r.prototype.__sended__=!1;var v=null;r.prototype.send=function(e,t){if(this.__sended__)return!1;if(this.__sended__=!0,"string"!=typeof e)throw new Error("Invalid url.");var n=[];null!=t&&n.push(a.serialize(t,"url")),n.push("k="+this.__key__),n.push("JSONP_CALLBACK=JSONP_CALLBACK"),n=n.join("&"),e+=/\?/.test(e)?"&"+n:"?"+n;var i=this.__target__;if(this.__async__&&i.setAttribute("async","async"),i.setAttribute("src",e),null===v&&(v=document.head||document.getElementsByTagName("head")[0]),!v||!v.parentNode)throw new ReferenceError("Head element is not exist.");i.parentNode||v.appendChild(i)},r.prototype.abort=function(){this.__canceled__=!0;var e=this.__target__;return e&&e.parentNode&&e.parentNode.removeChild(e),!0},n.JSONP_CALLBACK=function(e,t){var n=Math.max(y.length-1,0);if(void 0!==t)for(;n>0&&y[n].__key__!=t;)n--;if(y[n]&&y[n].__key__==t){var i=y.splice(n,1).pop();if(!i.__canceled__){var r=new u(u.SUCCESS);r.data=e,r.status=200,i.dispatchEvent(r)}}},"undefined"!=typeof window&&(window.JSONP_CALLBACK=n.JSONP_CALLBACK)},"system/DataSourceEvent.js":function(e,t){function n(e,t,r){return i.instanceOf(this,n)?(s.call(this,e,t,r),this):new n(e,t,r)}e.exports=n;var i=t("system/System.js"),r=t("system/Object.js"),s=t("system/Event.js");(n.prototype=r.create(s.prototype,{constructor:{value:n}})).condition=null,n.prototype.index=NaN,n.prototype.data=null,n.prototype.oldValue=null,n.prototype.newValue=null,n.prototype.current=NaN,n.prototype.offset=NaN,n.prototype.waiting=!1,n.prototype.totalSize=NaN,n.prototype.pageSize=NaN,n.prototype.totalSize=NaN,n.APPEND="dataSourceAppend",n.REMOVE="dataSourceRemove",n.UPDATE="dataSourceUpdate",n.SELECT="dataSourceSelect",n.CHANGED="dataSourceChanged",s.registerEvent(function(e,t,i){if(i instanceof n)return i;switch(e){case n.APPEND:case n.REMOVE:case n.UPDATE:case n.SELECT:case n.CHANGED:return new n(e)}})},"system/DataGrep.js":function(e,t){function n(e,t,n,i,r){return i="or"===i?"||":"&&",this[this.length]={logic:i,column:e,value:t,operational:n,type:r},this.length++,this}function i(e){if(!r.instanceOf(this,i))return new i(e);if(!r.instanceOf(e,a))throw new Error("error","Invalid data list");c(this,!0,{dataItems:e,filter:e}),s.defineProperty(this,"length",{value:0,writable:!0})}e.exports=i;var r=t("system/System.js"),s=t("system/Object.js"),o=t("system/Internal.js"),a=t("system/Array.js"),l=t("system/Function.js"),u=t("system/Symbol.js"),c=o.createSymbolStorage(u("DataGrep"));i.prototype=s.create(s.prototype,{constructor:{value:i},filter:{value:function(e){if(void 0===e)c(this,"filter",function(){for(var e,t,n,r,s=0,o=[];s<this.length;s++)if(e=this[s],0===o.length||o.push(e.logic),t=typeof e.value,n="this["+s+"].value",e.value instanceof i)o.push("!!this["+s+"].value.filter().call(this["+s+"].value,arguments[0])");else if("function"===t)o.push("this["+s+"].value.call(this,arguments[0])");else if("index"==e.operational||"notindex"==e.operational)a="notindex"===e.operational?"!":"",n=n.split(","),o.push(a+"("+n[0]+" >= arguments[1] && "+n[1]+" <= arguments[1])");else if(r='arguments[0]["'+e.column+'"]',"like"===e.operational||"notlike"===e.operational)a="notlike"===e.operational?"!":"","right"===e.type?o.push(a+"new RegExp('^'+"+n+" ).test("+r+")"):"left"===e.type?o.push(a+"new RegExp("+n+"+'$' ).test("+r+")"):o.push(a+"new RegExp( "+n+" ).test("+r+")");else if("range"==e.operational||"notrange"==e.operational){var a="notrange"===e.operational?"!":"";n=n.split(","),o.push(a+"("+n[0]+" >= "+r+" && "+n[1]+" <= "+r+")")}else o.push(r+e.operational+n);return 0===o.length?null:new l("return ( "+o.join(" ")+" )")}.call(this));else if("function"==typeof e)c(this,"filter",e);else if("string"==typeof e&&""!=e){var t=e;e=e.replace(/(\w+)\s*([\>\<\=\!])/g,function(e,t,n){return n=1==n.length&&"="==n?"==":n,"arguments[0]['"+t+"']"+n}).replace(/(not[\s]*)?(index)\(([\d\,\s]+)\)/gi,function(e,t,n,i){var r=i.split(","),s=r[0]>>0,o=Math.max(r[1]>>0,1);return(void 0===t?"":"!")+"( arguments[1] >= "+s+" && arguments[1] < "+o+") "}).replace(/(\w+)\s+(not[\s]*)?(like|range|in)\(([^\)]*?)\)/gi,function(e,t,n,i,r){var s=void 0===n?"":"!",o="arguments[0]['"+t+"']";if(/like/i.test(i))r=s+"new RegExp('"+(r=r.replace(/(%)?([^%]*?)(%)?/,function(e,t,n,i){return void 0===t?"^"+n:void 0===i?n+"$":n}))+"').test("+o+")";else if(/in/i.test(i))r=s+"( ["+r+"].indexOf("+o+") >=0 )";else{var a=r.split(",");r=s+"("+o+" >= "+a[0]+" && "+o+" < "+a[1]+")"}return r}).replace(/\s+(or|and)\s+/gi,function(e,t){return"or"==t.toLowerCase()?" || ":" && "}),c(this,"filter",new l("try{ return !!("+e+') }catch(e){ throw new SyntaxError("is not grep:'+t+'");}'))}else null===e&&c(this,"filter",null);return c(this,"filter")}},clean:{value:function(){for(var e=0;e<this.length;e++)delete this[e];return c(this,"filter",null),this.length=0,this}},execute:{value:function(e){var t=c(this,"dataItems");if(!(e=this.filter(e)))return t;for(var n=[],i=0;i<t.length;i++)e.call(this,t[i],i)&&n.push(t[i]);return n}},range:{value:function(e,t,i,r){return(t>=0||i>0)&&n.call(this,e,t+","+i,"range",r),this}},index:{value:function(e,t,i){return(e>=0||t>0)&&(t=parseInt(t)||1,e=parseInt(e)||0,n.call(this,"index",e+","+e+t,"index",i)),this}},eq:{value:function(e,t,i){return n.call(this,e,t,"==",i),this}},not:{value:function(e,t,i){return n.call(this,e,t,"!=",i),this}},gt:{value:function(e,t,i){return n.call(this,e,t,">",i),this}},lt:{value:function(e,t,i){return n.call(this,e,t,"<",i),this}},egt:{value:function(e,t,i){return n.call(this,e,t,">=",i),this}},elt:{value:function(e,t,i){return n.call(this,e,t,"<=",i),this}},like:{value:function(e,t,i,r){return n.call(this,e,t,"like",r,i),this}},notLike:{value:function(e,t,i,r){return n.call(this,e,t,"notlike",r,i),this}}}),i.LIKE_LEFT="left",i.LIKE_RIGHT="right",i.LIKE_BOTH="both"},"system/DataSource.js":function(e,t){function n(){if(!l.instanceOf(this,n))return new n;d.call(this),w(this,!0,{options:{method:y.METHOD_GET,dataType:y.TYPE_JSON,timeout:30,param:{},url:null,responseProfile:{data:"data",total:"total",code:"code",error:"error",successCode:0},requestProfile:{offset:"offset",rows:"rows"}},items:new p,cached:{queues:new p,lastSegments:null,loadSegments:new p},isRemote:!1,source:null,nowNotify:!1,loading:!1,loadCompleted:!1,pageSize:20,current:1,buffer:3,totalSize:NaN,grep:null})}function i(e,t){var n=w(this,"options");if(null==t)return n[e];if(n[e]=t,this.isRemote()){var i=w(this,"source");i instanceof y&&i.option(e,t)}return this}function r(e){var t=w(this,"options"),n=null,i=0,r=0,s=200;if("function"==typeof t.responseProfile){var u=p.prototype.map.call(["data","total","status","successCode"],function(n){return t.responseProfile(e.data,n)});if(n=u[0],i=u[1],r=u[2],s=u[3],r!=s)throw new Error("Loading data failed. current status:"+r)}else{var c=t.responseProfile.total,h=t.responseProfile.data,f=t.responseProfile.code;if(e.data[f]!=t.responseProfile.successCode)throw new Error("Loading data failed. current status:"+e.data[t.responseProfile.error]);if(l.isArray(e.data))i=(n=e.data[h]).length>>0;else{if(h&&"undefined"==typeof e.data[h]||c&&"undefined"===e.data[c])throw new Error("Response data profile fields is not correct.");i=c?e.data[c]>>0:0,n=e.data[h],0===i&&n&&(i=n.length>>0)}}if(!l.isArray(n))throw new Error("Response data set must be an array");var d=n.length>>0;i=Math.max(i,d),w(this,"loadCompleted",!0),w(this,"loading",!1),w(this,"totalSize",i);var y=this.pageSize(),v=w(this,"cached"),m=w(this,"items"),g=this.current(),_=p.prototype.indexOf.call(v.loadSegments,v.lastSegments)*y;p.prototype.splice.apply(m,[_,0].concat(n)),w(this,"nowNotify")&&p.prototype.indexOf.call(v.loadSegments,g)>=0&&a.call(this,g,_,y),m.length<i&&(w(this,"loadCompleted",!1),o.call(this))}function s(e,t){return e.lastSegments!=t&&e.loadSegments.indexOf(t)<0&&e.queues.indexOf(t)<0}function o(){var e=w(this,"loading"),t=w(this,"isRemote"),n=w(this,"loadCompleted");if(t&&!n){var i=this.current(),r=w(this,"cached"),o=r.queues,a=this.pageSize(),l=this.maxBuffer();if(s(r,i))o.unshift(i);else if(0===o.length)for(var c=1,p=this.totalPage();l>c;){var h=i+c,f=i-c;h<=p&&s(r,h)&&o.push(h),f>0&&s(r,f)&&o.push(f),c++}if(!e&&o.length>0){w(this,"loading",!0),i=o.shift(),r.lastSegments=i,r.loadSegments.push(i),r.loadSegments.length>1&&r.loadSegments.sort(function(e,t){return e-t});var d=(i-1)*a,y=w(this,"source"),v=w(this,"options"),m=u.merge({},v.param);m[v.requestProfile.offset]=d,m[v.requestProfile.rows]=a,y.load(v.url,m,v.method)}}}function a(e,t,n){if(!0===w(this,"nowNotify")){var i=this.grep().execute(),r=Math.min(t+n,this.realSize()),s=i.slice(t,r),o=new g(g.SELECT);o.current=e,o.offset=t,o.data=s,o.waiting=!1,o.pageSize=this.pageSize(),o.totalPage=this.totalPage(),o.totalSize=this.totalSize(),w(this,"nowNotify",!1),this.dispatchEvent(o)}}e.exports=n;var l=t("system/System.js"),u=t("system/Object.js"),c=t("system/Internal.js"),p=t("system/Array.js"),h=t("system/Symbol.js"),f=t("system/DataArray.js"),d=t("system/EventDispatcher.js"),y=t("system/Http.js"),v=t("system/HttpEvent.js"),m=t("system/PropertyEvent.js"),g=t("system/DataSourceEvent.js"),_=t("system/DataGrep.js"),w=c.createSymbolStorage(h("DataSource"));n.prototype=u.create(d.prototype,{constructor:{value:n},isRemote:{value:function(){return w(this,"isRemote")}},options:{value:function(e){return l.isObject(e)&&u.merge(w(this,"options"),e),this}},dataType:{value:function(e){return i.call(this,"dataType",e)}},method:{value:function(e){return i.call(this,"method",e)}},timeout:{value:function(e){return i.call(this,"timeout",e)}},parameter:{value:function(e){return i.call(this,"param",e)}},source:{value:function(e){var t=w(this,"source");if(t===e)return this;var n=w(this,"options");if(void 0===e)return w(this,"isRemote")?n.url:t;if(l.instanceOf(e,p)?(w(this,"items",e.slice(0)),w(this,"source",e),w(this,"isRemote",!1),!0===w(this,"selected")&&(w(this,"grep",null),this.select())):e&&("string"==typeof e&&(n.url=e,e=new y(n)),e instanceof y&&(w(this,"source",e),w(this,"isRemote",!0),e.addEventListener(v.SUCCESS,r,!1,0,this))),null===e){var i=w(this,"items"),s=w(this,"cached");return i.splice(0,i.length),s.lastSegments=null,s.loadSegments=new p,s.queues=new p,w(this,"nowNotify",!1),w(this,"loadCompleted",!1),this}var o=w(this,"source");return!w(this,"isRemote")&&l.is(o,y)&&o.removeEventListener(v.SUCCESS,r),this}},pageSize:{value:function(e){var t=w(this,"pageSize");if(e>=0&&t!==e){w(this,"pageSize",e);var n=new m(m.CHANGE);if(n.property="pageSize",n.newValue=e,n.oldValue=t,this.dispatchEvent(n),w(this,"selected")){var i=w(this,"items"),r=w(this,"cached");i.splice(0,i.length),r.lastSegments=null,r.loadSegments=new p,r.queues=new p,w(this,"nowNotify",!1),w(this,"loadCompleted",!1),this.select()}return this}return t}},current:{value:function(){return w(this,"current")}},totalPage:{value:function(){return this.totalSize()>0?Math.max(Math.ceil(this.totalSize()/this.pageSize()),1):NaN}},maxBuffer:{value:function(e){return e>0?(w(this,"buffer",Math.min(10,e)),this):w(this,"buffer")}},realSize:{value:function(){return w(this,"items").length}},__totalSize__:{value:0},totalSize:{value:function(){return Math.max(w(this,"totalSize"),this.realSize())}},grep:{value:function(){return w(this,"grep")||w(this,"grep",new _(w(this,"items")))}},filter:{value:function(e){return this.grep().filter(e),this}},orderBy:{value:function(e,t){var n=w(this,"order")||w(this,"order",{}),i=typeof e;return"undefined"===i?n:("object"===i?n=w(this,"order",e):"string"===i&&(n[e]=t||f.ASC),f.prototype.orderBy.call(w(this,"items"),n),this)}},offsetAt:{value:function(e){e>>=0;return isNaN(e)?e:(this.current()-1)*this.pageSize()+e}},append:{value:function(e,t){t=(t="number"==typeof t?t:this.realSize())<0?t+this.realSize()+1:t,t=Math.min(this.realSize(),Math.max(t,0)),e=l.instanceOf(e,p)?e:[e];for(var n,i=[],r=0;r<e.length;r++)(n=new g(g.CHANGED)).index=t+r,n.newValue=e[r],this.dispatchEvent(n)&&(p.prototype.splice.call(this.__items__,n.index,0,e[r]),i.push(e[r]));return n=new g(g.APPEND),n.index=t,n.data=i,this.dispatchEvent(n),i.length}},remove:{value:function(e){for(var t,n,i=this.grep().execute(e),r=[],s=0;s<i.length;s++)(t=p.prototype.indexOf.call(i,i[s]))>=0&&((n=new g(g.CHANGED)).index=t,n.oldValue=i[s],this.dispatchEvent(n)&&r.push(p.prototype.splice.call(this.__items__,n.index,1)));return r.length>0&&((n=new g(g.REMOVE)).condition=e,n.data=r,this.dispatchEvent(n)),r.length}},update:{value:function(e,t){for(var n,i=this.grep().execute(t),r=[],s=!1,o=0;o<i.length;o++){s=!1;var a=u.merge({},i[o]);for(var l in e)"undefined"!=typeof a[l]&&a[l]!=e[l]&&(a[l]=e[l],s=!0);s&&((n=new g(g.CHANGED)).newValue=a,n.oldValue=i[o],this.dispatchEvent(n)&&(u.merge(i[o],a),r.push(i[o])))}return n=new g(g.UPDATE),n.data=r,n.condition=t,n.newValue=e,this.dispatchEvent(n),r.length}},itemByIndex:{value:function(e){return"number"!=typeof e||e<0||e>=this.realSize()?null:w(this,"items")[e]||null}},indexByItem:{value:function(e){return w(this,"items").indexOf(e)}},range:{value:function(e,t){return w(this,"items").slice(e,t)}},select:{value:function(e){var t=this.totalPage();e=e>0?e:this.current(),e=Math.min(e,isNaN(t)?e:t),w(this,"current",e);var n=this.pageSize(),i=(e-1)*n,r=w(this,"cached"),s=w(this,"loadCompleted"),l=w(this,"isRemote"),u=w(this,"items"),c=!s&&l?r.loadSegments.indexOf(e):e-1,p=c<0||u.length<c*n+n;if(w(this,"nowNotify",!0),w(this,"selected",!0),l&&p&&!s){var h=new g(g.SELECT);h.current=e,h.offset=i,h.data=null,h.waiting=!0,this.dispatchEvent(h)}else a.call(this,e,c*n,n);return l&&o.call(this),this}}})},"es/components/PopUp.es":function(e,t){function n(e){a.defineProperty(this,c,{value:{_type:"box"}}),void 0===e&&(e="11"),r.call(this,e)}e.exports=n;t("es/core/Container.es"),t("es/core/Skin.es"),t("es/interfaces/IContainer.es");var i=t("es/components/popup/PopUpManage.es"),r=t("es/components/popup/BasePopUp.es"),s=t("es/skins/PopUpSkin.html"),o=t("es/events/SkinEvent.es"),a=(t("system/JSON.js"),t("system/Object.js")),l=(t("system/Element.js"),t("system/Symbol.js")),u=t("system/Internal.js"),c=l("es.components.PopUp").valueOf(),p={M38__instance:{writable:!0,value:null,type:8},skinClass:{writable:!0,value:s,type:8},M38_getInstance:{value:function(e){return void 0===e&&(e=null),e||(e=s),n.M38__instance||((n.M38__instance=new n("11")).setSkinClass(e),n.M38__instance[c]._type="box"),e&&n.M38__instance.getSkinClass()!==e&&n.M38__instance.setSkinClass(e),n.M38__instance},type:1},M38_modalityInstance:{writable:!0,value:null,type:8},M38_getModalityInstance:{value:function(e){return void 0===e&&(e=null),e||(e=s),n.M38_modalityInstance||((n.M38_modalityInstance=new n("11")).setSkinClass(e),n.M38_modalityInstance[c]._type="modality"),e&&n.M38_modalityInstance.getSkinClass()!==e&&n.M38_modalityInstance.setSkinClass(e),n.M38_modalityInstance},type:1},box:{value:function(e,t){return void 0===t&&(t={}),n.M38_getInstance(t.skinClass).J26_show(a.merge(!0,{mask:!0,disableScroll:!1,profile:{currentState:"tips",content:e},skinStyle:{background:"none",borderRadius:"0px",boxShadow:"none",border:"none"}},t))},type:1},tips:{value:function(e,t){return void 0===t&&(t={}),n.M38_getInstance(t.skinClass).J26_show(a.merge(!0,{timeout:2,vertical:"top",mask:!1,isModalWindow:!1,profile:{currentState:"tips",content:e},disableScroll:!1},t))},type:1},title:{value:function(e,t){return void 0===t&&(t={}),n.M38_getInstance(t.skinClass).J26_show(a.merge(!0,{timeout:2,vertical:"top",mask:!1,isModalWindow:!1,profile:{currentState:"title",content:e},disableScroll:!1},t))},type:1},alert:{value:function(e,t){return void 0===t&&(t={}),n.M38_getInstance(t.skinClass).J26_show(a.merge(!0,{mask:!0,isModalWindow:!1,vertical:"top",profile:{currentState:"alert",content:e}},t))},type:1},confirm:{value:function(e,t,i){return void 0===i&&(i={}),n.M38_getInstance(i.skinClass).J26_show(a.merge(!0,{mask:!0,callback:t,vertical:"top",isModalWindow:!1,profile:{currentState:"confirm",content:e},offsetY:2},i))},type:1},modality:{value:function(e,t,i){return void 0===i&&(i={}),n.M38_getModalityInstance(i.skinClass).J26_show(a.merge(!0,{mask:!0,isModalWindow:!0,profile:{currentState:"modality",titleText:e,content:t},animation:{fadeIn:{name:"fadeIn"},fadeOut:{name:"fadeOut"}}},i))},type:1}};for(var h in p)a.defineProperty(n,h,p[h]);var f={constructor:{value:n},M38__type:{writable:!0,value:"box",type:8},J26_show:{value:function(e){return void 0===e&&(e={}),this.setOption(e),this.display(),this},type:1},J26_getContainer:{value:function(){return this.getSkin().getPopupContainer()},type:1},J26_initializing:{value:function(){r.prototype.J26_initializing.call(this);this.getSkin().addEventListener(o.UNINSTALL,function(e){"box"===this[c]._type?n.M38__instance=null:n.M38_modalityInstance=null},!1,0,this)},type:1},display:{value:function(){var e;return this.J26_getState()||(e=this.getOption(),r.prototype.J26_show.call(this,e),r.prototype.display.call(this),i.show(this,!!e.isModalWindow,this.getOwner())),this.getElement()},type:1}};n.prototype=a.create(r.prototype,f),u.defineClass("es.components.PopUp",n,{"extends":r,"package":"es.components",classname:"PopUp",uri:["M38","J26","K37"],privateSymbol:c,method:p,proto:f},1)},"es/components/popup/BasePopUp.es":function(e,t){function n(){l.defineProperty(this,m,{value:{timeoutId:NaN,_option:null,state:!1,maskIntance:null,animationEnd:!0,actionButtons:["cancel","submit","close"],_owner:null,_title:null}}),i.apply(this,arguments)}e.exports=n;var i=t("es/core/SkinComponent.es"),r=t("es/core/Container.es"),s=(t("es/core/Display.es"),t("es/core/Skin.es"),t("es/interfaces/IContainer.es"),t("es/core/SystemManage.es")),o=t("es/events/SkinEvent.es"),a=t("es/components/popup/PopUpManage.es"),l=t("system/Object.js"),u=t("system/System.js"),c=(t("system/Function.js"),t("system/Reflect.js")),p=(t("system/Element.js"),t("system/Array.js")),h=t("system/Event.js"),f=t("system/ElementEvent.js"),d=t("system/MouseEvent.js"),y=t("system/Symbol.js"),v=t("system/Internal.js"),m=y("es.components.popup.BasePopUp").valueOf(),g={constructor:{value:n},J26_getTimeoutId:{value:function(){return this[m].timeoutId},type:2},J26_setTimeoutId:{value:function(e){return this[m].timeoutId=e},type:2},y39__option:{writable:!0,value:null,type:8},getOption:{value:function(){return null===this[m]._option&&(this[m]._option=l.merge(!0,{},a.defaultOptions)),this[m]._option},type:2},setOption:{value:function(e){this[m]._option=l.merge(!0,{},a.defaultOptions,e)},type:4},J26_getState:{value:function(){return this[m].state},type:2},J26_setState:{value:function(e){return this[m].state=e},type:2},J26_getMaskIntance:{value:function(){return this[m].maskIntance},type:2},J26_setMaskIntance:{value:function(e){return this[m].maskIntance=e},type:2},J26_getAnimationEnd:{value:function(){return this[m].animationEnd},type:2},J26_setAnimationEnd:{value:function(e){return this[m].animationEnd=e},type:2},action:{value:function(e){var t,i,r=this.getOption();if("function"===u.typeOf(r["on"+e])&&!1===(0,r["on"+e])())return!1;if(r.callback&&!1===c.call(n,r,"callback",[e]))return!1;this.J26_getMaskIntance()&&a.mask(this.J26_getMaskIntance()),u.isNaN(this.J26_getTimeoutId())||(u.clearTimeout(this.J26_getTimeoutId()),this.J26_setTimeoutId(NaN)),r.disableScroll&&s.enableScroll();var o=r.animation,l=this.getSkin();return this.J26_getState()&&o&&o.enabled?(i=this.J26_getContainer(),t=o.fadeOut,this.J26_setAnimationEnd(!1),i.style("animation",t.name+" "+t.duration+"s "+t.timing+" "+t.delay+"s "+t.fillMode),u.setTimeout(function(e){l.setVisible(!1),e.J26_setState(!1),e.J26_setAnimationEnd(!0),a.close(e)},1e3*(t.delay+t.duration),this)):(this.J26_setState(!1),l.setVisible(!1),a.close(this)),!0},type:1},J26_getContainer:{value:function(){return this.getSkin()},type:1},J26_position:{value:function(){if(this.J26_getState()){var e=this.getOption(),t=e.horizontal,i=e.vertical,r=this.J26_getContainer();("string"===u.typeOf(e.x)&&"%"===c.call(n,e.x,"slice",[-1])||!u.isNaN(e.x))&&(r.style("left",e.x),t=""),("string"===u.typeOf(e.y)&&"%"===c.call(n,e.y,"slice",[-1])||!u.isNaN(e.y))&&(r.style("top",e.y),i="");var o=parseInt(e.offsetX),a=parseInt(e.offsetY),l=s.getWindow(),p=l.width(),h=l.height();switch(t){case"left":r.setLeft(Math.max(o,0));break;case"right":r.setLeft(this.y39_getMaxAndMin(o+(p-r.getWidth()),p,r.getWidth()));break;case"center":r.setLeft(this.y39_getMaxAndMin(o+(p-r.getWidth())/2,p,r.getWidth()))}switch(i){case"top":r.setTop(Math.max(a,0));break;case"bottom":r.setTop(this.y39_getMaxAndMin(a+(h-r.getHeight()),h,r.getHeight()));break;case"middle":r.setTop(this.y39_getMaxAndMin(a+(h-r.getHeight())/2,h,r.getHeight()))}}},type:1},y39_getMaxAndMin:{value:function(e,t,n){return Math.max(Math.max(e,0),Math.min(e,t-n))},type:1},y39_actionButtons:{writable:!0,value:["cancel","submit","close"],type:8},J26_initializing:{value:function(){i.prototype.J26_initializing.call(this);var e=this.getSkin();s.getWindow().addEventListener(h.RESIZE,this.J26_position,!1,0,this),this.J26_getContainer().addEventListener(f.ADD,this.J26_position,!1,0,this),e.addEventListener(o.UPDATE_DISPLAY_LIST,this.J26_position,!1,0,this);var t=this.J26_getContainer(),n=this.getOption();t.removeEventListener(d.MOUSE_OUTSIDE),t.addEventListener(d.MOUSE_OUTSIDE,function(e){this.J26_getState()&&(n.isModalWindow?!0===n.clickOutsideClose&&this.close():this.J26_getAnimationEnd()&&(this.J26_setAnimationEnd(!1),t.getElement().animation("shake",.2),u.setTimeout(function(e){e.J26_setAnimationEnd(!0)},300,this)))},!1,0,this)},type:1},J26_show:{value:function(e){return void 0===e&&(e={}),this.J26_setState(!0),e.disableScroll&&s.disableScroll(),!0===e.mask&&this.J26_setMaskIntance(a.mask(null,e.maskStyle)),this},type:1},y39__owner:{writable:!0,value:null,type:8},getOwner:{value:function(){return null===this[m]._owner&&(this[m]._owner=new r(s.getBody())),this[m]._owner},type:2},setOwner:{value:function(e){this[m]._owner=e},type:4},y39__title:{writable:!0,value:null,type:8},getTitle:{value:function(){return this[m]._title},type:2},setTitle:{value:function(e){this[m]._title=e},type:4},getOnSubmit:{value:function(){return this.getOption().onsubmit},type:2},setOnSubmit:{value:function(e){this.getOption().onsubmit=e},type:4},getOnCancel:{value:function(){return this.getOption().oncancel},type:2},setOnCancel:{value:function(e){this.getOption().oncancel=e},type:4},getOnClose:{value:function(){return this.getOption().onclose},type:2},setOnClose:{value:function(e){this.getOption().onclose=e},type:4},setSkin:{value:function(e){var t,n;this.J26_getInitialized()?e!==(n=this.getSkin())&&(n&&n.removeEventListener(o.UPDATE_DISPLAY_LIST,this.J26_position),e.addEventListener(o.UPDATE_DISPLAY_LIST,this.J26_position,!1,0,this),this.J26_getState()?(i.prototype.setSkin.call(this,e),this.J26_setProfile()):n&&n.hasEventListener(o.UNINSTALL)&&((t=new o(o.UNINSTALL)).setOldSkin(n),t.setNewSkin(e),n.dispatchEvent(t))):i.prototype.setSkin.call(this,e)},type:4},J26_setProfile:{value:function(){var e=this.getSkin(),t=this.getOption(),n=t.profile;u.env.platform("IE",8)&&e.style("position","absolute"),null!=this[m]._title&&(n.titleText=this[m]._title),l.forEach(n,function(t,n){switch(n){case"currentState":e.setCurrentState(t);break;case"content":t&&e.setChildren(u.instanceOf(t,p)?t:[t]);default:e.assign(n,t)}},this),t.width>0&&e.setWidth(t.width),t.height>0&&e.setHeight(t.height),this.J26_position()},type:1},display:{value:function(){this.getSkin();var e,t=this.getOption();this.J26_setProfile();var n=i.prototype.display.call(this);n.show();var r=this.J26_getContainer(),s=t.animation,o=1e3*t.timeout;return s.enabled&&!s.running&&(this.J26_setAnimationEnd(!1),e=s.fadeIn,r.style("animation",e.name+" "+e.duration+"s "+e.timing+" "+e.delay+"s "+e.fillMode),o=1e3*(t.timeout+e.delay+e.duration),u.setTimeout(function(e){e.J26_setAnimationEnd(!0)},o,this)),t.timeout>0&&this.J26_setTimeoutId(u.setTimeout(function(e){e.action("close")},o,this)),n},type:1},close:{value:function(){this.action("close")},type:1}};n.prototype=l.create(i.prototype,g),v.defineClass("es.components.popup.BasePopUp",n,{"extends":i,"package":"es.components.popup",classname:"BasePopUp","abstract":!0,uri:["y39","J26","s40"],privateSymbol:m,method:{},proto:g},1)},"es/components/popup/PopUpManage.es":function(e,t){function n(){o.defineProperty(this,l,{value:{}})}e.exports=n;t("es/interfaces/IContainer.es"),t("es/interfaces/IDisplay.es");var i=t("es/core/SystemManage.es"),r=(t("es/components/popup/BasePopUp.es"),t("es/core/Display.es"),t("system/Array.js"),t("system/Reflect.js")),s=(t("system/Element.js"),t("system/Symbol.js")),o=t("system/Object.js"),a=t("system/Internal.js"),l=s("es.components.popup.PopUpManage").valueOf(),u={MASK_LEVEL:{value:99900,type:16},WINDOW_LEVEL:{value:99910,type:16},TOP_LEVEL:{value:99999,type:16},defaultOptions:{writable:!0,value:{profile:{titleText:"提示",currentState:"modality"},disableScroll:!1,isModalWindow:!0,mask:!0,callback:null,timeout:0,maskStyle:null,clickOutsideClose:!1,animation:{enabled:!0,fadeIn:{name:"fadeInDown",duration:.2,timing:"linear",delay:0,fillMode:"forwards"},fadeOut:{name:"fadeOutUp",duration:.2,timing:"linear",delay:0,fillMode:"forwards"}},horizontal:"center",vertical:"middle",offsetX:0,offsetY:0,x:NaN,y:NaN},type:8},a41_count:{writable:!0,value:0,type:8},a41_maskInstance:{writable:!0,value:null,type:8},a41_systemPopUpInstance:{writable:!0,value:null,type:8},a41_modalityInstances:{writable:!0,value:[],type:8},a41_maskActiveCount:{writable:!0,value:0,type:8},mask:{value:function(e,t){if(void 0===t&&(t=null),void 0===e&&(e=null),e)return r.decre(n,n,"maskActiveCount"),n.a41_maskActiveCount<1&&(e.fadeOut(),n.a41_maskActiveCount=0),e;var s=n.a41_maskInstance;return null==s&&((s=new h(i.getBody())).style("zIndex",n.MASK_LEVEL),n.a41_maskInstance=s),t&&s.options(t),r.incre(n,n,"maskActiveCount"),s.fadeIn(),s},type:1},show:{value:function(e,t,i){void 0===i&&(i=null),void 0===t&&(t=!1);r.incre(n,n,"count");var s=n.WINDOW_LEVEL;!0===t?(n.a41_modalityInstances.indexOf(e)<0&&n.a41_modalityInstances.push(e),n.active(e)):(n.a41_systemPopUpInstance&&e!==n.a41_systemPopUpInstance&&(n.a41_systemPopUpInstance.getElement(),n.a41_systemPopUpInstance.getParent()&&n.a41_systemPopUpInstance.getParent().removeChild(n.a41_systemPopUpInstance)),n.a41_systemPopUpInstance=e,s=n.TOP_LEVEL),e.getElement().style("zIndex",s),e.getElement().parent().isEmpty()&&i.addChild(e)},type:1},active:{value:function(e){for(var t,i,r=0,s=n.a41_modalityInstances.length,o=0;r<s;r++)i=n.a41_modalityInstances[r],t=e.getSkin(),e===i?(o=r,t.getElement().style("zIndex",n.WINDOW_LEVEL),t.getElement().addClass("active")):(t.getElement().style("zIndex",n.WINDOW_LEVEL-1),t.getElement().removeClass("active"));o>0&&(n.a41_modalityInstances.splice(o,1),n.a41_modalityInstances.push(e))},type:1},close:{value:function(e){var t;n.a41_count>0&&r.decre(n,n,"count");var i=n.a41_modalityInstances.indexOf(e);return i>=0?((t=e.getParent())&&t.removeChild(e),n.a41_modalityInstances.splice(i,1),n.a41_modalityInstances.length>0&&n.active(n.a41_modalityInstances[n.a41_modalityInstances.length-1]),e):null},type:1}};for(var c in u)o.defineProperty(n,c,u[c]);var p={constructor:{value:n}};n.prototype=o.create(o.prototype,p),a.defineClass("es.components.popup.PopUpManage",n,{"package":"es.components.popup",classname:"PopUpManage",uri:["a41","U43","s40"],privateSymbol:l,method:u,proto:p},1);var h=function(){function e(t){s.defineProperty(this,l,{value:{_options:null,_state:!1,timeoutId:NaN}}),n.call(this,new i('<div tabIndex="-1" />')),this[l]._options=e.l42_defaultOptions,this.style("cssText",r.serialize(e.l42_defaultOptions.style,"style")),this.setVisible(!1),t.addChild(this.getElement())}var n=t("es/core/Display.es"),i=t("system/Element.js"),r=t("system/System.js"),s=t("system/Object.js"),o=t("system/Symbol.js"),a=t("system/Internal.js"),l=o("MaskDisplay").valueOf(),u={l42_defaultOptions:{writable:!0,value:{animation:{enabled:!0,fadeIn:.2,fadeOut:.2},style:{backgroundColor:"#000000",opacity:.7,position:"fixed",left:"0px",top:"0px",right:"0px",bottom:"0px"}},type:8}};for(var c in u)s.defineProperty(e,c,u[c]);var p={constructor:{value:e},l42__options:{writable:!0,value:null,type:8},l42__state:{writable:!0,value:!1,type:8},options:{value:function(t){this[l]._options=s.merge(!0,{},e.l42_defaultOptions,t)},type:1},fadeIn:{value:function(){var t;r.isNaN(this[l].timeoutId)?this[l]._state?(this.getElement().style("opacity",this[l]._options.style.opacity),this.getElement().style("animation","none")):(t=e.l42_defaultOptions.animation).fadeIn>0&&this.getElement().fadeIn(t.fadeIn,this[l]._options.style.opacity):(r.clearTimeout(this[l].timeoutId),this[l].timeoutId=NaN),this[l]._state=!0,this.setVisible(!0)},type:1},l42_timeoutId:{writable:!0,value:NaN,type:8},fadeOut:{value:function(){this[l]._state&&(this[l]._state=!1,this[l].timeoutId=r.setTimeout(function(t){var n=e.l42_defaultOptions.animation,i=n.fadeOut;n.fadeOut>0&&t.getElement().fadeOut(n.fadeOut,t[l]._options.style.opacity),r.setTimeout(function(){t.setVisible(!1),t.getElement().style("animation","none")},1e3*i),r.clearTimeout(t[l].timeoutId)},100,this))},type:1}};return e.prototype=s.create(n.prototype,p),a.defineClass("MaskDisplay",e,{ns:"s40","extends":n,"package":"es.components.popup",classname:"MaskDisplay",uri:["l42","w2","s40"],privateSymbol:l,method:u,proto:p},1),e}()},"es/core/SystemManage.es":function(e,t){function n(){o.defineProperty(this,l,{value:{}}),i.apply(this,arguments)}e.exports=n;var i=t("system/EventDispatcher.js"),r=t("system/Element.js"),s=t("system/Symbol.js"),o=t("system/Object.js"),a=t("system/Internal.js"),l=s("es.core.SystemManage").valueOf(),u={g44__window:{writable:!0,value:undefined,type:8},getWindow:{value:function(){return n.g44__window||(n.g44__window=new r(window)),n.g44__window},type:1},g44__document:{writable:!0,value:undefined,type:8},getDocument:{value:function(){return n.g44__document||(n.g44__document=new r(document)),n.g44__document},type:1},g44__body:{writable:!0,value:undefined,type:8},getBody:{value:function(){return n.g44__body||(n.g44__body=new r(document.body)),n.g44__body},type:1},g44__disableScroll:{writable:!0,value:!1,type:8},disableScroll:{value:function(){var e;n.g44__disableScroll||(n.g44__disableScroll=!0,(e=n.getBody()).style("overflowX","hidden"),e.style("overflowY","hidden"))},type:1},enableScroll:{value:function(){var e;!0===n.g44__disableScroll&&(n.g44__disableScroll=!1,(e=n.getBody()).style("overflowX","auto"),e.style("overflowY","auto"))},type:1}};for(var c in u)o.defineProperty(n,c,u[c]);var p={constructor:{value:n}};n.prototype=o.create(i.prototype,p),a.defineClass("es.core.SystemManage",n,{"extends":null,"package":"es.core",classname:"SystemManage",uri:["g44","b45","n5"],privateSymbol:l,method:u,proto:p},1)},"system/MouseEvent.js":function(e,t){function n(e,t,i){if(!(this instanceof n))return new n(e,t,i);r.call(this,e,t,i)}e.exports=n;var i=t("system/Object.js"),r=t("system/Event.js"),s=t("system/System.js"),o=t("system/Element.js");(n.prototype=i.create(r.prototype,{constructor:{value:n}})).wheelDelta=null,n.prototype.pageX=NaN,n.prototype.pageY=NaN,n.prototype.offsetX=NaN,n.prototype.offsetY=NaN,n.prototype.screenX=NaN,n.prototype.screenY=NaN,n.MOUSE_DOWN="mousedown",n.MOUSE_UP="mouseup",n.MOUSE_OVER="mouseover",n.MOUSE_OUT="mouseout",n.MOUSE_OUTSIDE="mouseoutside",n.MOUSE_MOVE="mousemove",n.MOUSE_WHEEL="mousewheel",n.CLICK="click",n.DBLCLICK="dblclick",r.registerEvent(function(e,t,i){if(e&&/^mouse|click$/i.test(e)){var r=new n(e);return r.pageX=i.x||i.clientX||i.pageX,r.pageY=i.y||i.clientY||i.pageY,r.offsetX=i.offsetX,r.offsetY=i.offsetY,r.screenX=i.screenX,r.screenY=i.screenY,"number"!=typeof r.offsetX&&t&&(r.offsetX=i.pageX-t.offsetLeft,r.offsetY=i.pageY-t.offsetTop),e===n.MOUSE_WHEEL&&(r.wheelDelta=i.wheelDelta||(i.detail>0?-i.detail:Math.abs(i.detail))),r}}),s.env.platform(s.env.BROWSER_FIREFOX)&&(r.fix.map[n.MOUSE_WHEEL]="DOMMouseScroll"),r.fix.hooks[n.MOUSE_OUTSIDE]=function(e,t){var i=window,s=this,a=new o(this),l=r.fix.prefix+n.CLICK;e.proxyTarget=i,e.proxyType=[l],e.proxyHandle=function(t){var i=r.create(t),o=a.getBoundingRect();i.pageX>=o.left&&i.pageX<=o.right&&i.pageY>=o.top&&i.pageY<=o.bottom||(i.type=n.MOUSE_OUTSIDE,i.currentTarget=s,e.dispatcher.dispatchEvent(i))},setTimeout(function(){i.addEventListener?i.addEventListener(l,e.proxyHandle):i.attachEvent(l,e.proxyHandle)},10)}},"es/skins/PopUpSkin.html":function(e,t){function n(e){o.defineProperty(this,u,{value:{properties:{},head:null,body:null,footer:null,popupContainer:null,_hostComponent:undefined,_makeMap:{},hasSetHeight:!1}}),void 0===e&&(e=null),this[u]._hostComponent=e,i.call(this,"div");var t=new r;t.setName("tips"),t.setStateGroup(["simple"]);var n=new r;n.setName("title"),n.setStateGroup(["simple"]);var a=new r;a.setName("alert"),a.setStateGroup(["normal"]);var l=new r;l.setName("confirm"),l.setStateGroup(["normal"]);var c=new r;c.setName("modality"),c.setStateGroup(["normal"]),this.setStates([t,n,a,l,c]),this.setCurrentState("alert");var p={__var4__:{"class":"popup-head"},__var6__:{"class":"popup-title"},__var8__:{type:"button","class":"close"},__var9__:{"class":"popup-body"},__var10__:{"class":"popup-footer"},__var12__:{type:"button"},__var19__:{"class":"popup",tabindex:-1}};this[u].properties=p;var h=this.w2_createComponent(0,3,s,"div",null,p.__var4__);this.setHead(h);var f=this.w2_createComponent(0,6,s,"div",null,p.__var9__);this.setBody(f);var d=this.w2_createComponent(0,7,s,"div",null,p.__var10__);this.setFooter(d);var y=this.w2_createComponent(0,2,s,"div");this.setPopupContainer(y),this.attributes(this.getElement(),p.__var19__)}e.exports=n;var i=t("es/core/Skin.es"),r=t("es/core/State.es"),s=(t("es/interfaces/IDisplay.es"),t("es/components/PopUp.es"),t("es/core/Container.es")),o=(t("es/core/View.es"),t("es/core/Application.es"),t("es/core/SkinComponent.es"),t("system/Array.js"),t("system/System.js"),t("system/Reflect.js"),t("system/Object.js")),a=(t("system/Function.js"),t("system/Symbol.js")),l=t("system/Internal.js"),u=a("es.skins.PopUpSkin").valueOf(),c={constructor:{value:n},d46_properties:{writable:!0,value:{},type:8},getHead:{value:function(){return this[u].head},type:2},setHead:{value:function(e){return this[u].head=e},type:2},getBody:{value:function(){return this[u].body},type:2},setBody:{value:function(e){return this[u].body=e},type:2},getFooter:{value:function(){return this[u].footer},type:2},setFooter:{value:function(e){return this[u].footer=e},type:2},getPopupContainer:{value:function(){return this[u].popupContainer},type:2},setPopupContainer:{value:function(e){return this[u].popupContainer=e},type:2},d46__hostComponent:{writable:!0,value:undefined,type:8},w2_getHostComponent:{value:function(){return this[u]._hostComponent},type:2},w2_render:{value:function(){var e=this.getDataset(),t=this.w2_getCurrentStateGroup();if(!t)throw new TypeError("State group is not defined for 'stateGroup'");var n=e.titleText||"title",i=e.closeText||"×",r=e.submitText||"确 定",s=e.cancelText||"取 消",o=e.headHeight||NaN,a=e.footerHeight||NaN,l=e.left||NaN,c=e.top||NaN,p=e.right||NaN,h=e.bottom||NaN,f=this[u].properties,d=t.includeIn("tips")?null:this.getHead(),y=this.getBody(),v=t.includeIn("simple")?null:this.getFooter(),m=this.getPopupContainer();return d&&(d.setHeight(o),this.w2_updateChildren(d,[this.w2_createElement(0,4,"span",n,f.__var6__),t.includeIn("title")?null:this.w2_createElement(0,5,"button",i,f.__var8__,null,{click:this.d46_makeAction("close")})])),this.w2_updateChildren(y,this.getChildren()),v&&(v.setHeight(a),this.w2_updateChildren(v,[t.includeIn("alert")?null:this.w2_createElement(0,8,"button",s,f.__var12__,{"class":t.includeIn("modality")?"btn btn-default":"btn btn-sm btn-default"},{click:this.d46_makeAction("cancel")}),this.w2_createElement(0,9,"button",r,f.__var12__,{"class":(t.includeIn("modality"),"btn btn-sm btn-primary")},{click:this.d46_makeAction("submit")})])),m.setLeft(l),m.setTop(c),m.setRight(p),m.setBottom(h),this.attributes(m.getElement(),{"class":t.includeIn("modality")?"popup-container fixed popup-lg":"popup-container fixed"}),this.w2_updateChildren(m,[d,y,v]),[m]},type:1},d46__makeMap:{writable:!0,value:{},type:8},d46_makeAction:{value:function(e){if(this[u]._makeMap.hasOwnProperty(e))return this[u]._makeMap[e];var t=this.w2_getHostComponent().action.bind(this.w2_getHostComponent(),e);return this[u]._makeMap[e]=t,t},type:1},getWidth:{value:function(){return this.getPopupContainer().getWidth()},type:2},setWidth:{value:function(e){this.getPopupContainer().setWidth(e)},type:4},d46_hasSetHeight:{writable:!0,value:!1,type:8},getHeight:{value:function(){return this.getPopupContainer().getHeight()},type:2},setHeight:{value:function(e){this.getPopupContainer().setHeight(e),this[u].hasSetHeight=!0},type:4},w2_updateDisplayList:{value:function(){i.prototype.w2_updateDisplayList.call(this);var e=this.getPopupContainer().getHeight(),t=this.w2_getCurrentStateGroup();t.includeIn("tips")||(e-=this.getHead().getHeight()),t.includeIn("simple")||(e-=this.getFooter().getHeight()),this.getBody().setHeight(e)},type:1}};n.prototype=o.create(i.prototype,c),l.defineClass("es.skins.PopUpSkin",n,{"extends":i,"package":"es.skins",classname:"PopUpSkin",uri:["d46","w2","I47"],privateSymbol:u,method:{},proto:c},1)},"es/skins/DataGridSkin.html":function(e,t){function n(e){a.defineProperty(this,h,{value:{properties:{},head:null,body:null,pagination:null,foot:null,_hostComponent:undefined}}),void 0===e&&(e=null),this[h]._hostComponent=e,i.call(this,"table");var t={__var42__:{style:"height: 25px;"},__var49__:{colspan:3},__var51__:{"class":"table data-grid-skin"}};this[h].properties=t;var n=this.w2_createElement(0,2,"thead");this.setHead(n);var s=this.w2_createElement(0,7,"tbody");this.setBody(s);var o=this.w2_createComponent(0,15,r);this.setPagination(o);var l=this.w2_createElement(0,12,"tfoot");this.setFoot(l),this.attributes(this.getElement(),t.__var51__)}e.exports=n;var i=t("es/core/Skin.es"),r=(t("es/interfaces/IDisplay.es"),t("es/components/DataGrid.es"),t("es/components/Pagination.es")),s=(t("es/core/View.es"),t("es/core/Application.es"),t("es/core/SkinComponent.es"),t("es/skins/PaginationSkin.html")),o=(t("system/System.js"),t("system/Reflect.js")),a=(t("system/Array.js"),t("system/Object.js")),l=t("system/Element.js"),u=(t("system/DataSource.js"),t("system/DataSourceEvent.js")),c=t("system/Symbol.js"),p=t("system/Internal.js"),h=c("es.skins.DataGridSkin").valueOf(),f={constructor:{value:n},a48_properties:{writable:!0,value:{},type:8},getHead:{value:function(){return this[h].head},type:2},setHead:{value:function(e){return this[h].head=e},type:2},getBody:{value:function(){return this[h].body},type:2},setBody:{value:function(e){return this[h].body=e},type:2},getPagination:{value:function(){return this[h].pagination},type:2},setPagination:{value:function(e){return this[h].pagination=e},type:2},getFoot:{value:function(){return this[h].foot},type:2},setFoot:{value:function(e){return this[h].foot=e},type:2},a48__hostComponent:{writable:!0,value:undefined,type:8},w2_getHostComponent:{value:function(){return this[h]._hostComponent},type:2},w2_render:{value:function(){var e=this.getDataset(),t=this[h].properties,i=0,r=this.w2_createElement(0,3,"tr"),l=this.getHead(),u=0,c=this.getBody(),p=this.getPagination(),f=this.getFoot(),d=[];a.forEach(e.columns,function(t,n){d.push(this.w2_createElement(i,4,"th",[t,this.w2_createElement(i,6,"span")],null,{style:"height:"+e.headHeight+"px;line-height:"+e.headHeight+"px;"})),i++},this),this.w2_updateChildren(r,d),this.w2_updateChildren(l,[r]);var y=[];return a.forEach(e.datalist,function(i,r){var s=[];a.forEach(e.columns,function(r,a){switch(a){case"name":s.push(this.w2_createElement(u,9,"td",[this.w2_createElement(u,10,"input",null,t.__var42__,{value:o.get(n,i,a)})],null,{"data-column":a,style:"height:"+e.rowHeight+"px;line-height:"+e.rowHeight+"px;"}));break;default:s.push(this.w2_createElement(u,11,"td",o.get(n,i,a),null,{"data-column":a,style:"height:"+e.rowHeight+"px;line-height:"+e.rowHeight+"px;"}))}u++},this);var l=this.w2_createElement(u,8,"tr");this.w2_updateChildren(l,s),y.push(l),u++},this),this.w2_updateChildren(c,y),p.setRadius(3),p.setAsync(!0),p.setSkinClass(s),this.w2_updateChildren(f,[this.w2_createElement(0,13,"tr",[this.w2_createElement(0,14,"td",[p],t.__var49__)])]),[l,c,f]},type:1},w2_updateDisplayList:{value:function(){i.prototype.w2_updateDisplayList.call(this);var e=this.w2_getHostComponent(),t=e.getRadius()+"px",n=this.getElement();n.style("borderRadius",t),l("thead > tr:first-child >th:first-child",n).style("borderTopLeftRadius",t),l("thead > tr:first-child >th:last-child",n).style("borderTopRightRadius",t),l("tfoot > tr:last-child >td:first-child",n).style("borderBottomLeftRadius",t),l("tfoot > tr:last-child >td:last-child",n).style("borderBottomRightRadius",t),l("td",this.getFoot()).height(e.getFootHeight())},type:1},w2_initializing:{value:function(){var e,t,n,r=this.w2_getHostComponent();r.isNeedCreateSkin()&&(n=r.getDataSource(),t=this,e=r.getDataProfile(),this.getPagination().setDataSource(n),t.assign("rowHeight",r.getRowHeight()),t.assign("headHeight",r.getHeadHeight()),t.assign(e,[]),t.assign(r.getColumnProfile(),r.getColumns()),t.assign(r.getColumnProfile(),r.getColumns()),n.addEventListener(u.SELECT,function(n){n.waiting||(t.assign(e,n.data),t.display())}),n.select(this.getPagination().getCurrent())),i.prototype.w2_initializing.call(this)},type:1}};n.prototype=a.create(i.prototype,f),p.defineClass("es.skins.DataGridSkin",n,{"extends":i,"package":"es.skins",classname:"DataGridSkin",uri:["a48","w2","I47"],privateSymbol:h,method:{},proto:f},1)},"es/components/Pagination.es":function(e,t){function n(e){p.defineProperty(this,f,{value:{_dataSource:null,_profile:"page",_url:"",_pageSize:NaN,_current:NaN,_link:7,_radius:0}}),void 0===e&&(e="12"),i.call(this,e)}e.exports=n;var i=t("es/core/SkinComponent.es"),r=(t("es/core/Skin.es"),t("es/events/PaginationEvent.es")),s=(t("es/core/Display.es"),t("system/DataSource.js"),t("system/DataSourceEvent.js")),o=t("system/Locator.js"),a=t("system/System.js"),l=t("system/Reflect.js"),u=t("system/MouseEvent.js"),c=t("system/Symbol.js"),p=t("system/Object.js"),h=t("system/Internal.js"),f=c("es.components.Pagination").valueOf(),d={constructor:{value:n},s49__dataSource:{writable:!0,value:null,type:8},getDataSource:{value:function(){return this[f]._dataSource},type:2},setDataSource:{value:function(e){var t;this[f]._dataSource!==e&&(this[f]._dataSource=e,t=this,e.addEventListener(s.SELECT,function(e){!e.waiting&&t.J26_getInitialized()&&t.J26_commitPropertyAndUpdateSkin()}),this.J26_getInitialized()&&e.select(this.getCurrent()))},type:4},s49__profile:{writable:!0,value:"page",type:8},getProfile:{value:function(){return this[f]._profile},type:2},setProfile:{value:function(e){var t;this[f]._profile!==e&&(this[f]._profile=e,this.J26_getInitialized()&&(t=parseInt(o.query(e,1)),this.setCurrent(a.isNaN(t)?1:t)))},type:4},s49__url:{writable:!0,value:"",type:8},getUrl:{value:function(){return this[f]._url},type:2},setUrl:{value:function(e){this[f]._url!==e&&(this[f]._url=e,this.J26_getInitialized()&&this.J26_commitPropertyAndUpdateSkin())},type:4},getTotalPage:{value:function(){var e=this.getDataSource();return e?e.totalPage()||1:1},type:2},getTotalSize:{value:function(){var e=this.getDataSource();return e?e.totalSize():NaN},type:2},s49__pageSize:{writable:!0,value:NaN,type:8},getPageSize:{value:function(){var e=this.getDataSource();return e?e.pageSize():this[f]._pageSize},type:2},setPageSize:{value:function(e){var t;this[f]._pageSize!==e&&(this[f]._pageSize=e,(t=this.getDataSource())&&(t.pageSize(e),this.J26_getInitialized()&&t.select(this.getCurrent())))},type:4},s49__current:{writable:!0,value:NaN,type:8},getCurrent:{value:function(){var e,t=this.getDataSource();return a.isNaN(this[f]._current)&&(e=parseInt(o.query(this[f]._profile,1)),this[f]._current=a.isNaN(e)?1:e),t&&this.J26_getInitialized()?this.getDataSource().current():this[f]._current},type:2},setCurrent:{value:function(e){var t,i,s,o,u;e=a.isNaN(this.getTotalSize())?e:Math.min(Math.max(1,e),this.getTotalPage());var c=this.getCurrent();e!==c&&(this[f]._current=e,(u=new r(r.CHANGE)).setOldValue(c),u.setNewValue(e),o=this.getProfile(),s=this.getUrl(),"function"!==a.typeOf(s)?(i=this.getUrl(),u.setUrl(l.get(n,i,"length")>0?l.call(n,i,"indexOf",["?"])>=0?i+"&"+o+"="+e:i+"?"+o+"="+e:"?"+this.getProfile()+"="+e)):u.setUrl(s(e,o)),this.dispatchEvent(u)&&this.getAsync()&&(t=this.getDataSource())&&t.select(e))},type:4},s49__link:{writable:!0,value:7,type:8},getLink:{value:function(){return this[f]._link},type:2},setLink:{value:function(e){this[f]._link!==e&&(this[f]._link=e,this.J26_getInitialized()&&this.J26_commitPropertyAndUpdateSkin())},type:4},getWheelTarget:{value:function(){return this.J26_pull("wheelTarget")},type:2},setWheelTarget:{value:function(e){var t,n=this.J26_pull("wheelTarget");n!==e&&e&&(this.J26_push("wheelTarget",e),n&&n.removeEventListener(u.MOUSE_WHEEL),t=this,e.addEventListener(u.MOUSE_WHEEL,function(e){var n;e.preventDefault(),t.getAsync()&&(n=t.getCurrent(),n=e.wheelDelta>0?n+1:n-1,t.setCurrent(n))},!1,0,this))},type:4},s49__radius:{writable:!0,value:0,type:8},getRadius:{value:function(){return this[f]._radius},type:2},setRadius:{value:function(e){this[f]._radius!==e&&(this[f]._radius=e,this.J26_getInitialized()&&this.J26_commitPropertyAndUpdateSkin())},type:4},J26_initializing:{value:function(){var e,t;if(i.prototype.J26_initializing.call(this),this.isNeedCreateSkin()){if(!(t=this[f]._dataSource))throw new ReferenceError("dataSource is not defined");e=this.getPageSize(),a.isNaN(e)||t.pageSize(e),t.select(this.getCurrent())}},type:1},J26_commitPropertyAndUpdateSkin:{value:function(){var e;if(this.J26_getInitialized()){var t=this.getSkin(),r=this.getCurrent(),s=this.getTotalPage(),o=this.getPageSize(),u=this.getLink(),c=this.getUrl(),p=Math.max(r-Math.ceil(u/2),0);"function"!==a.typeOf(c)&&(e=c,c=l.get(n,e,"length")>0?function(t,i){return l.call(n,e,"indexOf",["?"])>=0?e+"&"+i+"="+t:e+"?"+i+"="+t}:function(e,t){return"?"+t+"="+e}),p=p+u>s?p-(p+u-s):p,t.assign("totalPage",s),t.assign("pageSize",o),t.assign("offset",(r-1)*o),t.assign("profile",this.getProfile()),t.assign("url",c),t.assign("current",r),t.assign("first",1),t.assign("prev",Math.max(r-1,1)),t.assign("next",Math.min(r+1,s)),t.assign("last",s),t.assign("link",a.range(Math.max(1+p,1),u+p,1)),i.prototype.J26_commitPropertyAndUpdateSkin.call(this)}},type:1}};n.prototype=p.create(i.prototype,d),h.defineClass("es.components.Pagination",n,{"extends":i,"package":"es.components",classname:"Pagination",uri:["s49","J26","K37"],privateSymbol:f,method:{},proto:d},1)},"system/Locator.js":function(e,t){function n(){throw new TypeError("Locator is not constructor")}e.exports=n;var i=t("system/Object.js"),r=t("system/System.js"),s={};n.url=function(){return s.url},n.uri=function(){return s.uri},n.path=function(e){return e>=0?s.path[e]:s.path.slice(0)},n.host=function(){return s.host},n.origin=function(){return s.origin},n.scheme=function(){return s.scheme},n.port=function(){return s.port},n.fragment=function(e){return e>=0?s.fragment[e]||null:s.fragment.slice(0)},n.query=function(e,t){return"string"==typeof e?(t=void 0===t?null:t,s.query[e]||t):i.merge({},s.query)},n.toUrl=function(e){var t=r.serialize(e.query||{},"url",!0);return e.fragment&&("string"==typeof e.fragment?t+="#"+e.fragment:e.fragment.length>0&&(t+="#"+e.fragment.join("#"))),(e.scheme||location.protocol||"http")+"://"+(e.host||location.hostname)+(e.port?":"+e.port:"")+(e.path&&e.path.length>0?"/"+e.path.join("/"):"")+(t?"?"+t:"")};var o={};n.create=function(e,t){if("string"!=typeof e)return!1;if(e=r.trim(e),!/^(https?|file|ftp|udp|tcp)\:\/\//i.test(e)){var n=location.protocol+"//"+location.hostname+(location.port?":"+location.port:"");e="/"===e.charAt(0)||"?"===e.charAt(0)?n+e:n+"/"+e}var i=o[e];if(!i){i=o[e]={};var s=e.indexOf(":");if(i.scheme=s>0&&s<6?e.slice(0,s).toLowerCase():null,i.url=e,e=e.slice(s+1).replace(/^\/+/g,""),s=e.indexOf("file"===i.scheme?":":"/"),i.host=s>0?e.slice(0,s):null,i.uri=(s>0?e.slice("file"===i.scheme?s+1:s):e).replace(/^\/\//g,"/"),i.path=i.uri,i.fragment=[],i.query={},e=i.uri,i.host&&i.host.indexOf("@")>0){var a=i.host.split("@",2);if(a[0]){var l=a[0].split(":",2);i.username=l[0],i.password=l[1]}a[1]&&(i.host=a[1])}if(i.host&&i.host.indexOf(":")>0){var u=i.host.split(":");u[0]&&(i.host=u[0]),u[1]&&(i.port=u[1])}var c=null;if((s=e.indexOf("?"))>=0&&(i.path=e.slice(0,s),c=e=e.slice(s+1)),i.path){var p=i.path.replace(/^\/+|\/+$/g,"");i.path=p?p.split("/"):[]}if((s=e.indexOf("#"))>=0&&(c&&(c=e.slice(0,s)),(e=e.slice(s+1))&&(i.fragment=e.split("#"))),c){c=c.split("&");for(var h=0;h<c.length;h++){var f=c[h].split("=",2);i.query[r.trim(f[0])]=f.length>1?window.decodeURIComponent(f[1]):""}}}return t?i[t]:i},n.match=function(e){var t=e;if("string"==typeof e&&(t=n.create(e)),!t)return null;if(t.host!==location.hostname)return null;var i=r.environments("URL_PATH_NAME");e="undefined"!=typeof t.query[i]?t.query[i]:"/"+t.path.join("/");var s=r.environments("HTTP_ROUTES");for(var o in s){var a=s[o];if("undefined"!=typeof a[e])return a[e]}return null},s=n.create(location.href)||{host:"",origin:"",scheme:"",port:"",uri:"",url:location.href,path:[],query:{},fragment:[]}},"es/events/PaginationEvent.es":function(e,t){function n(e,t,n){s.defineProperty(this,a,{value:{newValue:null,oldValue:null,url:null}}),void 0===n&&(n=!0),void 0===t&&(t=!0),i.call(this,e,t,n)}e.exports=n;var i=t("system/Event.js"),r=t("system/Symbol.js"),s=t("system/Object.js"),o=t("system/Internal.js"),a=r("es.events.PaginationEvent").valueOf(),l={CHANGE:{value:"paginationChange",type:16},REFRESH:{value:"paginationRefreshList",type:16}};for(var u in l)s.defineProperty(n,u,l[u]);var c={constructor:{value:n},getNewValue:{value:function(){return this[a].newValue},type:2},setNewValue:{value:function(e){return this[a].newValue=e},type:2},getOldValue:{value:function(){return this[a].oldValue},type:2},setOldValue:{value:function(e){return this[a].oldValue=e},type:2},getUrl:{value:function(){return this[a].url},type:2},setUrl:{value:function(e){return this[a].url=e},type:2}};n.prototype=s.create(i.prototype,c),o.defineClass("es.events.PaginationEvent",n,{"extends":null,"package":"es.events",classname:"PaginationEvent",uri:["a50","n51","X22"],privateSymbol:a,method:l,proto:c},1)},"es/skins/PaginationSkin.html":function(e,t){function n(e){s.defineProperty(this,c,{value:{properties:{},_hostComponent:undefined}}),void 0===e&&(e=null),this[c]._hostComponent=e,i.call(this,"div");var t={__var22__:{"class":"first"},__var26__:{"class":"prev"},__var31__:{"class":"next"},__var34__:{"class":"last"},__var35__:{"class":"pagination"}};this[c].properties=t,this.attributes(this.getElement(),t.__var35__)}e.exports=n;var i=t("es/core/Skin.es"),r=(t("es/components/Pagination.es"),t("es/core/View.es"),t("es/core/Application.es"),t("es/core/SkinComponent.es"),t("system/System.js")),s=(t("system/Reflect.js"),t("system/Array.js"),t("system/Function.js"),t("system/Object.js")),o=t("system/MouseEvent.js"),a=t("system/Element.js"),l=t("system/Symbol.js"),u=t("system/Internal.js"),c=l("es.skins.PaginationSkin").valueOf(),p={constructor:{value:n},T52_properties:{writable:!0,value:{},type:8},T52__hostComponent:{writable:!0,value:undefined,type:8},w2_getHostComponent:{value:function(){return this[c]._hostComponent},type:2},w2_render:{value:function(){var e=this.getDataset(),t=e.url,n=e.first,i=e.prev,r=e.next,o=e.last,a=e.profile,l=e.current||1,u=e.link,p=this[c].properties,h=0,f=[];return f.push(this.w2_createElement(0,2,"li",[this.w2_createElement(0,3,"a","第一页",null,{href:t(n,a)})],p.__var22__)),f.push(this.w2_createElement(0,4,"li",[this.w2_createElement(0,5,"a","上一页",null,{href:t(i,a),"class":1===l?"disabled":""})],p.__var26__)),s.forEach(u,function(e,n){f.push(this.w2_createElement(h,6,"li",[this.w2_createElement(h,7,"a",e,null,{href:t(e,a)})],null,{"class":"link "+(e==l?"current":"")})),h++},this),f.push(this.w2_createElement(0,8,"li",[this.w2_createElement(0,9,"a","下一页",null,{href:t(r,a)})],p.__var31__)),f.push(this.w2_createElement(0,10,"li",[this.w2_createElement(0,11,"a","最后页",null,{href:t(o,a)})],p.__var34__)),f},type:1},w2_initializing:{value:function(){var e=this.w2_getHostComponent(),t=new RegExp(e.getProfile()+"\\s*=\\s*(\\d+)");this.addEventListener(o.CLICK,function(n){var i,s;e.getAsync()&&"a"===a.getNodeName(n.target)&&(n.preventDefault(),s=a(n.target).property("href").match(t),(i=r.parseInt(s?s[1]:0))>0&&e.setCurrent(i))})},type:1},w2_updateDisplayList:{value:function(){i.prototype.w2_updateDisplayList.call(this);var e=this.w2_getHostComponent().getRadius();e>0&&a(".link",this.getElement()).style("borderRadius",e+"px")},type:1}};n.prototype=s.create(i.prototype,p),u.defineClass("es.skins.PaginationSkin",n,{"extends":i,"package":"es.skins",classname:"PaginationSkin",uri:["T52","w2","I47"],privateSymbol:c,method:{},proto:p},1)}});
+(function(definedModules){
+
+/**
+ * 已加载的模块
+ */
+var installedModules = {};
+
+/**
+ * 加载并初始化模块
+ * @param string 
+ */
+function require( identifier )
+{
+    if( installedModules[identifier] )
+    {
+        return installedModules[identifier].exports;
+    }
+
+    if( !definedModules.hasOwnProperty(identifier) )
+    {
+         throw new ReferenceError( identifier +" is not define.");
+    }
+
+    var module = installedModules[identifier] = {
+        id: identifier,
+        exports: {}
+    };
+
+	definedModules[identifier].call(module.exports, module, require);
+	return module.exports;
+}
+
+require.has=function has( identifier )
+{
+    return definedModules.hasOwnProperty(identifier);
+}
+
+var Internal= require("system/Internal.js");
+var Locator = require("system/Locator.js");
+var Object  = require("system/Object.js");
+var System  = require("system/System.js");
+var Event   = require("system/Event.js");
+var global  = System.getGlobalEvent();
+var httpRoutes = {
+	"get":{
+		"Test":"Test@index"
+	}
+};
+var handle = "a33d25e8bd553b4e";
+var env={
+    "HTTP_DEFAULT_ROUTE":"Test@index",
+    "HTTP_ROUTES":httpRoutes,
+    "HTTP_ROUTE_PATH":null,
+    "MODE":3,
+    "ORIGIN_SYNTAX":"javascript",
+    "URL_PATH_NAME":"PATH",
+    "HTTP_ROUTE_CONTROLLER":null,
+    "COMMAND_SWITCH":0,
+    "VERSION":1574844778828,
+    "LOAD_JS_PATH":"js",
+    "LOAD_CSS_PATH":"css",
+    "WORKSPACE":"src/",
+    "MODULE_SUFFIX":".es"
+};
+Object.merge(Internal.env, env);
+var EaseScript = window[ handle ] = {
+    "Requirements":[],
+    "Load":{},
+    "Environments":env
+};
+
+if( typeof window[ handle ] === "object" )
+{
+    if( window[ handle ].Load )
+    {
+        EaseScript.Load = window[ handle ].Load;
+    }
+    if( window[ handle ].HTTP_DEFAULT_ROUTE )
+    {
+        env.HTTP_DEFAULT_ROUTE =  window[ handle ].HTTP_DEFAULT_ROUTE;
+    }
+}
+
+
+/**
+ * 加载指定的脚本文件
+ * @param filename
+ * @param callback
+ * @param classname
+ * @return {HTMLScriptElement}
+ */
+var loadMap = {};
+function loadScript(filename,callback){
+
+    if( loadMap[filename] )
+    {
+        if(typeof callback === "function"){
+            callback();
+        }
+        return loadMap[filename];
+    }
+    var script = null;
+    var match = filename.match(/\.(css|js)[$|\?]/i);
+    switch ( match && match[1].toLowerCase() ){
+        case "js" :
+            script = document.createElement('script');
+            script.setAttribute('type', 'text/javascript');
+            script.setAttribute('src', filename );
+            break;
+        case "css":
+            script = document.createElement('link');
+            script.setAttribute('rel', 'stylesheet');
+            script.setAttribute('href', filename );
+            break;
+    }
+    if( !script )
+    {
+        throw new TypeError("Invalid script file. only support css or js for the '"+filename+"'");
+    }
+    loadMap[filename] = script;
+    if( callback )
+    {
+        var loaded = false;
+        script.onreadystatechange = script.onload = function (e) {
+            if ((script.readyState == 'loaded' || script.readyState == 'complete' || script.readyState == 4) || (e && e.type === "load")) {
+                script.onreadystatechange  = script.onload = null;
+                if(loaded===false){
+                    callback(e);
+                    loaded = true;
+                }
+            }
+        }
+    }
+    var headElement = document.head || document.getElementsByTagName("head")[0];
+    if( !headElement || !headElement.parentNode )
+    {
+        throw new ReferenceError("Head element is not exist.");
+    }
+    headElement.appendChild(script);
+    return script;
+}
+
+/**
+ * 开始执行应该模块
+ * @param module
+ * @param method
+ */
+function start(module, method)
+{
+    var main = require( module );
+    var obj = new main();
+    global.dispatchEvent(new Event(Event.INITIALIZING));
+    if( method )
+    {
+        if( typeof obj[method] === "function" )
+        {
+            obj[method]();
+        }else{
+            throw new ReferenceError( method+" is not exist.");
+        }
+    }
+    if (global.hasEventListener(Event.INITIALIZE_COMPLETED)) 
+    {
+        global.dispatchEvent(new Event(Event.INITIALIZE_COMPLETED));
+    }
+}
+
+/**
+ * 加载器
+ * @param requirements
+ * @param then
+ */
+function loader(requirements, then)
+{
+    if( !requirements || !(requirements.length > 0) )return then();
+    requirements = requirements.slice(0);
+    (function load() {
+       requirements.length > 0 ? loadScript(requirements.shift(), load) :  then();
+    }());
+}
+
+/**
+ * 初始化模块文件
+ * @param {} module 
+ */
+function initModule(module)
+{
+    if( typeof EaseScript.Load[module] === "function" && EaseScript.Load[module].init !==true )
+    {
+        EaseScript.Load[module].init = true;
+        var modules = EaseScript.Load[module].call( EaseScript, require );
+        Object.forEach( modules, function(classModule,classname)
+        {
+            if( !definedModules.hasOwnProperty(classname) )
+            {
+                definedModules[ classname ] = classModule;
+            }
+        });
+    }
+}
+
+function match(routes, pathName )
+{
+    if( !routes )
+    {
+        return null;
+    }
+
+    pathName = pathName.replace(/^\/|\/$/g,'');
+    var pathArr = pathName.split('/');
+    for(var p in routes )
+    {
+       var routeName = p.replace(/^\/|\/$/g,'').toLowerCase();
+       var routeArr = routeName.split('/');
+       if( routeArr.length === pathArr.length )
+       {
+           var args = [];
+           var props = [];
+           if( p.indexOf("{") >= 0 )
+           {
+                var index = 0;
+                var len = routeArr.length;
+                while( index < len )
+                {
+                    var name = routeArr[ index ];
+                    if( name.charAt(0) ==="{" && name.charAt(name.length-1) ==="}" )
+                    {
+                       props.push( name.slice(1,-1) )
+                       args.push( pathArr[index] );
+
+                    }else if( name !== pathArr[index].toLowerCase() )
+                    {
+                       break;
+                    }
+                    index++;
+                }
+
+                if( index < len )
+                {
+                    continue;
+                }
+
+           }else if( routeName !== pathName.toLowerCase() )
+           {
+               continue;
+           }
+           return {
+              provider:routes[ p ],
+              props:props,
+              args:args
+           }
+       }
+    }
+    return null;
+}
+
+
+/**
+ * 文档加载就绪
+ */
+global.addEventListener(Event.READY,function (e) {
+ 
+    var routeMap = env.HTTP_ROUTES && env.HTTP_ROUTES.get || {};
+    var path = Locator.query( env.URL_PATH_NAME );
+    if( !path )
+    {
+        path = Locator.path().join("/") ;
+    }else{
+        path = path.replace(/^\/|\/$/g,'');
+    }
+
+    path = path.toLowerCase();
+    var matchRouter = path && match( routeMap, path );
+    var router =  matchRouter || {
+        provider:env.HTTP_DEFAULT_ROUTE,
+        props:[],
+        args:[]
+    };
+
+    var controller = router ? router.provider.split("@") : [];
+    var module = controller[0];
+    var method = controller[1];
+    env.HTTP_ROUTE_CONTROLLER=router;
+
+    if( typeof routeMap[ path ] !== "undefined"){
+        env.HTTP_ROUTE_PATH = path ;
+    }else{
+        Object.forEach(routeMap,function (provider, name) {
+            if( provider === router ){
+                env.HTTP_ROUTE_PATH = name;
+                return false;
+            }
+        });
+    }
+
+    //调度指定模块中的方法
+    (env.HTTP_DISPATCHER=function(module, method, callback)
+    {
+        module = env.WORKSPACE+module+env.MODULE_SUFFIX;
+
+        //如果存在先初始化
+        initModule(module);
+
+        //如果模块类已经加载
+        if( require.has( module ) )
+        {
+            typeof callback === "function" ? callback( start(module, method) ) : start(module, method);
+        }
+        //需要加载模块及模块相关脚本
+        else
+        {
+            //如果没有配置指定的模块
+            var moduleInfo = EaseScript.Requirements[ module ]
+            if( !moduleInfo || !moduleInfo.script )
+            {
+                throw new ReferenceError("Not found the '"+module+"'." );
+            }
+
+            //加载模块样式
+            if( moduleInfo.css )
+            {
+                loadScript( moduleInfo.css );
+            }
+
+            //加载模块依赖文件
+            loader(moduleInfo.require, function () {
+                //加载主模块
+                loadScript(moduleInfo.script, function () {
+                    //初始化模块
+                    initModule(module);
+                    typeof callback === "function" ? callback( start(module, method) ) : start(module, method);
+                },module);
+            });
+        }
+
+    })(module, method);
+    
+},false,-500);
+
+}({
+
+/***** Class src/Test.es *****/
+
+"src/Test.es": function(module,require){
+function Test(){Object.defineProperty(this,__PRIVATE__,{value:{}});
+
+	Application.call(this);
+	var __this0__ = this;
+	console.log("test");
+	var b=function(item){
+		if(item === void 0 ){
+			item=[];
+		}
+		console.log(__this0__,__this0__.index({}));
+		function name(){
+			var b=function(item){
+				return item;
+			};
+			return [];
+		}return item;
+	};
+};
+module.exports=Test;
+var Application=require("es/core/Application.es");
+var TestView=require("src/view/TestView.html");
+var console=require("system/Console.js");
+var Function=require("system/Function.js");
+var Array=require("system/Array.js");
+var Symbol=require("system/Symbol.js");
+var Object=require("system/Object.js");
+var Internal=require("system/Internal.js");
+var __PRIVATE__=Symbol("Test").valueOf();
+var method={};
+var proto={"constructor":{"value":Test},"index":{"value":function index(obj){
+	this.render(new TestView(this));
+	return {};
+},"type":1}
+};
+Test.prototype=Object.create( Application.prototype , proto);
+Internal.defineClass("Test",Test,{
+	"extends":Application,
+	"classname":"Test",
+	"uri":["P53","C31","d54"],
+	"privateSymbol":__PRIVATE__,
+	"method":method,
+	"proto":proto
+},1);
+
+},
+
+/***** Class es/core/Application.es *****/
+
+"es/core/Application.es": function(module,require){
+function Application(){
+	Object.defineProperty(this,__PRIVATE__,{value:{"appContainer":null,"initiated":false,"_dataset":{},"_async":true}});
+
+	EventDispatcher.call(this,document);
+	this[__PRIVATE__].appContainer=Element.createElement("div");
+	this[__PRIVATE__].appContainer.className="application";
+};
+module.exports=Application;
+var View=require("es/core/View.es");
+var Interaction=require("es/core/Interaction.es");
+var ApplicationEvent=require("es/events/ApplicationEvent.es");
+var IDisplay=require("es/interfaces/IDisplay.es");
+var EventDispatcher=require("system/EventDispatcher.js");
+var Element=require("system/Element.js");
+var System=require("system/System.js");
+var Object=require("system/Object.js");
+var Reflect=require("system/Reflect.js");
+var Symbol=require("system/Symbol.js");
+var Internal=require("system/Internal.js");
+var __PRIVATE__=Symbol("es.core.Application").valueOf();
+var method={"x30_lastApp":{"writable":true,"value":null,"type":8}
+};
+for(var prop in method){
+	Object.defineProperty(Application, prop, method[prop]);
+}
+var proto={"constructor":{"value":Application},"x30_appContainer":{"writable":true,"value":null,"type":8}
+,"x30_initiated":{"writable":true,"value":false,"type":8}
+,"getContainer":{"value":function getContainer(){
+	var event;
+	var container=this[__PRIVATE__].appContainer;
+	if(this[__PRIVATE__].initiated===false){
+		event=new ApplicationEvent(ApplicationEvent.FETCH_ROOT_CONTAINER);
+		event.setContainer(container);
+		if(this.dispatchEvent(event)){
+			if(System.is(event.getContainer(), IDisplay)){
+				container=Reflect.get(Application,event.getContainer().getElement(),0);
+			}
+			else {
+				container=event.getContainer();
+			}
+			if(!event.defaultPrevented){
+				if(Application.x30_lastApp){
+					document.body.removeChild(Application.x30_lastApp);
+				}
+				document.body.appendChild(container);
+				Application.x30_lastApp=container;
+			}
+		}
+		this[__PRIVATE__].initiated=true;
+		this[__PRIVATE__].appContainer=container;
+	}
+	return container;
+},"type":1}
+,"assign":{"value":function assign(name,value){
+	if(value === void 0 ){
+		value=null;
+	}
+	if(value==null){
+		return this[__PRIVATE__]._dataset[name];
+	}
+	return this[__PRIVATE__]._dataset[name]=value;
+},"type":1}
+,"x30__dataset":{"writable":true,"value":{},"type":8}
+,"getDataset":{"value":function dataset(){
+	return this[__PRIVATE__]._dataset;
+},"type":2},"setDataset":{"value":function dataset(value){
+	this[__PRIVATE__]._dataset=value;
+},"type":4},"getTitle":{"value":function title(){
+	return this[__PRIVATE__]._dataset.title;
+},"type":2},"setTitle":{"value":function title(value){
+	this[__PRIVATE__]._dataset.title=value;
+	document.title=value;
+},"type":4},"x30__async":{"writable":true,"value":true,"type":8}
+,"getAsync":{"value":function async(){
+	return true;
+},"type":2},"setAsync":{"value":function async(flag){
+	this[__PRIVATE__]._async=flag;
+},"type":4},"getComponentId":{"value":function getComponentId(prefix){
+	if(prefix === void 0 ){
+		prefix="";
+	}
+	return "";
+},"type":1}
+,"render":{"value":function render(view){
+	view.display();
+	return view;
+},"type":1}
+};
+Application.prototype=Object.create( EventDispatcher.prototype , proto);
+Internal.defineClass("es.core.Application",Application,{
+	"extends":null,
+	"package":"es.core",
+	"classname":"Application",
+	"uri":["x30","C31","Q5"],
+	"privateSymbol":__PRIVATE__,
+	"method":method,
+	"proto":proto
+},1);
+
+},
+
+/***** System system/Internal.js *****/
+
+"system/Internal.js": function(module,require){
+/*
+ * EaseScript
+ * Copyright © 2017 EaseScript All rights reserved.
+ * Released under the MIT license
+ * https://github.com/51breeze/EaseScript
+ * @author Jun Ye <664371281@qq.com>
+ */
+
+module.exports =(function(
+Internal,
+$Object,
+$Array,
+$String,
+$Number,
+$Function,
+$RegExp,
+$Boolean,
+$Date,
+$Math,
+$Error,
+$SyntaxError,
+$TypeError,
+$EvalError,
+$ReferenceError,
+$JSON,
+$Symbol,
+$console
+){
+
+/**
+ * 环境参数配置
+ */
+var env = Internal.env = {
+    'BROWSER_IE': 'IE',
+    'BROWSER_FIREFOX': 'FIREFOX',
+    'BROWSER_CHROME': 'CHROME',
+    'BROWSER_OPERA': 'OPERA',
+    'BROWSER_SAFARI': 'SAFARI',
+    'BROWSER_MOZILLA': 'MOZILLA',
+    'NODE_JS': 'NODE_JS',
+    'IS_CLIENT': false
+};
+
+var _platform = [];
+if (typeof navigator !== "undefined") 
+{
+    var ua = navigator.userAgent.toLowerCase();
+    var s;
+    (s = ua.match(/msie ([\d.]+)/)) ? _platform = [env.BROWSER_IE, parseFloat(s[1])] :
+    (s = ua.match(/firefox\/([\d.]+)/)) ? _platform = [env.BROWSER_FIREFOX, parseFloat(s[1])] :
+    (s = ua.match(/chrome\/([\d.]+)/)) ? _platform = [env.BROWSER_CHROME, parseFloat(s[1])] :
+    (s = ua.match(/opera.([\d.]+)/)) ? _platform = [env.BROWSER_OPERA, parseFloat(s[1])] :
+    (s = ua.match(/version\/([\d.]+).*safari/)) ? _platform = [env.BROWSER_SAFARI, parseFloat(s[1])] :
+    (s = ua.match(/^mozilla\/([\d.]+)/)) ? _platform = [env.BROWSER_MOZILLA, parseFloat(s[1])] : null;
+    env.IS_CLIENT = true;
+
+} else
+{
+    var nodejs = eval("(typeof process !== 'undefined' ? process.versions.node : 0)");
+    _platform = [env.NODE_JS, nodejs];
+}
+
+/**
+ * 获取当前运行平台
+ * @returns {*}
+ */
+env.platform = function platform(name, version)
+{
+    if ( typeof name === "string" )
+    {
+        name = name.toUpperCase();
+        if( version > 0 )return name == _platform[0] && env.version( version );
+        return name == _platform[0];
+    }
+    return _platform[0];
+};
+
+/**
+ * 判断是否为指定的浏览器
+ * @param type
+ * @returns {string|null}
+ */
+env.version = function version(value, expre) {
+    var result = _platform[1];
+    if (value == null)return result;
+    value = parseFloat(value);
+    switch (expre) {
+        case '=' :
+            return result == value;
+        case '!=' :
+            return result != value;
+        case '>' :
+            return result > value;
+        case '>=' :
+            return result >= value;
+        case '<=' :
+            return result <= value;
+        case '<' :
+            return result < value;
+        default:
+            return result <= value;
+    }
+};
+
+Internal.defineProperty = $Object.defineProperty;
+
+/**
+* 定义属性描述
+*/
+if( !Internal.defineProperty || Internal.env.version(Internal.env.BROWSER_IE,8) )
+{
+    Internal.defineProperty = function defineProperty(obj, prop, desc)
+    {
+        if( obj == null)
+        {
+            throw new TypeError('target is non-object');
+        }
+        return obj[prop] = desc.value;
+    }
+}
+
+
+Internal.createSymbolStorage=function(symbol)
+{
+    return function(target, name, value )
+    {
+        if( name === true )
+        {
+            target[ symbol ]=value;
+            return value;
+        }
+        var data = target[ symbol ];
+        if( !data )
+        {
+            data={};
+            target[ symbol ]=data;
+        }
+        if( typeof value !== "undefined" )
+        {
+            if( typeof data[ name ] === "number" )
+            {
+                if (value === "increment")return data[name]++;
+                if (value === "decrement")return data[name]--;
+            }
+            data[ name ]=value;
+            return value;
+        }
+        return name==null ? data : data[ name ];
+    }
+};
+
+var classValueMap={
+    1:"Class",
+    2:"Interface",
+    3:"Namespace",
+}
+var modules = {};
+Internal.defineClass=function(name,classFactory,desc,type)
+{
+    Internal.defineProperty(classFactory,"name",{enumerable: false, value: name,configurable:false});
+    if( type != 3 )
+    {
+        Internal.defineProperty(classFactory, "valueOf", { enumerable: false, value:function valueOf(){
+            return "["+classValueMap[type]+" "+name+"]";
+        },configurable:false});
+    }
+
+    Internal.defineProperty(classFactory, "toString", { enumerable: false, value:function toString(){
+        return "["+classValueMap[type]+" "+name+"]";
+    },configurable:false});
+
+    Internal.defineProperty(classFactory, "constructor", { enumerable: false, value:classFactory,configurable:false});
+    Internal.defineProperty(classFactory, "__CLASS__", { enumerable: false, value:name,configurable:false});
+    Internal.defineProperty(classFactory, "__RESOURCETYPE__", { enumerable: false, value:type,configurable:false});
+    Internal.defineProperty(classFactory, "__T__", { enumerable: false,value:desc,configurable:false});
+
+    modules[ name ] = classFactory;
+    return classFactory;
+}
+
+Internal.getClassModule=function( name )
+{
+    if( modules.hasOwnProperty(name) )
+    {
+        return modules[name];
+    }
+    return null;
+}
+
+Internal.$Object = $Object;
+Internal.$Array = $Array;
+Internal.$String = $String;
+Internal.$Number = $Number;
+Internal.$Function = $Function;
+Internal.$RegExp = $RegExp;
+Internal.$Boolean = $Boolean;
+Internal.$Date = $Date;
+Internal.$Error = $Error;
+Internal.$Math = $Math;
+Internal.$SyntaxError = $SyntaxError;
+Internal.$TypeError = $TypeError;
+Internal.$SyntaxError = $SyntaxError;
+Internal.$EvalError = $EvalError;
+Internal.$ReferenceError = $ReferenceError;
+Internal.$JSON = $JSON;
+Internal.$Symbol = $Symbol;
+Internal.$console = $console;
+Internal.iteratorClassName="es.interfaces.IListIterator";
+return Internal;
+
+}({},Object,Array,String,Number,Function,RegExp,Boolean,Date,Math,Error,SyntaxError,TypeError,EvalError,ReferenceError,JSON,Symbol,console));
+},
+
+/***** System system/Array.js *****/
+
+"system/Array.js": function(module,require){
+/*
+* Copyright © 2017 EaseScript All rights reserved.
+* Released under the MIT license
+* https://github.com/51breeze/EaseScript
+* @author Jun Ye <664371281@qq.com>
+* @require System,Object,ReferenceError,TypeError
+*/
+function Array(length)
+{
+    if( !(this instanceof Array) )
+    {
+        var obj = new Array();
+        $Array.apply(obj , Array.prototype.slice.call(arguments, 0) );
+        return obj;
+    }
+
+    $Array.call(this);
+    if( arguments.length > 0 )
+    {
+        if( typeof length === 'number' && arguments.length===1 )
+        {
+            this.length = length;
+        }else
+        {
+            Array.prototype.splice.apply(this, [0,0].concat( Array.prototype.slice.call(arguments,0) ) );
+        }
+    }
+    return this;
+};
+
+module.exports = Array;
+var Internal =require("system/Internal.js");
+var System =require("system/System.js");
+var Object =require("system/Object.js");
+
+
+var $Array = Internal.$Array;
+
+Object.defineProperty(Array,"from",{value:$Array.from});
+Object.defineProperty(Array,"of",{value:$Array.of});
+Object.defineProperty(Array,"isArray",{value:$Array.isArray});
+
+Array.prototype = Object.create( $Array.prototype,{
+    "constructor":{value:Array},  
+    /**
+     * 返回此对象的字符串
+     * @returns {*}
+     */
+    "toString":{value:function toString()
+    {
+        if( this.constructor === Array ){
+            return "[object Array]";
+        }
+        return Object.prototype.toString.call(this);
+    }},
+
+    /**
+     * 返回此对象的数据值
+     * @returns {*}
+     */
+    "valueOf":{value:function valueOf()
+    {
+        if( this.constructor === Array ){
+            return this.slice(0);
+        }
+        return Object.prototype.valueOf.call(this);
+    }},
+    "length":{value:0,writable:true},
+    "hasOwnProperty":{value:Object.prototype.hasOwnProperty},
+    "propertyIsEnumerable":{value:Object.prototype.propertyIsEnumerable},
+
+    /**
+     * 返回一个唯一元素的数组
+     * @returns {Array}
+     */
+    "unique":{value:function unique()
+        {
+            if (this==null)throw new ReferenceError('this is null or not defined');
+            var obj = System.Object(this);
+            var arr = Array.prototype.slice.call(obj,0);
+            var i=0;
+            var b;
+            var len = arr.length >> 0;
+            for(;i<len;i++)
+            {
+                b = i+1;
+                for (;b<len;b++)if(arr[i]===arr[b])arr.splice(b, 1);
+            }
+            return arr;
+        }
+    }
+
+});
+
+/**
+ * 将一个数组的所有元素从开始索引填充到具有静态值的结束索引
+ * @param value
+ * @param start
+ * @param end
+ * @returns {Object}
+ */
+if (!Array.prototype.fill)
+{
+    Object.defineProperty(Array.prototype,"fill",{value:function fill(value, start, end)
+        {
+            if (this==null)throw new ReferenceError('this is null or not defined');
+            if (!(System.is(this, Array) || System.isArray(this)))throw new ReferenceError('this is not Array');
+            var len = this.length >> 0;
+            var relativeStart = start >> 0;
+            var k = relativeStart < 0 ? Math.max(len + relativeStart, 0) : Math.min(relativeStart, len);
+            var relativeEnd = end == null ? len : end >> 0;
+            var final = relativeEnd < 0 ? Math.max(len + relativeEnd, 0) : Math.min(relativeEnd, len);
+            while (k < final) {
+                this[k] = value;
+                k++;
+            }
+            return this;
+        }
+    });
+}
+
+/**
+ * 返回数组中满足提供的测试函数的第一个元素的值。否则返回 undefined。
+ * @param callback
+ * @param thisArg
+ * @returns {*}
+ */
+if (!Array.prototype.find)
+{
+    Object.defineProperty(Array.prototype,"find",{value:function find(callback, thisArg)
+        {
+            if (typeof callback !== 'function')throw new TypeError('callback must be a function');
+            if (this==null)throw new ReferenceError('this is null or not defined');
+            var obj = System.Object(this);
+            var len = obj.length >> 0;
+            var k = 0;
+            thisArg = thisArg || this;
+            while (k<len)if( k in obj)
+            {
+                if( callback.call(thisArg, obj[k++], k, obj) )
+                {
+                    return obj[k];
+                }
+            }
+            return;
+        }
+    });
+}
+
+if (!Array.from)
+{
+    Object.defineProperty(Array,"from",{value:(function () {
+        var toStr = Object.prototype.toString;
+        var isCallable = function (fn) {
+            return typeof fn === 'function' || toStr.call(fn) === '[object Function]';
+        };
+        var toInteger = function (value) {
+            var number = Number(value);
+            if (isNaN(number)) { return 0; }
+            if (number === 0 || !isFinite(number)) { return number; }
+            return (number > 0 ? 1 : -1) * Math.floor(Math.abs(number));
+        };
+        var maxSafeInteger = Math.pow(2, 53) - 1;
+        var toLength = function (value) {
+            var len = toInteger(value);
+            return Math.min(Math.max(len, 0), maxSafeInteger);
+        };
+    
+        return function from(arrayLike) {
+            var C = this;
+            var items = Object(arrayLike);
+            if (arrayLike == null) {
+            throw new TypeError("Array.from requires an array-like object - not null or undefined");
+            }
+            var mapFn = arguments.length > 1 ? arguments[1] : void undefined;
+            var T;
+            if (typeof mapFn !== 'undefined') {
+            if (!isCallable(mapFn)) {
+                throw new TypeError('Array.from: when provided, the second argument must be a function');
+            }
+            if (arguments.length > 2) {
+                T = arguments[2];
+            }
+            }
+            var len = toLength(items.length);
+            var A = isCallable(C) ? Object(new C(len)) : new Array(len);
+            var k = 0;
+            var kValue;
+            while (k < len) {
+            kValue = items[k];
+            if (mapFn) {
+                A[k] = typeof T === 'undefined' ? mapFn(kValue, k) : mapFn.call(T, kValue, k);
+            } else {
+                A[k] = kValue;
+            }
+            k += 1;
+            }
+            A.length = len;
+            return A;
+        };
+        }())
+    });
+}
+
+if (!Array.of)
+{
+    Object.defineProperty(Array,"of",{value:function of() {
+       return Array.prototype.slice.call(arguments);
+    }});
+}
+},
+
+/***** System system/JSON.js *****/
+
+"system/JSON.js": function(module,require){
+/*
+ * EaseScript
+ * Copyright © 2017 EaseScript All rights reserved.
+ * Released under the MIT license
+ * https://github.com/51breeze/EaseScript
+ * @author Jun Ye <664371281@qq.com>
+ * @require Object, Array
+ */
+var Internal =require("system/Internal.js");
+var _JSON= Internal.$JSON || (function()
+{
+    function JSON() {
+        if (this instanceof JSON)throw new TypeError('JSON is not constructor.');
+    }
+    var escMap = {'"': '\\"', '\\': '\\\\', '\b': '\\b', '\f': '\\f', '\n': '\\n', '\r': '\\r', '\t': '\\t'};
+    var escRE = /[\\"\u0000-\u001F\u2028\u2029]/g;
+    function escFunc(m) {
+        return escMap[m] || '\\u' + (m.charCodeAt(0) + 0x10000).toString(16).substr(1);
+    }
+    JSON.parse = function (strJson)
+    {
+        return eval('(' + strJson + ')');
+    };
+
+    JSON.stringify = function(value)
+    {
+        if (value == null) return 'null';
+        var type = typeof value;
+        if (type === 'number')return System.isFinite(value) ? value.toString() : 'null';
+        if (type === 'boolean')return value.toString();
+        if (type === 'object') {
+            var tmp = [];
+            if (typeof value.toJSON === 'function') {
+                return JSON.stringify(value.toJSON());
+            } else if (System.instanceOf(value, Array)) {
+                for (var i = 0; i < value.length; i++)tmp.push(JSON.stringify(value[i]));
+                return '[' + tmp.join(',') + ']';
+            } else if (System.isObject(value)) {
+                for (var b in value)tmp.push(JSON.stringify(b) + ':' + JSON.stringify(value[b]));
+                return '{' + tmp.join(',') + '}';
+            } else {
+                var items = Object.prototype.getEnumerableProperties.call(value);
+                for (var i = 0; i < items.length; i++)tmp.push(JSON.stringify(items[i].key) + ':' + JSON.stringify(items[i].value));
+                return '{' + tmp.join(', ') + '}';
+            }
+        }
+        return '"' + value.toString().replace(escRE, escFunc) + '"';
+    };
+    return JSON;
+
+}());
+
+module.exports = _JSON;
+var Object =require("system/Object.js");
+var Array =require("system/Array.js");
+var System =require("system/System.js");
+
+},
+
+/***** System system/Symbol.js *****/
+
+"system/Symbol.js": function(module,require){
+/*
+ * EaseScript
+ * Copyright © 2017 EaseScript All rights reserved.
+ * Released under the MIT license
+ * https://github.com/51breeze/EaseScript
+ * @author Jun Ye <664371281@qq.com>
+ * @require System,Internal
+ */
+var Internal =require("system/Internal.js");
+var hasSymbol = !!Internal.$Symbol;
+var _Symbol = Internal.$Symbol || (function()
+{
+    var tables={};
+    var hash={};
+    var prefix ='@@symbol';
+    var prefixLen =  prefix.length;
+    var SYMBOL_KEY_NAME = prefix+'(SYMBOL_KEY_NAME)';
+    var SYMBOL_KEY_VALUE= prefix+'(SYMBOL_KEY_VALUE)';
+    function isSymbolPropertyName( propName )
+    {
+        if( propName==null || hasSymbol===true )return false;
+        propName=propName.toString();
+        return propName.substr(0,prefixLen) === prefix+'(' && propName.substr(-1)===')';
+    }
+
+    var factor = (function () {
+        return function Symbol( name ){
+            this[SYMBOL_KEY_NAME] = name || '';
+            this[SYMBOL_KEY_VALUE]= prefix+'('+System.uid()+')';
+        };
+    }());
+
+    /**
+     * Symbol对象
+     * @param name
+     * @constructor
+     */
+    function Symbol( name )
+    {
+        if(this instanceof Symbol)
+        {
+            throw new TypeError('is not constructor');
+        }
+        return new factor(name);
+    }
+    Symbol.prototype.constructor = Symbol;
+    factor.prototype = Symbol.prototype;
+
+    /**
+     * 返回Symbol的原始值
+     * @returns {string}
+     */
+    Symbol.prototype.toString=function toString()
+    {
+        return this[SYMBOL_KEY_VALUE];
+        //throw new TypeError ("can't convert symbol to string");
+    };
+
+    /**
+     * 返回Symbol的表示式
+     * @returns {string}
+     */
+    Symbol.prototype.valueOf=function valueOf()
+    {
+        return this[SYMBOL_KEY_VALUE];
+    };
+
+    /**
+     * 在注册表中生成一个指定名称的symbol。并返回symbol对象
+     * @param name
+     * @returns {Symbol}
+     */
+    Symbol["for"] = function( name )
+    {
+        if( tables[name] )return tables[name];
+        tables[name] = Symbol( name );
+        hash[ tables[name][SYMBOL_KEY_VALUE] ]=name;
+        return tables[name];
+    };
+
+    /**
+     * 返回在注册表中的symbol名称
+     * 如果不存在返回undefined
+     * @param symbol
+     * @returns {*}
+     */
+    Symbol.keyFor=function keyFor( symbol )
+    {
+        if( symbol instanceof Symbol )
+        {
+            return hash[ symbol[SYMBOL_KEY_VALUE] ];
+        }
+        return undefined;
+    };
+    Symbol.isSymbolPropertyName = isSymbolPropertyName;
+    return Symbol;
+
+}());
+
+module.exports =_Symbol;
+var System =require("system/System.js");
+},
+
+/***** System system/Namespace.js *****/
+
+"system/Namespace.js": function(module,require){
+/*
+ * EaseScript
+ * Copyright © 2017 EaseScript All rights reserved.
+ * Released under the MIT license
+ * https://github.com/51breeze/EaseScript
+ * @author Jun Ye <664371281@qq.com>
+ * @require System,Object,Symbol,Internal;
+ */
+
+function Namespace(prefix, uri)
+{
+    storage(this, true, {prefix:prefix||'',uri:uri||''});
+}
+
+module.exports = Namespace;
+var Object =require("system/Object.js");
+var Symbol =require("system/Symbol.js");
+var System =require("system/System.js");
+var Internal =require("system/Internal.js");
+var storage=Internal.createSymbolStorage( Symbol('Namespace') );
+var codeMap={};
+
+Object.defineProperty( Namespace, "getCodeByUri", {value:function getCodeByUri(uri){
+    return codeMap[uri] || '';
+}});
+
+Object.defineProperty( Namespace, "valueOf", {value:function valueOf(){
+    return '[Namespace object]';
+}});
+
+Object.defineProperty( Namespace, "toString", {value:function toString(){
+    return '[Namespace object]';
+}});
+
+Namespace.prototype = Object.create( Object.prototype,{
+    "constructor":{value:Namespace},
+    "toString":{
+        value:function toString(){
+            return this.valueOf();
+        }
+    },
+    "valueOf":{
+        value:function valueOf(){
+            var data = storage(this);
+            return data.prefix+data.uri;
+        }
+    }
+});
+
+
+System.Namespace = Namespace;
+},
+
+/***** System system/Reflect.js *****/
+
+"system/Reflect.js": function(module,require){
+/*
+ * EaseScript
+ * Copyright © 2017 EaseScript All rights reserved.
+ * Released under the MIT license
+ * https://github.com/51breeze/EaseScript
+ * @author Jun Ye <664371281@qq.com>
+ * @require Object,System,Namespace,Error,TypeError,ReferenceError,SyntaxError
+ */
+
+function Reflect()
+{ 
+    throw new SyntaxError('Reflect is not constructor.');
+}
+module.exports =Reflect;
+var Object =require("system/Object.js");
+
+var Namespace =require("system/Namespace.js");
+
+
+var Object =require("system/Object.js");
+var System =require("system/System.js");
+var Internal =require("system/Internal.js");
+var $Reflect = Internal.$Reflect;
+var $has = Object.prototype.hasOwnProperty;
+var ATTR_TYPE={
+    1:"function",
+    2:"get",
+    4:"set",
+    8:"var",
+    16:"const",
+    32:"namespace"
+};
+var _construct = $Reflect ? $Reflect.construct : function construct(theClass,args)
+{
+    if( !System.isFunction( theClass ) )
+    {
+        throw new TypeError('is not function');
+    }
+    switch ( args.length )
+    {
+        case 0 :
+            return new theClass();
+        case 1 :
+            return new theClass(args[0]);
+        case 2 :
+            return new theClass(args[0], args[1]);
+        case 3 :
+            return new theClass(args[0], args[1], args[2]);
+        default :
+            return Function('f,a', 'return new f(a[' + System.range(0, args.length).join('],a[') + ']);')(theClass, args);
+    }
+};
+
+var _apply = $Reflect ? $Reflect.apply : function apply(target, thisArgument, argumentsList)
+{
+    if( System.typeOf(target) !== "function" )
+    {
+        throw new TypeError('is not function');
+    }
+    thisArgument = thisArgument === target ? undefined : thisArgument;
+    if (argumentsList != null) {
+        return target.apply(thisArgument === target ? undefined : thisArgument, argumentsList);
+    }
+    if (thisArgument != null) {
+        return target.call(thisArgument);
+    }
+    return target();
+};
+
+function fetchAccessorName(name,accessor)
+{
+    return accessor+(name.substr(0,1).toUpperCase()+name.substr(1));
+}
+
+function fetchDescObject(target, prop, value, desc, accessor )
+{
+    if( accessor && ATTR_TYPE[ desc.type ] === accessor )
+    {
+        var def = {"prop": prop, "desc": desc};
+        def[ accessor ] = desc.value;
+        return def;
+    }
+    return {"target":target,"prop": prop,"value":value, "desc": desc};
+}
+
+function fetchMethodAndAttributeDesc(context,proto,target,name,isstatic,accessor,ns)
+{
+    var prop = accessor ? fetchAccessorName(name,accessor) : name;
+    prop = ns ? ns+'_'+prop : prop;
+    if( $has.call(proto,prop) )
+    {
+        var desc = proto[prop];
+
+        //静态成员
+        if( isstatic )
+        {
+            return fetchDescObject(target, prop, target[prop], desc, accessor );
+        }
+        //实例成员
+        else
+        {
+            //私有实例属性
+            if( context && context.__T__.uri[0]===ns )
+            {
+                var _private = context.__T__.privateSymbol.valueOf();
+                if( $has.call( target[_private], name ) )
+                {
+                    return fetchDescObject(target[_private], name, target[_private][name], desc, accessor);
+                }
+            }
+            return fetchDescObject(proto, prop, desc.value, desc, accessor);
+        }
+    }
+    if( accessor )
+    {
+       return fetchMethodAndAttributeDesc(context,proto,target, name,isstatic,'',ns);
+    }
+    return null;
+}
+
+function getNamespaceUri(context, ns)
+{
+    if( !ns || !(ns.length > 0) )
+    {
+        return context ? context.__T__.uri : [];
+    }
+    var uri = context.__T__.uri.slice(0);
+    var len = ns.length;
+    for(;i<len;i++)
+    {
+        var item = ns[i];
+        if( item instanceof Namespace )
+        {
+            uri.push( Namespace.getCodeByUri( item.valueOf() ) );
+        }
+    }
+    return uri;
+}
+
+function description(scope, target, name , receiver , ns, accessor)
+{
+    //表示获取一个类中的属性或者方法（静态属性或者静态方法）
+    if( System.isClass(target.constructor) )
+    {
+        var isstatic = ( !receiver || receiver === target ) && System.isClass(target);
+        var objClass = isstatic ? target : target.constructor;
+        var context = System.isClass(scope) ? scope : null;
+        var proto = isstatic ? objClass.__T__.method : objClass.__T__.proto;
+
+        //获取公开的属性
+        var desc = fetchMethodAndAttributeDesc( context, proto, target, name, isstatic, accessor, '');
+        if( desc )
+        {
+            return desc;
+        }
+
+        //获取带有命名空间的属性
+        var uri = getNamespaceUri( context, ns);
+        do{ 
+            var i = uri.length;
+            proto = isstatic ? objClass.__T__.method : objClass.__T__.proto;
+            while ( proto && (i--) > 0)
+            {
+                desc = fetchMethodAndAttributeDesc( context, proto, target, name, isstatic, accessor, uri[i]);
+                if ( desc )
+                {
+                    return desc;
+                }
+            }
+
+        }while( !isstatic && System.isClass(objClass = objClass.__T__["extends"]) );
+
+        if( accessor && accessor==="set" )
+        {
+           return {"writable":false};
+        }
+
+        objClass = (objClass || Object).prototype;
+        var obj = objClass[name];
+        if( obj )
+        {
+            return {"target":objClass, "prop": name, "value":obj, "desc": {value:obj} };
+        }
+    }
+    return null;
+};
+
+
+/**
+ * 静态方法 Reflect.apply() 通过指定的参数列表发起对目标(target)函数的调用
+ * @param theClass
+ * @param thisArgument
+ * @param argumentsList
+ * @returns {*}
+ */
+Reflect.apply=function apply(target, thisArgument, argumentsList )
+{
+    if( !System.isFunction( target ) || System.isClass(target) )
+    {
+        throw new TypeError('target is not function');
+    }
+
+    if( !System.isArray(argumentsList) )
+    {
+        argumentsList = typeof argumentsList !== "undefined" ? [argumentsList] : [];
+    }
+    return _apply(target, thisArgument, argumentsList);
+};
+
+/**
+ * 调用一个对象上的函数
+ * @param target
+ * @param propertyKey
+ * @param thisArgument
+ * @param argumentsList
+ * @returns {*}
+ */
+Reflect.call=function call(scope, target, propertyKey,argumentsList,thisArgument,ns)
+{
+    if( target == null )throw new ReferenceError('target is null or undefined');
+    if( propertyKey==null ){
+        return Reflect.apply( target, thisArgument, argumentsList );
+    }
+    var fn = Reflect.get(scope,target, propertyKey, thisArgument , ns );
+    if( typeof fn !== "function" )
+    {
+        throw new TypeError('target.'+propertyKey+' is not function');
+    }
+    return _apply(fn, thisArgument||target, argumentsList||[]);
+};
+
+/**
+ * Reflect.construct() 方法的行为有点像 new 操作符 构造函数 ， 相当于运行 new target(...args).
+ * @param target
+ * @param argumentsList
+ * @returns {*}
+ */
+Reflect.construct=function construct(target , args)
+{
+    if( System.isClass(target) )
+    {
+        if( target.__T__.abstract )
+        {
+            throw new TypeError('Abstract class cannot be instantiated');
+        }
+    }
+    return _construct(target, args || []);
+};
+
+/**
+ * 静态方法 Reflect.deleteProperty() 允许用于删除属性。它很像 delete operator ，但它是一个函数。
+ * @param target
+ * @param propertyKey
+ * @returns {boolean}
+ */
+Reflect.deleteProperty=function deleteProperty(target, propertyKey)
+{
+    if( !target || propertyKey==null )return false;
+    if( propertyKey==="__proto__")return false;
+    if( System.isClass(target) ){
+        if( target.__T__.dynamic !==true )return false;
+        if( target.__T__.privateSymbol === propertyKey)return false;
+    }
+    if( $has.call(target,propertyKey) )
+    {
+        return (delete target[propertyKey]);
+    }
+    return false;
+};
+
+/**
+ * 静态方法 Reflect.has() 作用与 in 操作符 相同。
+ * @param target
+ * @param propertyKey
+ * @returns {boolean}
+ */
+Reflect.has=function has(scope, target, propertyKey)
+{
+    if( propertyKey==null || target == null )return false;
+    if( propertyKey==="__proto__")return false;
+    if( System.isClass(target.constructor) )
+    {
+        return !!description(scope,target,propertyKey,null,null,"get");
+    }
+    return propertyKey in target;
+};
+
+Reflect.type=function type(value, typeClass)
+{
+    if( typeof typeClass === "string" )
+    {
+        var original = value;
+        typeClass = typeClass.toLowerCase();
+        switch ( typeClass )
+        {
+            case "integer" :
+            case "int" :
+            case "number":
+            case "uint":
+                value = parseInt(value);
+                if (typeClass !== "number")
+                 {
+                    if (typeClass === "uint" && value < 0)
+                    {
+                        throw new System.RangeError(original + " convert failed. can only be an unsigned Integer");
+                    }
+                    if (value > 2147483647 || value < -2147483648)
+                    {
+                        throw new System.RangeError(original + " convert failed. the length of overflow Integer");
+                    }
+                }
+                break;
+            case "double":
+            case "float":
+                value = parseFloat(value);
+                break;
+            case "class" :
+               if( !System.isClass(value) )
+               {
+                   throw new TypeError(original + " is not Class.");
+               }
+               break;
+        }
+        return value;
+    }
+    if( value == null || typeClass === Object )return value;
+    if( typeClass && !System.is(value, typeClass) )
+    {
+        var classname = System.isClass(typeClass.constructor) ? typeClass.constructor.__CLASS__ :  System.typeOf( typeClass );
+        throw new TypeError( value+' can not be convert for "' + classname+'"' );
+    }
+    return value;
+};
+
+/**
+ * 获取目标公开的属性值
+ * @param target
+ * @param propertyKey
+ * @returns {*}
+ */
+Reflect.get=function(scope,target, propertyKey, receiver , ns )
+{
+    if( propertyKey==null )return target;
+    if( target == null )throw new ReferenceError('target is null or undefined');
+    var desc = description(scope,target,propertyKey,receiver,ns,"get");
+    receiver = receiver || target;
+    if( !desc )
+    {
+        //内置对象属性外部不可访问
+        if( propertyKey === '__proto__' )return undefined;
+        return target[propertyKey];
+    }
+    if( desc.get )
+    {
+        return desc.get.call( System.isClass(receiver) ? null : receiver);
+    }
+    return desc.value;
+};
+
+/**
+ * 设置目标公开的属性值
+ * @param target
+ * @param propertyKey
+ * @param value
+ * @returns {*}
+ */
+Reflect.set=function(scope,target, propertyKey, value , receiver ,ns )
+{
+    if( propertyKey==null )return target;
+    if( target == null )throw new ReferenceError('target is null or undefined');
+    var desc = description(scope,target,propertyKey,receiver,ns,"set");
+    var isstatic = System.isClass(target);
+    receiver = receiver || target;
+    if( !desc )
+    {
+        //内置对象属性外部不可访问
+        if( propertyKey === '__proto__' )
+        {
+            throw new ReferenceError('__proto__ is not writable');
+        }
+        if( isstatic )
+        {
+            throw new ReferenceError(propertyKey+' is not exists');
+        }
+        var objClass = target.constructor;
+        if( System.isClass(objClass) ) 
+        {
+            if( objClass.__T__.dynamic !==true )
+            {
+                throw new ReferenceError(propertyKey+' is not exists');
+            }
+            var obj = target[propertyKey];
+            //如果是一个动态对象并且是第一次赋值时存在此属性名则认为是原型对象上的类成员， 不能赋值。
+            if( obj && !$has.call(target,propertyKey) )
+            {
+                throw new TypeError(propertyKey+' is not configurable');
+            }
+
+        }
+        //如果是一个静态类不能赋值。
+        else if( typeof target ==="function" )
+        {
+            throw new TypeError(propertyKey+' is not configurable');
+        }
+        return target[propertyKey]=value;
+    }
+    if( desc.set )
+    {
+        return desc.set.call( isstatic ? null : receiver, value);
+    }
+    if( desc.writable === false  )
+    {
+        throw new ReferenceError(propertyKey+' is not writable');
+    }
+    if( typeof desc.target === "object" || typeof desc.target === "function" )
+    {
+        return desc.target[ desc.prop ] = value;
+    }
+    throw new ReferenceError(propertyKey+' is not writable');
+};
+
+Reflect.incre=function incre(scope,target, propertyKey, flag , ns)
+{
+    flag = flag !== false;
+    var val = Reflect.get(scope,target, propertyKey, undefined, ns );
+    var ret = val+1;
+    Reflect.set(scope,target, propertyKey, ret , undefined, ns );
+    return flag ? val : ret;
+}
+
+Reflect.decre= function decre(scope,target, propertyKey, flag , ns )
+{
+    flag = flag !== false;
+    var val = Reflect.get(scope,target, propertyKey, undefined, ns );
+    var ret = val-1;
+    Reflect.set(scope,target, propertyKey, ret , undefined, ns );
+    return flag ? val : ret;
+}
+},
+
+/***** System system/Function.js *****/
+
+"system/Function.js": function(module,require){
+/*
+ * EaseScript
+ * Copyright © 2017 EaseScript All rights reserved.
+ * Released under the MIT license
+ * https://github.com/51breeze/EaseScript
+ * @author Jun Ye <664371281@qq.com>
+ * @require System,Array,Object
+ */
+function Function() {
+    return $Function.apply(this, Array.prototype.slice.call(arguments,0) );
+};
+
+module.exports = Function;
+var Object =require("system/Object.js");
+var Array =require("system/Array.js");
+var Internal =require("system/Internal.js");
+var $Function = Internal.$Function;
+
+Function.prototype = Object.create( Object.prototype );
+Function.prototype.apply = $Function.prototype.apply;
+Function.prototype.call = $Function.prototype.call;
+Function.prototype.bind = $Function.prototype.bind;
+
+},
+
+/***** System system/System.js *****/
+
+"system/System.js": function(module,require){
+/*
+ * EaseScript
+ * Copyright © 2017 EaseScript All rights reserved.
+ * Released under the MIT license
+ * https://github.com/51breeze/EaseScript
+ * @author Jun Ye <664371281@qq.com>
+* @require System,Internal;
+*/
+
+var System={};
+var Internal =require("system/Internal.js");
+System.env = Internal.env;
+
+/**
+ * 运行相关的环境信息
+ * @type {{}}
+ */
+System.environments=function environments( name )
+{
+    if( typeof name === "string" )
+    {
+        return Internal.env[name] || null;
+    }
+    return Object.merge( {}, Internal.env );
+}
+
+
+module.exports =System;
+
+var Object =require("system/Object.js");
+var Array =require("system/Array.js");
+var JSON =require("system/JSON.js");
+var Reflect =require("system/Reflect.js");
+var Function =require("system/Function.js");
+var EventDispatcher =require("system/EventDispatcher.js");
+var $Object = Internal.$Object;
+var $Array = Internal.$Array;
+var $Function = Internal.$Function;
+
+System.isFinite = isFinite;
+System.decodeURI = decodeURI;
+System.decodeURIComponent = decodeURIComponent;
+System.encodeURI = encodeURI;
+System.encodeURIComponent = encodeURIComponent;
+System.isNaN = isNaN;
+System.Infinity = Infinity;
+System.parseFloat = parseFloat;
+System.parseInt = parseInt;
+
+;(function(f){
+    System.setTimeout =f(setTimeout);
+    System.setInterval =f(setInterval);
+})(function(f){return function(c,t){
+    var a=[].slice.call(arguments,2);
+    return f( function(){ c.apply(this,a) }, t ) };
+});
+System.clearTimeout = function(id){
+    return clearTimeout( id );
+};
+System.clearInterval = function(id){
+    return clearInterval( id );
+};
+/**
+ * 返回对象类型的字符串表示形式
+ * @param instanceObj
+ * @returns {*}
+ */
+System.typeOf = function typeOf(instanceObj)
+{
+    if (instanceObj == null )
+    {
+        return instanceObj===null ? 'object' : 'undefined';
+    }
+    if ( System.isClass( instanceObj ) )return 'class';
+    if ( System.isInterface( instanceObj ) )return 'interface';
+    if ( System.isNamespace( instanceObj ) )return 'namespace';
+    return typeof instanceObj;
+};
+
+/**
+ * 检查实例对象是否属于指定的类型(不会检查接口类型)
+ * @param instanceObj
+ * @param theClass
+ * @returns {boolean}
+ */
+System.instanceOf = function instanceOf(instanceObj, theClass)
+{
+    if( instanceObj == null )
+    {
+        return theClass === Object || theClass===$Object  ? true : false;
+    }
+
+    if (theClass === 'class')
+    {
+        return System.isClass( instanceObj );
+    }
+
+    if( theClass === JSON )
+    {
+        return System.isObject( instanceObj );
+    }
+
+    if( System.isClass( theClass ) )
+    {
+        return instanceObj instanceof theClass;
+    }
+
+    if ( theClass === Array )
+    {
+        return System.isArray( instanceObj );
+    }
+    if ( theClass === Object )
+    {
+        return typeof instanceObj ==="object";
+    }
+    if ( theClass === Function )
+    {
+        return System.isFunction( instanceObj );
+    }
+    return Object(instanceObj) instanceof theClass;
+};
+
+/**
+ * 检查实例对象是否属于指定的类型(检查接口类型)
+ * @param instanceObj
+ * @param theClass
+ * @returns {boolean}
+ */
+System.is=function is(instanceObj, theClass)
+{
+    if( instanceObj == null )
+    {
+        return theClass === Object || theClass===$Object ? true : false;
+    }
+   
+    if (theClass === 'class')
+    {
+        return System.isClass( instanceObj );
+    }
+
+    var isClass = System.isClass( instanceObj.constructor );
+    if( isClass && System.isInterface(theClass) )
+    {
+        var objClass =instanceObj.constructor;
+        while ( objClass && System.isClass(objClass) )
+        {
+            var impls = objClass.__T__.implements;
+            if (impls && impls.length > 0)
+            {
+                var i = 0;
+                var len = impls.length;
+                for (; i < len; i++)
+                {
+                   if( isInterfaceEqual(impls[i],theClass) )
+                   {
+                       return true;
+                   }
+                }
+            }
+            objClass =objClass.__T__["extends"];
+        }
+        return false;
+    }
+    return System.instanceOf(instanceObj, theClass);
+};
+
+/**
+ * 判断指定的对象是否为一个类
+ */
+System.isClass=function isClass( target )
+{
+   return target && typeof target === "function" && target.__CLASS__ && target.__RESOURCETYPE__ === 1;
+}
+
+System.isInterface=function isInterface( target )
+{
+   return target && typeof target === "function" && target.__CLASS__ && target.__RESOURCETYPE__ === 2;
+}
+
+System.isNamespace=function isNamespace( target )
+{
+   return target && typeof target === "function" && target.__CLASS__ && target.__RESOURCETYPE__ === 3;
+}
+
+/**
+* 判断接口模块是否有继承指定的接口类
+*/
+function isInterfaceEqual(interfaceModule,interfaceClass)
+{
+    if (interfaceModule === interfaceClass)
+    {
+        return true;
+    }
+    interfaceModule = interfaceModule.__T__["extends"];
+    if( interfaceModule )
+    {
+        if( interfaceModule instanceof Array )
+        {
+            var len = interfaceModule.length;
+            var i = 0;
+            for( ;i<len;i++)
+            {
+                if( isInterfaceEqual(interfaceModule[i],interfaceClass) )
+                {
+                    return true;
+                }
+            }
+
+        }else
+        {
+            return isInterfaceEqual(interfaceModule,interfaceClass);
+        }
+    }
+    return false;
+}
+
+/**
+ * 判断是否为一个单纯的对象
+ * @param val
+ * @returns {boolean}
+ */
+System.isObject = function isObject(val, flag )
+{
+    if (!val || typeof val !== "object")return false;
+    var proto = Object.getPrototypeOf(val);
+    if( proto === Object.prototype || proto === $Object.prototype )
+    {
+        return true;
+    }
+    return flag && val instanceof Object;
+};
+/**
+ * 检查所有传入的值定义
+ * 如果传入多个值时所有的都定义的才返回true否则为false
+ * @param val,...
+ * @returns {boolean}
+ */
+System.isDefined = function isDefined()
+{
+    var i = arguments.length;
+    while (i > 0) if (typeof arguments[--i] === 'undefined')return false;
+    return true;
+};
+
+/**
+ * 判断是否为数组
+ * @param val
+ * @returns {boolean}
+ */
+System.isArray = function isArray(val) {
+    if (!val || typeof val !== "object")return false;
+    var proto = Object.getPrototypeOf(val);
+    return proto === Array.prototype || proto === $Array.prototype;
+};
+
+/**
+ * 判断是否为函数
+ * @param val
+ * @returns {boolean}
+ */
+System.isFunction = function isFunction(val) {
+    if (!val)return false;
+    return System.typeOf(val) === 'function' || val instanceof Function || Object.getPrototypeOf(val) === $Function.prototype;
+};
+/**
+ * 判断是否为布尔类型
+ * @param val
+ * @returns {boolean}
+ */
+System.isBoolean =function isBoolean(val) {
+    return typeof val === 'boolean';
+};
+/**
+ * 判断是否为字符串
+ * @param val
+ * @returns {boolean}
+ */
+System.isString = function isString(val) {
+    return typeof val === 'string';
+};
+/**
+ * 判断是否为一个标量
+ * 只有对象类型或者Null不是标量
+ * @param {boolean}
+ */
+System.isScalar = function isScalar(val) {
+    var t = typeof val;
+    return t === 'string' || t === 'number' || t === 'float' || t === 'boolean';
+};
+/**
+ * 判断是否为数字类型
+ * @param val
+ * @returns {boolean}
+ */
+System.isNumber = function isNumber(val) {
+    return typeof val === 'number';
+};
+
+/**
+ * 判断是否为一个空值
+ * @param val
+ * @param flag 为true时排除val为0的值
+ * @returns {boolean}
+ */
+System.isEmpty =function isEmpty(val, flag) {
+    if (!val)return flag !== true || val !== 0;
+    if (System.isObject(val)||System.isArray(val)) {
+        var ret;
+        for (ret in val)break;
+        return typeof ret === "undefined";
+    }
+    return false;
+};
+
+/**
+ * 去掉指定字符两边的空白
+ * @param str
+ * @returns {string}
+ */
+System.trim =function trim(str) {
+    return typeof str === "string" ? str.replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, '') : '';
+};
+
+/**
+ * 返回一组指定范围值的数组
+ * @param low 最低值
+ * @param high 最高值
+ * @param step 每次的步增数，默认为1
+ */
+System.range =function range(low, high, step) {
+
+    if( high >= low )
+    {
+        var obj = [];
+        if (!System.isNumber(step))step = 1;
+        step = Math.max(step, 1);
+        for (;low <= high; low += step)obj.push(low);
+        return obj;
+    }
+    return [];
+};
+
+/**
+ * 将字符串的首字母转换为大写
+ * @param str
+ * @returns {string}
+ */
+System.ucfirst =  function ucfirst(str) {
+    return typeof str === "string" ? str.charAt(0).toUpperCase() + str.substr(1) : str;
+};
+
+/**
+ * 将字符串的首字母转换为小写
+ * @param str
+ * @returns {string}
+ */
+System.lcfirst =  function lcfirst(str) {
+    return typeof str === "string" ? str.charAt(0).toLowerCase() + str.substr(1) : str;
+};
+
+
+/**
+ * 复制字符串到指定的次数
+ * @param string str
+ * @param number num
+ * @returns {string}
+ */
+System.repeat = function repeat(str, num) {
+    if (typeof str === "string") {
+        return new Array((parseInt(num) || 0) + 1).join(str);
+    }
+    return '';
+};
+
+/**
+ * 比较两个两个字符串的值。
+ * 如果 a > b 返回 1 a<b 返回 -1 否则返回 0
+ * 比较的优先级数字优先于字符串。字母及汉字是按本地字符集排序。
+ * @param a
+ * @param b
+ * @returns {*}
+ */
+System.compare = function compare(a, b) {
+
+    var c = System.parseFloat(a), d = System.parseFloat(b);
+    if (System.isNaN(c) && System.isNaN(d)) {
+        return a.localeCompare(b);
+    } else if (!System.isNaN(c) && !System.isNaN(d)) {
+        return c > d ? 1 : (c < d ? -1 : 0);
+    }
+    return System.isNaN(c) ? 1 : -1;
+};
+
+/**
+ * 格式化输出
+ * @format
+ * @param [...]
+ * @returns {string}
+ */
+System.sprintf = function sprintf() {
+    var str = '', i = 1, len = arguments.length, param;
+    if (len > 0) {
+        str = arguments[0];
+        if (typeof str === "string") {
+            for (; i < len; i++) {
+                param = arguments[i];
+                str = str.replace(/%(s|d|f|v)/, function (all, method) {
+                    if (method === 'd') {
+                        param = System.parseInt(param);
+                        return System.isNaN(param) ? '' : param;
+                    } else if (method === 'f') {
+                        param = System.parseFloat(param);
+                        return System.isNaN(param) ? '' : param;
+                    } else if (method === 'v') {
+                        return Object.prototype.valueOf.call(param);
+                    }
+                    return Object.prototype.toString.call(param);
+                });
+            }
+            str.replace(/%(s|d|f|v)/g, '');
+        }
+    }
+    return str;
+};
+/**
+ * 把一个对象序列化为一个字符串
+ * @param object 要序列化的对象
+ * @param type   要序列化那种类型,可用值为：url 请求的查询串,style 样式字符串。 默认为 url 类型
+ * @param group  是否要用分组，默认是分组（只限url 类型）
+ * @return string
+ */
+System.serialize = function serialize(object, type, group) {
+    if (typeof object === "string" || !object)
+        return object;
+    var str = [], key, joint = '&', separate = '=', val = '', prefix = System.isBoolean(group) ? null : group;
+    type = type || 'url';
+    group = ( group !== false );
+    if (type === 'style') {
+        joint = ';';
+        separate = ':';
+        group = false;
+    } else if (type === 'attr') {
+        separate = '=';
+        joint = ' ';
+        group = false;
+    }
+    if (System.isObject(object))for (key in object) {
+        val = type === 'attr' ? '"' + object[key] + '"' : object[key];
+        key = prefix ? prefix + '[' + key + ']' : key;
+        str = str.concat(typeof val === 'object' ? System.serialize(val, type, group ? key : false) : key + separate + val);
+    }
+    return str.join(joint);
+};
+/**
+ * 将一个已序列化的字符串反序列化为一个对象
+ * @param str
+ * @returns {{}}
+ */
+System.unserialize=function unserialize(str) {
+    var object = {}, index, joint = '&', separate = '=', val, ref, last, group = false;
+    if (/[\w\-]+\s*\=.*?(?=\&|$)/.test(str)) {
+        str = str.replace(/^&|&$/, '');
+        group = true;
+
+    } else if (/[\w\-\_]+\s*\:.*?(?=\;|$)/.test(str)) {
+        joint = ';';
+        separate = ':';
+        str = str.replace(/^;|;$/, '')
+    }
+
+    str = str.split(joint);
+    for (index in str) {
+        val = str[index].split(separate);
+        if (group && /\]\s*$/.test(val[0])) {
+            ref = object, last;
+            val[0].replace(/\w+/ig, function (key) {
+                last = ref;
+                ref = !ref[key] ? ref[key] = {} : ref[key];
+            });
+            last && ( last[RegExp.lastMatch] = val[1] );
+        } else {
+            object[val[0]] = val[1];
+        }
+    }
+    return object;
+};
+
+var __uid__=1;
+
+/**
+ * 全局唯一值
+ * @returns {string}
+ */
+System.uid =function uid()
+{
+   return (__uid__++)+''+( Math.random() * 100000 )>>>0;
+};
+
+/**
+ * 给一个指定的对象管理一组数据
+ * @param target
+ * @param name
+ * @param value
+ * @returns {*}
+ */
+System.storage=function storage(target, name , value)
+{
+    if( target==null )throw new TypeError('target can not is null or undefined');
+    if( typeof name !== "string" )throw new TypeError('name can only is string');
+    var namespace = name.split('.');
+    var i = 0, len = namespace.length-1;
+    while( i<len )
+    {
+        name = namespace[i++];
+        target= target[ name ] || (target[ name ] = {});
+    }
+    name = namespace[ len ];
+    if( value !== undefined )
+    {
+        return target[name] = value;
+
+    }else if( value === undefined )
+    {
+        var val = target[ name ];
+        delete target[ name ];
+        return val;
+    }
+    return target[name];
+};
+
+var _globalEvent=null;
+System.getGlobalEvent=function getGlobalEvent()
+{
+    if( _globalEvent===null )
+    {
+        _globalEvent = new EventDispatcher( window );
+    }
+    return _globalEvent;
+}
+
+/**
+ * 根据指定的类名获取类的对象
+ * @param name
+ * @returns {Object}
+ */
+System.getDefinitionByName = function getDefinitionByName(name)
+{
+    var module = Internal.getClassModule(name);
+    if( module )
+    {
+        return module;
+    }
+    throw new TypeError('"' + name + '" is not defined.');
+};
+
+System.hasClass = function hasClass(name) 
+{
+    return !!Internal.getClassModule( name );
+};
+
+/**
+ * 返回类的完全限定类名
+ * @param value 需要完全限定类名称的对象。
+ * 可以将任何类型、对象实例、原始类型和类对象
+ * @returns {string}
+ */
+System.getQualifiedClassName = function getQualifiedClassName( target )
+{
+    if( target == null )throw new ReferenceError( 'target is null or undefined' );
+    if( target===System )return 'System';
+    if( target===JSON )return 'JSON';
+    if( target===Reflect )return 'Reflect';
+    if( typeof target === "function" && target.prototype)
+    {
+        var valueof = target.valueOf();
+        if( valueof.indexOf("[Class") === 0 )
+        {
+           return valueof.slice(7,-1);
+
+        }else if( valueof.indexOf("[Namespace") === 0 )
+        {
+            return valueof.slice(11,-1);
+        }else if( valueof.indexOf("[Interface") === 0 )
+        {
+            return valueof.slice(11,-1);
+        }
+        var str = con.toString();
+        str = str.substr(0, str.indexOf('(') );
+        return str.substr(str.lastIndexOf(' ')+1);
+    }
+    throw new ReferenceError( 'target is not Class' );
+};
+
+/**
+ * 返回对象的完全限定类名
+ * @param value 需要完全限定类名称的对象。
+ * 可以将任何类型、对象实例、原始类型和类对象
+ * @returns {string}
+ */
+System.getQualifiedObjectName = function getQualifiedObjectName( target )
+{
+    if( target == null || typeof target !== "object")
+    {
+        throw new ReferenceError( 'target is not object or is null' );
+    }
+    return System.getQualifiedClassName( Object.getPrototypeOf( target ).constructor );
+};
+/**
+ * 获取指定实例对象的超类名称
+ * @param value
+ * @returns {string}
+ */
+System.getQualifiedSuperclassName =function getQualifiedSuperclassName(target)
+{
+    if( target == null )throw new ReferenceError( 'target is null or undefined' );
+    var classname = System.getQualifiedClassName( Object.getPrototypeOf( target ).constructor );
+    var module = Internal.getClassModule( classname );
+    if( module )
+    {
+        return System.getQualifiedClassName( module["extends"] || Object );
+    }
+    return null;
+};
+},
+
+/***** System system/ListIterator.js *****/
+
+"system/ListIterator.js": function(module,require){
+/*
+ * EaseScript
+ * Copyright © 2017 EaseScript All rights reserved.
+ * Released under the MIT license
+ * https://github.com/51breeze/EaseScript
+ * @author Jun Ye <664371281@qq.com>
+ * @require Object,Symbol,Internal
+ */
+
+function ListIterator( target )
+{
+    if( target instanceof ListIterator )return target;
+    if( !(this instanceof ListIterator) )return new ListIterator(target);
+    var iteratorClass = Internal.getClassModule( Internal.iteratorClassName );
+    var isIterator = target && iteratorClass && System.is(target, iteratorClass );
+    storage(this,true,{
+        "isIterator":isIterator,
+        "target":target,
+        "items": isIterator ? null : Object.prototype.getEnumerableProperties.call( target ),
+        "cursor":-1,
+        "key":undefined,
+        "current":undefined
+    });
+}
+
+module.exports = ListIterator;
+var Object =require("system/Object.js");
+var Symbol =require("system/Symbol.js");
+var Internal =require("system/Internal.js");
+var storage=Internal.createSymbolStorage( Symbol('ListIterator') );
+
+//@private
+function callMethod(target, name)
+{
+    target=storage(target,"target");
+    return target[name]();
+}
+
+ListIterator.prototype = Object.create( Object.prototype, {
+
+    "constructor":{value:ListIterator},
+
+    /**
+     * 返回当前的元素键名
+     * @returns {ListIterator.key|*|string}
+     */
+    "key":{value:function key()
+    {
+        if( storage(this,"isIterator") )
+        {
+            return callMethod(this,"key");
+        }
+        return storage(this,"key");
+    }},
+
+    /**
+     * 返回当前指针位置的元素
+     * @returns {*}
+     */
+    "current":{value:function current()
+    {
+        if( storage(this,"isIterator") )
+        {
+            return callMethod(this,"current");
+        }
+        return storage(this,"current");
+    }},
+
+    /**
+     * 将指针定位到下一个元素。
+     * 成功返回true，失败返回false
+     * @returns Boolean
+     */
+    "next":{value:function next()
+    {
+        if( storage(this,"isIterator") )
+        {
+            return callMethod(this,"next");
+        }
+        var items = storage(this, "items");
+        var result = false;
+        if( items && items.length > 0 )
+        {
+            var cursor = storage(this, "cursor", "increment") + 1;
+            result = cursor < items.length;
+            if( result )
+            {
+                var item = items[ cursor ];
+                storage(this, "current", item.value );
+                storage(this, "key", item.key );
+
+            }else if ( cursor > 0 )
+            {
+                this.rewind();
+            }
+        }
+        return result;
+    }},
+
+    /**
+     * 重置指针
+     * @returns {ListIterator}
+     */
+    "rewind":{value:function rewind()
+    {
+        if( storage(this,"isIterator") )
+        {
+            callMethod(this,"rewind");
+
+        }else
+        {
+            storage(this, "current", undefined);
+            storage(this, "key", undefined);
+            storage(this, "cursor", -1);
+        }
+    }}
+
+});
+
+},
+
+/***** System system/Object.js *****/
+
+"system/Object.js": function(module,require){
+/*
+ * Copyright © 2017 EaseScript All rights reserved.
+ * Released under the MIT license
+ * https://github.com/51breeze/EaseScript
+ * @author Jun Ye <664371281@qq.com>
+ * @require System
+ */
+
+var Internal =require("system/Internal.js");
+var $Object = Internal.$Object;
+
+function Object( value )
+{
+    if ( value != null )return $Object(value);
+    if( !(this instanceof Object) ) return new Object();
+    return this;
+}
+
+/**
+ * 定义属性
+ */
+Internal.defineProperty(Object,"defineProperty",{value:Internal.defineProperty});
+
+/**
+ * 生成一个对象
+ */
+Object.defineProperty(Object,"create",{value:$Object.create});
+
+/**
+ * 返回一个给定对象自身可枚举属性的键值对数组
+ */
+Object.defineProperty(Object,"entries",{value:function(obj){
+
+    var properties = Object.prototype.getEnumerableProperties(2);
+    var resArray = new Array();
+    for(var p in properties)
+    {
+        resArray.push([ p , properties[p] ])
+    } 
+    return resArray;
+
+}});
+
+
+/**
+ * 合并其它参数到指定的 target 对象中
+ * 如果只有一个参数则只对本身进行扩展。
+ * @param deep true 深度合并
+ * @param target object 目标源对象
+ * @param ...valueObj object 待合并到目标源上的对象
+ * @returns Object
+ */
+Object.defineProperty(Object,"merge",{
+    value:function merge()
+    {
+        var options, name, src, copy, copyIsArray, clone,
+            target = arguments[0] || {},
+            i = 1,
+            length = arguments.length,
+            deep = false;
+        if ( typeof target === "boolean" )
+        {
+            deep = target;
+            target = arguments[1] || {};
+            i++;
+        }
+        if ( length === i )
+        {
+            target = {};
+            --i;
+        }else if ( typeof target !== "object" && typeof target !== "function" )
+        {
+            target = {};
+        }
+
+        //只有动态类对象允许合并属性
+        if( ( System.isClass(target.constructor) && target.constructor.__T__.dynamic !==true) || System.isClass(target) )
+        {
+            return target;
+        }
+
+        var isArrayTarget = System.isArray(target);
+
+        for ( ;i < length; i++ )
+        {
+            if ( (options = arguments[ i ]) != null )
+            {
+                if( System.isClass(options) )continue;
+                if( System.isClass(options.constructor) )
+                {
+                    options = Object.prototype.getEnumerableProperties.call(options, 2);
+                }
+                for( name in options )
+                {
+                    if( !$Object.prototype.hasOwnProperty.call(options,name) )continue;
+                    copy = options[name];
+                    if ( target === copy )continue;
+                    if ( deep && copy && ( System.isObject(copy) || ( copyIsArray = System.isArray(copy) ) ) )
+                    {
+                        src =  target[name];
+                        if ( copyIsArray )
+                        {
+                            copyIsArray = false;
+                            clone = src && System.isArray(src) ? src : [];
+
+                        } else
+                        {
+                            clone = src && System.isObject(src) ? src : {};
+                        }
+                        
+                        if( isArrayTarget ){
+                           target.push( Object.merge( deep, clone, copy ) );
+                        }else{
+                           target[name]=Object.merge( deep, clone, copy );
+                        }
+
+                    } else if ( copy !== void 0 )
+                    {
+                        if( isArrayTarget ){
+                           target.push( copy );
+                        }else{
+                           target[name]=copy;
+                        }
+                    }
+                }
+            }
+        }
+        return target;
+    }
+});
+
+/**
+ * 循环每一个元素并应用到指定的回调函数上
+ * @param object
+ * @param callback
+ */
+Object.defineProperty(Object,"forEach",{
+    value:function forEach(object,callback,thisObject)
+    {
+        if( object == null || System.isClass(object) || typeof callback !== "function" )return;
+        var value = null;
+        var iteratorClass = Internal.getClassModule( Internal.iteratorClassName );
+        var isIterator = object instanceof ListIterator || ( iteratorClass && System.is(object, iteratorClass) );
+        thisObject = thisObject||object;
+        if( isIterator && typeof object.next === "function" )
+        {
+            var next = object.next;
+            var current = object.current;
+            var key = object.key;
+            var rewind = object.rewind;
+            rewind.call(object);
+            while(next.call(object))
+            {
+                value = current.call(object);
+                if( callback.call(thisObject, value, key.call(object) ) === false )
+                {
+                    return value;
+                }
+            }
+
+        }else
+        {
+            var token = null;
+            if ( System.isClass(object.constructor) )
+            {
+                if (object.constructor.__T__.dynamic !== true)return;
+                token = object.constructor.__T__.uri[0];
+            }
+
+            for (var prop in object)
+            {
+                if (Symbol.isSymbolPropertyName && Symbol.isSymbolPropertyName(prop))continue;
+                if (prop !== token && $Object.prototype.propertyIsEnumerable.call(object, prop))
+                {
+                    value = object[prop];
+                    if( callback.call(thisObject, value, prop) === false )
+                    {
+                        return value;
+                    }
+                }
+            }
+        }
+    }
+});
+
+/**
+ * 获取对象的原型
+ */
+Object.defineProperty(Object,"getPrototypeOf",{
+    value:$Object.getPrototypeOf || function getPrototypeOf(obj)
+    {
+        if( obj == null )throw new TypeError("non-object");
+        if( System.isClass(obj.constructor) )
+        {
+            return null;
+        }
+        return obj.__proto__ ? obj.__proto__ : (obj.constructor ? obj.constructor.prototype : null);
+    }
+});
+
+/**
+ * 设置对象的原型链
+ * @returns {Object}
+ */
+Object.defineProperty(Object,"setPrototypeOf",{
+    value:$Object.setPrototypeOf || function setPrototypeOf(obj, proto)
+    {
+        if( obj == null )throw new TypeError("non-object");
+        if( System.isClass(obj.constructor))
+        {
+            return false;
+        }
+        obj.__proto__ = proto;
+        return obj;
+    }
+});
+
+
+/**
+ * 设置对象的原型链
+ * @returns {Object}
+ */
+Object.defineProperty(Object,"setPrototypeOf",{
+    value:$Object.setPrototypeOf || function setPrototypeOf(obj, proto)
+    {
+        if( obj == null )throw new TypeError("non-object");
+        if( System.isClass(obj.constructor))
+        {
+            return false;
+        }
+        obj.__proto__ = proto;
+        return obj;
+    }
+});
+
+
+ /**
+ * 返回对象可枚举的属性的键名
+ * @returns {Array}
+ */
+Object.defineProperty(Object,"keys",{
+    value:function keys( target )
+    {
+        return Object.prototype.getEnumerableProperties.call(target,-1);
+    }
+});
+
+
+/**
+ * 返回对象可枚举的属性值
+ * @returns {Array}
+ */
+Object.defineProperty(Object, "values",{
+    value:function values( target )
+    {
+        return Object.prototype.getEnumerableProperties.call(target,1);
+    }
+});
+
+//基础对象的原型方法
+Object.prototype = Object.create( $Object.prototype,{
+
+    /**
+    * 返回对象的原始值
+    */
+   "valueOf":{
+       value:function valueOf()
+       {
+           if( System.isClass(this.constructor) )
+           {
+               var objClass = this.constructor;
+               var p = objClass.__T__['package'];
+               return '[object '+(p ? p+'.' : '')+objClass.__T__.classname+"]";
+           }
+           return $Object.prototype.valueOf.call(this);
+       }
+   },
+   "toString":{
+        value:function toString()
+        {
+            if( System.isClass(this.constructor) )
+            {
+                var objClass = this.constructor;
+                var p = objClass.__T__['package'];
+                return '[object '+(p ? p+'.' : '')+objClass.__T__.classname+"]";
+            }
+            return $Object.prototype.toString.call(this);
+        }
+    },
+
+    /**
+     * 表示对象本身是否已经定义了指定的属性。
+     * 如果目标对象具有与 name 参数指定的字符串匹配的属性，则此方法返回 true；否则返回 false。
+     * @param prop 对象的属性。
+     * @returns {Boolean}
+     */
+    "hasOwnProperty":{
+        value:function hasOwnProperty( name )
+        {
+            if( this == null )throw new TypeError("non-object");
+            if( System.isClass(this) ) return false;
+            if( System.isClass(this.constructor) )
+            {
+                if( this.constructor.__T__.dynamic !==true )return false;
+                if( this.constructor.__T__.uri[0] === name )return false;
+            }
+            return $Object.prototype.hasOwnProperty.call(this,name);
+        }
+    },
+
+
+     /**
+     * 表示指定的属性是否存在、是否可枚举。
+     * 如果为 true，则该属性存在并且可以在 for..in 循环中枚举。该属性必须存在于目标对象上，
+     * 原因是：该方法不检查目标对象的原型链。您创建的属性是可枚举的，但是内置属性通常是不可枚举的。
+     * @param name
+     * @returns {Boolean}
+     */
+    "propertyIsEnumerable":{
+        value:function propertyIsEnumerable( name )
+        {
+            if( this == null )throw new TypeError("non-object");
+            if( System.isClass(this) ) return false;
+            if( System.isClass(this.constructor) )
+            {
+                if( this.constructor.__T__.dynamic !==true )return false;
+                if( this.constructor.__T__.uri[0] === name )return false;
+            }
+            if( Symbol.isSymbolPropertyName && Symbol.isSymbolPropertyName(name) )return false;
+            return $Object.prototype.propertyIsEnumerable.call(this,name);
+        }
+    },
+
+    /**
+     * 获取可枚举的属性
+     * @param state
+     * @returns {Array}
+     */
+    "getEnumerableProperties":{
+        value:function getEnumerableProperties( state )
+        {
+            if( this == null )throw new TypeError("non-object");
+            var items=state===2 ? {} : [];
+            if( System.isClass(this) )return items;
+            if( System.isArray(this) && state !==2 )return this;
+
+            var iteratorClass = Internal.getClassModule( Internal.iteratorClassName );
+            var isIterator = this instanceof ListIterator || ( iteratorClass && System.is(this, iteratorClass) );
+            if( isIterator && typeof this.next === "function" )
+            {
+                var next = this.next;
+                var current = this.current;
+                var key = this.key;
+                var rewind = this.rewind;
+                rewind.call(this);
+                while( next.call(this) )
+                {
+                    makeValue(items, current.call(this), key.call(this) , state);
+                }
+    
+            }else 
+            {
+                var token = null;
+                if ( System.isClass(this.constructor) )
+                {
+                    if (this.constructor.__T__.dynamic !== true)return items;
+                    token = this.constructor.__T__.uri[0];
+                }
+                
+                for (var prop in this)
+                {
+                    if (Symbol.isSymbolPropertyName && Symbol.isSymbolPropertyName(prop))continue;
+                    if (prop !== token && $Object.prototype.propertyIsEnumerable.call(this, prop))
+                    {
+                        makeValue(items,this[prop], prop, state);
+                    }
+                }
+            }
+            return items;
+        }
+    },
+
+    /**
+    * 对象的构造函数
+    */
+    "constructor":{
+        value:Object
+    }
+});
+
+function makeValue(items,value, prop, state)
+{
+    //类中定义的属性成员不可枚举
+    //动态类设置的属性可以枚举，但属性描述符enumerable=false时不可枚举
+    switch (state){
+        case -1 : items.push(prop); break;
+        case  1 : items.push(value); break;
+        case  2 : items[prop] = value; break;
+        default : items.push({key: prop, value: value});
+    }
+}
+
+module.exports =Object;
+var System =require("system/System.js");
+var Symbol =require("system/Symbol.js");
+var Array =require("system/Array.js");
+var ListIterator =require("system/ListIterator.js");
+
+},
+
+/***** System system/Event.js *****/
+
+"system/Event.js": function(module,require){
+/*
+ * Copyright © 2017 EaseScript All rights reserved.
+ * Released under the MIT license
+ * https://github.com/51breeze/EaseScript
+ * @author Jun Ye <664371281@qq.com>
+ * @require System,Object
+ */
+function Event( type, bubbles, cancelable )
+{
+    if( type && typeof type !=="string" )throw new TypeError('event type is not string');
+    this.type = type;
+    this.bubbles = !(bubbles===false);
+    this.cancelable = !(cancelable===false);
+}
+
+module.exports = Event;
+var Object =require("system/Object.js");
+var System =require("system/System.js");
+
+
+
+/**
+ * 一组事件名的常量
+ * @type {string}
+ */
+Event.SUBMIT='submit';
+Event.RESIZE='resize';
+Event.SELECT='fetch';
+Event.UNLOAD='unload';
+Event.LOAD='load';
+Event.LOAD_START='loadstart';
+Event.PROGRESS='progress';
+Event.RESET='reset';
+Event.FOCUS='focus';
+Event.BLUR='blur';
+Event.ERROR='error';
+Event.COPY='copy';
+Event.BEFORECOPY='beforecopy';
+Event.CUT='cut';
+Event.BEFORECUT='beforecut';
+Event.PASTE='paste';
+Event.BEFOREPASTE='beforepaste';
+Event.SELECTSTART='selectstart';
+Event.READY='ready';
+Event.SCROLL='scroll';
+Event.INITIALIZE_COMPLETED = "initializeCompleted";
+
+Event.ANIMATION_START="animationstart";
+Event.ANIMATION_END="animationend";
+Event.ANIMATION_ITERATION="animationiteration";
+Event.TRANSITION_END="transitionend";
+
+/**
+ * 事件原型
+ * @type {Object}
+ */
+Event.prototype = Object.create( Object.prototype,{
+    "constructor":{value:Event},
+    "toString":function toString(){
+        return '[object Event]';
+    },
+    "valueOf":function valueOf(){
+        return '[object Event]';
+    }
+});
+
+//true 只触发冒泡阶段的事件 , false 只触发捕获阶段的事件
+Event.prototype.bubbles = true;
+//是否可以取消浏览器默认关联的事件
+Event.prototype.cancelable = true;
+Event.prototype.currentTarget = null;
+Event.prototype.target = null;
+Event.prototype.defaultPrevented = false;
+Event.prototype.originalEvent = null;
+Event.prototype.type = null;
+Event.prototype.propagationStopped = false;
+Event.prototype.immediatePropagationStopped = false;
+Event.prototype.altkey = false;
+Event.prototype.button = false;
+Event.prototype.ctrlKey = false;
+Event.prototype.shiftKey = false;
+Event.prototype.metaKey = false;
+
+/**
+ * 阻止事件的默认行为
+ */
+Event.prototype.preventDefault = function preventDefault()
+{
+    if( this.cancelable===true )
+    {
+        this.defaultPrevented = true;
+        if ( this.originalEvent )
+        {
+            if( this.originalEvent.preventDefault ){
+                this.originalEvent.preventDefault();
+            }else{
+                this.originalEvent.returnValue = false;
+            }
+        }
+    }
+};
+
+/**
+ * 阻止向上冒泡事件
+ */
+Event.prototype.stopPropagation = function stopPropagation()
+{
+    if( this.originalEvent )
+    {
+        this.originalEvent.stopPropagation ? this.originalEvent.stopPropagation() :  this.originalEvent.cancelBubble=true;
+    }
+    this.propagationStopped = true;
+};
+
+/**
+ *  阻止向上冒泡事件，并停止执行当前事件类型的所有侦听器
+ */
+Event.prototype.stopImmediatePropagation = function stopImmediatePropagation()
+{
+    if( this.originalEvent && this.originalEvent.stopImmediatePropagation )this.originalEvent.stopImmediatePropagation();
+    this.stopPropagation();
+    this.immediatePropagationStopped = true;
+};
+
+/**
+ * map event name
+ * @internal Event.fix;
+ */
+Event.fix={
+    map:{},
+    hooks:{},
+    prefix:'',
+    cssprefix:'',
+    cssevent:{},
+    eventname:{
+        'DOMContentLoaded':true
+    }
+};
+Event.fix.map[ Event.READY ]='DOMContentLoaded';
+Event.fix.cssevent[ Event.ANIMATION_START ]     ="AnimationStart";
+Event.fix.cssevent[ Event.ANIMATION_END ]       ="AnimationEnd";
+Event.fix.cssevent[ Event.ANIMATION_ITERATION ] ="AnimationIteration";
+Event.fix.cssevent[ Event.TRANSITION_END ]      ="TransitionEnd";
+
+/**
+ * 获取统一的事件名
+ * @param type
+ * @param flag
+ * @returns {*}
+ * @internal Event.type;
+ */
+Event.type = function type( eventType, flag )
+{
+    if( typeof eventType !== "string" )return eventType;
+    if( flag===true )
+    {
+        eventType= Event.fix.prefix==='on' ? eventType.replace(/^on/i,'') : eventType;
+        var lower =  eventType.toLowerCase();
+        if( Event.fix.cssprefix && lower.substr(0, Event.fix.cssprefix.length )===Event.fix.cssprefix )
+        {
+            return lower.substr(Event.fix.cssprefix.length);
+        }
+        for(var prop in Event.fix.map)
+        {
+            if( Event.fix.map[prop].toLowerCase() === lower )
+            {
+                return prop;
+            }
+        }
+        return eventType;
+    }
+    if( Event.fix.cssevent[ eventType ] ){
+        return Event.fix.cssprefix ? Event.fix.cssprefix+Event.fix.cssevent[ eventType ] : eventType;
+    }
+    if( Event.fix.eventname[ eventType ]===true )return eventType;
+    return Event.fix.map[ eventType ] ? Event.fix.map[ eventType ] : Event.fix.prefix+eventType.toLowerCase();
+};
+
+var eventModules=[];
+
+//@internal Event.registerEvent;
+Event.registerEvent = function registerEvent( callback )
+{
+    eventModules.push( callback );
+};
+
+/*
+ * 根据原型事件创建一个Event
+ * @param event
+ * @returns {Event}
+ * @internal Event.create;
+ */
+Event.create = function create( originalEvent )
+{
+    originalEvent=originalEvent ? originalEvent : (typeof window === "object" ? window.event : null);
+    var event=null;
+    var i=0;
+    if( !originalEvent )throw new TypeError('Invalid event');
+    var type = originalEvent.type;
+    var target = originalEvent.srcElement || originalEvent.target;
+    target = target && target.nodeType===3 ? target.parentNode : target;
+    var currentTarget =  originalEvent.currentTarget || target;
+    if( typeof type !== "string" )throw new TypeError('Invalid event type');
+    if( !System.instanceOf(originalEvent,Event) )
+    {
+        type = Event.type(type, true);
+        while (i < eventModules.length && !(event = eventModules[i++](type, target, originalEvent)));
+    }else
+    {
+        event = originalEvent;
+    }
+    if( !(event instanceof Event) )event = new Event( type );
+    event.type=type;
+    event.target=target;
+    event.currentTarget = currentTarget;
+    event.bubbles = originalEvent.bubbles !== false;
+    event.cancelable = originalEvent.cancelable !== false;
+    event.originalEvent = originalEvent;
+    event.timeStamp = originalEvent.timeStamp;
+    event.relatedTarget= originalEvent.relatedTarget;
+    event.altkey= !!originalEvent.altkey;
+    event.button= originalEvent.button;
+    event.ctrlKey= !!originalEvent.ctrlKey;
+    event.shiftKey= !!originalEvent.shiftKey;
+    event.metaKey= !!originalEvent.metaKey;
+    if( originalEvent.animationName )
+    {
+        event.animationName = originalEvent.animationName;
+        event.elapsedTime   = originalEvent.elapsedTime;
+        event.eventPhase   = originalEvent.eventPhase;
+        event.isTrusted   = originalEvent.isTrusted;
+    }
+    return event;
+};
+
+Event.fix.hooks[ Event.READY ]=function (listener, dispatcher)
+{
+    var target=this;
+    var doc = this.contentWindow ?  this.contentWindow.document : this.ownerDocument || this.document || this;
+    var win=  doc && doc.nodeType===9 ? doc.defaultView || doc.parentWindow : window;
+    if( !(win || doc) )return;
+    var id = null;
+    var has = false;
+    var handle=function(event)
+    {
+        if( !event )
+        {
+            switch ( doc.readyState )
+            {
+                case 'loaded'   :
+                case 'complete' :
+                case '4'        :
+                    event= new Event( Event.READY );
+                    break;
+            }
+        }
+        if( event && has===false)
+        {
+            has = true;
+            if(id){
+                window.clearInterval(id);
+                id = null;
+            }
+            event = event instanceof Event ? event : Event.create( event );
+            event.currentTarget = target;
+            event.target = target;
+            dispatcher( event );
+        }
+    }
+    var type = Event.type(Event.READY);
+    doc.addEventListener ? doc.addEventListener( type, handle) : doc.attachEvent(type, handle);
+    id = window.setInterval(handle,50);
+    return true;
+}
+},
+
+/***** System system/EventDispatcher.js *****/
+
+"system/EventDispatcher.js": function(module,require){
+/*
+ * EaseScript
+ * Copyright © 2017 EaseScript All rights reserved.
+ * Released under the MIT license
+ * https://github.com/51breeze/EaseScript
+ * @author Jun Ye <664371281@qq.com>
+ * @require System,Object,Event,Internal,Symbol
+ */
+
+function EventDispatcher( target )
+{
+    if( !(this instanceof EventDispatcher) )
+    {
+        return target && target instanceof EventDispatcher ? target : new EventDispatcher( target );
+    }
+    if( target != null && !( typeof target.addEventListener === "function" ||
+        System.typeOf( target.attachEvent )=== "function" ||
+        System.typeOf( target.onreadystatechange ) !== "undefined" ||
+        target instanceof EventDispatcher ) )
+    {
+        target = null;
+    }
+    storage(this, true, {target:target||this, events:{}});
+}
+
+module.exports = EventDispatcher;
+var Object =require("system/Object.js");
+var System =require("system/System.js");
+var Internal =require("system/Internal.js");
+var Symbol =require("system/Symbol.js");
+var Event =require("system/Event.js");
+var storage=Internal.createSymbolStorage( Symbol('EventDispatcher') );
+
+EventDispatcher.prototype=Object.create( Object.prototype,{
+    "constructor":{value:EventDispatcher}
+});
+
+
+/**
+ * 判断是否有指定类型的侦听器
+ * @param type
+ * @param listener
+ * @returns {boolean}
+ */
+EventDispatcher.prototype.hasEventListener=function hasEventListener( type , listener )
+{
+    var target =  storage(this,'target') || this;
+    if( target instanceof EventDispatcher && target !== this )
+    {
+        return target.hasEventListener(type, listener);
+    }
+    var len = target.length >> 0;
+    if( len > 0 )
+    {
+        while(len>0 && target[--len] )
+        {
+           if( $hasEventListener(target[len], type, listener) )
+           {
+               return true;
+           }
+        }
+        return false;
+    }
+    return $hasEventListener(target, type, listener);
+};
+
+/**
+ * 添加侦听器
+ * @param type
+ * @param listener
+ * @param priority
+ * @returns {EventDispatcher}
+ */
+EventDispatcher.prototype.addEventListener=function addEventListener(type,callback,useCapture,priority,reference)
+{
+    if( typeof type !== 'string' )throw new TypeError('Invalid event type');
+    if( typeof callback !== 'function' )throw new TypeError('Invalid callback function');
+    var target = storage(this,'target') || this;
+    if( target instanceof EventDispatcher && target !== this )
+    {
+        target.addEventListener(type,callback,useCapture,priority,reference||this);
+        return this;
+    }
+    var listener=new Listener(type,callback,useCapture,priority,reference,this);
+    var len = target.length >> 0;
+    if( len > 0 )
+    {
+        while(len>0 && target[--len] )
+        {
+            $addEventListener( target[len], listener );
+        }
+        return this;
+    }
+    $addEventListener(target, listener);
+    return this;
+};
+
+/**
+ * 移除指定类型的侦听器
+ * @param type
+ * @param listener
+ * @returns {boolean}
+ */
+EventDispatcher.prototype.removeEventListener=function removeEventListener(type,listener)
+{
+    var target = storage(this,'target') || this;
+    if(target instanceof EventDispatcher && target !== this )
+    {
+        return target.removeEventListener(type,listener);
+    }
+    var len = target.length >> 0;
+    if( len > 0 ){
+        while(len>0 && target[--len] )$removeEventListener( target[len], type, listener, this);
+        return true;
+    }
+    return $removeEventListener(target,type,listener,this);
+};
+
+/**
+ * 调度指定事件
+ * @param event
+ * @returns {boolean}
+ */
+EventDispatcher.prototype.dispatchEvent=function dispatchEvent( event )
+{
+    //if( typeof event === "string" )event = new System.Event( event );
+    if( !System.is(event,Event) )throw new TypeError('Invalid event');
+    var target = storage(this,'target') || this;
+    if( target instanceof EventDispatcher && target !== this )
+    {
+        return target.dispatchEvent(event);
+    }
+    var len = target.length >> 0;
+    if( len > 0 ){
+        while(len>0 && target[--len] )
+        {
+            event.target = event.currentTarget = target[len];
+            $dispatchEvent(event);
+        }
+        return !event.immediatePropagationStopped;
+    }
+    event.target = event.currentTarget=target;
+    return $dispatchEvent( event );
+};
+
+/**
+ * 判断是否有指定的侦听器
+ * @param target
+ * @param type
+ * @param listener
+ * @return {boolean}
+ */
+function $hasEventListener(target, type, listener)
+{
+    var is = typeof listener === "function";
+    var events =  storage(target,'events');
+    if( events && Object.prototype.hasOwnProperty.call(events,type) )
+    {
+        events = events[type];
+        var length = events.length;
+        if( !is ){
+            return length > 0;
+        }
+        while (length > 0)
+        {
+            --length;
+            if ( events[length].callback === listener )
+            {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+/**
+ * 添加侦听器到元素中
+ * @param listener
+ * @param handle
+ * @returns {boolean}
+ */
+function $addEventListener(target, listener )
+{
+    if( target==null )throw new ReferenceError('this is null or not define');
+
+    //获取事件数据集
+    var type = listener.type;
+    var data = storage(target);
+    var events = data.events || (data.events={});
+    //获取指定事件类型的引用
+    events = events[ type ] || ( events[ type ]=[] );
+    //如果不是 EventDispatcher 则在第一个事件中添加事件代理。
+    if( events.length===0 && !(target instanceof EventDispatcher) )
+    {
+        //自定义事件处理
+        if( Object.prototype.hasOwnProperty.call(Event.fix.hooks,type) )
+        {
+            Event.fix.hooks[ type ].call(target, listener, $dispatchEvent);
+
+        }else {
+            type = Event.type(type);
+            try {
+                if( target.addEventListener )
+                {
+                    target.addEventListener(type, $dispatchEvent, listener.useCapture);
+                }else
+                {
+                    listener.proxyType=[type];
+                    listener.proxyTarget=target;
+                    listener.proxyHandle=function (e) {
+                        $dispatchEvent(e, target);
+                    }
+                    target.attachEvent(type, listener.proxyHandle);
+                }
+            }catch (e) {}
+        }
+    }
+
+    //添加到元素
+    events.push( listener );
+    
+    //按权重排序，值大的在前面
+    if( events.length > 1 ) events.sort(function(a,b)
+    {
+        return a.priority=== b.priority ? 0 : (a.priority < b.priority ? 1 : -1);
+    });
+    return true;
+}
+/**
+ * 添加侦听器到元素中
+ * @param string type 事件类型, 如果是一个'*'则表示删除所有的事件
+ * @param function listener 可选，如果指定则只删除此侦听器
+ * @param EventDispatcher eventDispatcher 可选，如果指定则只删除本对象中的元素事件
+ * @returns {boolean}
+ */
+function $removeEventListener(target, type, listener , dispatcher )
+{
+    if( target==null )throw new ReferenceError('this is null or not define');
+
+    //获取事件数据集
+    var events =storage(target,'events');
+    if( !events || !Object.prototype.hasOwnProperty.call(events,type) )
+    {
+        return false;
+    }
+    events = events[type];
+    var length= events.length;
+    var ret = length;
+    var is = typeof listener === "function";
+    while (length > 0)
+    {
+        --length;
+        //如果有指定侦听器则删除指定的侦听器
+        if ( (!is || events[length].callback === listener) && events[length].dispatcher === dispatcher )
+        {
+            var result = events.splice(length, 1);
+            if( result[0] && result[0].proxyHandle && result[0].proxyType )
+            {
+                var types = result[0].proxyType;
+                var num = types.length;
+                while ( num > 0 )
+                {
+                    $removeListener(result[0].proxyTarget || target, types[ --num ], result[0].proxyHandle);
+                }
+            }
+        }
+    }
+
+    //如果是元素并且没有侦听器就删除
+    if( events.length < 1 && !(target instanceof EventDispatcher)  )
+    {
+        $removeListener(target, type, $dispatchEvent);
+    }
+    return events.length !== ret;
+}
+
+function $removeListener(target, type , handle )
+{
+    var eventType= Event.type( type );
+    if( target.removeEventListener )
+    {
+        target.removeEventListener(eventType,handle,false);
+        target.removeEventListener(eventType,handle,true);
+
+    }else if( target.detachEvent )
+    {
+        target.detachEvent(eventType,handle);
+    }
+}
+
+
+/**
+ * 调度指定侦听项
+ * @param event
+ * @param listeners
+ * @returns {boolean}
+ */
+function $dispatchEvent(e, currentTarget )
+{
+    if( !(e instanceof Event) )
+    {
+        e = Event.create( e );
+        if(currentTarget)e.currentTarget = currentTarget;
+    }
+    if( !e || !e.currentTarget )throw new Error('invalid event target');
+    var target = e.currentTarget;
+    var events = storage(target,'events');
+    if( !events || !Object.prototype.hasOwnProperty.call(events, e.type) )return true;
+    events = events[e.type].slice(0);
+    var length= 0,listener,thisArg,count=events.length;
+    while( length < count )
+    {
+        listener = events[ length++ ];
+        thisArg = listener.reference || listener.dispatcher;
+        //如果是一个元素对象，设置当前元素为事件元素
+        // bug 在Display 组件中使用事件后
+        //if( thisArg.setCurrentElementTarget===true && e.target && (e.target.nodeType === 1 || e.target.nodeType === 9 || e.target.window) ){
+            //thisArg.current( e.target );
+        //}
+        //调度侦听项
+        listener.callback.call( thisArg , e );
+        if( e.immediatePropagationStopped===true )
+           return false;
+    }
+    return true;
+}
+/**
+ * 事件侦听器
+ * @param type
+ * @param callback
+ * @param priority
+ * @param capture
+ * @param currentTarget
+ * @param target
+ * @constructor
+ */
+function Listener(type,callback,useCapture,priority,reference,dispatcher)
+{
+    this.type=type;
+    this.callback=callback;
+    this.useCapture=!!useCapture;
+    this.priority=priority>>0;
+    this.reference=reference || null;
+    this.dispatcher=dispatcher;
+}
+Object.defineProperty(Listener.prototype,"constructor",{value:Listener});
+Listener.prototype.useCapture=false;
+Listener.prototype.dispatcher=null;
+Listener.prototype.reference=null;
+Listener.prototype.priority=0;
+Listener.prototype.callback=null;
+Listener.prototype.currentTarget=null;
+Listener.prototype.type=null;
+Listener.prototype.proxyHandle = null;
+Listener.prototype.proxyTarget = null;
+Listener.prototype.proxyType = null;
+
+},
+
+/***** System system/PropertyEvent.js *****/
+
+"system/PropertyEvent.js": function(module,require){
+/*
+ * EaseScript
+ * Copyright © 2017 EaseScript All rights reserved.
+ * Released under the MIT license
+ * https://github.com/51breeze/EaseScript
+ * @author Jun Ye <664371281@qq.com>
+ * @require Event,Object
+ */
+function PropertyEvent( type, bubbles,cancelable ){
+    if( !(this instanceof PropertyEvent) )return new PropertyEvent(type, bubbles,cancelable);
+    Event.call(this, type, bubbles,cancelable );
+    return this;
+}
+
+module.exports =PropertyEvent;
+var Event =require("system/Event.js");
+var Object =require("system/Object.js");
+
+PropertyEvent.prototype=Object.create( Event.prototype ,{
+    "constructor":{value:PropertyEvent}
+});
+PropertyEvent.prototype.property=null;
+PropertyEvent.prototype.newValue=null;
+PropertyEvent.prototype.oldValue=null;
+PropertyEvent.CHANGE='propertychange';
+PropertyEvent.COMMIT='propertycommit';
+Event.fix.map[ PropertyEvent.CHANGE ] = 'input';
+
+var hash = 'lastValue_'+(new Date().getTime())+ '_'+ Math.random() * 10000;
+
+//属性事件
+Event.registerEvent(function ( type , target, originalEvent )
+{
+    switch ( type ){
+        case PropertyEvent.CHANGE :
+        case PropertyEvent.COMMIT :
+            if( originalEvent instanceof Event )return originalEvent;
+            var event =new PropertyEvent( type );
+            var property = typeof originalEvent.propertyName === "string" ? originalEvent.propertyName : null;
+            if( property===hash)return null;
+
+            var nodename = target && typeof target.nodeName=== "string" ? target.nodeName.toLowerCase() : '';
+            if( !property && nodename )
+            {
+                switch ( nodename )
+                {
+                    case 'select'   :
+                    case 'input'    :
+                    case 'textarea' :
+                        property='value';
+                    break;
+                    default:
+                        property='textContent';
+                }
+            }
+          
+            if( property )
+            {
+                event.property = property;
+                event.oldValue = target[hash] || undefined;
+                event.newValue = target[property];
+                target[hash]= event.newValue;
+            }
+            return event;
+    }
+});
+},
+
+/***** System system/StyleEvent.js *****/
+
+"system/StyleEvent.js": function(module,require){
+/*
+ * EaseScript
+ * Copyright © 2017 EaseScript All rights reserved.
+ * Released under the MIT license
+ * https://github.com/51breeze/EaseScript
+ * @author Jun Ye <664371281@qq.com>
+ * @require Event,PropertyEvent,Object
+ */
+function StyleEvent( type, bubbles,cancelable ){
+    if( !(this instanceof StyleEvent) )return new StyleEvent(type, bubbles,cancelable);
+    PropertyEvent.call(this, type, bubbles,cancelable );
+    return this;
+};
+
+module.exports =StyleEvent;
+var Object =require("system/Object.js");
+var PropertyEvent =require("system/PropertyEvent.js");
+
+StyleEvent.prototype=Object.create( PropertyEvent.prototype ,{
+    "constructor":{value:StyleEvent}
+});
+StyleEvent.CHANGE='styleChange';
+},
+
+/***** System system/ScrollEvent.js *****/
+
+"system/ScrollEvent.js": function(module,require){
+/*
+ * EaseScript
+ * Copyright © 2017 EaseScript All rights reserved.
+ * Released under the MIT license
+ * https://github.com/51breeze/EaseScript
+ * @author Jun Ye <664371281@qq.com>
+ * @require Event,PropertyEvent,Object
+ */
+function ScrollEvent( type, bubbles,cancelable ){
+    if( !(this instanceof ScrollEvent) )return new ScrollEvent(type, bubbles,cancelable);
+    PropertyEvent.call(this, type, bubbles,cancelable );
+    return this;
+};
+
+module.exports =ScrollEvent;
+var Object =require("system/Object.js");
+var PropertyEvent =require("system/PropertyEvent.js");
+var Event =require("system/Event.js");
+
+ScrollEvent.prototype=Object.create( PropertyEvent.prototype ,{
+    "constructor":{value:ScrollEvent}
+});
+ScrollEvent.CHANGE='scrollChange';
+
+//属性事件
+Event.registerEvent(function ( type , target, originalEvent )
+{
+    if( originalEvent instanceof ScrollEvent )return originalEvent;
+    if( type === ScrollEvent.CHANGE )return new ScrollEvent( ScrollEvent.CHANGE );
+});
+},
+
+/***** System system/ElementEvent.js *****/
+
+"system/ElementEvent.js": function(module,require){
+/*
+ * EaseScript
+ * Copyright © 2017 EaseScript All rights reserved.
+ * Released under the MIT license
+ * https://github.com/51breeze/EaseScript
+ * @author Jun Ye <664371281@qq.com>
+ * @require System,Event,Object
+ */
+function ElementEvent( type, bubbles,cancelable )
+{
+    if( !System.instanceOf(this,ElementEvent) )return new ElementEvent(type, bubbles,cancelable);
+    Event.call(this, type, bubbles,cancelable );
+    return this;
+};
+
+module.exports = ElementEvent;
+var Object =require("system/Object.js");
+var Event =require("system/Event.js");
+var System =require("system/System.js");
+
+ElementEvent.prototype=Object.create( Event.prototype,{
+    "constructor":{value:ElementEvent}
+});
+ElementEvent.prototype.parent=null;
+ElementEvent.prototype.child=null;
+ElementEvent.ADD='elementAdd';
+ElementEvent.ADD_TO_DOCUMENT='elementAddToDocument';
+ElementEvent.REMOVE='elementRemove';
+ElementEvent.CHANGE='elementChildrenChange';
+
+//鼠标事件
+Event.registerEvent(function ( type , target, originalEvent )
+{
+    if( originalEvent instanceof ElementEvent )return originalEvent;
+});
+},
+
+/***** System system/Element.js *****/
+
+"system/Element.js": function(module,require){
+/*
+ * EaseScript
+ * Copyright © 2017 EaseScript All rights reserved.
+ * Released under the MIT license
+ * https://github.com/51breeze/EaseScript
+ * @author Jun Ye <664371281@qq.com>
+ * @require System,Object,Array,EventDispatcher,Internal,StyleEvent,PropertyEvent,ScrollEvent,ElementEvent,Math,TypeError,Error,Symbol
+ */
+
+
+/**
+ * Element class
+ * @param selector
+ * @param context
+ * @returns {Element}
+ * @constructor
+ */
+function Element(selector, context)
+{
+    if( !(this instanceof Element) )
+    {
+        return new Element( selector, context );
+    }
+    if( context )context= context instanceof Element ? context[0] : context;
+    storage(this,true,{
+        'context':context,
+        'forEachCurrentItem':null,
+        'forEachCurrentIndex':NaN
+    });
+    var result=null;
+    if( selector )
+    {
+        //复制Element的结果到当前对象
+         if( selector instanceof Element )
+        {
+            result = Array.prototype.slice.call(selector,0);
+        }
+        //指定的选择器是一组元素
+        else if ( System.isArray(selector) )
+        {
+            result = filters( selector );
+        }
+        //是一个选择器或者指定一个需要创建的html标签
+        else if (typeof selector === "string")
+        {
+            selector = System.trim( selector );
+            //创建一个指定标签的新元素
+            if( selector.charAt(0) === '<' && selector.charAt(selector.length - 1) === '>' )
+            {
+                result=[createElement(selector)];
+            }
+            //查询指定选择器的元素
+            else
+            {
+                result = querySelector(selector, context);
+            }
+        }
+        //指定的选择器为元素对象
+        else if ( Element.isNodeElement(selector) || Element.isWindow(selector) )
+        {
+            result = [selector];
+        }
+    }
+    Object.defineProperty(this,"length", {value:0,writable:true});
+    if( result )makeElement( this, result);
+    EventDispatcher.call(this);
+}
+
+module.exports = Element;
+var Object =require("system/Object.js");
+var Internal =require("system/Internal.js");
+var Symbol =require("system/Symbol.js");
+var System =require("system/System.js");
+var Array =require("system/Array.js");
+var EventDispatcher =require("system/EventDispatcher.js");
+var StyleEvent =require("system/StyleEvent.js");
+var PropertyEvent =require("system/PropertyEvent.js");
+var ScrollEvent =require("system/ScrollEvent.js");
+var ElementEvent =require("system/ElementEvent.js");
+
+
+var Event =require("system/Event.js");
+var storage=Internal.createSymbolStorage( Symbol('Element') );
+var accessor={};
+var fix={
+    attrMap:{
+        'tabindex'       : 'tabIndex',
+        'readonly'       : 'readOnly',
+        'for'            : 'htmlFor',
+        'maxlength'      : 'maxLength',
+        'cellspacing'    : 'cellSpacing',
+        'cellpadding'    : 'cellPadding',
+        'rowspan'        : 'rowSpan',
+        'colspan'        : 'colSpan',
+        'usemap'         : 'useMap',
+        'frameborder'    : 'frameBorder',
+        'class'          : 'className',
+        'contenteditable': 'contentEditable'
+    }
+    ,attrtrue:{
+        'className':true,
+        'innerHTML':true,
+        'value'    :true
+    }
+    ,cssPrefixName:''
+    ,cssPrefix:{
+        'box-shadow':true,
+        'border-radius':true,
+        'border-top-left-radius':true,
+        'border-top-right-radius':true,
+        'border-bottom-left-radius':true,
+        'border-bottom-right-radius':true,
+        'focus-ring-color':true,
+        'user-select':true,
+        'radial-gradient':true,
+        'linear-gradient':true,
+        'transform':true,
+        'transition':true,
+        'animation':true,
+        'animation-name':true,
+        'animation-duration':true,
+        'animation-iteration-count':true,
+        'animation-delay':true,
+        'animation-fill-mode':true,
+        'animation-direction':true,
+        'animation-timing-function':true,
+        'animation-play-state':true
+    }
+    ,cssUpperRegex:/([A-Z]|^ms)/g
+    ,cssCamelRegex:/-([a-z]|[0-9])/ig
+    ,cssCamelCase:function( all, letter )
+    {
+        return ( letter + "" ).toUpperCase();
+    }
+    ,cssNumber:{
+        "fillOpacity": true,
+        "fontWeight": true,
+        "lineHeight": true,
+        "opacity": true,
+        "orphans": true,
+        "widows": true,
+        "zIndex": true,
+        "zoom": true
+    }
+    ,cssHooks:{}
+    ,cssMap:{}
+    ,fnHooks:{}
+    ,cssDisplayRegex:/^(none|table(?!-c[ea]).+)/
+    ,cssDisplayMap:{position:"absolute",visibility: "hidden", display:"block"}
+    ,getsizeval:function( prop )
+    {
+        if ( Element.isWindow(this) )
+        {
+            var val =  Math.max(
+                this['inner'+prop] || 0,
+                this['offset'+prop] || 0,
+                this['client'+prop] || 0
+            ) || document.documentElement['client'+prop];
+            if( document.compatMode ==="BackCompat" ){
+                val = document.body['client'+prop];
+            }
+            return val;
+
+        } else if ( Element.isDocument(this) )
+        {
+            return Math.max(
+                    this.body['scroll'+prop] || 0,
+                    this.documentElement['scroll'+prop] || 0,
+                    this.body['offset'+prop] || 0,
+                    this['offset'+prop] || 0,
+                    this.body['client'+prop] || 0,
+                    this['client'+prop] || 0
+                )+(this.documentElement[ prop==='Height'? 'clientTop' : 'clientLeft' ] || 0);
+        }
+        var val = this['offset'+prop] || 0;
+        if( val < 1 )
+        {
+            var style = getComputedStyle( this );
+            val = parseFloat( prop==="Width" ? style.width : style.height )||0;
+            if( val < 1 && fix.cssDisplayRegex.test( style.display ) )
+            {
+                var oldCss = {};
+                var p;
+                for( p in fix.cssDisplayMap )
+                {
+                    oldCss[p]=style[ p ];
+                    this.style[ p ]=fix.cssDisplayMap[p];
+                }
+                val = this['offset'+prop] || 0;
+                for( p in oldCss )this.style[ p ]=oldCss[p];
+            }
+        }
+        return val;
+    }
+};
+
+/**
+ * @private
+ */
+function access(callback, name, newValue, isDisplay, isHidden)
+{
+    var write= typeof newValue !== 'undefined';
+    var getter = accessor[callback].get;
+    var setter = accessor[callback].set;
+    if( fix.fnHooks[callback] )
+    {
+        getter = typeof fix.fnHooks[callback].get === "function" ? fix.fnHooks[callback].get : getter ;
+        setter = typeof fix.fnHooks[callback].set === "function" ? fix.fnHooks[callback].set : setter ;
+    }
+    if( !write )
+    {
+        var elem = this.current();
+        return elem ? getter.call(elem,name,this) : false;
+    }
+
+    return this.forEach(function(elem)
+    {
+        var oldValue= getter.call(elem,name,this);
+        if( isDisplay )
+        {
+            var _data = storage(elem, 'data') || storage(elem, 'data', {});
+            if( isHidden ){
+                _data['---display---'] = oldValue;
+            }else{
+                newValue = _data['---display---'];
+                if( !newValue || newValue.toLowerCase() === "none" )
+                {
+                    newValue=getDisplayValueByElem( elem );
+                }
+            }
+        }
+
+        if( oldValue !== newValue )
+        {
+            var event = setter.call(elem,name,newValue,this);
+            if( event )
+            {
+                if (typeof event === "string")
+                {
+                    event = event === StyleEvent.CHANGE ? new StyleEvent(StyleEvent.CHANGE) : new PropertyEvent(PropertyEvent.CHANGE);
+                    event.property = name;
+                }
+                if (event instanceof PropertyEvent)
+                {
+                    event.property = event.property || name;
+                    event.newValue = event.newValue || newValue;
+                    event.oldValue = event.oldValue || oldValue;
+                    this.dispatchEvent(event);
+                }
+            }
+        }
+    });
+}
+
+/**
+ * 获取元素的显示属性
+ * @param elem
+ * @returns {*}
+ */
+function getDisplayValueByElem( elem )
+{
+    var nodename = elem.nodeName.toLowerCase();
+    switch ( nodename )
+    {
+        case "table" :
+            return 'table' ;
+        case "thead" :
+            return 'table-header-group' ;
+        case "tbody" :
+            return 'table-row-group';
+        case "tfoot" :
+            return 'table-footer-group';
+        case "tr" :
+            return 'table-row';
+        case "td" :
+            return 'table-cell';
+        case "col" :
+            return 'table-column';
+        case "caption" :
+            return 'table-caption';
+        case "colgroup" :
+            return 'table-column-group';
+        case "div" :
+        case "ul"  :
+        case "li"  :
+        case "p":
+        case "address":
+        case "dl":
+        case "dd":
+        case "dt":
+        case "ol":
+        case "fieldset":
+        case "form":
+        case "h1":
+        case "h2":
+        case "h3":
+        case "h4":
+        case "h5":
+        case "h6":
+            return 'block';
+        default :
+            return 'inline';
+    }
+}
+
+/**
+ * @private
+ */
+function getChildNodes(elem)
+{
+    var ret=[];
+    if( !Element.isFrame(elem) && elem.hasChildNodes() )
+    {
+        var len=elem.childNodes.length,index= 0,node;
+        while( index < len )
+        {
+            node=elem.childNodes.item(index);
+            if( Element.getNodeName(node) !== "#text" )
+            {
+                ret.push(node);
+            }
+            ++index;
+        }
+    }
+    return ret;
+}
+/**
+ * @private
+ */
+function dispatchEvent(dispatch, type, parent, child )
+{
+    if( dispatch.hasEventListener(type) )
+    {
+        var event = new ElementEvent(type);
+        event.parent = parent;
+        event.child = child;
+        return dispatch.dispatchEvent(event);
+    }
+    return true;
+}
+
+/**
+ *  @private
+ */
+function recursion(prop, selector, deep, exclude)
+{
+    var results = new Array();
+    var current;
+    var nodename = '';
+    var last;
+    this.forEach(function(elem)
+    {
+        if( elem && elem.nodeType )
+        {
+            current = elem;
+            do{
+                last = current;
+                current = current[prop];
+                if( exclude && (elem === exclude || current===exclude) )return;
+                if( current && ( nodename = Element.getNodeName(current) ) !== "#text" && results.indexOf( current ) < 0 )
+                {
+                    results.push( current );
+                }
+            } while ( current && last !== current && ( deep===true || nodename === "#text" ) );
+        }
+    });
+    return selector ?
+        ( typeof selector === "function" ?
+            Array.prototype.filter.call(results,function(elem){
+                this.current(elem);
+                return selector.call(this,elem);
+            },this)
+           : querySelector(selector,null,null,results) )
+        : results;
+}
+
+/**
+ * @private
+ * @param instance
+ * @param results
+ * @returns {*}
+ */
+function makeElement( instance, results , index )
+{
+    if( typeof results.valueOf === "function"  ){
+        results = results.valueOf();
+    }
+    Array.prototype.splice.apply(instance, [].concat.apply([index || 0, 0], results));
+    return instance;
+}
+
+/**
+ * 统一规范的样式名
+ * @param name
+ * @returns {string}
+ */
+function getStyleName(name )
+{
+    if( typeof name !=='string' )
+        return name;
+    if( name === 'cssText')
+        return name;
+    name=fix.cssMap[name] || name;
+    name=name.replace( /^-ms-/, "ms-" ).replace( fix.cssCamelRegex, fix.cssCamelCase );
+    name = name.replace( fix.cssUpperRegex, "-$1" ).toLowerCase();
+    if( fix.cssPrefix[name] === true )
+    {
+        return fix.cssPrefixName + name;
+    }
+    return name;
+}
+
+/**
+ * @param cssText
+ * @returns {string}
+ */
+function formatStyleSheet( styleObject,type,node,elem)
+{
+    if( type==="object" )
+    {
+        var results=[];
+        for( var name in styleObject )
+        {
+            var value = formatStyleValue(name, styleObject[name], node, elem);
+            if( value !==false )
+            {
+                value = typeof value === "object" ? System.serialize(value, 'style') : getStyleName(name) + ":" + value;
+                results.push(value);
+            }
+        }
+        return results.join(";");
+    }
+    return styleObject.replace(/([\w\-]+)\s*\:([^\;\}]*)/g, function (all, name, value) {
+        value = formatStyleValue(name, value, node, elem);
+        if( !value )return "";
+        return typeof value === "object" ? System.serialize(value, 'style') : getStyleName(name)+":"+value;
+    });
+}
+
+/**
+ * 格式化样式名及属性值
+ * @param name
+ * @param value
+ * @return {string}
+ */
+function formatStyleValue(name, value, node, elem, apply )
+{
+    var type = typeof value;
+    if( type === "string" )
+    {
+        value = System.trim(value);
+        type = /^\d+$/.test( value ) ? 'number' : type;
+    }
+    if( type === "string" )
+    {
+        var increment = /^([\-+])=([\-+.\de]+)/.exec(value);
+        if (increment)
+        {
+            var inc = accessor.style.get.call(node||{}, name, elem);
+            inc = parseFloat(inc) || 0;
+            value = (+(increment[1] + 1) * +increment[2]) + inc;
+            type = "number";
+
+        } else if( System.env.platform("IE", 8) && value.substr(0, 5) === "rgba(" )
+        {
+            value = value.replace(/rgba\(.*?\)/i, rgbToHex(value));
+        }
+    }
+
+    if( type === "number" && isNaN( value ) )
+    {
+        return false;
+    }
+
+    //添加单位
+    if( type === "number" && !fix.cssNumber[name] )
+    {
+        value += "px";
+    }
+    if( fix.cssHooks[name] && typeof fix.cssHooks[name].set === "function")
+    {
+        if( apply )
+        {
+            var orgname = getStyleName(name);
+            if( !fix.cssHooks[name].set.call(node,node.style,value,orgname) )
+            {
+                node.style[ orgname ] = value;
+            }
+
+        }else
+        {
+            var obj = {};
+            fix.cssHooks[name].set.call(node||{},obj,value,elem);
+            return obj;
+        }
+
+    }else
+    {
+        if( apply )
+        {
+            node.style[ getStyleName(name) ] = value;
+        }else{
+            return value;
+        }
+    }
+}
+
+
+/**
+ * 选择元素
+ * @param mixed selector CSS3选择器
+ * @param mixed context  上下文
+ * @returns []
+ */
+var querySelector = typeof Sizzle === "function" ? Sizzle : function(selector, context, results, seed )
+{
+    if( !results || !System.isArray(results) )
+    {
+        if( context )
+        {
+            if( Element.isWindow(context) )
+            {
+                context = document;
+            }else if( typeof context === "string" && !( context = document.querySelector( context ) ) )
+            {
+                return [];
+            }
+
+            if( !Element.isHTMLContainer(context) )
+            {
+               throw new TypeError("Invalid context in Element.querySelector");
+            }
+        }
+        results = Array.prototype.slice.call( (context||document).querySelectorAll(selector) );
+    }
+
+    if( seed && System.isArray(seed) )
+    {
+        var i=0;
+        var ret=[];
+        while( i<seed.length )
+        {
+            if( Array.prototype.indexOf.call(results, seed[i]) >=0 && Array.prototype.indexOf.call(ret,seed[i]) < 0)
+            {
+                ret.push( seed[i] );
+            }
+            i++;
+        }
+        return ret;
+    }
+    return results;
+};
+
+/**
+ * @type {RegExp}
+ */
+var singleTagRegex=/^<(\w+)(.*?)\/\s*>$/;
+
+/**
+ * 创建HTML元素
+ * @param html 一个html字符串
+ * @returns {Node}
+ */
+function createElement(html , flag , isTable )
+{
+    if(System.isString(html) )
+    {
+        html=System.trim( html ).replace(/[\r\n]+/g,'');
+        if( html )
+        {
+            if( flag ===true )
+            {
+                return document.createTextNode( html );
+            }
+
+            var match;
+            if (html.charAt(0) === "<" && ( match = singleTagRegex.exec(html) ))
+            {
+                var elem = document.createElement(match[1]);
+                var attr = matchAttr(html);
+                for (var prop in attr) {
+                    accessor['property'].set.call( elem, prop, attr[prop]);
+                }
+                return elem;
+
+            }else if ( html.length >= 1 && /^[^\d+][a-zA-Z0-9]+$/.test(html) )
+            {
+                try {
+                    return document.createElement(html);
+                } catch (e) {
+                }
+            }  
+
+            var div = document.createElement("div");
+            var result = html.match(/^\<(tr|th|td|tbody|thead|tfoot)(?:[\s\>]+)/i);
+            if( result )
+            {
+                var level = 1;
+                switch( result[1] )
+                {
+                    case 'td':
+                        html='<table><tbody><tr>'+html+'</tr></tbody></table>';
+                        level = 3;
+                        break;
+                    case 'th':
+                        html='<table><thead><tr>'+html+'</tr></thead></table>';
+                        level = 3;
+                        break;
+                    case 'tr' :
+                        html='<table><tbody>'+html+'</tbody></table>';
+                        level = 2;
+                        break;
+                    default :
+                        html ='<table>'+html+'</table>';
+                        level = 1;
+                }
+
+                div.innerHTML = html;
+                for (var i = 0; i < level; i++)
+                {
+                    div = div.childNodes.item(0);
+                    div.parentNode.removeChild( div );
+                }
+
+                if( !div )
+                {
+                    throw new Error('Invalid html');
+                }
+
+                if( isTable )
+                {
+                    return div;
+                }
+
+            }else
+            {
+                div.innerHTML = html;
+            }
+
+            var len=div.childNodes.length;
+            if(  len > 1 )
+            {
+                var fragment= document.createDocumentFragment();
+                while( len > 0 )
+                {
+                    --len;
+                    fragment.appendChild( div.childNodes.item(0) );
+                }
+                return fragment;
+            }
+            div=div.childNodes.item(0);
+            return div.parentNode.removeChild( div );
+        }
+
+    }else if (Element.isNodeElement(html) )
+        return  html.parentNode ?cloneNode(html,true) : html;
+    throw new Error('createElement param invalid')
+}
+var getAttrExp = /(\w+)(\s*=\s*([\"\'])([^\3]*?)[^\\]\3)?/g;
+var lrQuoteExp = /^[\'\"]|[\'\"]$/g;
+
+/**
+ * @private
+ * 匹配字符串中的属性
+ * @param strAttr
+ * @return {}
+ */
+function matchAttr(strAttr)
+{
+    if( typeof strAttr === "string" && /[\S]*/.test(strAttr) )
+    {
+        var i=  strAttr.charAt(0)==='<' ? 1 : 0;
+        var attr=strAttr.replace(/=\s*(\w+)/g,'="$1"').match( getAttrExp );
+        strAttr={};
+        if( attr && attr.length > 0 )
+        {
+            var item;
+            while( item=attr[i++] )
+            {
+                var val  =  item.split('=');
+                if( val.length > 0 )
+                {
+                    var prop =System.trim( val[0] );
+                    strAttr[ prop ]='';
+                    if( typeof val[1] === "string" )
+                    {
+                        strAttr[ prop ]=val[1].replace( lrQuoteExp ,'').replace(/\\([\'\"])/g,'$1');
+                    }
+                }
+            }
+        }
+        return strAttr;
+    }
+    return null;
+}
+
+/**
+ * @private
+ * 合并元素属性。
+ * 将 oSource 对象的属性合并到 target 元素
+ * @param target 目标对象
+ * @param oSource 引用对象
+ * @returns {*}
+ */
+function mergeAttributes(target, oSource)
+{
+    var iselem=Element.isNodeElement( target );
+    if( System.isObject(oSource) )
+    {
+        for (var key in oSource)if (oSource[key] && oSource[key] != '')
+        {
+            iselem ? accessor['property'].set.call( target, key,  oSource[key] ) : target[key] = oSource[key];
+        }
+
+    }else
+    {
+        var i=0, len=oSource.attributes.length,item;
+        while( i<len )
+        {
+            item=oSource.attributes.item(i++);
+            if( item.nodeValue && item.nodeValue !='' )
+            {
+                iselem ?  accessor['property'].set.call( target, item.nodeName, item.nodeValue ) : target[item.nodeName] = item.nodeValue;
+            }
+        }
+    }
+    return target;
+}
+
+/**
+ * @private
+ * 判断元素是否有样式
+ * @param elem
+ * @returns {boolean}
+ */
+function hasStyle(elem )
+{
+    return elem && elem.nodeType && elem.style && !(elem.nodeType === 3 || elem.nodeType === 8 || elem.nodeType === 9 || elem.nodeType === 11);
+}
+
+/**
+ * @private
+ * 获取元素当前的样式
+ * @param elem
+ * @returns {Object}
+ */
+function getComputedStyle(elem)
+{
+    if( !hasStyle(elem) )return {};
+    return document.defaultView && document.defaultView.getComputedStyle ? document.defaultView.getComputedStyle(elem, null)
+        : elem.currentStyle || elem.style;
+}
+
+/**
+ * @private
+ * 克隆节点元素
+ * @param nodeElement
+ * @returns {Node}
+ */
+function cloneNode(nodeElement , deep )
+{
+    if( nodeElement.cloneNode )
+    {
+        return nodeElement.cloneNode( !!deep );
+    }
+    //nodeElement.nodeName
+    if( typeof nodeElement.nodeName==='string' )
+    {
+        var node = document.createElement( nodeElement.nodeName  );
+        if( node )mergeAttributes(node,nodeElement);
+        return node;
+    }
+    return null;
+}
+
+/**
+ * @private
+ * @param results
+ * @returns {Array}
+ */
+function filters(results) {
+     return Array.prototype.filter.call(results, function (elem) {
+        return Element.isNodeElement(elem) || Element.isWindow(elem);
+    });
+}
+
+
+Element.prototype= Object.create( EventDispatcher.prototype,{
+    "constructor":{value:Element},
+    
+    /**
+     * 返回此对象的字符串
+     * @returns {*}
+     */
+    "toString":{value:function toString()
+    {
+        if( this.constructor === Element ){
+            return "[object Element]";
+        }
+        return EventDispatcher.prototype.toString.call(this);
+    }},
+
+    /**
+     * 返回此对象的数据值
+     * @returns {*}
+     */
+    "valueOf":{value:function valueOf()
+    {
+        if( this.constructor === Element ){
+            return this.slice(0);
+        }
+        return EventDispatcher.prototype.valueOf.call(this);
+    }}
+})
+
+Element.prototype.setCurrentElementTarget=true;
+
+/**
+ * 返回一个指定开始索引到结束索引的元素并返回新的Element集合
+ */
+Element.prototype.slice = Array.prototype.slice;
+
+/**
+ * 替换或者增加一个或者多个元素并返回新的Element集合
+ */
+Element.prototype.splice= function splice(start,deleteLenght)
+{
+    var results = Element.prototype.concat.apply([],Element.prototype.slice.call(arguments,2) );
+    var items = Array.prototype.splice.call( this, start, deleteLenght);
+    Array.prototype.splice.apply( this, Array.prototype.concat.apply( [0,this.length],  this.concat( results ) ) );
+    return items;
+}
+
+/**
+ * 合并一个或者多个元素并返回一个新的Element集合
+ */
+Element.prototype.concat = function concat()
+{
+    var results = this.slice(0);
+    var index = 0;
+    while ( arguments.length > index )
+    {
+        var items = [];
+        if( arguments[index] instanceof Element )
+        {
+            items = arguments[index].slice(0);
+        }
+        else
+        {
+            items = filters( System.isArray(arguments[index]) ? arguments[index] : [ arguments[index] ] );
+        }
+        results = Array.prototype.concat.apply( results,items);
+        index++;
+    }
+    return Array.prototype.unique.call(results);
+}
+
+/**
+ * 搜索一个指定的元素在当前匹配的集合中的位置
+ */
+Element.prototype.indexOf= Array.prototype.indexOf;
+
+/**
+ * 遍历元素
+ * @param function callback
+ * @param object refObject
+ * @returns {*}
+ */
+Element.prototype.forEach=function forEach(callback , refObject)
+{
+    var result=null;
+    refObject=refObject || this;
+    var current = storage(this,'forEachCurrentItem');
+    if( current )
+    {
+        result=callback.call( refObject ,current, storage(this,'forEachCurrentIndex') );
+    }else
+    {
+        var items=this.slice(0),
+            index = 0,
+            len=items.length;
+        for( ; index < len ; index++ )
+        {
+            current = items[ index ];
+            storage(this,'forEachCurrentItem',current);
+            storage(this,'forEachCurrentIndex',index);
+            result=callback.call(refObject ,current,index);
+            if( result != null )break;
+        }
+        storage(this,'forEachCurrentItem',null);
+        storage(this,'forEachCurrentIndex',NaN);
+    }
+    return result == null ? this : result;
+};
+
+/**
+ * 设置获取当前操作的元素
+ * 此操作不会改变原有元素结果集，只是对当前操作的设置和一个引用的元素
+ * 如果在调用这个方法之前调用了this.forEach且没有结束遍历，则返回的是forEach当前游标位置的元素，否则为0的游标元素
+ * @param selector|HTMLElement element
+ * @returns {*}
+ */
+Element.prototype.current=function current( elem )
+{
+    if( typeof elem === "undefined" )
+    {
+        return storage(this,'forEachCurrentItem') || this[0];
+    }
+    if( elem )
+    {
+        if (typeof elem === "string")
+        {
+            elem = querySelector(elem, this.context || document);
+            elem = elem && elem.length > 0 ? elem[0] : null;
+        }
+        elem = elem && ( Element.isNodeElement(elem) || Element.isWindow(elem) ) ? elem : null;
+    }
+    storage(this, 'forEachCurrentIndex', NaN);
+    storage(this, 'forEachCurrentItem', elem);
+    return this;
+};
+
+/**
+ * @private
+ */
+accessor['property']={
+    get:function(name){
+        name = fix.attrMap[ name ] || name;
+        return  ( fix.attrtrue[name] || !this.getAttribute  ? this[name] : this.getAttribute(name) ) || null;
+    }
+    ,set:function(name,newValue){
+        name = fix.attrMap[ name ] || name;
+        if( fix.attrtrue[name] ===true && newValue === null )newValue = '';
+        if( newValue === null ){
+            fix.attrtrue[name] || !this.removeAttribute ? delete this[name] : this.removeAttribute(name);
+        }else
+        {
+            fix.attrtrue[name] || !this.setAttribute  ? this[name] = newValue : this.setAttribute(name, newValue);
+        }
+        return PropertyEvent.CHANGE;
+    }
+};
+
+/**
+ * 为每一个元素设置属性值
+ * @param name
+ * @param value
+ * @returns {Element}
+ */
+Element.prototype.property=function property(name,value)
+{
+    return access.call(this,'property',name,value);
+};
+
+/**
+ * 设置一组属性
+ * @param propsObject
+ * @returns {Element}
+ */
+Element.prototype.properties=function properties( propsObject )
+{
+    if( propsObject && typeof propsObject === "object" )
+    {
+        Object.forEach(propsObject,function(value,name)
+        {
+            access.call(this,'property',name,value);
+        },this);
+        return this;
+    }
+
+    var elem = this.current();
+    var props={};
+    if (elem.hasAttributes()) 
+    {
+       var attrs = elem.attributes;
+       for(var i=0;i<attrs.length;i++)
+       {
+         props[ attrs[i].name ] = attrs[i].value;
+       }
+    } 
+    return props;
+}
+
+/**
+ * 判断当前匹配元素是否有指定的属性名
+ * @param prop
+ * @returns {boolean}
+ */
+Element.prototype.hasProperty=function hasProperty(prop)
+{
+    var elem = this.current();
+    if( !elem )return false;
+    if( fix.attrtrue[prop] === true )
+    {
+        return typeof elem[prop] !== "undefined";
+    }
+    return typeof elem.hasAttribute === 'function' ? elem.hasAttribute( prop ) : typeof elem[prop] !== "undefined";
+};
+
+/**
+ * 获取设置数据对象
+ * @param name
+ * @param value
+ * @returns {*}
+ */
+Element.prototype.data=function data(name, value)
+{
+    var type =  typeof name;
+    var write = typeof value !== "undefined";
+    var data;
+    return this.forEach(function(elem)
+    {
+        if( type === "object" )
+        {
+            storage(elem,'data',name);
+
+        }else if( type === 'string' && write )
+        {
+            data = storage(elem,'data') || storage(elem,'data',{});
+            data[ name ]=value;
+
+        }else
+        {
+            data = storage(elem,'data');
+            return type === 'string' && data ? data[name] : data || null;
+        }
+    });
+};
+
+var rgbregex = /\s*rgba\(\s*(\d+)\,\s*(\d+)\,\s*(\d+)/i;
+var rgbToHex = function(value)
+{
+      var ret = value.match(rgbregex);
+      if( ret )
+      {
+          return [
+              '#',
+              ("0" + Number(ret[1] >> 0).toString(16) ).slice(-2),
+              ("0" + Number(ret[2] >> 0).toString(16) ).slice(-2),
+              ("0" + Number(ret[3] >> 0).toString(16) ).slice(-2),
+          ].join('');
+      }
+      return value;
+};
+
+/**
+ * @private
+ */
+accessor['style']= {
+    get:function(name){
+        var getter = fix.cssHooks[name] && typeof fix.cssHooks[name].get === "function" ? fix.cssHooks[name].get : null;
+        var style = this.currentStyle || this.style;
+        if( name !=="cssText" ){
+            style = getComputedStyle(this);
+        }
+        return getter ? getter.call(this, style, name) : style[name]||'';
+    }
+    ,set:function(name, value, obj ){
+        var type = typeof value;
+        if( type === "object" )
+        {
+            for( var b in value )
+            {
+                formatStyleValue(b, value[b], this , obj , true );
+            }
+        }else
+        {
+            //解析 cssText 样式名
+            if( name === 'cssText' )
+            {
+                if( value == null )
+                {
+                    value = "";
+                }else if( type === "string" )
+                {
+                    var _cssText = this.style.cssText;
+                    value = (_cssText ? _cssText+";" : "")+formatStyleSheet(value, type, this, obj);
+                }
+            }
+            formatStyleValue(name, value, this , obj , true );
+        }
+        return StyleEvent.CHANGE;
+    }
+};
+
+/**
+ * 设置所有匹配元素的样式
+ * @param name
+ * @param value
+ * @returns {Element}
+ */
+Element.prototype.style=function style(name, value)
+{
+    return access.call(this,'style',name,value);
+};
+
+/**
+ * 显示元素
+ * @returns {Element}
+ */
+Element.prototype.show=function show()
+{
+    access.call(this,'style',"display",'',true,false);
+    return this;
+};
+
+/**
+ * 隐藏当前元素
+ * @returns {Element}
+ */
+Element.prototype.hide=function hide()
+{
+    access.call(this,'style',"display",'none',true,true);
+    return this;
+};
+
+/**
+ * @private
+ */
+accessor['text']= {
+    get:function(){  return typeof this.textContent === "string" ? this.textContent : this.innerText; }
+    ,set:function(name,newValue){
+        typeof this.textContent === "string" ? this.textContent=newValue : this.innerText=newValue;
+        return PropertyEvent.CHANGE;
+    }
+};
+
+/**
+ * 获取设置当前元素的文本内容。
+ * @returns {string|Element}
+ */
+Element.prototype.text=function text( value )
+{
+    return access.call(this,'text','text',value);
+};
+
+/**
+ * @private
+ */
+accessor['value']= {
+    get:function(){ return this.value || null }
+    ,set:function(name,newValue){
+        this.value=newValue ;
+        return PropertyEvent.CHANGE;
+    }
+};
+
+/**
+ * 获取设置表单元素的值。此方法只会对表单元素有用。
+ * @returns {string|Element}
+ */
+Element.prototype.value=function value( val )
+{
+    return access.call(this,'value','value',val);
+};
+
+/**
+ * 判断是否有指定的类名
+ * @param className
+ * @returns {boolean}
+ */
+Element.prototype.hasClass=function hasClass( className )
+{
+    if( typeof className !=='string' )
+    {
+        throw new Error("className is not String");
+    }
+    var value=this.property("class");
+    if( !value ) return false;
+    return new RegExp('(\\s|^)' + className + '(\\s|$)').test(  System.trim(value) );
+};
+
+/**
+ * 添加指定的类名
+ * @param className
+ * @returns {Element}
+ */
+Element.prototype.addClass=function addClass( className , replace )
+{
+    if( typeof className !== "string" )throw new Error('className is not String');
+    className = System.trim( className );
+    var exp = replace===true ? null : new RegExp('(\\s|^)' + className + '(\\s|$)');
+    this.forEach(function(elem){
+        if( !hasStyle(elem) )return;
+        var old = System.trim( this.property("class") || '' );
+        if (!( old && exp && exp.test(old) )) {
+            var oldClass = [old];
+            var newValue = className;
+            if (replace !== true) {
+                oldClass.push(className);
+                newValue = oldClass.join(' ');
+            }
+            elem['className'] = newValue;
+            if (this.hasEventListener(StyleEvent.CHANGE)) {
+                var event = new StyleEvent(StyleEvent.CHANGE);
+                event.property = 'class';
+                event.newValue = newValue;
+                event.oldValue = old;
+                if (!this.dispatchEvent(event)) {
+                    elem['className'] = old;
+                }
+            }
+            try{elem.offsetWidth = elem.offsetWidth}catch(e){};
+        }
+    });
+    return this;
+};
+
+/**
+ * 移除指定的类名或者清除所有的类名。
+ * @param className
+ * @returns {Element}
+ */
+Element.prototype.removeClass=function removeClass( className )
+{
+    var all = !className || typeof className !== 'string';
+    return this.forEach(function(elem){
+        if(!hasStyle(elem))return;
+        var old = elem['className']||'';
+        var newValue = !all && old ? old.replace( new RegExp('(\\s|^)' + className + '(\\s|$)'), ' ') : '';
+        this.addClass(newValue, true);
+    });
+};
+
+/**
+ * 获取设置元素宽度
+ * @param value
+ * @returns {int|Element}
+ */
+Element.prototype.width=function width( value )
+{
+    if( value == null )
+    {
+        return parseFloat( fix.getsizeval.call(this.current(),'Width') );
+    }
+    access.call(this,'style','width',value);
+    return this;
+};
+
+/**
+ * 获取设置元素高度
+ * @param value
+ * @returns {int|Element}
+ */
+Element.prototype.height=function height( value )
+{
+    if( value == null )
+    {
+        return parseFloat( fix.getsizeval.call(this.current(),'Height') );
+    }
+    access.call(this,'style','height',value);
+    return this;
+};
+
+/**
+ * 为当前选择的元素集应用动画效果
+ * @param name  动画名
+ * @param duration 持续时间
+ * @param timing 运行函数名  linear ease ease-in ease-out ease-in-out cubic-bezier(n,n,n,n)
+ * @param delay  延时
+ * @param count 重复次数
+ * @param direction 是否应该轮流反向播放动画
+ * @param fillMode 属性规定动画在播放之前或之后，其动画效果是否可见  none | forwards | backwards | both
+ */
+Element.prototype.animation=function animation(name, duration, timing, delay, count, direction, fillMode)
+{
+    var cmd = name+" "+(duration || 3)+"s "+(timing ||"ease");
+    if(delay>0)cmd+=" "+delay+"s";
+    if(count>1)cmd+=" "+count;
+    if(direction)cmd+=" alternate";
+    if(!fillMode)fillMode = "both";
+    cmd+=" "+fillMode;
+    this.style("animation","unset");
+    this.style("animation",cmd);
+    return this;
+}
+
+/**
+ * 淡入效果
+ * @param duration
+ * @param opacity
+ */
+Element.prototype.fadeIn=function(duration, opacity)
+{
+    var name = "fadeIn";
+    if( opacity>0 && opacity < 1)
+    {
+        name = Element.createAnimationStyleSheet("fadeIn_0_"+opacity,{from:{"opacity":0},to:{"opacity":opacity}});
+    }
+    this.animation(name,duration,"linear");
+    return this;
+}
+
+/**
+ * 淡出效果
+ * @param duration
+ * @param opacity
+ */
+Element.prototype.fadeOut=function(duration, opacity)
+{
+    var name = "fadeOut";
+    if( opacity>0 && opacity<1)
+    {
+        name = Element.createAnimationStyleSheet("fadeOut_"+opacity+"_0",{from:{"opacity":opacity},to:{"opacity":0}});
+    }
+    this.animation(name,duration,"linear");
+    return this;
+}
+
+/**
+ * @private
+ */
+accessor['scroll']={
+    get:function(prop){
+        var e = this.defaultView || this.parentWindow || this;
+        var p= 'scroll'+prop;
+        return parseInt( Element.isWindow( e ) ? e[ prop.toLowerCase()==='top'?'pageYOffset':'pageXOffset'] || e.document.documentElement[p] || e.document.body[p] : e[p] );
+    },
+    set:function(prop,newValue,obj)
+    {
+        var e = this.defaultView || this.parentWindow || this;
+        var old = accessor.scroll.get.call(this, prop);
+        if( newValue == old )return;
+        if( obj.style('position')==='static' )obj.style('position','relative');
+        if(typeof e.scrollTo === "function")
+        {
+            var param = [newValue,NaN];
+            if( prop.toLowerCase()==='top' )param = param.reverse();
+            e.scrollTo.apply(e, param );
+
+        } else
+        {
+            e['scroll'+prop] = newValue;
+        }
+        if( this.hasEventListener.call( ScrollEvent.CHANGE ) )
+        {
+            var event = new ScrollEvent( ScrollEvent.CHANGE );
+            event.property = prop.toLowerCase();
+            event.newValue = newValue;
+            event.oldValue = old;
+            return event;
+        }
+    }
+};
+
+/**
+ * 获取设置滚动条顶部的位置
+ * @param value
+ */
+Element.prototype.scrollTop=function scrollTop(value)
+{
+    return access.call(this,'scroll','Top',value);
+};
+
+/**
+ * 获取设置滚动条左部的位置
+ * @param value
+ */
+Element.prototype.scrollLeft=function scrollLeft(value)
+{
+    return access.call(this,'scroll','Left',value);
+};
+
+/**
+ * 获取滚动条的宽度
+ * @param value
+ */
+Element.prototype.scrollWidth=function scrollWidth()
+{
+    return access.call(this,'scroll','Width');
+};
+
+/**
+ * 获取滚动条的高度
+ * @param value
+ */
+Element.prototype.scrollHeight=function scrollHeight()
+{
+    return access.call(this,'scroll','Height');
+};
+
+/**
+ * 获取元素相对文档页面边界的矩形坐标。
+ * 如果元素的 position = fixed 或者 force=== true 则相对浏览器窗口的位置
+ * @param NodeElement elem
+ * @param boolean force 是否为全局坐标
+ * @returns {left,top,right,bottom,width,height}
+ */
+Element.prototype.getBoundingRect=function getBoundingRect( force )
+{
+    var value={ 'top': 0, 'left': 0 ,'right' : 0,'bottom':0,'width':0,'height':0};
+    var elem= this.current();
+    if( Element.isWindow(elem) )
+    {
+        value.left = elem.screenLeft || elem.screenX;
+        value.top = elem.screenTop || elem.screenY;
+        value.width = this.width();
+        value.height = this.height();
+        value.right = value.width + value.left;
+        value.bottom = value.height + value.top;
+        return value;
+    }
+
+    if( !Element.isNodeElement( elem ) )
+        throw new Error('invalid elem. elem not is NodeElement');
+
+    var doc =  elem.ownerDocument || elem, docElem=doc.documentElement;
+    this.current( Element.getWindow( doc ) );
+    var scrollTop = this.scrollTop();
+    var scrollLeft = this.scrollLeft();
+    this.current( elem );
+
+    if( "getBoundingClientRect" in document.documentElement )
+    {
+        var box = elem.getBoundingClientRect();
+        var clientTop = docElem.clientTop || doc.body.clientTop || 0,
+            clientLeft = docElem.clientLeft || doc.body.clientLeft || 0;
+
+        value.top = box.top + scrollTop - clientTop;
+        value.left = box.left + scrollLeft - clientLeft;
+        value.right = box.right + scrollLeft - clientLeft;
+        value.bottom = box.bottom + scrollTop - clientTop;
+        value.width = box.width || box.right-box.left;
+        value.height = box.height || box.bottom-box.top;
+
+    }else
+    {
+        value.width = this.width();
+        value.height= this.height();
+        do {
+            value.top += elem.offsetTop;
+            value.left += elem.offsetLeft;
+            elem = elem.offsetParent;
+        } while (elem);
+        value.right = value.width+value.left;
+        value.bottom = value.height+value.top;
+    }
+
+    //始终相对浏览器窗口的位置
+    if( this.style('position') === 'fixed' || force===true )
+    {
+        value.top -= scrollTop;
+        value.left -= scrollLeft;
+        value.right -= scrollLeft;
+        value.bottom -= scrollTop;
+    }
+    return value;
+};
+
+/**
+ * @private
+ */
+var position_hash={'absolute':true,'relative':true,'fixed':true};
+accessor['position']={
+    get:function(prop,obj){
+        return obj.getBoundingRect()[ prop ];
+    },
+    set:function(prop,newValue,obj){
+        var val = accessor.style.get.call(this,'position');
+        if( val && !position_hash[val] )
+        {
+            accessor.style.set.call(this,'position','relative');
+        }
+        return accessor.style.set.call(this,prop,newValue,obj);
+    }
+};
+
+/**
+ * 获取或者设置相对于父元素的左边位置
+ * @param number val
+ * @returns {number|Element}
+ */
+Element.prototype.left=function left( val )
+{
+    return access.call(this,'position','left',val)
+};
+
+/**
+ * 获取或者设置相对于父元素的顶边位置
+ * @param number val
+ * @returns {number|Element}
+ */
+Element.prototype.top=function top(val )
+{
+    return access.call(this,'position','top',val)
+};
+
+/**
+ * 获取或者设置相对于父元素的右边位置
+ * @param number val
+ * @returns {number|Element}
+ */
+Element.prototype.right=function right(val )
+{
+    return access.call(this,'position','right',val)
+};
+
+/**
+ * 获取或者设置相对于父元素的底端位置
+ * @param number val
+ * @returns {number|Element}
+ */
+Element.prototype.bottom=function bottom(val )
+{
+    return access.call(this,'position','bottom',val)
+};
+
+/**
+ * @private
+ */
+function point(left, top, local )
+{
+    var old = storage(this,'forEachCurrentItem');
+    var target = this.current();
+    this.current( target.parentNode );
+    var offset=this.getBoundingRect();
+    this.current( old );
+    left = left || 0;
+    top = top || 0;
+    return local===true ? {left:offset.left+left,top:offset.top+top} : {left:left-offset.left, top:top-offset.top};
+}
+
+/**
+ *  将本地坐标点转成相对视图的全局点
+ *  @param left
+ *  @param top
+ *  @returns {object} left top
+ */
+Element.prototype.localToGlobal=function localToGlobal(left, top)
+{
+    return point.call(this,left, top, true);
+};
+
+/**
+ *  将视图的全局点转成相对本地坐标点
+ *  @param left
+ *  @param top
+ *  @returns {object}  left top
+ */
+Element.prototype.globalToLocal=function globalToLocal(left, top )
+{
+    return point.call(this,left, top);
+};
+
+//============================================元素选择===================================
+
+/**
+ * 查找当前匹配的第一个元素下的指定选择器的元素
+ * @param selector
+ * @returns {Element}
+ */
+Element.prototype.find=function find( selector )
+{
+    if( selector == null )
+    {
+        throw new TypeError("selector is null or is undefined");
+    }
+    var resutls = [];
+    if( typeof selector === "function" )
+    {
+        resutls= Array.prototype.filter.call( this.slice(0), function(elem){
+            this.current(elem);
+            return selector.call(this,elem);
+        },this);
+
+    }else
+    {
+        this.forEach(function (elem) {
+            if (elem === selector) {
+                resutls = [elem];
+                return elem;
+            }
+            resutls = [].concat.apply(resutls, querySelector(selector, elem));
+        });
+    }
+    return makeElement( new Element() , resutls );
+};
+
+/**
+ * 查找所有匹配元素的父级元素或者指定selector的父级元素（不包括祖辈元素）
+ * @param selector
+ * @returns {Element}
+ */
+Element.prototype.parent=function parent( selector )
+{
+    return makeElement( new Element() , recursion.call(this,"parentNode",selector) );
+};
+
+/**
+ * 查找所有匹配元素的祖辈元素或者指定 selector 的祖辈元素。
+ * 如果指定了 selector 则返回最近的祖辈元素
+ * @param selector
+ * @returns {Element}
+ */
+Element.prototype.parents=function parents( selector )
+{
+    return makeElement( new Element() , recursion.call(this,"parentNode",selector,true,document.body) );
+};
+
+/**
+ * 获取所有匹配元素向上的所有同辈元素,或者指定selector的同辈元素
+ * @param selector
+ * @returns {Element}
+ */
+Element.prototype.prevAll=function prevAll( selector )
+{
+    return makeElement( new Element() , recursion.call(this,"previousSibling",selector,true) );
+};
+
+/**
+ * 获取所有匹配元素紧邻的上一个同辈元素,或者指定selector的同辈元素
+ * @param selector
+ * @returns {Element}
+ */
+Element.prototype.prev=function prev( selector )
+{
+    return makeElement( new Element() ,recursion.call(this,"previousSibling",selector) );
+};
+
+/**
+ * 获取所有匹配元素向下的所有同辈元素或者指定selector的同辈元素
+ * @param selector
+ * @returns {Element}
+ */
+Element.prototype.nextAll=function nextAll( selector )
+{
+    return makeElement(new Element() ,recursion.call(this,"nextSibling",selector, true));
+};
+
+/**
+ * 获取每一个匹配元素紧邻的下一个同辈元素或者指定selector的同辈元素
+ * @param selector
+ * @returns {Element}
+ */
+Element.prototype.next=function next(selector )
+{
+    return makeElement( new Element() ,recursion.call(this,"nextSibling",selector) );
+};
+
+/**
+ * 获取每一个匹配元素的所有同辈元素
+ * @param selector
+ * @returns {Element}
+ */
+Element.prototype.siblings=function siblings( selector )
+{
+    var instance = makeElement( new Element(),recursion.call(this,"previousSibling",selector,true) );
+    makeElement(instance,recursion.call(this,"nextSibling",selector,true),instance.length);
+    return instance;
+};
+
+/**
+ * 查找所有匹配元素的所有子级元素，不包括孙元素
+ * @param selector 如果是 * 返回包括文本节点的所有元素。不指定返回所有HTMLElement元素。
+ * @returns {Element}
+ */
+Element.prototype.children=function children( selector )
+{
+    var results=[];
+    this.forEach(function(elem)
+    {
+        results = results.concat( getChildNodes( elem ) );
+    });
+    if( typeof selector === "function" )
+    {
+        results = Array.prototype.filter.call(results,selector);
+    }else if( selector ) {
+        results = querySelector(selector,null,null,results);
+    }
+    return makeElement( new Element(), results );
+};
+
+//========================操作元素===========================
+
+/**
+ * 获取或者设置 html
+ * @param htmlObject
+ * @returns {string | Element}
+ */
+Element.prototype.html=function html( htmlObject )
+{
+    var outer = htmlObject === true;
+    var write= !outer && typeof htmlObject !== "undefined";
+    if( !write && this.length < 1 ) return '';
+    var is = false;
+    if( write && htmlObject )
+    {
+        if( typeof htmlObject === "string" )
+        {
+            htmlObject = System.trim( htmlObject ).replace(/[\r\n\t]+/g,'');
+
+        }else if( htmlObject instanceof Element )
+        {
+            htmlObject = htmlObject.current();
+            is = true;
+        }else if( Element.isNodeElement(htmlObject) )
+        {
+            is = true;
+        }
+    }
+    return this.forEach(function(elem)
+    {
+        if( !write )
+        {
+            htmlObject=elem.innerHTML;
+            if( outer )
+            {
+                if( typeof elem.outerHTML==='string' )
+                {
+                    htmlObject=elem.outerHTML;
+                }else
+                {
+                    var cloneElem=cloneNode( elem, true);
+                    if( cloneElem )
+                    {
+                        htmlObject=document.createElement( 'div' ).appendChild( cloneElem ).innerHTML;
+                    }
+                }
+            }
+            return htmlObject;
+        }
+
+        //清空所有的子节点
+        while( elem.hasChildNodes() )
+        {
+            this.removeChild( elem.childNodes.item(0) );
+        }
+        
+        //如果是一个节点对象
+        if(is)
+        {
+            return this.addChild( htmlObject );
+        }
+        try
+        {
+            elem.innerHTML = htmlObject;
+            if( System.env.platform(System.env.BROWSER_IE,8) )
+            {
+               switch ( Element.getNodeName(elem) ){
+                   case "thead" :
+                   case "tbody":
+                   case "tfoot":
+                   case "table":
+                   case "tr":
+                   case "th":
+                   case "td":
+                       this[ this.indexOf( elem ) ] = replaceHtmlElement(elem, htmlObject);
+               }
+            }
+
+        } catch (e)
+        {
+            this[ this.indexOf( elem ) ] = replaceHtmlElement(elem, htmlObject);
+        }
+    });
+};
+
+/**
+ * 替换一个html元素
+ * @param elem
+ * @param htmlObject
+ * @return {Node}
+ */
+function replaceHtmlElement(elem, htmlObject )
+{
+    var nodename = Element.getNodeName(elem);
+    if ( !( new RegExp("^<" + nodename,'i').exec(htmlObject) ) )
+    {
+        htmlObject ="<"+nodename+">"+htmlObject+"</"+nodename+">";
+    }
+
+    var child = createElement(htmlObject,false,true);
+
+    //thead,tbody,tfoot,tr,th,td
+    if( Element.getNodeName(child.childNodes[0]) === nodename )
+    {
+        child = child.childNodes[0];
+        child.parentNode.removeChild( child );
+    }
+
+    mergeAttributes(child, elem);
+    var parent = elem.parentNode;
+    if( !parent ){
+        parent = document.createElement("div");
+        parent.appendChild( elem );
+        parent.replaceChild(child, elem);
+        parent.removeChild(child);
+    }else {
+        parent.replaceChild(child, elem);
+    }
+    return child;
+}
+
+/**
+ * 添加子级元素（所有已匹配的元素）
+ * @param childElemnet
+ * @returns {Element}
+ */
+Element.prototype.addChild=function addChild(childElemnet)
+{
+    return this.addChildAt(childElemnet,-1);
+};
+
+/**
+ * 在指定位置加子级元素（所有已匹配的元素）。
+ * 如果 childElemnet 是一个已存在的元素，那么会先删除后再添加到当前匹配的元素中后返回，后续匹配的元素不会再添加此元素。
+ * @param childElemnet 要添加的子级元素
+ * @param index | refChild | fn(node,index,parent)  要添加到的索引位置
+ * @returns {Element}
+ */
+Element.prototype.addChildAt=function addChildAt( childElemnet, index )
+{
+     if( System.isNaN(index) )throw new Error('Invalid param the index in addChildAt');
+     if( System.instanceOf(childElemnet,Element) )
+     {
+         childElemnet.forEach(function(child,at) {
+             this.addChildAt(child, !isNaN(at) ? at+index : index );
+         },this);
+         return childElemnet;
+     }
+     if( !Element.isNodeElement( childElemnet ) )
+     {
+         throw new TypeError('is not Element in addChildAt');
+     }
+     var parent = this.current();
+     if( !Element.isHTMLElement( parent ) )
+     {
+        throw new Error('parent is null of child elemnet in addChildAt');
+     }
+
+    var refChild=index===-1 ? null : this.getChildAt(index);
+    if( childElemnet.parentNode )this.removeChild( childElemnet );
+    parent.insertBefore( childElemnet , refChild || null );
+    if( Element.getNodeName(childElemnet)==="#document-fragment" )
+    {
+        childElemnet['parent-element'] = parent;
+    }
+    dispatchEvent( new EventDispatcher( childElemnet ) ,ElementEvent.ADD, parent, childElemnet );
+    dispatchEvent( new EventDispatcher( parent ) , ElementEvent.CHANGE, parent, childElemnet );
+    if( this.isNodeInDocumentChain() ){
+        dispatchAddToDocumentEvent(parent,childElemnet );
+    }
+    return childElemnet;
+};
+
+/**
+ * 触发元素已经添加到文档中事件
+ * @param parent
+ * @param child
+ */
+function dispatchAddToDocumentEvent( parent, child )
+{
+    dispatchEvent( new EventDispatcher( child ) , ElementEvent.ADD_TO_DOCUMENT, parent, child);
+    if( child.hasChildNodes() && child.childNodes.length > 0 )
+    {
+        for(var i=0; i<child.childNodes.length;i++)
+        {
+            dispatchAddToDocumentEvent( child, child.childNodes.item(i) )
+        }
+    }
+}
+
+/**
+ * 返回指定索引位置的子级元素( 匹配选择器的第一个元素 )
+ * 此方法只会计算节点类型为1的元素。
+ * @param index | refChild | fn(node,index,parent)
+ * @returns {Node|null}
+ */
+Element.prototype.getChildAt=function getChildAt( index )
+{
+    if( typeof index !== 'number' )throw new TypeError("index is not Number");
+    var elem = this.current();
+    if( !elem || !elem.hasChildNodes() )return null;
+    var childNodes = getChildNodes(elem);
+    index=index < 0 ? index+childNodes.length : index;
+    return index >= 0 && index < childNodes.length ? childNodes[index] : null;
+};
+
+/**
+ * 返回子级元素相对于父元素的索引位置( 匹配选择器的第一个元素 )
+ * @param childElemnet | selector
+ * @returns {Number}
+ */
+Element.prototype.getChildIndex=function getChildIndex( childElemnet )
+{
+    if( childElemnet instanceof Element )
+    {
+        childElemnet = childElemnet.current();
+    }
+    if( !Element.isNodeElement(childElemnet)  )
+    {
+        throw new TypeError('is not HTMLElement in getChildIndex');
+    }
+    var parent = childElemnet.parentNode;
+    if( !parent || !parent.hasChildNodes() )return -1;
+    var childNodes = getChildNodes(parent);
+    return Array.prototype.indexOf.call( childNodes, childElemnet);
+};
+
+/**
+ * 移除指定的子级元素
+ * @param childElemnet|selector
+ * @returns {Element}
+ */
+Element.prototype.removeChild=function removeChild( childElemnet )
+{
+    if( System.instanceOf(childElemnet,Element) )
+    {
+        childElemnet = childElemnet.current();
+    }
+    if( !Element.isNodeElement(childElemnet) )
+    {
+        throw new TypeError('is not HTMLElement in removeChild');
+    }
+
+    var parent = childElemnet.parentNode;
+    if( !parent && Element.getNodeName(childElemnet)==="#document-fragment" )
+    {
+        parent = childElemnet['parent-element'];
+        if( parent )
+        {
+            var elem = new Element( parent )
+            while ( parent.childNodes.length > 0 )
+            {
+               elem.removeChild( parent.childNodes[0] );
+            }
+        }
+        return childElemnet;
+    }
+    if( parent === this.current() )
+    {
+        var nodeChild=parent.removeChild(childElemnet);
+        dispatchEveryRemoveEvent(parent, childElemnet);
+        dispatchEvent( new EventDispatcher( parent ) , ElementEvent.CHANGE, parent, childElemnet );
+        nodeChild = null;
+    }
+    return childElemnet;
+};
+
+/**
+ * 触发每一个元素的删除事件
+ * @param parent
+ * @param child
+ */
+function dispatchEveryRemoveEvent( parent, child )
+{
+    dispatchEvent( new EventDispatcher( child ) , ElementEvent.REMOVE, parent, child);
+    if(child.hasChildNodes() && child.childNodes.length > 0 )
+    {
+        for(var i=0; i<child.childNodes.length;i++)
+        {
+            dispatchEveryRemoveEvent( child, child.childNodes.item(i) )
+        }
+    }
+}
+
+/**
+ * 移除子级元素
+ * @param childElemnet|index|fn  允许是一个节点元素或者是相对于节点列表中的索引位置（不包括文本节点）。
+ *        也可以是一个回调函数过滤要删除的子节点元素。
+ * @returns {Element}
+ */
+Element.prototype.removeChildAt=function removeChildAt( index )
+{
+    var child= this.getChildAt( index );
+    if( !child )
+    {
+        throw new Error('Not found child. in removeChildAt');
+    }
+    return this.removeChild( child );
+};
+
+/**
+ * 判断是否这空的集合
+ * @returns {boolean}
+ */
+Element.prototype.isEmpty=function isEmpty()
+{
+    return !(this.length > 0);
+}
+
+/**
+ * 判断当前元素节点是否在文档链中
+ * @returns {boolean}
+ */
+Element.prototype.isNodeInDocumentChain=function isNodeInDocumentChain()
+{
+    var node = this.current();
+    return node && Element.contains(document.documentElement, node);
+}
+
+/**
+ * 测试指定的元素（或者是一个选择器）是否为当前元素的子级
+ * @param parent
+ * @param child
+ * @returns {boolean}
+ */
+Element.contains=function contains(parent,child)
+{
+    if( !parent || !child )return false;
+    if( parent instanceof Element )parent = parent.current();
+    if( child instanceof Element )child = child.current();
+    if( Element.isWindow(parent) )
+    {
+        parent = document.documentElement;
+    }
+    if( Element.isNodeElement(child) && Element.isNodeElement(parent) )
+    {
+        if('contains' in parent){
+            return parent.contains( child ) && parent !== child;
+        }
+        if( parent.compareDocumentPosition )
+        {
+            return !!(parent.compareDocumentPosition(child) & 16) && parent !== child;
+        }
+    }
+    return querySelector( child, parent ).length > 0;
+};
+
+/**
+ * 判断两个元素是否一致
+ * 如果指定的是一个元素对象（Element）， 那么会检查每一个元素都相等，只有所有的元素集都一致才会返回 true 反之 false。
+ * 如果指定的参数为同一个对象也会返回true。
+ * 此方法主要是比较集合元素，并非是元素对象(Element)
+ * @param a
+ * @param b
+ */
+Element.equal=function equal( a, b )
+{
+    if( a === b )return true;
+    if( !a || !b )return false;
+    var a1 = a instanceof Element ? a.slice(0) : [a];
+    var b1 = b instanceof Element ? b.slice(0) : [b];
+    if( a1.length != b1.length )return false;
+    var i=0;
+    var items = a1.concat(b1);
+    var len   = items.length;
+    for(;i<len;i++)
+    {
+        if( Element.isNodeElement( items[i] ) )
+        {
+            if( a1.indexOf(items[i]) < 0 || b1.indexOf(items[i]) < 0 )
+            {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+/**
+ * @private
+ * @type {boolean}
+ */
+var ishtmlobject = typeof HTMLElement==='object';
+
+/**
+ * 判断是否为一个HtmlElement类型元素,document 不属性于 HtmlElement
+ * @returns {boolean}
+ */
+Element.isHTMLElement=function isHTMLElement( elem )
+{
+    if( !elem )return false;
+    return ishtmlobject ? elem instanceof HTMLElement : ( (elem.nodeType === 1 || elem.nodeType === 11) && typeof elem.nodeName === "string" );
+};
+
+
+/**
+ * 判断是否为一个表单元素
+ * @returns {boolean}
+ */
+Element.isForm=function isForm(elem, exclude)
+{
+    if( elem )
+    {
+        var nodename = Element.getNodeName(elem);
+        switch ( nodename )
+        {
+            case 'select'   :
+            case 'input'    :
+            case 'textarea' :
+            case 'button'   :
+                return exclude && typeof exclude === 'string' ? exclude.toLowerCase() !== nodename : true;
+        }
+    }
+    return false;
+};
+
+/**
+ * 判断是否为一个节点类型元素
+ * document window 不属于节点类型元素
+ * @returns {boolean}
+ */
+var hasNode= typeof Node !== "undefined";
+Element.isNodeElement=function isNodeElement( elem )
+{
+    if( !elem || typeof elem !== "object" ) return false;
+    return hasNode ? elem instanceof Node : elem.nodeType && (typeof elem.nodeName === "string" || typeof elem.tagName === "string" || elem.nodeName==="#document-fragment");
+};
+
+
+/**
+ * 判断是否为一个html容器元素。
+ * HTMLElement和document属于Html容器
+ * @param element
+ * @returns {boolean|*|boolean}
+ */
+Element.isHTMLContainer=function isHTMLContainer( elem )
+{
+    return elem && ( Element.isHTMLElement(elem) || Element.isDocument(elem) );
+};
+
+/**
+ * 判断是否为一个事件元素
+ * @param element
+ * @returns {boolean}
+ */
+Element.isEventElement=function isEventElement( elem )
+{
+    return elem && ( typeof elem.addEventListener === "function" || typeof elem.attachEvent=== "function" || typeof elem.onreadystatechange !== "undefined" );
+};
+
+/**
+ * 判断是否为窗口对象
+ * @param obj
+ * @returns {boolean}
+ */
+Element.isWindow=function isWindow( elem )
+{
+    return elem && elem == Element.getWindow(elem);
+};
+
+/**
+ * 决断是否为文档对象
+ * @returns {*|boolean}
+ */
+Element.isDocument=function isDocument( elem )
+{
+    return elem && elem.nodeType===9;
+};
+
+/**
+ * 判断是否为一个框架元素
+ * @returns {boolean}
+ */
+Element.isFrame=function isFrame( elem )
+{
+    var nodename = Element.getNodeName(elem);
+    return (nodename === 'iframe' || nodename === 'frame');
+};
+
+
+/**
+ * 获取元素所在的窗口对象
+ * @param elem
+ * @returns {window|null}
+ */
+Element.getWindow=function getWindow( elem )
+{
+    if( elem && typeof elem === "object" )
+    {
+        elem = elem.ownerDocument || elem;
+        return elem.window || elem.defaultView || elem.contentWindow || elem.parentWindow || window || null;
+    }
+    return null;
+};
+
+/**
+ * 以小写的形式返回元素的节点名
+ * @returns {string}
+ */
+Element.getNodeName = function getNodeName( elem )
+{
+    return elem && elem.nodeName && typeof elem.nodeName=== "string" ? elem.nodeName.toLowerCase() : '';
+};
+
+
+// fix style name add prefix
+if( System.env.platform( System.env.BROWSER_FIREFOX ) && System.env.version(4) )
+{
+    fix.cssPrefixName='-moz-';
+}else if( System.env.platform( System.env.BROWSER_SAFARI )  || System.env.platform( System.env.BROWSER_CHROME ) )
+{
+    fix.cssPrefixName='-webkit-';
+}else if( System.env.platform(System.env.BROWSER_OPERA) )
+{
+    fix.cssPrefixName='-o-';
+}else if( System.env.platform(System.env.BROWSER_IE) && System.env.version(9,'>=') )
+{
+    fix.cssPrefixName='-ms-';
+}
+
+if( fix.cssPrefixName==="-webkit-" && typeof Event !== "undefined" )
+{
+    Event.fix.cssprefix="webkit";
+}
+
+//set hooks for userSelect style
+fix.cssHooks.userSelect={
+    get: function( style )
+    {
+        return style[ getStyleName('userSelect') ] || '';
+    },
+    set: function( style, value )
+    {
+        style[ getStyleName('userSelect') ] = value;
+        style['-moz-user-fetch'] = value;
+        style['-webkit-touch-callout'] = value;
+        style['-khtml-user-fetch'] = value;
+        return true;
+    }
+};
+
+//set hooks for radialGradient and linearGradient style
+fix.cssHooks.radialGradient=fix.cssHooks.linearGradient={
+
+    get: function( style, name )
+    {
+        return storage(this, name ) || '';
+    },
+    set: function( style, value, name )
+    {
+        value = System.trim(value);
+        storage(this, name , value);
+        if( ( System.env.platform(System.env.BROWSER_SAFARI) && System.env.version(5.1,'<') )  ||
+            ( System.env.platform(System.env.BROWSER_CHROME) && System.env.version(10,'<') ) )
+        {
+            var position='';
+            var deg= 0;
+            if(name==='radialGradient')
+            {
+                position=value.match(/([^\#]*)/);
+                if( position ){
+                    position = position[1].replace(/\,\s*$/,'');
+                    value=value.replace(/([^\#]*)/,'')
+                }
+                value = value.split(',');
+            }else
+            {
+                var deg = value.match(/^(\d+)deg/);
+                value = value.split(',');
+                if( deg )
+                {
+                    deg = deg[1];
+                    value.splice(0,1);
+                }
+                deg=System.parseFloat(deg) || 0;
+            }
+            var color = [];
+            for(var i=0; i<value.length; i++)
+            {
+                var item = System.trim(value[i]).split(/\s+/,2);
+                if( i===0 )color.push("from("+item[0]+")");
+                if( !(i===0 || i===value.length-1 ) || typeof item[1] !== "undefined"  )
+                {
+                    var num = (item[1]>>0) / 100;
+                    color.push( "color-stop("+num+","+item[0]+")" );
+                }
+                if( i===value.length-1 )
+                    color.push("to("+item[0]+")");
+            }
+
+            var width= fix.getsizeval.call(this,'Width');
+            var height= fix.getsizeval.call(this,'Height');
+            if(name==='radialGradient')
+            {
+                position = position.split(/\,/,2);
+                var point = System.trim(position[0]).split(/\s+/,2);
+                if(point.length===1)point.push('50%');
+                var point = point.join(' ');
+                position=point+',0, '+point+', '+width/2;
+                value=System.sprintf("%s,%s,%s",'radial',position,color.join(',') );
+
+            }else{
+
+                var x1=Math.cos(  deg*(Math.PI/180) );
+                var y1=Math.sin(  deg*(Math.PI/180) );
+                value=System.sprintf("%s,0% 0%,%s %s,%s",'linear',Math.round(x1*width),Math.round(y1*height),color.join(',') );
+            }
+            name='gradient';
+
+        }else if( !value.match(/^(left|top|right|bottom|\d+)/) && name==='linearGradient' )
+        {
+            value= '0deg,'+value;
+
+        }else if( name==='linearGradient' )
+        {
+            value= value.replace(/^(\d+)(deg)?/,'$1deg')
+        }
+
+        var prop = 'background-image';
+        if( System.env.platform(System.env.BROWSER_IE,9) )
+        {
+            value=value.split(',');
+            var deg = value.splice(0,1).toString();
+            deg = parseFloat( deg ) || 0;
+            var color=[];
+            for(var i=0; i<value.length; i++)
+            {
+                var item = System.trim(value[i]).split(/\s+/,2);
+                color.push( i%1===1 ? "startColorstr='"+item[0]+"'" :  "endColorstr='"+item[0]+"'" );
+            }
+            var type = deg % 90===0 ? '1' : '0';
+            var linear = name==='linearGradient' ? '1' : '2';
+            value = 'alpha(opacity=100 style='+linear+' startx=0,starty=5,finishx=90,finishy=60);';
+            value= style.filter || '';
+            value += System.sprintf(";progid:DXImageTransform.Microsoft.gradient(%s, GradientType=%s);",color.join(','), type );
+            value += "progid:DXImageTransform.Microsoft.gradient(enabled = false);";
+            prop='filter';
+
+        }else
+        {
+            value= System.sprintf('%s(%s)', getStyleName( name ) , value ) ;
+        }
+        style[ prop ] = value ;
+        return true;
+    }
+};
+
+//@internal Element.fix;
+Element.fix = fix;
+Element.createElement = createElement;
+Element.querySelector=querySelector;
+
+/**
+ * @private
+ */
+var animationSupport=null;
+
+/**
+ * 判断是否支持css3动画
+ * @returns {boolean}
+ */
+Element.isAnimationSupport = function isAnimationSupport()
+{
+    if( animationSupport === null )
+    {
+        var prefix = fix.cssPrefixName;
+        var div = Element.createElement('div');
+        var prop = prefix+'animation-play-state';
+        div.style[prop] = 'paused';
+        animationSupport = div.style[prop] === 'paused';
+    }
+    return animationSupport;
+};
+
+var createdAnimationHash = {};
+
+/**
+ * 生成css3样式动画
+ * properties={
+*    '0%':'left:10px;',
+*    '100%':'left:100px;'
+* }
+ */
+Element.createAnimationStyleSheet=function(stylename, properties)
+{
+    if( !Element.isAnimationSupport() )return false;
+    stylename = stylename.replace(".","_");
+    var css=["{"];
+    if( createdAnimationHash[stylename] ===true )
+    {
+        return stylename;
+    }
+    createdAnimationHash[stylename] = true;
+    for( var i in properties )
+    {
+        css.push( i + ' {');
+        if( System.isObject(properties[i]) )
+        {
+            css.push( System.serialize( properties[i], 'style' ) );
+        }else
+        {
+            css.push( properties[i] );
+        }
+        css.push( '}' );
+    }
+    css.push('}');
+
+    if( Element.addStyleSheet( '@'+fix.cssPrefixName+'keyframes '+stylename, css.join("\r\n") ) )
+    {
+        return stylename;
+    }
+    return null;
+};
+
+/**
+ * @private
+ */
+var headStyle =null;
+
+/**
+ * @param string style
+ */
+Element.addStyleSheet=function addStyleSheet(styleName, StyleSheetObject)
+{
+    if( headStyle=== null )
+    {
+        var head = document.getElementsByTagName('head')[0];
+        headStyle = document.createElement('style');
+        head.appendChild( headStyle );
+    }
+
+    if( System.isObject(StyleSheetObject) )
+    {
+        StyleSheetObject= formatStyleSheet(StyleSheetObject,'object');
+    }else {
+        StyleSheetObject = formatStyleSheet( System.trim(StyleSheetObject) ,'string');
+    }
+
+    if( System.env.platform( System.env.BROWSER_IE, 8 ) )
+    {
+        var styleName = styleName.split(',');
+        var styleSheet = headStyle.styleSheet;
+        StyleSheetObject = StyleSheetObject.replace(/^\{/,'').replace(/\}$/,'');
+        try {
+            for (var i = 0; i < styleName.length; i++) {
+                if (styleSheet.insertRule) {
+                    styleSheet.insertRule(styleName + '{' + StyleSheetObject + '}', styleSheet.cssRules.length);
+                }
+                else {
+                    styleSheet.addRule(styleName[i], StyleSheetObject, -1);
+                }
+            }
+        }catch (e){}
+
+    }else
+    {
+        if (StyleSheetObject.charAt(0) !== '{')
+        {
+            StyleSheetObject = '{' + StyleSheetObject + '}';
+        }
+        headStyle.appendChild( document.createTextNode(styleName + StyleSheetObject ) );
+    }
+    return true;
+};
+},
+
+/***** Class es/events/ApplicationEvent.es *****/
+
+"es/events/ApplicationEvent.es": function(module,require){
+function ApplicationEvent(type,bubbles,cancelable){
+	Object.defineProperty(this,__PRIVATE__,{value:{"container":undefined}});
+
+	if(cancelable === void 0 ){
+		cancelable=true;
+	}
+	if(bubbles === void 0 ){
+		bubbles=true;
+	}
+	Event.call(this,type,bubbles,cancelable);
+};
+module.exports=ApplicationEvent;
+var Event=require("system/Event.js");
+var Symbol=require("system/Symbol.js");
+var Object=require("system/Object.js");
+var Internal=require("system/Internal.js");
+var __PRIVATE__=Symbol("es.events.ApplicationEvent").valueOf();
+var method={"FETCH_ROOT_CONTAINER":{"value":'applicationFetchRootContainer',"type":16}
+};
+for(var prop in method){
+	Object.defineProperty(ApplicationEvent, prop, method[prop]);
+}
+var proto={"constructor":{"value":ApplicationEvent},"getContainer":{"value":function(){
+	return this[__PRIVATE__].container;
+},"type":2},"setContainer":{"value":function(val){
+	return this[__PRIVATE__].container=val;
+},"type":2}};
+ApplicationEvent.prototype=Object.create( Event.prototype , proto);
+Internal.defineClass("es.events.ApplicationEvent",ApplicationEvent,{
+	"extends":null,
+	"package":"es.events",
+	"classname":"ApplicationEvent",
+	"uri":["q32","S33","Z22"],
+	"privateSymbol":__PRIVATE__,
+	"method":method,
+	"proto":proto
+},1);
+
+},
+
+/***** Class es/interfaces/IDisplay.es *****/
+
+"es/interfaces/IDisplay.es": function(module,require){
+function IDisplay(){
+throw new TypeError("\"es.interfaces.IDisplay\" is not constructor.");
+};
+module.exports=IDisplay;
+var es_internal=require("es/core/es_internal.es");
+var IContainer=require("es/interfaces/IContainer.es");
+var Symbol=require("system/Symbol.js");
+var Object=require("system/Object.js");
+var Internal=require("system/Internal.js");
+var __PRIVATE__=Symbol("es.interfaces.IDisplay").valueOf();
+Internal.defineClass("es.interfaces.IDisplay",IDisplay,{
+	"package":"es.interfaces",
+	"classname":"IDisplay"
+},2);
+
+},
+
+/***** Class es/core/View.es *****/
+
+"es/core/View.es": function(module,require){
+function View(context){
+	Object.defineProperty(this,__PRIVATE__,{value:{"_context":undefined}});
+
+	Skin.call(this,context.getContainer());
+	this[__PRIVATE__]._context=context;
+};
+module.exports=View;
+var Application=require("es/core/Application.es");
+var Skin=require("es/core/Skin.es");
+var Element=require("system/Element.js");
+var Event=require("system/Event.js");
+var Symbol=require("system/Symbol.js");
+var Object=require("system/Object.js");
+var Internal=require("system/Internal.js");
+var __PRIVATE__=Symbol("es.core.View").valueOf();
+var method={"CHARSET_GB2312":{"value":'GB2312',"type":16}
+,"CHARSET_GBK":{"value":'GBK',"type":16}
+,"CHARSET_UTF8":{"value":'UTF-8',"type":16}
+};
+for(var prop in method){
+	Object.defineProperty(View, prop, method[prop]);
+}
+var proto={"constructor":{"value":View},"i4__context":{"writable":true,"value":undefined,"type":8}
+,"getContext":{"value":function context(){
+	return this[__PRIVATE__]._context;
+},"type":2},"getTitle":{"value":function title(){
+	return this[__PRIVATE__]._context.getTitle();
+},"type":2},"setTitle":{"value":function title(value){
+	this[__PRIVATE__]._context.setTitle(value);
+},"type":4},"display":{"value":function display(){
+	var init=this.j2_getInitialized();
+	var elem=Skin.prototype.display.call(this);
+	if(!init&&this.hasEventListener("INTERNAL_BEFORE_CHILDREN")){
+		this.dispatchEvent(new Event("INTERNAL_BEFORE_CHILDREN"));
+	}
+	return elem;
+},"type":1}
+};
+View.prototype=Object.create( Skin.prototype , proto);
+Internal.defineClass("es.core.View",View,{
+	"extends":Skin,
+	"package":"es.core",
+	"classname":"View",
+	"uri":["i4","j2","Q5"],
+	"privateSymbol":__PRIVATE__,
+	"method":method,
+	"proto":proto
+},1);
+
+},
+
+/***** Class es/core/Skin.es *****/
+
+"es/core/Skin.es": function(module,require){
+function Skin(name,attr){
+	Object.defineProperty(this,__PRIVATE__,{value:{"_bindable":null,"_currentStateGroup":null,"initialized":false,"invalidate":false,"bindEventMaps":{},"elementMaps":{},"timeoutId":null,"callback":null,"_dataset":{},"_installer":null,"_watchMap":null,"_children":[],"statesGroup":{},"_currentState":null}});
+
+	if(attr === void 0 ){
+		attr=null;
+	}
+	var elem=null;
+	if(System.typeOf(name)==="string"){
+		elem=new Element(document.createElement(name));
+	}
+	else if(System.instanceOf(name, Element)){
+		elem=name;
+	}
+	else if(Element.isNodeElement(name)){
+		elem=new Element(name);
+	}
+	else if(System.is(name, IDisplay)){
+		elem=name.getElement();
+	}
+	Container.call(this,elem,attr);
+};
+module.exports=Skin;
+var SkinComponent=require("es/core/SkinComponent.es");
+var Container=require("es/core/Container.es");
+var SkinEvent=require("es/events/SkinEvent.es");
+var State=require("es/core/State.es");
+var IDisplay=require("es/interfaces/IDisplay.es");
+var IContainer=require("es/interfaces/IContainer.es");
+var IBindable=require("es/interfaces/IBindable.es");
+var System=require("system/System.js");
+var Element=require("system/Element.js");
+var Object=require("system/Object.js");
+var Array=require("system/Array.js");
+var Bindable=require("system/Bindable.js");
+var EventDispatcher=require("system/EventDispatcher.js");
+var Reflect=require("system/Reflect.js");
+var ElementEvent=require("system/ElementEvent.js");
+var Function=require("system/Function.js");
+var Map=require("system/Map.js");
+var Symbol=require("system/Symbol.js");
+var Internal=require("system/Internal.js");
+var __PRIVATE__=Symbol("es.core.Skin").valueOf();
+var method={};
+var proto={"constructor":{"value":Skin},"j2_render":{"value":function render(){
+	return this.getChildren().slice(0);
+},"type":1}
+,"s6__bindable":{"writable":true,"value":null,"type":8}
+,"j2_getBindable":{"value":function bindable(){
+	var value=this[__PRIVATE__]._bindable;
+	if(!value){
+		value=new Bindable(this,"*");
+		this[__PRIVATE__]._bindable=value;
+	}
+	return value;
+},"type":2},"s6__currentStateGroup":{"writable":true,"value":null,"type":8}
+,"j2_getCurrentStateGroup":{"value":function getCurrentStateGroup(){
+	var p;
+	var currentState=this[__PRIVATE__]._currentState;
+	if(!currentState){
+		throw new ReferenceError('State is not define.');
+	}
+	if(this[__PRIVATE__]._currentStateGroup){
+		return this[__PRIVATE__]._currentStateGroup;
+	}
+	var state=null;
+	var statesGroup=this[__PRIVATE__].statesGroup;
+	if(statesGroup.hasOwnProperty(currentState)){
+		state=statesGroup[currentState];
+		this[__PRIVATE__]._currentStateGroup=state;
+		return state;
+	}
+	for(p in statesGroup){
+		state=statesGroup[p];
+		if(state.includeIn(currentState)){
+			this[__PRIVATE__]._currentStateGroup=state;
+			return state;
+		}
+	}
+	throw new ReferenceError('"'+currentState+'"'+' is not define');
+},"type":1}
+,"j2_initializing":{"value":function initializing(){
+},"type":1}
+,"j2_updateDisplayList":{"value":function updateDisplayList(){
+},"type":1}
+,"j2_getInitialized":{"value":function(){
+	return this[__PRIVATE__].initialized;
+},"type":2},"j2_setInitialized":{"value":function(val){
+	return this[__PRIVATE__].initialized=val;
+},"type":2},"s6_invalidate":{"writable":true,"value":false,"type":8}
+,"j2_createChildren":{"value":function createChildren(){
+	var e;
+	var nodes;
+	if(this[__PRIVATE__].invalidate===false){
+		if(this[__PRIVATE__].timeoutId){
+			System.clearTimeout(this[__PRIVATE__].timeoutId);
+			this[__PRIVATE__].timeoutId=null;
+		}
+		this[__PRIVATE__].invalidate=true;
+		nodes=this.j2_render();
+		this.j2_updateChildren(this,nodes);
+		this.s6_updateInstallState();
+		this.j2_updateDisplayList();
+		if(this.hasEventListener(SkinEvent.UPDATE_DISPLAY_LIST)){
+			e=new SkinEvent(SkinEvent.UPDATE_DISPLAY_LIST);
+			e.setChildren(nodes);
+			this.dispatchEvent(e);
+		}
+	}
+},"type":1}
+,"s6_bindEventMaps":{"writable":true,"value":{},"type":8}
+,"j2_bindEvent":{"value":function bindEvent(index,uniqueKey,target,events){
+	var p;
+	var uukey=(index+""+uniqueKey);
+	var data=this[__PRIVATE__].bindEventMaps[uukey];
+	if(!data){
+		data={items:{},origin:target};
+		this[__PRIVATE__].bindEventMaps[uukey]=data;
+		if(System.instanceOf(target, EventDispatcher)){
+			data.eventTarget=target;
+		}
+		else {
+			data.eventTarget=new EventDispatcher(target);
+		}
+	}
+	for(p in events){
+		if(Reflect.get(Skin,data.items,p)!==events[p]){
+			if(Reflect.get(Skin,data.items,p)){
+				Reflect.call(Skin,data.eventTarget,"removeEventListener",[p,Reflect.get(Skin,data.items,p)]);
+			}
+			if(events[p]){
+				Reflect.set(Skin,data.items,p,events[p]);
+				Reflect.call(Skin,data.eventTarget,"addEventListener",[p,events[p],false,0,this]);
+			}
+		}
+	}
+},"type":1}
+,"s6_elementMaps":{"writable":true,"value":{},"type":8}
+,"j2_createElement":{"value":function createElement(index,uniqueKey,name,children,attrs,update,events){
+	if(events === void 0 ){
+		events=null;
+	}
+	if(update === void 0 ){
+		update=null;
+	}
+	if(attrs === void 0 ){
+		attrs=null;
+	}
+	if(children === void 0 ){
+		children=null;
+	}
+	var uukey=(uniqueKey+''+index);
+	var obj=this[__PRIVATE__].elementMaps[uukey];
+	if(!obj){
+		obj=document.createElement(name);
+		this[__PRIVATE__].elementMaps[uukey]=obj;
+		if(attrs){
+			this.attributes(obj,attrs);
+		}
+	}
+	if(children){
+		if(System.typeOf(children)==="object"){
+			if(!(System.instanceOf(children, Array))){
+				children=[children];
+			}
+			this.j2_updateChildren(obj,children);
+		}
+		else {
+			obj.textContent=children+"";
+		}
+	}
+	if(update){
+		this.attributes(obj,update);
+	}
+	if(events){
+		this.j2_bindEvent(index,uniqueKey,obj,events);
+	}
+	return obj;
+},"type":1}
+,"j2_createComponent":{"value":function createComponent(index,uniqueKey,classTarget,tagName,children,attrs,update,events){
+	if(events === void 0 ){
+		events=null;
+	}
+	if(update === void 0 ){
+		update=null;
+	}
+	if(attrs === void 0 ){
+		attrs=null;
+	}
+	if(children === void 0 ){
+		children=null;
+	}
+	if(tagName === void 0 ){
+		tagName=null;
+	}
+	var uukey=(uniqueKey+''+index);
+	var obj=this[__PRIVATE__].elementMaps[uukey];
+	if(!obj){
+		if(tagName){
+			obj=new classTarget(new Element(Element.createElement(tagName)));
+		}
+		else {
+			obj=new classTarget(uukey);
+		}
+		this[__PRIVATE__].elementMaps[uukey]=obj;
+		if(attrs){
+			this.attributes(obj.getElement(),attrs);
+		}
+	}
+	if(children){
+		if(!(System.instanceOf(children, Array))){
+			children=[System.typeOf(children)==="object"?children:children+""];
+		}
+		if(System.instanceOf(obj, SkinComponent)){
+			obj.setChildren(children);
+		}
+		else {
+			this.j2_updateChildren(obj,children);
+		}
+	}
+	if(update){
+		this.attributes(obj.getElement(),update);
+	}
+	if(events){
+		this.j2_bindEvent(index,uniqueKey,obj,events);
+	}
+	return obj;
+},"type":1}
+,"s6_meregChildren":{"value":function meregChildren(children){
+	var child;
+	var len=children.length;
+	var index=0;
+	var results=[];
+	for(;index<len;index++){
+		child=children[index];
+		if(System.instanceOf(child, Array)){
+			results=results.concat(this.s6_meregChildren(child));
+		}
+		else {
+			results.push(child);
+		}
+	}
+	return results;
+},"type":1}
+,"j2_updateChildren":{"value":function updateChildren(parentNode,children){
+	var nextChildNode;
+	var owner;
+	var elem;
+	var nextChild;
+	var nextIndex;
+	var childDisplay;
+	var newNode;
+	var isDisplay;
+	var childItem;
+	var oldNode;
+	var e;
+	if(!parentNode)return ;
+	var parentDisplay=null;
+	if(System.instanceOf(parentNode, SkinComponent)){
+		parentNode.setChildren(children);
+		return ;
+	}
+	else if(System.is(parentNode, IDisplay)){
+		parentDisplay=parentNode;
+		parentNode=parentNode.getElement().current();
+	}
+	children=this.s6_meregChildren(children);
+	var parent=parentNode;
+	var totalNodes=parent.childNodes.length;
+	var totalChilds=children.length;
+	var len=Math.max(totalChilds,totalNodes);
+	var i=0;
+	var offset=0;
+	while(i<len){
+		newNode=null;
+		oldNode=parent.childNodes[i-offset];
+		childItem=children[i];
+		isDisplay=System.is(childItem, IDisplay);
+		if(isDisplay){
+			elem=childItem.display();
+			owner=childItem.getOwner();
+			if(owner){
+				this.s6_installer(childItem,owner);
+				offset++;
+				i++;
+				continue ;
+			}
+			else {
+				newNode=elem.current();
+			}
+		}
+		else if(childItem){
+			if(System.typeOf(childItem)==="string"){
+				if(Element.getNodeName(oldNode)==="text"){
+					if(oldNode.textContent!==childItem){
+						oldNode.textContent=childItem;
+					}
+					newNode=oldNode;
+				}
+				else {
+					newNode=Element.createElement("text");
+					newNode.textContent=childItem;
+				}
+			}
+			else {
+				newNode=childItem;
+			}
+		}
+		else {
+			offset++;
+		}
+		if(newNode!==oldNode){
+			if(newNode&&oldNode){
+				parent.replaceChild(newNode,oldNode);
+				this.s6_removeEvent(parent,oldNode);
+			}
+			else {
+				if(oldNode){
+					nextIndex=i;
+					nextChild=null;
+					nextChildNode=null;
+					while(nextIndex<len&&!(nextChild=children[++nextIndex]));
+					if(nextChild){
+						if(System.is(nextChild, IDisplay)){
+							nextChildNode=nextChild.display().current();
+						}
+						else if(System.typeOf(nextChild)==="string"&&Element.getNodeName(oldNode)==="text"){
+							nextChildNode=oldNode;
+						}
+						else {
+							nextChildNode=nextChild;
+						}
+					}
+					if(nextChildNode!==oldNode){
+						parent.removeChild(oldNode);
+						this.s6_removeEvent(parent,oldNode);
+					}
+				}
+				if(newNode){
+					parent.appendChild(newNode);
+				}
+			}
+			if(newNode&&isDisplay){
+				childDisplay=childItem;
+				if(parentDisplay){
+					childDisplay.G7_setParentDisplay(parentDisplay);
+				}
+				e=new ElementEvent(ElementEvent.ADD);
+				e.parent=parentDisplay||parent;
+				e.child=newNode;
+				childDisplay.getElement().dispatchEvent(e);
+			}
+		}
+		i++;
+	}
+},"type":1}
+,"s6_removeEvent":{"value":function removeEvent(parentNode,childNode){
+	var e=new ElementEvent(ElementEvent.REMOVE);
+	e.parent=parentNode;
+	e.child=childNode;
+	(new EventDispatcher(childNode)).dispatchEvent(e);
+},"type":1}
+,"s6_timeoutId":{"writable":true,"value":null,"type":8}
+,"s6_callback":{"writable":true,"value":null,"type":8}
+,"j2_nowUpdate":{"value":function nowUpdate(delay){
+	if(delay === void 0 ){
+		delay=200;
+	}
+	this[__PRIVATE__].invalidate=false;
+	if(this[__PRIVATE__].timeoutId){
+		System.clearTimeout(this[__PRIVATE__].timeoutId);
+	}
+	var callback=this[__PRIVATE__].callback;
+	if(!callback){
+		callback=this.j2_createChildren.bind(this);
+		this[__PRIVATE__].callback=callback;
+	}
+	this[__PRIVATE__].timeoutId=System.setTimeout(callback,delay);
+},"type":1}
+,"assign":{"value":function assign(name,value){
+	if(value === void 0 ){
+		value=null;
+	}
+	var dataset=this[__PRIVATE__]._dataset;
+	if(value===null){
+		return dataset[name];
+	}
+	if(dataset[name]!==value){
+		dataset[name]=value;
+		if(this.j2_getInitialized()){
+			this.j2_nowUpdate();
+		}
+	}
+	return value;
+},"type":1}
+,"s6__dataset":{"writable":true,"value":{},"type":8}
+,"getDataset":{"value":function dataset(){
+	return this[__PRIVATE__]._dataset;
+},"type":2},"setDataset":{"value":function dataset(value){
+	this[__PRIVATE__]._dataset=value;
+	if(this.j2_getInitialized()){
+		this.j2_nowUpdate();
+	}
+},"type":4},"attributes":{"value":function attributes(target,attrs){
+	if(target==null)return ;
+	var isElem=System.instanceOf(target, Element);
+	Object.forEach(attrs,function(value,name){
+		var prop;
+		var elem;
+		if(isElem){
+			elem=target;
+			if(name==="content"&&elem.text()!==value){
+				elem.text(value);
+			}
+			else if(name==="innerHTML"&&target.innerHTML!==value){
+				elem.html(value);
+			}
+			else if(elem.property(name)!=value){
+				elem.property(name,value);
+			}
+		}
+		else {
+			if(name==="content"){
+				prop=System.typeOf(target.textContent)==="string"?"textContent":"innerText";
+				if(target[prop]!==value){
+					target[prop]=value;
+				}
+			}
+			else if(name==="innerHTML"&&target.innerHTML!==value){
+				target.innerHTML=value;
+			}
+			else if(name==="class"||name==="className"){
+				if(target.className!==attrs[name]){
+					target.className=attrs[name];
+				}
+			}
+			else if(Reflect.call(Skin,target,"getAttribute",[name])!=attrs[name]){
+				Reflect.call(Skin,target,"setAttribute",[name,attrs[name]]);
+			}
+		}
+	});
+},"type":1}
+,"s6__installer":{"writable":true,"value":null,"type":8}
+,"s6_installer":{"value":function installer(child,viewport){
+	var map=this[__PRIVATE__]._installer;
+	if(map===null){
+		map=new Map();
+		this[__PRIVATE__]._installer=map;
+	}
+	var install=map.get(child);
+	if(!install){
+		install={"viewport":viewport};
+		map.set(child,install);
+	}
+	if(!install.state){
+		viewport.addChild(child);
+	}
+	install.state=true;
+},"type":1}
+,"s6_updateInstallState":{"value":function updateInstallState(){
+	var map=this[__PRIVATE__]._installer;
+	if(map){
+		map.forEach(function(value,key){
+			if(value.state!==true&&key.getParent()){
+				value.viewport.removeChild(key);
+			}
+			value.state=false;
+		});
+	}
+},"type":1}
+,"s6__watchMap":{"writable":true,"value":null,"type":8}
+,"s6_getWatchMap":{"value":function watchMap(){
+	var dict=this[__PRIVATE__]._watchMap;
+	if(dict===null){
+		dict=new Map();
+		this[__PRIVATE__]._watchMap=dict;
+	}
+	return dict;
+},"type":2},"watch":{"value":function watch(name,target,propName,sourceTarget){
+	if(sourceTarget === void 0 ){
+		sourceTarget=null;
+	}
+	var dict;
+	var bindable=this.j2_getBindable();
+	if(sourceTarget){
+		dict=this.s6_getWatchMap();
+		bindable=dict.get(sourceTarget);
+		if(!bindable){
+			bindable=new Bindable(sourceTarget,"*");
+			dict.set(sourceTarget,bindable);
+		}
+	}
+	bindable.bind(target,propName,name);
+},"type":1}
+,"unwatch":{"value":function unwatch(target,propName,sourceTarget){
+	if(sourceTarget === void 0 ){
+		sourceTarget=null;
+	}
+	if(propName === void 0 ){
+		propName=null;
+	}
+	var bindable;
+	var bind;
+	var dict;
+	if(sourceTarget){
+		dict=this.s6_getWatchMap();
+		bind=dict.get(sourceTarget);
+		if(bind){
+			bind.unbind(target,propName);
+			dict.delete(sourceTarget);
+		}
+	}
+	else {
+		bindable=this.j2_getBindable();
+		bindable.unbind(target,propName);
+	}
+},"type":1}
+,"s6__children":{"writable":true,"value":[],"type":8}
+,"getChildren":{"value":function children(){
+	return this[__PRIVATE__]._children.slice(0);
+},"type":2},"setChildren":{"value":function children(value){
+	this[__PRIVATE__]._children=value.slice(0);
+	if(this.j2_getInitialized()){
+		this.j2_nowUpdate();
+	}
+},"type":4},"getChildAt":{"value":function getChildAt(index){
+	var children=this[__PRIVATE__]._children;
+	index=index<0?index+children.length:index;
+	if(!children[index]){
+		throw new RangeError('The index out of range');
+	}
+	return Reflect.get(Skin,children[index],"target");
+},"type":1}
+,"getChildIndex":{"value":function getChildIndex(child){
+	var children=this[__PRIVATE__]._children;
+	var len=children.length;
+	var index=0;
+	for(;index<len;index++){
+		if(Reflect.get(Skin,children[index],"target")===child){
+			return index;
+		}
+	}
+	return -1;
+},"type":1}
+,"addChildAt":{"value":function addChildAt(child,index){
+	var parent=child.getParent();
+	if(parent){
+		parent.removeChild(child);
+	}
+	var children=this[__PRIVATE__]._children;
+	index=index<0?index+children.length+1:index;
+	children.splice(index,0,child);
+	child.G7_setParentDisplay(this);
+	if(this.j2_getInitialized()){
+		this.j2_nowUpdate();
+	}
+	return child;
+},"type":1}
+,"removeChild":{"value":function removeChild(child){
+	var children=this[__PRIVATE__]._children;
+	var index=this.getChildIndex(child);
+	if(index>=0){
+		return this.removeChildAt(index);
+	}
+	else {
+		throw new ReferenceError('The child is not added.');
+	}
+},"type":1}
+,"removeChildAt":{"value":function removeChildAt(index){
+	var children=this[__PRIVATE__]._children;
+	index=index<0?index+children.length:index;
+	if(!(children.length>index)){
+		throw new RangeError('The index out of range');
+	}
+	var child=children[index];
+	children.splice(index,1);
+	if(child.getParent()){
+		child.getParent().removeChild(child);
+	}
+	child.G7_setParentDisplay(null);
+	if(this.j2_getInitialized()){
+		this.j2_nowUpdate();
+	}
+	return child;
+},"type":1}
+,"removeAllChild":{"value":function removeAllChild(){
+	var len=this[__PRIVATE__]._children.length;
+	while(len>0){
+		this.removeChildAt(--len);
+	}
+},"type":1}
+,"s6_statesGroup":{"writable":true,"value":{},"type":8}
+,"setStates":{"value":function states(value){
+	var name;
+	var stateObj;
+	var len=value.length;
+	var i=0;
+	var statesGroup=this[__PRIVATE__].statesGroup;
+	for(;i<len;i++){
+		stateObj=value[i];
+		name=stateObj.getName();
+		if(!name)throw new TypeError('name is not define in Skin.states');
+		if(statesGroup.hasOwnProperty(name)){
+			throw new TypeError('"'+name+'" has already been declared in Skin.states');
+		}
+		statesGroup[name]=stateObj;
+	}
+},"type":4},"s6__currentState":{"writable":true,"value":null,"type":8}
+,"getCurrentState":{"value":function currentState(){
+	return this[__PRIVATE__]._currentState;
+},"type":2},"setCurrentState":{"value":function currentState(name){
+	var current=this[__PRIVATE__]._currentState;
+	if(current!==name){
+		this[__PRIVATE__]._currentState=name;
+		this[__PRIVATE__]._currentStateGroup=null;
+		if(this.j2_getInitialized()){
+			this.j2_nowUpdate();
+		}
+	}
+},"type":4},"display":{"value":function display(){
+	if(this.j2_getInitialized()===false){
+		this.j2_setInitialized(true);
+		this.j2_initializing();
+	}
+	Container.prototype.display.call(this);
+	this.j2_nowUpdate(0);
+	return this.getElement();
+},"type":1}
+};
+Skin.prototype=Object.create( Container.prototype , proto);
+Internal.defineClass("es.core.Skin",Skin,{
+	"extends":Container,
+	"package":"es.core",
+	"classname":"Skin",
+	"implements":[IBindable],
+	"uri":["s6","j2","Q5"],
+	"privateSymbol":__PRIVATE__,
+	"method":method,
+	"proto":proto
+},1);
+
+},
+
+/***** Class es/core/Container.es *****/
+
+"es/core/Container.es": function(module,require){
+function Container(element,attr){
+	Object.defineProperty(this,__PRIVATE__,{value:{"_children":[],"_layout":null}});
+
+	if(attr === void 0 ){
+		attr=null;
+	}
+	if(!Element.isHTMLContainer(element[0])){
+		throw new TypeError("Invalid container element");
+	}
+	Display.call(this,element,attr);
+};
+module.exports=Container;
+var Display=require("es/core/Display.es");
+var IDisplay=require("es/interfaces/IDisplay.es");
+var IContainer=require("es/interfaces/IContainer.es");
+var BaseLayout=require("es/components/layout/BaseLayout.es");
+var Element=require("system/Element.js");
+var Array=require("system/Array.js");
+var System=require("system/System.js");
+var Symbol=require("system/Symbol.js");
+var Object=require("system/Object.js");
+var Internal=require("system/Internal.js");
+var __PRIVATE__=Symbol("es.core.Container").valueOf();
+var method={};
+var proto={"constructor":{"value":Container},"b8__children":{"writable":true,"value":[],"type":8}
+,"getChildren":{"value":function children(){
+	return this[__PRIVATE__]._children.slice(0);
+},"type":2},"setChildren":{"value":function children(value){
+	this.removeAllChild();
+	var len=value.length;
+	var index=0;
+	for(;index<len;index++){
+		if(System.is(value[0], IDisplay)){
+			this.addChild(value[0]);
+		}
+	}
+},"type":4},"getChildAt":{"value":function getChildAt(index){
+	var children=this[__PRIVATE__]._children;
+	index=index<0?index+children.length:index;
+	var result=children[index];
+	if(result==null){
+		throw new RangeError('The index out of range');
+	}
+	return result;
+},"type":1}
+,"getChildIndex":{"value":function getChildIndex(child){
+	var children=this[__PRIVATE__]._children;
+	return children.indexOf(child);
+},"type":1}
+,"addChild":{"value":function addChild(child){
+	return this.addChildAt(child,-1);
+},"type":1}
+,"addChildAt":{"value":function addChildAt(child,index){
+	var parent=child.getParent();
+	if(parent){
+		parent.removeChild(child);
+	}
+	var children=this[__PRIVATE__]._children;
+	var at=index<0?index+children.length+1:index;
+	children.splice(at,0,child);
+	child.G7_setParentDisplay(this);
+	this.getElement().addChildAt(child.getElement(),index);
+	return child;
+},"type":1}
+,"removeChild":{"value":function removeChild(child){
+	var index=this.getChildIndex(child);
+	if(index>=0){
+		return this.removeChildAt(index);
+	}
+	else {
+		throw new ReferenceError('The child is not added.');
+	}
+},"type":1}
+,"removeChildAt":{"value":function removeChildAt(index){
+	var children=this[__PRIVATE__]._children;
+	index=index<0?index+children.length:index;
+	if(!(children.length>index)){
+		throw new RangeError('The index out of range');
+	}
+	var child=children[index];
+	children.splice(index,1);
+	this.getElement().removeChild(child.getElement());
+	child.G7_setParentDisplay(null);
+	return child;
+},"type":1}
+,"removeAllChild":{"value":function removeAllChild(){
+	var len=this[__PRIVATE__]._children.length;
+	while(len>0){
+		this.removeChildAt(--len);
+	}
+	this.getElement().html('');
+},"type":1}
+,"contains":{"value":function contains(child){
+	return Element.contains(this.getElement(),child.getElement());
+},"type":1}
+,"b8__layout":{"writable":true,"value":null,"type":8}
+,"getLayout":{"value":function layout(){
+	return this[__PRIVATE__]._layout;
+},"type":2},"setLayout":{"value":function layout(value){
+	value.setTarget(this);
+	this[__PRIVATE__]._layout=value;
+},"type":4}};
+Container.prototype=Object.create( Display.prototype , proto);
+Internal.defineClass("es.core.Container",Container,{
+	"extends":Display,
+	"package":"es.core",
+	"classname":"Container",
+	"implements":[IContainer],
+	"uri":["b8","j2","Q5"],
+	"privateSymbol":__PRIVATE__,
+	"method":method,
+	"proto":proto
+},1);
+
+},
+
+/***** Class es/core/Display.es *****/
+
+"es/core/Display.es": function(module,require){
+function Display(element,attr){
+	Object.defineProperty(this,__PRIVATE__,{value:{"_element":undefined,"_width":NaN,"_height":NaN,"_visible":false,"_visibleFlag":false,"parentDisplay":null,"_owner":null}});
+
+	if(attr === void 0 ){
+		attr=null;
+	}
+	if(element==null||element.length!=1){
+		throw new TypeError("The selector elements can only is a single element");
+	}
+	if(!Element.isNodeElement(element[0])){
+		throw new TypeError("Invalid node element");
+	}
+	this[__PRIVATE__]._element=element;
+	if(attr){
+		if(attr.innerHTML){
+			element.html(attr.innerHTML);
+			delete attr.innerHTML;
+		}
+		else if(attr.content){
+			element.text(attr.content);
+			delete attr.content;
+		}
+		element.properties(attr);
+	}
+	EventDispatcher.call(this,element);
+};
+module.exports=Display;
+var Element=require("system/Element.js");
+var IDisplay=require("es/interfaces/IDisplay.es");
+var es_internal=require("es/core/es_internal.es");
+var IContainer=require("es/interfaces/IContainer.es");
+var EventDispatcher=require("system/EventDispatcher.js");
+var Object=require("system/Object.js");
+var System=require("system/System.js");
+var Symbol=require("system/Symbol.js");
+var Internal=require("system/Internal.js");
+var __PRIVATE__=Symbol("es.core.Display").valueOf();
+var method={};
+var proto={"constructor":{"value":Display},"b9__element":{"writable":true,"value":undefined,"type":8}
+,"getElement":{"value":function element(){
+	return this[__PRIVATE__]._element;
+},"type":2},"b9__width":{"writable":true,"value":NaN,"type":8}
+,"getWidth":{"value":function width(){
+	return System.isNaN(this[__PRIVATE__]._width)?this[__PRIVATE__]._element.width():this[__PRIVATE__]._width;
+},"type":2},"setWidth":{"value":function width(value){
+	if(!System.isNaN(value)){
+		this[__PRIVATE__]._width=value;
+		this[__PRIVATE__]._element.width(value);
+	}
+},"type":4},"b9__height":{"writable":true,"value":NaN,"type":8}
+,"getHeight":{"value":function height(){
+	return System.isNaN(this[__PRIVATE__]._height)?this[__PRIVATE__]._element.height():this[__PRIVATE__]._height;
+},"type":2},"setHeight":{"value":function height(value){
+	if(!System.isNaN(value)){
+		this[__PRIVATE__]._height=value;
+		this[__PRIVATE__]._element.height(value);
+	}
+},"type":4},"b9__visible":{"writable":true,"value":false,"type":8}
+,"b9__visibleFlag":{"writable":true,"value":false,"type":8}
+,"getVisible":{"value":function visible(){
+	if(this[__PRIVATE__]._visibleFlag===false){
+		return !(this[__PRIVATE__]._element.style("display")==="none");
+	}
+	return this[__PRIVATE__]._visible;
+},"type":2},"setVisible":{"value":function visible(flag){
+	this[__PRIVATE__]._visible=flag;
+	this[__PRIVATE__]._visibleFlag=true;
+	flag===false?this[__PRIVATE__]._element.hide():this[__PRIVATE__]._element.show();
+},"type":4},"property":{"value":function property(name,value){
+	if(value === void 0 ){
+		value=null;
+	}
+	return this[__PRIVATE__]._element.property(name,value);
+},"type":1}
+,"style":{"value":function style(name,value){
+	if(value === void 0 ){
+		value=null;
+	}
+	return this[__PRIVATE__]._element.style(name,value);
+},"type":1}
+,"getScrollTop":{"value":function scrollTop(){
+	return this[__PRIVATE__]._element.scrollTop();
+},"type":2},"setScrollTop":{"value":function scrollTop(value){
+	if(!System.isNaN(value)){
+		this[__PRIVATE__]._element.scrollTop(value);
+	}
+},"type":4},"getScrollLeft":{"value":function scrollLeft(){
+	return this[__PRIVATE__]._element.scrollTop();
+},"type":2},"setScrollLeft":{"value":function scrollLeft(value){
+	if(!System.isNaN(value)){
+		this[__PRIVATE__]._element.scrollTop(value);
+	}
+},"type":4},"getScrollWidth":{"value":function scrollWidth(){
+	return this[__PRIVATE__]._element.scrollWidth();
+},"type":2},"getScrollHeight":{"value":function scrollHeight(){
+	return this[__PRIVATE__]._element.scrollHeight();
+},"type":2},"getBoundingRect":{"value":function getBoundingRect(global){
+	if(global === void 0 ){
+		global=false;
+	}
+	return this[__PRIVATE__]._element.getBoundingRect(global);
+},"type":1}
+,"getLeft":{"value":function left(){
+	return this[__PRIVATE__]._element.left();
+},"type":2},"setLeft":{"value":function left(value){
+	if(!System.isNaN(value)){
+		this[__PRIVATE__]._element.left(value);
+	}
+},"type":4},"getTop":{"value":function top(){
+	return this[__PRIVATE__]._element.top();
+},"type":2},"setTop":{"value":function top(value){
+	if(!System.isNaN(value)){
+		this[__PRIVATE__]._element.top(value);
+	}
+},"type":4},"getRight":{"value":function right(){
+	return this[__PRIVATE__]._element.right();
+},"type":2},"setRight":{"value":function right(value){
+	if(!System.isNaN(value)){
+		this[__PRIVATE__]._element.right(value);
+	}
+},"type":4},"getBottom":{"value":function bottom(){
+	return this[__PRIVATE__]._element.bottom();
+},"type":2},"setBottom":{"value":function bottom(value){
+	if(!System.isNaN(value)){
+		this[__PRIVATE__]._element.bottom(value);
+	}
+},"type":4},"localToGlobal":{"value":function localToGlobal(left,top){
+	return this[__PRIVATE__]._element.localToGlobal(left,top);
+},"type":1}
+,"globalToLocal":{"value":function globalToLocal(left,top){
+	return this[__PRIVATE__]._element.globalToLocal(left,top);
+},"type":1}
+,"b9_parentDisplay":{"writable":true,"value":null,"type":8}
+,"G7_setParentDisplay":{"value":function setParentDisplay(value){
+	if(value === void 0 ){
+		value=null;
+	}
+	this[__PRIVATE__].parentDisplay=value;
+},"type":1}
+,"getParent":{"value":function parent(){
+	return this[__PRIVATE__].parentDisplay;
+},"type":2},"inDocumentChain":{"value":function inDocumentChain(){
+	return Element.contains(document,this[__PRIVATE__]._element[0]);
+},"type":1}
+,"display":{"value":function display(){
+	return this[__PRIVATE__]._element;
+},"type":1}
+,"b9__owner":{"writable":true,"value":null,"type":8}
+,"getOwner":{"value":function owner(){
+	return this[__PRIVATE__]._owner;
+},"type":2},"setOwner":{"value":function owner(value){
+	this[__PRIVATE__]._owner=value;
+},"type":4}};
+Display.prototype=Object.create( EventDispatcher.prototype , proto);
+Internal.defineClass("es.core.Display",Display,{
+	"extends":null,
+	"package":"es.core",
+	"classname":"Display",
+	"implements":[IDisplay],
+	"uri":["b9","j2","Q5"],
+	"privateSymbol":__PRIVATE__,
+	"method":method,
+	"proto":proto
+},1);
+
+},
+
+/***** Class es/core/es_internal.es *****/
+
+"es/core/es_internal.es": function(module,require){
+function es_internal(prefix,uri){
+Namespace.call(this,prefix,uri);
+};
+module.exports=es_internal;
+var Object=require("system/Object.js");
+var Internal=require("system/Internal.js");
+var Namespace=require("system/Namespace.js");
+Object.defineProperty(es_internal, "valueOf", {value:function valueOf(){
+return "es.core/public:es_internal";
+}});
+Internal.defineClass("es.core.es_internal",es_internal,{
+	"ns":"G7",
+	"package":"es.core",
+	"classname":"es_internal"
+},3);
+
+},
+
+/***** Class es/interfaces/IContainer.es *****/
+
+"es/interfaces/IContainer.es": function(module,require){
+function IContainer(){
+throw new TypeError("\"es.interfaces.IContainer\" is not constructor.");
+};
+module.exports=IContainer;
+var IDisplay=require("es/interfaces/IDisplay.es");
+var Symbol=require("system/Symbol.js");
+var Object=require("system/Object.js");
+var Internal=require("system/Internal.js");
+var __PRIVATE__=Symbol("es.interfaces.IContainer").valueOf();
+Internal.defineClass("es.interfaces.IContainer",IContainer,{
+	"package":"es.interfaces",
+	"classname":"IContainer"
+},2);
+
+},
+
+/***** Class es/components/layout/BaseLayout.es *****/
+
+"es/components/layout/BaseLayout.es": function(module,require){
+function BaseLayout(){
+	Object.defineProperty(this,__PRIVATE__,{value:{"_target":null,"_children":[],"_parent":null,"_viewport":null,"_gap":0}});
+
+	EventDispatcher.call(this);
+};
+module.exports=BaseLayout;
+var IDisplay=require("es/interfaces/IDisplay.es");
+var EventDispatcher=require("system/EventDispatcher.js");
+var Array=require("system/Array.js");
+var System=require("system/System.js");
+var Event=require("system/Event.js");
+var Element=require("system/Element.js");
+var ElementEvent=require("system/ElementEvent.js");
+var Reflect=require("system/Reflect.js");
+var StyleEvent=require("system/StyleEvent.js");
+var Object=require("system/Object.js");
+var Symbol=require("system/Symbol.js");
+var Internal=require("system/Internal.js");
+var __PRIVATE__=Symbol("es.components.layout.BaseLayout").valueOf();
+var method={"k15_rootLayouts":{"writable":true,"value":[],"type":8}
+,"k15_initialize":{"writable":true,"value":false,"type":8}
+,"k15_initRootLayout":{"value":function initRootLayout(){
+	if(BaseLayout.k15_initialize===false){
+		BaseLayout.k15_initialize=true;
+		System.getGlobalEvent().addEventListener(Event.INITIALIZE_COMPLETED,BaseLayout.k15_nowUpdateLayout);
+		System.getGlobalEvent().addEventListener(Event.RESIZE,BaseLayout.k15_nowUpdateLayout);
+	}
+},"type":1}
+,"k15_nowUpdateLayout":{"value":function nowUpdateLayout(){
+	var layout;
+	var len=BaseLayout.k15_rootLayouts.length;
+	var index=0;
+	for(;index<len;index++){
+		layout=BaseLayout.k15_rootLayouts[index];
+		layout.l16_nowUpdateChildren(parseInt(layout.getViewport().width()),parseInt(layout.getViewport().height()));
+	}
+},"type":1}
+,"k15_findLayoutByTarget":{"value":function findLayoutByTarget(children,target){
+	var layout;
+	var item;
+	var len=children.length;
+	var i=0;
+	for(;i<len;i++){
+		item=children[i];
+		if(item.getTarget()===target){
+			return item;
+		}
+		layout=BaseLayout.k15_findLayoutByTarget(item[__PRIVATE__]._children,target);
+		if(layout){
+			return layout;
+		}
+	}
+	return null;
+},"type":1}
+,"k15_findParentLayout":{"value":function findParentLayout(children,elem){
+	var parent;
+	var item;
+	var len=children.length;
+	var i=0;
+	for(;i<len;i++){
+		item=children[i];
+		parent=BaseLayout.k15_findParentLayout(item[__PRIVATE__]._children,elem);
+		if(parent){
+			return parent;
+		}
+		if(Element.contains(item.getTarget().getElement(),elem)){
+			return item;
+		}
+	}
+	return null;
+},"type":1}
+,"k15_findChildrenLayout":{"value":function findChildrenLayout(children,elem){
+	var item;
+	var len=children.length;
+	var i=0;
+	var results=[];
+	for(;i<len;i++){
+		item=children[i];
+		if(Element.contains(elem,item.getTarget().getElement())){
+			results.push(item);
+		}
+	}
+	return results;
+},"type":1}
+,"k15_assignParentForLayoutChildren":{"value":function assignParentForLayoutChildren(layoutChildren,parent){
+	var i;
+	var children=BaseLayout.k15_findChildrenLayout(layoutChildren,parent.getTarget().getElement());
+	if(children.length>0){
+		for(i=0;i<children.length;i++){
+			layoutChildren.splice(layoutChildren.indexOf(children[i]),1);
+			parent[__PRIVATE__]._children.push(children[i]);
+			children[i][__PRIVATE__]._parent=parent;
+		}
+		return true;
+	}
+	return false;
+},"type":1}
+,"k15_addLayout":{"value":function addLayout(layout){
+	var parent=BaseLayout.k15_findParentLayout(BaseLayout.k15_rootLayouts,layout.getTarget().getElement());
+	if(parent){
+		BaseLayout.k15_assignParentForLayoutChildren(parent[__PRIVATE__]._children,layout);
+		if(parent[__PRIVATE__]._children.indexOf(layout)<0){
+			parent[__PRIVATE__]._children.push(layout);
+			layout[__PRIVATE__]._parent=parent;
+		}
+	}
+	else {
+		BaseLayout.k15_assignParentForLayoutChildren(BaseLayout.k15_rootLayouts,layout);
+		if(BaseLayout.k15_rootLayouts.indexOf(layout)<0){
+			BaseLayout.k15_rootLayouts.push(layout);
+		}
+	}
+	BaseLayout.k15_initRootLayout();
+},"type":1}
+,"k15_removeLayout":{"value":function removeLayout(layout){
+	var layoutChildren=BaseLayout.k15_rootLayouts;
+	if(layout[__PRIVATE__]._parent){
+		layoutChildren=layout[__PRIVATE__]._parent[__PRIVATE__]._children;
+	}
+	var index=layoutChildren.indexOf(layout);
+	if(index>=0){
+		delete layoutChildren.splice;
+	}
+},"type":1}
+,"k15_updateRootLayout":{"value":function updateRootLayout(children){
+	var bElement;
+	var bLayout;
+	var index;
+	var aElement;
+	var aLayout;
+	var seek=0;
+	while(children.length>1&&seek<children.length){
+		aLayout=children[seek];
+		aElement=aLayout[__PRIVATE__]._target.getElement();
+		index=seek+1;
+		for(;index<children.length;index++){
+			bLayout=children[index];
+			bElement=bLayout[__PRIVATE__]._target.getElement();
+			if(Element.contains(aElement,bElement)){
+				aLayout[__PRIVATE__]._children.push(bLayout);
+				bLayout[__PRIVATE__]._parent=aLayout;
+				children.splice(index,1);
+				index--;
+				BaseLayout.k15_updateRootLayout(aLayout[__PRIVATE__]._children);
+			}
+			else if(Element.contains(bElement,aElement)){
+				bLayout[__PRIVATE__]._children.push(aLayout);
+				aLayout[__PRIVATE__]._parent=bLayout;
+				children.splice(seek,1);
+				BaseLayout.k15_updateRootLayout(bLayout[__PRIVATE__]._children);
+				break ;
+			}
+		}
+		seek++;
+	}
+},"type":1}
+,"k15_rectangle":{"writable":true,"value":["Top","Bottom","Left","Right"],"type":8}
+};
+for(var prop in method){
+	Object.defineProperty(BaseLayout, prop, method[prop]);
+}
+var proto={"constructor":{"value":BaseLayout},"k15__target":{"writable":true,"value":null,"type":8}
+,"k15__children":{"writable":true,"value":[],"type":8}
+,"k15__parent":{"writable":true,"value":null,"type":8}
+,"getTarget":{"value":function target(){
+	return this[__PRIVATE__]._target;
+},"type":2},"setTarget":{"value":function target(value){
+	var self;
+	var layoutTarget;
+	if(value!==this[__PRIVATE__]._target){
+		if(this[__PRIVATE__]._target){
+			layoutTarget=BaseLayout.k15_findLayoutByTarget(BaseLayout.k15_rootLayouts,this[__PRIVATE__]._target);
+			if(layoutTarget){
+				BaseLayout.k15_removeLayout(layoutTarget);
+			}
+		}
+		self=this;
+		value.getElement().addEventListener(ElementEvent.ADD,function(e){
+			if(Reflect.call(BaseLayout,this,"style",['position'])==="static"){
+				Reflect.call(BaseLayout,this,"style",['position','relative']);
+			}
+			BaseLayout.k15_addLayout(self);
+		});
+		value.getElement().removeEventListener(ElementEvent.REMOVE,function(e){
+			Reflect.call(BaseLayout,this,"removeEventListener",[ElementEvent.REMOVE]);
+			BaseLayout.k15_removeLayout(self);
+		});
+		this[__PRIVATE__]._target=value;
+	}
+},"type":4},"k15__viewport":{"writable":true,"value":null,"type":8}
+,"getViewport":{"value":function viewport(){
+	if(this[__PRIVATE__]._viewport===null){
+		this[__PRIVATE__]._viewport=this[__PRIVATE__]._target.getElement().parent();
+		this.k15_styleChange(this[__PRIVATE__]._viewport);
+	}
+	return this[__PRIVATE__]._viewport;
+},"type":2},"setViewport":{"value":function viewport(value){
+	this[__PRIVATE__]._viewport=value;
+	this.k15_styleChange(this[__PRIVATE__]._viewport);
+},"type":4},"k15_styleChange":{"value":function styleChange(target){
+	var self=this;
+	var oldWidth=NaN;
+	var oldHeight=NaN;
+	target.addEventListener(StyleEvent.CHANGE,function(e){
+		var width=target.width();
+		var height=target.height();
+		if(oldWidth!==width||oldHeight!==height){
+			oldWidth=width;
+			oldHeight=height;
+			self.l16_nowUpdateChildren(width,height);
+		}
+	});
+},"type":1}
+,"l16_getChildByNode":{"value":function getChildByNode(nodeElement){
+	var item;
+	var len=this[__PRIVATE__]._children.length;
+	var i=0;
+	for(;i<len;i++){
+		item=this[__PRIVATE__]._children[i];
+		if(Reflect.get(BaseLayout,item.getTarget().getElement(),0)===nodeElement){
+			return item;
+		}
+	}
+	return null;
+},"type":1}
+,"k15__gap":{"writable":true,"value":0,"type":8}
+,"getGap":{"value":function gap(){
+	return this[__PRIVATE__]._gap;
+},"type":2},"setGap":{"value":function gap(value){
+	this[__PRIVATE__]._gap=value;
+},"type":4},"l16_calculateWidth":{"value":function calculateWidth(elem,baseWidth){
+	var cssWidth;
+	var currentElem;
+	if(!elem.hasProperty("init-layout-width")){
+		if(!elem.hasProperty("percentWidth")&&!elem.hasProperty("explicitWidth")){
+			currentElem=elem.current();
+			cssWidth=Reflect.get(BaseLayout,(currentElem.currentStyle||currentElem.style),"width");
+			if(cssWidth&&cssWidth.charAt(cssWidth.length-1)==="%"){
+				elem.property("percentWidth",parseInt(cssWidth));
+			}
+			else {
+				elem.property("explicitWidth",parseInt(elem.width()));
+			}
+		}
+		elem.property("init-layout-width",1);
+	}
+	var value=0;
+	if(elem.hasProperty("explicitWidth")){
+		value=parseInt(elem.property("explicitWidth"));
+	}
+	else if(elem.hasProperty("percentWidth")){
+		value=parseInt(elem.property("percentWidth"));
+		value=value>0?value*baseWidth/100:0;
+	}
+	var maxWidth=1000000;
+	var minWidth=0;
+	if(elem.hasProperty("maxWidth")){
+		maxWidth=parseInt(elem.property("maxWidth"));
+	}
+	if(elem.hasProperty("minWidth")){
+		minWidth=parseInt(elem.property("minWidth"));
+	}
+	return Math.max(Math.min(value,maxWidth),minWidth);
+},"type":1}
+,"l16_calculateHeight":{"value":function calculateHeight(elem,baseWidth){
+	var cssHeight;
+	var currentElem;
+	if(!elem.hasProperty("init-layout-height")){
+		if(!elem.hasProperty("percentHeight")&&!elem.hasProperty("explicitHeight")){
+			currentElem=elem.current();
+			cssHeight=Reflect.get(BaseLayout,(currentElem.currentStyle||currentElem.style),"height");
+			if(cssHeight&&cssHeight.charAt(cssHeight.length-1)==="%"){
+				elem.property("percentHeight",parseInt(cssHeight));
+			}
+			else {
+				elem.property("explicitHeight",parseInt(elem.height()));
+			}
+		}
+		elem.property("init-layout-height",1);
+	}
+	var value=0;
+	if(elem.hasProperty("explicitHeight")){
+		value=parseInt(elem.property("explicitHeight"));
+	}
+	else if(elem.hasProperty("percentHeight")){
+		value=parseInt(elem.property("percentHeight"));
+		value=value>0?value*baseWidth/100:0;
+	}
+	var maxHeight=1000000;
+	var minHeight=0;
+	if(elem.hasProperty("maxHeight")){
+		maxHeight=parseInt(elem.property("maxHeight"));
+	}
+	if(elem.hasProperty("minHeight")){
+		minHeight=parseInt(elem.property("minHeight"));
+	}
+	return Math.max(Math.min(value,maxHeight),minHeight);
+},"type":1}
+,"l16_getRectangleBox":{"value":function getRectangleBox(elem){
+	var lName;
+	var uName;
+	var value={};
+	var i=0;
+	for(;i<4;i++){
+		uName=BaseLayout.k15_rectangle[i];
+		lName=uName.toLowerCase();
+		value[lName]=parseInt(elem.property(lName));
+		value['margin'+uName]=parseInt(elem.style('margin'+uName));
+	}
+	return value;
+},"type":1}
+,"l16_setLayoutSize":{"value":function setLayoutSize(width,height){
+	this.getTarget().getElement().style('cssText',{width:width,height:height});
+},"type":1}
+,"l16_nowUpdateChildren":{"value":function nowUpdateChildren(width,height){
+	var j;
+	var isChild;
+	var childNode;
+	var layout;
+	width=this.l16_calculateWidth(this.getTarget().getElement(),width);
+	height=this.l16_calculateHeight(this.getTarget().getElement(),height);
+	var len=this[__PRIVATE__]._children.length;
+	var index=0;
+	var parentNode=this.getTarget().getElement().current();
+	for(;index<len;index++){
+		layout=this[__PRIVATE__]._children[index];
+		childNode=layout.getTarget().getElement().current();
+		isChild=false;
+		if(parentNode.hasChildNodes()){
+			j=0;
+			for(;j<parentNode.childNodes.length;j++){
+				if(parentNode.childNodes.item(j)===childNode){
+					isChild=true;
+					break ;
+				}
+			}
+		}
+		if(isChild){
+			layout.l16_nowUpdateChildren(width,height);
+		}
+		else {
+			layout.l16_nowUpdateChildren(layout.getViewport().width(),layout.getViewport().height());
+		}
+	}
+	this.l16_calculateChildren(width,height);
+},"type":1}
+,"l16_calculateChildren":{"value":function calculateChildren(parentWidth,parentHeight){
+},"type":1}
+};
+BaseLayout.prototype=Object.create( EventDispatcher.prototype , proto);
+Internal.defineClass("es.components.layout.BaseLayout",BaseLayout,{
+	"extends":null,
+	"package":"es.components.layout",
+	"classname":"BaseLayout",
+	"uri":["k15","l16","J17"],
+	"privateSymbol":__PRIVATE__,
+	"method":method,
+	"proto":proto
+},1);
+
+},
+
+/***** Class es/interfaces/IBindable.es *****/
+
+"es/interfaces/IBindable.es": function(module,require){
+function IBindable(){
+throw new TypeError("\"es.interfaces.IBindable\" is not constructor.");
+};
+module.exports=IBindable;
+var Symbol=require("system/Symbol.js");
+var Object=require("system/Object.js");
+var Internal=require("system/Internal.js");
+var __PRIVATE__=Symbol("es.interfaces.IBindable").valueOf();
+Internal.defineClass("es.interfaces.IBindable",IBindable,{
+	"package":"es.interfaces",
+	"classname":"IBindable"
+},2);
+
+},
+
+/***** Class es/events/SkinEvent.es *****/
+
+"es/events/SkinEvent.es": function(module,require){
+function SkinEvent(type,bubbles,cancelable){
+	Object.defineProperty(this,__PRIVATE__,{value:{"children":null,"oldSkin":null,"newSkin":null}});
+
+	if(cancelable === void 0 ){
+		cancelable=true;
+	}
+	if(bubbles === void 0 ){
+		bubbles=true;
+	}
+	Event.call(this,type,bubbles,cancelable);
+};
+module.exports=SkinEvent;
+var Event=require("system/Event.js");
+var Symbol=require("system/Symbol.js");
+var Object=require("system/Object.js");
+var Internal=require("system/Internal.js");
+var __PRIVATE__=Symbol("es.events.SkinEvent").valueOf();
+var method={"UPDATE_DISPLAY_LIST":{"value":'skinUpdateDisplayList',"type":16}
+,"INSTALL":{"value":'skinInstall',"type":16}
+,"UNINSTALL":{"value":'skinUnInstall',"type":16}
+};
+for(var prop in method){
+	Object.defineProperty(SkinEvent, prop, method[prop]);
+}
+var proto={"constructor":{"value":SkinEvent},"getChildren":{"value":function(){
+	return this[__PRIVATE__].children;
+},"type":2},"setChildren":{"value":function(val){
+	return this[__PRIVATE__].children=val;
+},"type":2},"getOldSkin":{"value":function(){
+	return this[__PRIVATE__].oldSkin;
+},"type":2},"setOldSkin":{"value":function(val){
+	return this[__PRIVATE__].oldSkin=val;
+},"type":2},"getNewSkin":{"value":function(){
+	return this[__PRIVATE__].newSkin;
+},"type":2},"setNewSkin":{"value":function(val){
+	return this[__PRIVATE__].newSkin=val;
+},"type":2}};
+SkinEvent.prototype=Object.create( Event.prototype , proto);
+Internal.defineClass("es.events.SkinEvent",SkinEvent,{
+	"extends":null,
+	"package":"es.events",
+	"classname":"SkinEvent",
+	"uri":["i20","O21","Z22"],
+	"privateSymbol":__PRIVATE__,
+	"method":method,
+	"proto":proto
+},1);
+
+},
+
+/***** System system/Map.js *****/
+
+"system/Map.js": function(module,require){
+/*
+ * EaseScript
+ * Copyright © 2017 EaseScript All rights reserved.
+ * Released under the MIT license
+ * https://github.com/51breeze/EaseScript
+ * @author Jun Ye <664371281@qq.com>
+ * @require Symbol,Object
+ */
+
+
+/**
+ * 可以使用非字符串作为键值的存储表
+ * @constructor
+ */
+function Map()
+{
+    if( !(this instanceof Map) )
+        return new Map();
+    storage(this,true,{map:[]});
+}
+
+module.exports = Map;
+var Object =require("system/Object.js");
+var Internal =require("system/Internal.js");
+var Symbol =require("system/Symbol.js");
+var ListIterator =require("system/ListIterator.js");
+var storage=Internal.createSymbolStorage( Symbol('Map') );
+
+function indexByKey(map,key)
+{
+    var i = 0,len=map.length
+    for(; i<len; i++)
+    {
+        if( map[i].key===key )
+        {
+            return i;
+        }
+    }
+    return -1;
+};
+
+Map.prototype = Object.create( Object.prototype, {
+
+/**
+ * 设置指定键值的数据,如果相同的键值则会覆盖之前的值。
+ * @param key
+ * @param value
+ * @returns {Dictionary}
+ */
+"set":{value:function set(key,value)
+{
+    var map =  storage(this,'map');
+    var index = indexByKey(map,key);
+    if( index < 0 )
+    {
+        map.push({'key':key,'value':value});
+    }else
+    {
+        map[index].value=value;
+    }
+    return value;
+}},
+
+/**
+ * 获取已设置的值
+ * @param key
+ * @returns {*}
+ */
+"get":{value:function get( key , defualt)
+{
+    var map =  storage(this,'map');
+    var index = indexByKey(map,key);
+    if( index >= 0 )
+    {
+       return map[index].value;
+
+    }else if( typeof defualt !== "undefined" )
+    {
+        map.push({'key':key,'value':defualt});
+        return defualt;
+    }
+    return undefined;
+}},
+
+/**
+ * 返回所有已设置的数据
+ * 数组中的每个项是一个对象
+ * @returns {Array}
+ */
+"entries":{value:function entries()
+{
+    return new ListIterator( storage(this,'map') );
+}},
+
+/**
+ * 返回所有已设置的数据
+ * 数组中的每个项是一个对象
+ * @returns {Array}
+ */
+"forEach":{value:function forEach(callback,thisObj)
+{
+    var map = storage(this,'map');
+    var len = map.length;
+    var i=0;
+    while( i<len )
+    {
+       var item = map[i++];
+       callback.call(thisObj||null,  item.value, item.key, this);
+    }
+}},
+
+/**
+ * 返回有的key值
+ * @returns {Array}
+ */
+"keys":{value:function keys()
+{
+    var map = storage(this,'map');
+    var value=[],i;
+    for( i in map )
+    {
+        value.push(map[i].key);
+    }
+    return value;
+}},
+
+/**
+ * 返回有键的值
+ * @returns {Array}
+ */
+"values":{value:function values()
+{
+    var map = storage(this,'map');
+    var value=[],i;
+    for( i in map )
+    {
+        value.push(map[i].value);
+    }
+    return value;
+}},
+
+/**
+ * 删除已设置过的对象,并返回已删除的值（如果存在）否则为空。
+ * @param key
+ * @returns {*}
+ */
+"delete":{value:function( key )
+{
+    var map = storage(this,'map');
+    var index = indexByKey(map,key);
+    if( index >=0 )
+    {
+        delete map.splice(index,1);
+        return true;
+    }
+    return false;
+}},
+
+/**
+ * 返回已设置数据的总数
+ * @returns {Number}
+ */
+"size":{value:function size()
+{
+    var map = storage(this,'map');
+    return map.length;
+}},
+
+/**
+ * 返回已设置数据的总数
+ * @returns {Number}
+ */
+"has":{value:function has()
+{
+    var map = storage(this,'map');
+    return indexByKey(map,key) >= 0;
+}},
+
+/**
+ * 返回已设置数据的总数
+ * @returns {Number}
+ */
+"clear":{value:function clear()
+{
+    var map = storage(this,'map');
+    var len = map.length;
+    var i=0;
+    while( i<len )
+    {
+       delete map.splice(i,1);
+    }
+}}
+
+});
+
+Object.defineProperty(Map.prototype["delete"],"name",{value:"delete"});
+},
+
+/***** System system/Bindable.js *****/
+
+"system/Bindable.js": function(module,require){
+/*
+ * Copyright © 2017 EaseScript All rights reserved.
+ * Released under the MIT license
+ * https://github.com/51breeze/EaseScript
+ * @author Jun Ye <664371281@qq.com>
+ * @require System,Object,Symbol,Reflect,Element,EventDispatcher,SyntaxError,ReferenceError
+ */
+
+/**
+ * 提交属性到每个绑定的对象
+ * @private
+ * @param property
+ * @param newValue
+ */
+function commitProperties(event)
+{
+    var property = Reflect.get(null,event,'property');
+    var binding = storage(this,'binding');
+    var hash = storage(this,'hash');
+    var bind =  binding[ property ];
+    
+    if( bind )
+    {
+        var newValue = Reflect.get(null,event, 'newValue');
+
+        //相同的属性值不再提交
+        if (typeof newValue !== "undefined" && newValue !== hash[property] )
+        {
+            hash[property] = newValue;
+            var i,item;
+            for( i in bind )
+            {
+                item=bind[i];
+                setProperty(item.item.element, item.name, newValue );
+            }
+        }
+    }
+}
+/**
+ * 设置属性值
+ * @param object
+ * @param prop
+ * @param newValue
+ */
+function setProperty(object, prop, newValue )
+{
+    if( object instanceof Bindable )
+    {
+        Bindable.prototype.property.call(object,prop,newValue);
+
+    }else if( Element.isNodeElement(object) )
+    {
+        if( typeof object[ prop ] !== "undefined"  )object[ prop ] = newValue;
+
+    }else if( object instanceof Element )
+    {
+        if( prop ==="content" )
+        {
+            prop="text";
+        }
+        
+        if( typeof object[prop] === "function" )
+        {
+            object[prop]( newValue );
+        }else
+        {
+            Element.prototype.property.call(object,prop,newValue);
+        }
+
+    }else if( Reflect.has(null, object, prop) )
+    {
+        Reflect.set(null, object, prop, newValue );
+    }
+}
+
+function getProperty(object, prop )
+{
+    if( object instanceof Bindable )
+    {
+        return Bindable.prototype.property.call(object,prop);
+
+    }else if( Element.isNodeElement(object) )
+    {
+       return object[ prop ];
+
+    }else if( object instanceof Element )
+    {
+        if( typeof object[prop] === "function" )
+        {
+            return object[prop]();
+        }else {
+            return Element.prototype.property.call(object, prop);
+        }
+
+    }else if( Reflect.has(null, object, prop) )
+    {
+        return Reflect.get(null, object, prop );
+    }
+    return undefined;
+}
+
+/**
+ * 数据双向绑定器
+ * @param source 数据源对象。
+ * 如果是一个EventDispatcher对象，则该对象上的所有 PropertyEvent.CHANGE 事件都会反应到此绑定器中
+ * 如果是一个DOM元素则会监听当前元素的属性变更并反应到此绑定器中。
+ * @param type 监听的事件类型, 默认为 PropertyEvent.CHANGE
+ * @constructor
+ */
+function Bindable(source,properties)
+{
+    if( !(this instanceof Bindable) )
+        return new Bindable( source );
+    EventDispatcher.call(this , source );
+    if( typeof properties === "string" )
+    {
+        properties = [ properties ];
+    }
+    if( !System.isArray(properties) )
+    {
+        throw new TypeError('Invalid properties must is be String or Array. in Bindable');
+    }
+    storage(this,true,{"source":source,"properties":properties,"hash":{},"subscriber":new Map(),"binding":{}});
+    this.addEventListener(PropertyEvent.CHANGE,commitProperties);
+}
+
+module.exports = Bindable;
+var EventDispatcher =require("system/EventDispatcher.js");
+var Object =require("system/Object.js");
+var System =require("system/System.js");
+var PropertyEvent =require("system/PropertyEvent.js");
+var Symbol =require("system/Symbol.js");
+var Map =require("system/Map.js");
+var Symbol =require("system/Symbol.js");
+var Element =require("system/Element.js");
+var Reflect =require("system/Reflect.js");
+var Internal =require("system/Internal.js");
+var storage=Internal.createSymbolStorage( Symbol('Bindable') );
+
+
+Bindable.prototype=Object.create( EventDispatcher.prototype,{
+   "constructor":{value:Bindable}
+});
+
+/**
+ * 指定对象到当前绑定器。
+ * @param object target 绑定的目标对象。
+ * @param string property 绑定目标对象的属性名。当绑定器中有属性变更时会更新这个属性名的值。
+ * @param string name 绑定数据源中(source)的属性名。
+ * @param boolean flag 一个布尔值， 如果为 false 此目标对象的属性发生变化时不会通知到此绑定器，默认为 true 通知。
+ * @returns {Bindable}
+ */
+Bindable.prototype.bind=function bind(target, property, name, flag)
+{
+    var subscriber = storage(this,'subscriber');
+    var properties = storage(this,'properties');
+    var binding = storage(this,'binding');
+    var item = subscriber.get(target,{binding:{},dispatcher:null,handle:null,element:target});
+    var dispatch = flag !== false;
+    name = name || property;
+    if( typeof property !== "string" )
+    {
+        throw new TypeError("Invalid property must is be a String in Bindable.bind");
+    }
+    if( !(properties[0] ==='*' || properties.indexOf(name) >= 0) )
+    {
+        throw new TypeError("No binding source property name. in Bindable.bind");
+    }
+
+    //是否启用双向绑定
+    if( dispatch && item.handle === null )
+    {
+        //创建一个可派发事件的对象
+        if( !item.dispatcher )
+        {
+            dispatch = target;
+            if( target instanceof Element ){
+
+                item.element = target;
+                dispatch = item.element;
+
+            }else if( Element.isNodeElement(target) )
+            {
+                item.element = new Element(target);
+                dispatch = item.element;
+            }
+            if( dispatch === target && !(target instanceof EventDispatcher) )dispatch = null;
+            if( dispatch )item.dispatcher = dispatch;
+        }
+
+        //如果是一个可派发事件的对象，才能启用双向绑定
+        if( item.dispatcher )
+        {
+            item.handle = function (event)
+            {
+                var property = Reflect.get(null,event,'property');
+                var newValue = Reflect.get(null,event,'newValue');
+                var oldValue = Reflect.get(null,event,'oldValue');
+                if( property && typeof newValue !== "undefined" && newValue!==oldValue && item.binding.hasOwnProperty(property) )
+                {
+                    this.property( item.binding[ property ] , newValue );
+                }
+            };
+            //如果目标对象的属性发生变化
+            Reflect.call(null,item.dispatcher,'addEventListener',[PropertyEvent.CHANGE,item.handle,false,0,this] );
+        }
+    }
+
+    if( !item.binding[ property ] )
+    {
+        item.binding[property] = name;
+        ( binding[name] || (binding[name] = []) ).push({"name": property, "item": item});
+    }
+    var source = storage(this,'source');
+    if( source )
+    {
+        if( !Reflect.has(null,source, name) )
+        {
+            throw new TypeError("target source property is not exists for '"+name+"'");
+        }
+        var value = Reflect.get(null,source, name);
+        if( value )
+        {
+            setProperty(item.element, property, value );
+        }
+    }
+    return this;
+};
+
+/**
+ * 解除绑定(取消订阅)
+ * @public
+ * @param object target 数据对象，允许是一个 DOM元素、EventDispatcher、Object
+ * @param string property 需要绑定的属性名
+ * @returns {boolean}
+ */
+Bindable.prototype.unbind=function unbind(target,property)
+{
+    var subscriber = storage(this,'subscriber');
+    var item=subscriber.get( target );
+    var binding = storage(this,'binding');
+    var bind;
+    if( typeof property ==='string' )
+    {
+        if( item )
+        {
+            if( item.binding.hasOwnProperty( property ) )
+            {
+                var name = item.binding[property];
+                if( binding[name] )
+                {
+                    removeItem(binding[name],item,property);
+                    delete item.binding[property];
+                    if( System.isEmpty(item.binding) )
+                    {
+                        item.dispatcher.removeEventListener(PropertyEvent.CHANGE,item.handle);
+                    }
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    if( item )
+    {
+        for( var p in binding )
+        {
+            bind = binding[ p ];
+            removeItem(bind,item);
+        }
+        item.dispatcher.removeEventListener(PropertyEvent.CHANGE,item.handle);
+    }
+    return !!subscriber.delete( target );
+};
+
+function removeItem( bind ,item, name )
+{
+    var index=0;
+    for( ; index<bind.length; index++ )
+    {
+        if( bind[index].item === item && (!name || bind[index].name === name ) )
+        {
+            bind.splice(index--, 1);
+        }
+    }
+}
+
+/**
+ * 提交属性的值到绑定器。
+ * 调用此方法成功后会传递当前改变的值到绑定的对象中。
+ * @param string name
+ * @param void value
+ */
+Bindable.prototype.property=function property(name,value)
+{
+    if( typeof name === "string" )
+    {
+        var hash = storage(this,'hash');
+        var old = hash[name];
+        var source = storage(this, 'source');
+        if (typeof value !== 'undefined' && old !== value )
+        {
+            //如果目标源属性没有定义
+            if( !this.hasProperty(name) )return false;
+            setProperty( source, name, value);
+            var ev = new PropertyEvent(PropertyEvent.CHANGE);
+            ev.property = name;
+            ev.newValue = value;
+            ev.oldValue = old;
+            this.dispatchEvent(ev);
+            return true;
+        }
+        return typeof old === "undefined" ? getProperty( source, name ) : old;
+    }
+    return false;
+};
+
+/**
+ * 检查是否有指定的属性名
+ * @param string name
+ * @returns {boolean}
+ */
+Bindable.prototype.hasProperty=function hasProperty(name)
+{
+    var properties = storage(this,'properties');
+    if( properties[0] === '*' )
+    {
+        return Reflect.has(null,storage(this,'source'),name);
+    }
+    return properties.indexOf(name) >= 0;
+};
+
+},
+
+/***** Class es/core/State.es *****/
+
+"es/core/State.es": function(module,require){
+function State(name){
+	Object.defineProperty(this,__PRIVATE__,{value:{"_name":'',"_stateGroup":[]}});
+
+	EventDispatcher.call(this);
+	if(name === void 0 ){
+		name='';
+	}
+	this[__PRIVATE__]._name=name;
+};
+module.exports=State;
+var EventDispatcher=require("system/EventDispatcher.js");
+var Array=require("system/Array.js");
+var Symbol=require("system/Symbol.js");
+var Object=require("system/Object.js");
+var Internal=require("system/Internal.js");
+var __PRIVATE__=Symbol("es.core.State").valueOf();
+var method={};
+var proto={"constructor":{"value":State},"H23__name":{"writable":true,"value":'',"type":8}
+,"H23__stateGroup":{"writable":true,"value":[],"type":8}
+,"getName":{"value":function name(){
+	return this[__PRIVATE__]._name;
+},"type":2},"setName":{"value":function name(value){
+	this[__PRIVATE__]._name=value;
+},"type":4},"getStateGroup":{"value":function stateGroup(){
+	return this[__PRIVATE__]._stateGroup;
+},"type":2},"setStateGroup":{"value":function stateGroup(value){
+	this[__PRIVATE__]._stateGroup=value;
+},"type":4},"includeIn":{"value":function includeIn(value){
+	return value===this[__PRIVATE__]._name||this[__PRIVATE__]._stateGroup.indexOf(value)>=0;
+},"type":1}
+};
+State.prototype=Object.create( EventDispatcher.prototype , proto);
+Internal.defineClass("es.core.State",State,{
+	"extends":null,
+	"package":"es.core",
+	"classname":"State",
+	"uri":["H23","I24","Q5"],
+	"privateSymbol":__PRIVATE__,
+	"method":method,
+	"proto":proto
+},1);
+
+},
+
+/***** Class es/core/SkinComponent.es *****/
+
+"es/core/SkinComponent.es": function(module,require){
+function SkinComponent(componentId){
+	Object.defineProperty(this,__PRIVATE__,{value:{"_componentId":undefined,"_async":true,"_skin":null,"_skinClass":null,"properties":{},"_parent":null,"_children":[],"events":{},"_owner":null}});
+
+	Component.call(this);
+	if(System.isDefined(SkinComponent.U25_componentIdHash[componentId])){
+	}
+	SkinComponent.U25_componentIdHash[componentId]=true;
+	this[__PRIVATE__]._componentId=componentId;
+};
+module.exports=SkinComponent;
+var Component=require("es/core/Component.es");
+var SkinEvent=require("es/events/SkinEvent.es");
+var Skin=require("es/core/Skin.es");
+var IContainer=require("es/interfaces/IContainer.es");
+var IDisplay=require("es/interfaces/IDisplay.es");
+var es_internal=require("es/core/es_internal.es");
+var System=require("system/System.js");
+var Reflect=require("system/Reflect.js");
+var PropertyEvent=require("system/PropertyEvent.js");
+var Object=require("system/Object.js");
+var Element=require("system/Element.js");
+var Array=require("system/Array.js");
+var Function=require("system/Function.js");
+var EventDispatcher=require("system/EventDispatcher.js");
+var Event=require("system/Event.js");
+var Symbol=require("system/Symbol.js");
+var Internal=require("system/Internal.js");
+var __PRIVATE__=Symbol("es.core.SkinComponent").valueOf();
+var method={"U25_componentIdHash":{"writable":true,"value":{},"type":8}
+};
+for(var prop in method){
+	Object.defineProperty(SkinComponent, prop, method[prop]);
+}
+var proto={"constructor":{"value":SkinComponent},"U25__componentId":{"writable":true,"value":undefined,"type":8}
+,"getComponentId":{"value":function getComponentId(prefix){
+	if(prefix === void 0 ){
+		prefix="";
+	}
+	return prefix?prefix+'-'+this[__PRIVATE__]._componentId:this[__PRIVATE__]._componentId;
+},"type":1}
+,"U25__async":{"writable":true,"value":true,"type":8}
+,"getAsync":{"value":function async(){
+	return true;
+},"type":2},"setAsync":{"value":function async(flag){
+	this[__PRIVATE__]._async=flag;
+},"type":4},"isNeedCreateSkin":{"value":function isNeedCreateSkin(){
+	return true;
+},"type":1}
+,"U25__skin":{"writable":true,"value":null,"type":8}
+,"getSkin":{"value":function skin(){
+	var skin;
+	var skinClass;
+	if(this[__PRIVATE__]._skin===null){
+		skinClass=this.getSkinClass();
+		if(skinClass===null){
+			throw new TypeError("the \""+System.getQualifiedObjectName(this)+"\" skinClass is not defined.");
+		}
+		skin=Reflect.type(new skinClass(this),Skin);
+		this[__PRIVATE__]._skin=skin;
+	}
+	return this[__PRIVATE__]._skin;
+},"type":2},"setSkin":{"value":function skin(skinObj){
+	var install;
+	var uninstall;
+	var event;
+	var old=this[__PRIVATE__]._skin;
+	if(skinObj!==old){
+		this[__PRIVATE__]._skin=skinObj;
+		if(this.B26_getInitialized()){
+			if(this.hasEventListener(PropertyEvent.CHANGE)){
+				event=new PropertyEvent(PropertyEvent.CHANGE);
+				event.oldValue=old;
+				event.newValue=skinObj;
+				event.property='skin';
+				this.dispatchEvent(event);
+			}
+			if(old&&old.hasEventListener(SkinEvent.UNINSTALL)){
+				uninstall=new SkinEvent(SkinEvent.UNINSTALL);
+				uninstall.setOldSkin(old);
+				uninstall.setNewSkin(skinObj);
+				old.dispatchEvent(uninstall);
+			}
+			this.U25_installChildren();
+			this.B26_commitProperty();
+			this.B26_nowUpdateSkin();
+			if(skinObj.hasEventListener(SkinEvent.INSTALL)){
+				install=new SkinEvent(SkinEvent.INSTALL);
+				install.setOldSkin(old);
+				install.setNewSkin(skinObj);
+				skinObj.dispatchEvent(install);
+			}
+		}
+	}
+},"type":4},"U25__skinClass":{"writable":true,"value":null,"type":8}
+,"getSkinClass":{"value":function skinClass(){
+	return this[__PRIVATE__]._skinClass;
+},"type":2},"setSkinClass":{"value":function skinClass(value){
+	var event;
+	var old=this[__PRIVATE__]._skinClass;
+	if(old!==value){
+		this[__PRIVATE__]._skinClass=value;
+		if(this.B26_getInitialized()){
+			if(this.hasEventListener(PropertyEvent.CHANGE)){
+				event=new PropertyEvent(PropertyEvent.CHANGE);
+				event.oldValue=old;
+				event.newValue=value;
+				event.property='skinClass';
+				this.dispatchEvent(event);
+			}
+			this.setSkin(Reflect.type(new value(this),Skin));
+		}
+	}
+},"type":4},"B26_getProperties":{"value":function(){
+	return this[__PRIVATE__].properties;
+},"type":2},"B26_setProperties":{"value":function(val){
+	return this[__PRIVATE__].properties=val;
+},"type":2},"getHeight":{"value":function height(){
+	if(this.B26_getInitialized()){
+		return this.getSkin().getHeight();
+	}
+	return this.B26_getProperties().height;
+},"type":2},"setHeight":{"value":function height(value){
+	if(this.B26_getInitialized()){
+		this.getSkin().setHeight(value);
+	}
+	this.B26_getProperties().height=value;
+},"type":4},"getWidth":{"value":function width(){
+	if(this.B26_getInitialized()){
+		return this.getSkin().getWidth();
+	}
+	return this.B26_getProperties().width;
+},"type":2},"setWidth":{"value":function width(value){
+	if(this.B26_getInitialized()){
+		this.getSkin().setWidth(value);
+	}
+	this.B26_getProperties().width=value;
+},"type":4},"getElement":{"value":function element(){
+	if(this.B26_getInitialized()){
+		return this.getSkin().getElement();
+	}
+	return null;
+},"type":2},"getVisible":{"value":function visible(){
+	if(this.B26_getInitialized()){
+		return this.getSkin().getVisible();
+	}
+	return !!this.B26_getProperties().visible;
+},"type":2},"setVisible":{"value":function visible(flag){
+	if(this.B26_getInitialized()){
+		this.getSkin().setVisible(flag);
+	}
+	this.B26_getProperties().visible=flag;
+},"type":4},"getLeft":{"value":function left(){
+	if(this.B26_getInitialized()){
+		return this.getSkin().getLeft();
+	}
+	return this.B26_getProperties().left;
+},"type":2},"setLeft":{"value":function left(value){
+	if(this.B26_getInitialized()){
+		this.getSkin().setLeft(value);
+	}
+	this.B26_getProperties().left=value;
+},"type":4},"getTop":{"value":function top(){
+	if(this.B26_getInitialized()){
+		return this.getSkin().getTop();
+	}
+	return this.B26_getProperties().top;
+},"type":2},"setTop":{"value":function top(value){
+	if(this.B26_getInitialized()){
+		this.getSkin().setTop(value);
+	}
+	this.B26_getProperties().top=value;
+},"type":4},"getRight":{"value":function right(){
+	if(this.B26_getInitialized()){
+		return this.getSkin().getRight();
+	}
+	return this.B26_getProperties().right;
+},"type":2},"setRight":{"value":function right(value){
+	if(this.B26_getInitialized()){
+		this.getSkin().setRight(value);
+	}
+	this.B26_getProperties().right=value;
+},"type":4},"getBottom":{"value":function bottom(){
+	if(this.B26_getInitialized()){
+		return this.getSkin().getBottom();
+	}
+	return this.B26_getProperties().bottom;
+},"type":2},"setBottom":{"value":function bottom(value){
+	if(this.B26_getInitialized()){
+		this.getSkin().setBottom(value);
+	}
+	this.B26_getProperties().bottom=value;
+},"type":4},"U25__parent":{"writable":true,"value":null,"type":8}
+,"G7_setParentDisplay":{"value":function setParentDisplay(value){
+	if(value === void 0 ){
+		value=null;
+	}
+	if(this.B26_getInitialized()){
+		this.getSkin().G7_setParentDisplay(value);
+	}
+	this[__PRIVATE__]._parent=value;
+},"type":1}
+,"getParent":{"value":function parent(){
+	if(this.B26_getInitialized()){
+		return this.getSkin().getParent();
+	}
+	return this[__PRIVATE__]._parent;
+},"type":2},"U25__children":{"writable":true,"value":[],"type":8}
+,"getChildren":{"value":function children(){
+	if(this.B26_getInitialized()){
+		return this.getSkin().getChildren().slice(0);
+	}
+	else {
+		return this[__PRIVATE__]._children.slice(0);
+	}
+},"type":2},"setChildren":{"value":function children(value){
+	if(this.B26_getInitialized()){
+		this.getSkin().setChildren(value.slice(0));
+	}
+	else {
+		this[__PRIVATE__]._children=value.slice(0);
+	}
+},"type":4},"getChildAt":{"value":function getChildAt(index){
+	if(this.B26_getInitialized()){
+		return this.getSkin().getChildAt(index);
+	}
+	else {
+		if(index<0){
+			index=index+this[__PRIVATE__]._children.length;
+		}
+		return this[__PRIVATE__]._children[index];
+	}
+},"type":1}
+,"getChildIndex":{"value":function getChildIndex(child){
+	if(this.B26_getInitialized()){
+		return this.getSkin().getChildIndex(child);
+	}
+	else {
+		return this[__PRIVATE__]._children.indexOf(child);
+	}
+},"type":1}
+,"addChild":{"value":function addChild(child){
+	if(this.B26_getInitialized()){
+		return this.getSkin().addChild(child);
+	}
+	else {
+		this[__PRIVATE__]._children.push(child);
+		return child;
+	}
+},"type":1}
+,"addChildAt":{"value":function addChildAt(child,index){
+	if(this.B26_getInitialized()){
+		return this.getSkin().addChildAt(child,index);
+	}
+	else {
+		if(index<0){
+			index=index+this[__PRIVATE__]._children.length;
+		}
+		this[__PRIVATE__]._children.splice(index,0,child);
+		return child;
+	}
+},"type":1}
+,"removeChild":{"value":function removeChild(child){
+	var index;
+	if(this.B26_getInitialized()){
+		return this.getSkin().removeChild(child);
+	}
+	else {
+		index=this[__PRIVATE__]._children.indexOf(child);
+		if(index>=0){
+			this.removeChildAt(index);
+		}
+		else {
+			throw new ReferenceError("child is not exists.");
+		}
+	}
+},"type":1}
+,"removeChildAt":{"value":function removeChildAt(index){
+	if(this.B26_getInitialized()){
+		return this.getSkin().removeChildAt(index);
+	}
+	else {
+		if(index<0){
+			index=index+this[__PRIVATE__]._children.length;
+		}
+		if(this[__PRIVATE__]._children[index]){
+			return this[__PRIVATE__]._children.splice(index,1);
+		}
+		throw new ReferenceError("Index is out of range");
+	}
+},"type":1}
+,"removeAllChild":{"value":function removeAllChild(){
+	if(this.B26_getInitialized()){
+		this.getSkin().removeAllChild();
+	}
+	else {
+		this[__PRIVATE__]._children=[];
+	}
+},"type":1}
+,"contains":{"value":function contains(child){
+	if(!this.B26_getInitialized()){
+		return false;
+	}
+	else {
+		return this.getSkin().contains(child);
+	}
+},"type":1}
+,"U25_events":{"writable":true,"value":{},"type":8}
+,"addEventListener":{"value":function addEventListener(type,callback,useCapture,priority,reference){
+	if(reference === void 0 ){
+		reference=null;
+	}
+	if(priority === void 0 ){
+		priority=0;
+	}
+	if(useCapture === void 0 ){
+		useCapture=false;
+	}
+	Component.prototype.addEventListener.call(this,type,callback,useCapture,priority,reference);
+	if(this.B26_getInitialized()){
+		this.getSkin().addEventListener(type,callback,useCapture,priority,reference);
+	}
+	else {
+		if(!this[__PRIVATE__].events.hasOwnProperty(type)){
+			this[__PRIVATE__].events[type]=[];
+		}
+		Reflect.call(SkinComponent,this[__PRIVATE__].events[type],"push",[{"callback":callback,"useCapture":useCapture,"priority":priority,"reference":reference}]);
+	}
+	return this;
+},"type":1}
+,"removeEventListener":{"value":function removeEventListener(type,listener){
+	if(listener === void 0 ){
+		listener=null;
+	}
+	var len;
+	var map;
+	var flag=Component.prototype.removeEventListener.call(this,type,listener);
+	if(this.B26_getInitialized()){
+		return this.getSkin().removeEventListener(type,listener);
+	}
+	else if(this[__PRIVATE__].events.hasOwnProperty(type)){
+		if(!listener){
+			delete this[__PRIVATE__].events[type];
+			return true;
+		}
+		map=this[__PRIVATE__].events[type];
+		len=map.length;
+		for(;len>0;){
+			if(Reflect.get(SkinComponent,map[--len],"callback")===listener){
+				map.splice(len,1);
+				return true;
+			}
+		}
+	}
+	return flag;
+},"type":1}
+,"dispatchEvent":{"value":function dispatchEvent(event){
+	return Component.prototype.dispatchEvent.call(this,event);
+},"type":1}
+,"hasEventListener":{"value":function hasEventListener(type,listener){
+	if(listener === void 0 ){
+		listener=null;
+	}
+	return Component.prototype.hasEventListener.call(this,type,listener);
+},"type":1}
+,"display":{"value":function display(){
+	if(!this.B26_getInitialized()){
+		this.B26_initializing();
+		this.B26_commitPropertyAndUpdateSkin();
+	}
+	else if(!this.getSkin().getParent()){
+		this.B26_nowUpdateSkin();
+	}
+	return this.getSkin().getElement();
+},"type":1}
+,"B26_initializing":{"value":function initializing(){
+	if(!this.B26_getInitialized()){
+		Component.prototype.B26_initializing.call(this);
+		this.U25_installChildren();
+		this.B26_commitProperty();
+	}
+},"type":1}
+,"U25_installChildren":{"value":function installChildren(){
+	if(this[__PRIVATE__]._children.length>0){
+		this.getSkin().setChildren(this[__PRIVATE__]._children);
+	}
+},"type":1}
+,"B26_commitProperty":{"value":function commitProperty(){
+	var skin=this.getSkin();
+	Object.forEach(this.B26_getProperties(),function(value,name){
+		if(Reflect.has(SkinComponent,skin,name)){
+			Reflect.set(SkinComponent,skin,name,value);
+		}
+	});
+	Object.forEach(this[__PRIVATE__].events,function(listener,type){
+		var item;
+		var len=listener.length;
+		var index=0;
+		for(;index<len;index++){
+			item=listener[index];
+			skin.removeEventListener(type,item.callback);
+			skin.addEventListener(type,item.callback,item.useCapture,item.priority,item.reference);
+		}
+	},this);
+	if(this[__PRIVATE__]._parent){
+		skin.G7_setParentDisplay(this[__PRIVATE__]._parent);
+	}
+},"type":1}
+,"B26_commitPropertyAndUpdateSkin":{"value":function commitPropertyAndUpdateSkin(){
+	if(this.B26_getInitialized()){
+		this.B26_nowUpdateSkin();
+	}
+},"type":1}
+,"B26_nowUpdateSkin":{"value":function nowUpdateSkin(){
+	var skin=this.getSkin();
+	skin.display();
+},"type":1}
+,"B26_push":{"value":function push(name,value){
+	this.B26_getProperties()[name]=value;
+},"type":1}
+,"B26_pull":{"value":function pull(name){
+	return this.B26_getProperties()[name];
+},"type":1}
+,"U25__owner":{"writable":true,"value":null,"type":8}
+,"getOwner":{"value":function owner(){
+	return this[__PRIVATE__]._owner;
+},"type":2},"setOwner":{"value":function owner(value){
+	this[__PRIVATE__]._owner=value;
+},"type":4}};
+SkinComponent.prototype=Object.create( Component.prototype , proto);
+Internal.defineClass("es.core.SkinComponent",SkinComponent,{
+	"extends":Component,
+	"package":"es.core",
+	"classname":"SkinComponent",
+	"implements":[IDisplay,IContainer],
+	"uri":["U25","B26","Q5"],
+	"privateSymbol":__PRIVATE__,
+	"method":method,
+	"proto":proto
+},1);
+
+},
+
+/***** Class es/core/Component.es *****/
+
+"es/core/Component.es": function(module,require){
+function Component(){
+	Object.defineProperty(this,__PRIVATE__,{value:{"initialized":false}});
+
+	EventDispatcher.call(this);
+};
+module.exports=Component;
+var ComponentEvent=require("es/events/ComponentEvent.es");
+var EventDispatcher=require("system/EventDispatcher.js");
+var Symbol=require("system/Symbol.js");
+var Object=require("system/Object.js");
+var Internal=require("system/Internal.js");
+var __PRIVATE__=Symbol("es.core.Component").valueOf();
+var method={};
+var proto={"constructor":{"value":Component},"B26_getInitialized":{"value":function(){
+	return this[__PRIVATE__].initialized;
+},"type":2},"B26_setInitialized":{"value":function(val){
+	return this[__PRIVATE__].initialized=val;
+},"type":2},"B26_initializing":{"value":function initializing(){
+	if(this.B26_getInitialized()===false){
+		this.B26_setInitialized(true);
+		if(this.hasEventListener(ComponentEvent.INITIALIZING)){
+			this.dispatchEvent(new ComponentEvent(ComponentEvent.INITIALIZING));
+		}
+	}
+},"type":1}
+};
+Component.prototype=Object.create( EventDispatcher.prototype , proto);
+Internal.defineClass("es.core.Component",Component,{
+	"extends":null,
+	"package":"es.core",
+	"classname":"Component",
+	"uri":["Y27","B26","Q5"],
+	"privateSymbol":__PRIVATE__,
+	"method":method,
+	"proto":proto
+},1);
+
+},
+
+/***** Class es/events/ComponentEvent.es *****/
+
+"es/events/ComponentEvent.es": function(module,require){
+function ComponentEvent(type,bubbles,cancelable){
+	Object.defineProperty(this,__PRIVATE__,{value:{"hostComponent":null,"hotUpdateModule":null}});
+
+	if(cancelable === void 0 ){
+		cancelable=true;
+	}
+	if(bubbles === void 0 ){
+		bubbles=true;
+	}
+	Event.call(this,type,bubbles,cancelable);
+};
+module.exports=ComponentEvent;
+var Event=require("system/Event.js");
+var Symbol=require("system/Symbol.js");
+var Object=require("system/Object.js");
+var Internal=require("system/Internal.js");
+var __PRIVATE__=Symbol("es.events.ComponentEvent").valueOf();
+var method={"INITIALIZING":{"value":'componentInitializing',"type":16}
+,"INITIALIZED":{"value":'componentInitialized',"type":16}
+,"COMPONENT_HOT_UPDATE":{"value":'componentHotUpdate',"type":16}
+,"COMPONENT_INSTALL":{"value":'componentInstall',"type":16}
+,"COMPONENT_UNINSTALL":{"value":'componentUnInstall',"type":16}
+};
+for(var prop in method){
+	Object.defineProperty(ComponentEvent, prop, method[prop]);
+}
+var proto={"constructor":{"value":ComponentEvent},"getHostComponent":{"value":function(){
+	return this[__PRIVATE__].hostComponent;
+},"type":2},"setHostComponent":{"value":function(val){
+	return this[__PRIVATE__].hostComponent=val;
+},"type":2},"getHotUpdateModule":{"value":function(){
+	return this[__PRIVATE__].hotUpdateModule;
+},"type":2},"setHotUpdateModule":{"value":function(val){
+	return this[__PRIVATE__].hotUpdateModule=val;
+},"type":2}};
+ComponentEvent.prototype=Object.create( Event.prototype , proto);
+Internal.defineClass("es.events.ComponentEvent",ComponentEvent,{
+	"extends":null,
+	"package":"es.events",
+	"classname":"ComponentEvent",
+	"uri":["B28","T29","Z22"],
+	"privateSymbol":__PRIVATE__,
+	"method":method,
+	"proto":proto
+},1);
+
+},
+
+/***** Class es/core/Interaction.es *****/
+
+"es/core/Interaction.es": function(module,require){
+function Interaction(){
+throw new TypeError("\"es.core.Interaction\" is not constructor.");
+};
+module.exports=Interaction;
+var System=require("system/System.js");
+var Reflect=require("system/Reflect.js");
+var Object=require("system/Object.js");
+var Symbol=require("system/Symbol.js");
+var Internal=require("system/Internal.js");
+var __PRIVATE__=Symbol("es.core.Interaction").valueOf();
+var method={"key":{"writable":true,"value":"FJH9-H3EW-8WI0-YT2D","type":8}
+,"b34_properties":{"writable":true,"value":{},"type":8}
+,"getProperties":{"value":function getProperties(){
+	return Interaction.b34_properties;
+},"type":1}
+,"b34_initialized":{"writable":true,"value":false,"type":8}
+,"pull":{"value":function pull(key){
+	if(Interaction.b34_initialized===false){
+		Interaction.b34_initialized=true;
+		if(System.isObject(Reflect.get(Interaction,window,Interaction.key))){
+			Interaction.b34_properties=Reflect.get(Interaction,window,Interaction.key);
+		}
+	}
+	return System.isDefined(Interaction.b34_properties[key])?Interaction.b34_properties[key]:null;
+},"type":1}
+,"push":{"value":function push(key,data){
+	if(System.isDefined(Interaction.b34_properties[key])){
+		Interaction.b34_properties[key]=Object.merge(Interaction.b34_properties[key],data);
+	}
+	else {
+		Interaction.b34_properties[key]=data;
+	}
+},"type":1}
+};
+for(var prop in method){
+	Object.defineProperty(Interaction, prop, method[prop]);
+}
+var proto={};
+Object.defineProperty(Interaction,"prototype",{value:{}});
+Internal.defineClass("es.core.Interaction",Interaction,{
+	"package":"es.core",
+	"classname":"Interaction",
+	"uri":["b34","b35","Q5"],
+	"privateSymbol":__PRIVATE__,
+	"method":method,
+	"proto":proto
+},1);
+
+},
+
+/***** System system/Console.js *****/
+
+"system/Console.js": function(module,require){
+/*
+ * Copyright © 2017 EaseScript All rights reserved.
+ * Released under the MIT license
+ * https://github.com/51breeze/EaseScript
+ * @author Jun Ye <664371281@qq.com>
+ * @require System,SyntaxError
+ */
+function Console()
+{
+   throw new SyntaxError('console object is not constructor or function');
+}
+
+module.exports = Console;
+var Internal =require("system/Internal.js");
+var System =require("system/System.js");
+
+var Function =require("system/Function.js");
+var call = Function.prototype.call;
+var output = Internal.$console;
+
+function toString( args )
+{
+    var str=[ output ];
+    for(var i=0; i<args.length; i++)
+    {
+        if( args[i] && ( System.isObject(args[i],true) || typeof args[i] ==="function" ) )
+        {
+            str.push( args[i].valueOf() );
+        }else
+        {
+            str.push( args[i] );
+        }
+    }
+    return str;
+}
+
+Console.log=function log(){
+    call.apply(output.log, toString( arguments ) );
+};
+Console.info =function info(){
+    call.apply(output.info, toString( arguments ) );
+};
+Console.trace = function trace(){
+    call.apply(output.trace, toString( arguments ) );
+};
+Console.warn = function warn(){
+    call.apply(output.warn, toString( arguments ) );
+};
+Console.error = function error(){
+    call.apply(output.error, toString( arguments ) );
+};
+Console.dir = function dir(){
+    call.apply(output.dir, toString( arguments ) );
+};
+Console.assert = function assert(){
+    call.apply(output.assert, toString( arguments ) );
+};
+Console.time = function time(){
+    call.apply(output.time, toString( arguments ) );
+};
+Console.timeEnd = function timeEnd(){
+    call.apply(output.timeEnd, toString( arguments ) );
+};
+},
+
+/***** Class src/view/TestView.html *****/
+
+"src/view/TestView.html": function(module,require){
+function TestView(hostComponent){
+	Object.defineProperty(this,__PRIVATE__,{value:{"properties":{},"answer":null,"dataGrid":null,"_hostComponent":undefined,"_inputValue":""}});
+
+	if(hostComponent === void 0 ){
+		hostComponent=null;
+	}
+	this[__PRIVATE__]._hostComponent=hostComponent;
+	View.call(this,hostComponent);
+	var __var94__=new State();
+	__var94__.setName("show");
+	__var94__.setStateGroup(["fail","success"]);
+	var __var95__=new State();
+	__var95__.setName("grid");
+	__var95__.setStateGroup(["grid"]);
+	var __var96__=new State();
+	__var96__.setName("none");
+	var __var97__=new State();
+	__var97__.setName("text");
+	this.setStates([__var94__,__var95__,__var96__,__var97__]);
+	this.setCurrentState("none");
+	var attrs={"__var61__":{"style":"margin: 15px;","class":"title-list"},"__var65__":{"style":"text-align: center;"},"__var67__":{"style":"cursor: pointer;"},"__var70__":{"style":"color: red;margin: 0px 12px;"},"__var74__":{"placeholder":"在里输入,看下面会发生什么"},"__var78__":{"placeholder":"在里输入,看上面会发生什么"},"__var84__":{"style":"color: red;"},"__var87__":{"style":"text-align: center;margin: 15px auto;"},"__var93__":{"style":"width: 80%; margin: 0px auto; margin-top: 50px;"}};
+	this[__PRIVATE__].properties=attrs;
+	var answer=this.j2_createElement(0,20,"span",null,attrs.__var70__);
+	this.setAnswer(answer);
+	var dataGrid=(this.j2_createComponent(0,32,DataGrid));
+	this.setDataGrid(dataGrid);
+};
+module.exports=TestView;
+var View=require("es/core/View.es");
+var PopUp=require("es/components/PopUp.es");
+var PropertyEvent=require("system/PropertyEvent.js");
+var IDisplay=require("es/interfaces/IDisplay.es");
+var State=require("es/core/State.es");
+var Application=require("es/core/Application.es");
+var Test=require("src/Test.es");
+var DataGrid=require("es/components/DataGrid.es");
+var SkinComponent=require("es/core/SkinComponent.es");
+var Container=require("es/core/Container.es");
+var PopUpSkin=require("es/skins/PopUpSkin.html");
+var DataGridSkin=require("es/skins/DataGridSkin.html");
+var Array=require("system/Array.js");
+var System=require("system/System.js");
+var Reflect=require("system/Reflect.js");
+var Function=require("system/Function.js");
+var Object=require("system/Object.js");
+var Symbol=require("system/Symbol.js");
+var Internal=require("system/Internal.js");
+var __PRIVATE__=Symbol("view.TestView").valueOf();
+var method={};
+var proto={"constructor":{"value":TestView},"j1_properties":{"writable":true,"value":{},"type":8}
+,"getAnswer":{"value":function(){
+	return this[__PRIVATE__].answer;
+},"type":2},"setAnswer":{"value":function(val){
+	return this[__PRIVATE__].answer=val;
+},"type":2},"getDataGrid":{"value":function(){
+	return this[__PRIVATE__].dataGrid;
+},"type":2},"setDataGrid":{"value":function(val){
+	return this[__PRIVATE__].dataGrid=val;
+},"type":2},"j1__hostComponent":{"writable":true,"value":undefined,"type":8}
+,"j2_getHostComponent":{"value":function hostComponent(){
+	return this[__PRIVATE__]._hostComponent;
+},"type":2},"j2_render":{"value":function render(){
+	var dataset=this.getDataset();
+	var stateGroup=this.j2_getCurrentStateGroup();
+	if(!stateGroup){
+		throw new TypeError("State group is not defined for 'stateGroup'");
+	}
+	var message=dataset.message||"title is default";
+	var attrs=this[__PRIVATE__].properties;
+	var __var55__=(this.j2_createComponent(0,6,Container,"div",[this.j2_createElement(0,7,"div",[this.j2_createElement(0,8,"a","弹框组件",null,null,{"click":(this.j1_change.bind(this,'show'))}),this.j2_createElement(0,9,"a","表格组件",null,null,{"click":(this.j1_change.bind(this,'grid'))}),this.j2_createElement(0,10,"a","双向绑定和变量",null,null,{"click":(this.j1_change.bind(this,'text'))}),this.j2_createElement(0,11,"a","重置状态",null,null,{"click":(this.j1_change.bind(this,'none'))})],attrs.__var61__)]));
+	var answer=this.getAnswer();
+	var __var62__=(stateGroup.includeIn("show")?this.j2_createComponent(0,12,PopUp,null,[this.j2_createElement(0,13,"p",[this.j2_createElement(0,14,"div","这里是弹框内容")],attrs.__var65__),this.j2_createElement(0,15,"p",[this.j2_createElement(0,16,"a","点我，再来一个问候",attrs.__var67__,null,{"click":this.j1_showTips})],attrs.__var65__),this.j2_createElement(0,17,"p",[this.j2_createElement(0,18,"div",[this.j2_createElement(0,19,"text","您选择的结果是?"),answer])],attrs.__var65__)]):null);
+	var __var73__=this.j2_createElement(0,22,"input",null,attrs.__var74__);
+	var __var77__=this.j2_createElement(0,25,"input",null,attrs.__var78__);
+	var dataGrid=(stateGroup.includeIn("grid")?this.getDataGrid():null);
+	if(__var62__){
+		__var62__.setTitle("弹框组件");
+		__var62__.setSkinClass(PopUpSkin);
+	}
+	this.watch("inputValue",__var73__,"value");
+	this.watch("inputValue",__var77__,"value");
+	if(dataGrid){
+		dataGrid.setSkinClass(DataGridSkin);
+		dataGrid.setSource(new Array(new Object({"id":1,"name":"张三","phone":15302662598}),new Object({"id":2,"name":"李四","phone":1869875696}),new Object({"id":2,"name":"王五","phone":1896325987})));
+		dataGrid.setColumns({"id":"ID","name":"名称","phone":"电话"});
+		this.j2_bindEvent(0,32,dataGrid,{"click":this.j1_click});
+	}
+	return [this.j2_createElement(0,4,"h1","Welcome use EaseScript"),this.j2_createElement(0,5,"div",[__var55__,__var62__,stateGroup.includeIn("text")?this.j2_createElement(0,21,"div",[__var73__,this.j2_createElement(0,23,"br"),this.j2_createElement(0,24,"br"),__var77__,this.j2_createElement(0,26,"br"),this.j2_createElement(0,27,"br"),this.j2_createElement(0,28,"button","清空",null,null,{"click":this.j2_reset}),this.j2_createElement(0,29,"button","提交并刷新",null,null,{"click":this.j2_apply}),this.j2_createElement(0,30,"h3",[this.j2_createElement(0,31,"span",message,attrs.__var84__)])],attrs.__var87__):null,dataGrid],attrs.__var93__)];
+},"type":1}
+,"j1_click":{"value":function click(e){
+	PopUp.title("on click grid");
+	new PropertyEvent();
+},"type":1}
+,"j1_showTips":{"value":function showTips(){var __this0__ = this;
+	PopUp.confirm("Are you ok?",function(e){
+		__this0__.getAnswer().innerHTML=e==="submit"?"很好":"一般"
+	},{profile:{submitText:"很好",cancelText:"一般",titleText:"向您问候"}});
+},"type":1}
+,"j1_change":{"value":function change(name){
+	this.setCurrentState(name);
+},"type":1}
+,"j2_reset":{"value":function reset(){
+	this.setInputValue("");
+},"type":1}
+,"j2_apply":{"value":function apply(){
+	this.assign("message",this.getInputValue());
+},"type":1}
+,"getInputValue":{"value":function(){
+	return this[__PRIVATE__]._inputValue;
+},"type":2},"setInputValue":{"value":function(val){
+	var old = this[__PRIVATE__]._inputValue;
+	if(old!==val){
+		this[__PRIVATE__]._inputValue=val;
+		var event = new PropertyEvent(PropertyEvent.CHANGE);
+		event.property = "inputValue";
+		event.oldValue = old;
+		event.newValue = val;
+		this.dispatchEvent(event);
+	}
+},"type":4}};
+TestView.prototype=Object.create( View.prototype , proto);
+Internal.defineClass("view.TestView",TestView,{
+	"extends":View,
+	"package":"view",
+	"classname":"TestView",
+	"uri":["j1","j2","K3"],
+	"privateSymbol":__PRIVATE__,
+	"method":method,
+	"proto":proto
+},1);
+
+},
+
+/***** Class es/components/DataGrid.es *****/
+
+"es/components/DataGrid.es": function(module,require){
+function DataGrid(componentId){
+	Object.defineProperty(this,__PRIVATE__,{value:{"_dataSource":null,"_columns":{},"_columnProfile":'columns',"_dataProfile":'datalist',"_radius":5,"_rowHeight":25,"_headHeight":30,"_footHeight":30}});
+
+	if(componentId === void 0 ){
+		componentId="10";
+	}
+	SkinComponent.call(this,componentId);
+};
+module.exports=DataGrid;
+var SkinComponent=require("es/core/SkinComponent.es");
+var DataSource=require("system/DataSource.js");
+var System=require("system/System.js");
+var Object=require("system/Object.js");
+var Reflect=require("system/Reflect.js");
+var Symbol=require("system/Symbol.js");
+var Internal=require("system/Internal.js");
+var __PRIVATE__=Symbol("es.components.DataGrid").valueOf();
+var method={};
+var proto={"constructor":{"value":DataGrid},"Z36__dataSource":{"writable":true,"value":null,"type":8}
+,"getDataSource":{"value":function dataSource(){
+	var dataSource=this[__PRIVATE__]._dataSource;
+	if(dataSource===null){
+		dataSource=new DataSource();
+		this[__PRIVATE__]._dataSource=dataSource;
+	}
+	return dataSource;
+},"type":2},"getSource":{"value":function source(){
+	return this.getDataSource().source();
+},"type":2},"setSource":{"value":function source(data){
+	this.getDataSource().source(data);
+},"type":4},"Z36__columns":{"writable":true,"value":{},"type":8}
+,"getColumns":{"value":function columns(){
+	return this[__PRIVATE__]._columns;
+},"type":2},"setColumns":{"value":function columns(columns){
+	this[__PRIVATE__]._columns=System.isString(columns)?Reflect.call(DataGrid,columns,"split",[',']):columns;
+},"type":4},"getRows":{"value":function rows(){
+	return this.getDataSource().pageSize();
+},"type":2},"setRows":{"value":function rows(value){
+	this.getDataSource().pageSize(value);
+},"type":4},"Z36__columnProfile":{"writable":true,"value":'columns',"type":8}
+,"getColumnProfile":{"value":function columnProfile(){
+	return this[__PRIVATE__]._columnProfile;
+},"type":2},"setColumnProfile":{"value":function columnProfile(value){
+	this[__PRIVATE__]._columnProfile=value;
+},"type":4},"Z36__dataProfile":{"writable":true,"value":'datalist',"type":8}
+,"getDataProfile":{"value":function dataProfile(){
+	return this[__PRIVATE__]._dataProfile;
+},"type":2},"setDataProfile":{"value":function dataProfile(profile){
+	this[__PRIVATE__]._dataProfile=profile;
+},"type":4},"Z36__radius":{"writable":true,"value":5,"type":8}
+,"getRadius":{"value":function radius(){
+	return this[__PRIVATE__]._radius;
+},"type":2},"setRadius":{"value":function radius(value){
+	this[__PRIVATE__]._radius=value;
+	this.B26_commitPropertyAndUpdateSkin();
+},"type":4},"Z36__rowHeight":{"writable":true,"value":25,"type":8}
+,"getRowHeight":{"value":function rowHeight(){
+	return this[__PRIVATE__]._rowHeight;
+},"type":2},"setRowHeight":{"value":function rowHeight(value){
+	this[__PRIVATE__]._rowHeight=value;
+	this.B26_commitPropertyAndUpdateSkin();
+},"type":4},"Z36__headHeight":{"writable":true,"value":30,"type":8}
+,"getHeadHeight":{"value":function headHeight(){
+	return this[__PRIVATE__]._headHeight;
+},"type":2},"setHeadHeight":{"value":function headHeight(value){
+	this[__PRIVATE__]._headHeight=value;
+	this.B26_commitPropertyAndUpdateSkin();
+},"type":4},"Z36__footHeight":{"writable":true,"value":30,"type":8}
+,"getFootHeight":{"value":function footHeight(){
+	return this[__PRIVATE__]._footHeight;
+},"type":2},"setFootHeight":{"value":function footHeight(value){
+	this[__PRIVATE__]._footHeight=value;
+	this.B26_commitPropertyAndUpdateSkin();
+},"type":4}};
+DataGrid.prototype=Object.create( SkinComponent.prototype , proto);
+Internal.defineClass("es.components.DataGrid",DataGrid,{
+	"extends":SkinComponent,
+	"package":"es.components",
+	"classname":"DataGrid",
+	"uri":["Z36","B26","B37"],
+	"privateSymbol":__PRIVATE__,
+	"method":method,
+	"proto":proto
+},1);
+
+},
+
+/***** System system/DataArray.js *****/
+
+"system/DataArray.js": function(module,require){
+/*
+ * Copyright © 2017 EaseScript All rights reserved.
+ * Released under the MIT license
+ * https://github.com/51breeze/EaseScript
+ * @author Jun Ye <664371281@qq.com>
+ * @require System,Object,Array,ReferenceError
+ */
+function DataArray()
+{
+    if( !System.instanceOf(this,DataArray) )
+    {
+        return Array.apply( Object.create( DataArray.prototype ), Array.prototype.slice.call(arguments,0) );
+    }
+    if( arguments.length === 1 && System.instanceOf(arguments[0],Array) )
+    {
+        Array.apply(this, arguments[0]);
+    }else{
+        Array.apply(this, Array.prototype.slice.call(arguments,0) );
+    }
+    return this;
+}
+
+module.exports = DataArray;
+var System =require("system/System.js");
+var Object =require("system/Object.js");
+var Array =require("system/Array.js");
+
+
+DataArray.DESC='desc';
+DataArray.ASC='asc';
+DataArray.prototype= Object.create( Array.prototype,{
+    "constructor":{value:DataArray},
+    /**
+     * 返回此对象的字符串
+     * @returns {*}
+     */
+    "toString":{value:function toString()
+    {
+        if( this.constructor === DataArray )
+        {
+            return "[object DataArray]";
+        }
+        return Array.prototype.toString.call(this);
+    }},
+
+    /**
+     * 根据指定的列进行排序
+     * @param column
+     * @param type
+     * @returns {DataArray}
+     */
+    "orderBy":{value:function orderBy(column,type)
+    {
+        if( this.length < 2 )return this;
+        if( (column === DataArray.DESC || column === DataArray.ASC || column==null) && type==null )
+        {
+            if( typeof this[0] === "object" )
+            {
+                throw new ReferenceError('Missing column name.');
+            }
+            this.sort(function (a,b) {
+                return column === DataArray.DESC ? System.compare(b,a) : System.compare(a,b);
+            });
+            return this;
+        }
+
+        var field=column,orderby=['var a=arguments[0],b=arguments[1],s=0,cp=arguments[2];'];
+        if( typeof column !== "object" )
+        {
+            field={};
+            field[ column ] = type;
+        }
+        for(var c in field )
+        {
+            type = DataArray.DESC === field[c].toLowerCase() ?  DataArray.DESC :  DataArray.ASC;
+            orderby.push( type===DataArray.DESC ? "cp(b['"+c+"'],a['"+c+"']):s;" : "cp(a['"+c+"'],b['"+c+"']):s;");
+        }
+        orderby = orderby.join("s=s==0?");
+        orderby+="return s;";
+        var fn = new Function( orderby );
+        this.sort(function (a,b) {
+            return fn(a,b,System.compare);
+        });
+        return this;
+    }},
+
+    /**
+     * 统计数组中所有值的和
+     * @param function callback 回调函数，返回每个项的值。
+     * @returns {number}
+     * @public
+     */
+    "sum":{value:function sum( callback )
+    {
+        var result = 0;
+        var type = typeof callback;
+        var index=0,len=this.length >> 0;
+        if( len===0 )return 0;
+        if( type !== "function" ){
+            if( type === "string" ){
+                var field = callback;
+                if( typeof this[0][ field ] === "undefined" )
+                {
+                    throw new ReferenceError('assign field does not define. for "'+type+'"');
+                }
+                callback = function( value ){return value[field]>>0;}
+            }else
+            {
+                if( typeof this[0] === "object" )
+                {
+                    throw new ReferenceError('Missing field name.');
+                }
+                callback = function( value ){return System.isNaN(value) ? 0 : value>>0;}
+            }
+        }
+        for(;index<len;index++)
+        {
+            result+=callback.call(this,this[index])>>0;
+        }
+        return result;
+    }}
+});
+
+
+
+},
+
+/***** System system/HttpEvent.js *****/
+
+"system/HttpEvent.js": function(module,require){
+/*
+ * EaseScript
+ * Copyright © 2017 EaseScript All rights reserved.
+ * Released under the MIT license
+ * https://github.com/51breeze/EaseScript
+ * @author Jun Ye <664371281@qq.com>
+ * @require Event,Object
+ */
+function HttpEvent( type, bubbles,cancelable ){
+    if( !(this instanceof HttpEvent) )return new HttpEvent(type, bubbles,cancelable);
+    Event.call(this, type, bubbles,cancelable );
+    return this;
+};
+
+module.exports = HttpEvent;
+var Object =require("system/Object.js");
+var Event =require("system/Event.js");
+
+HttpEvent.prototype=Object.create( Event.prototype,{
+    "constructor":{value:HttpEvent},
+    "toString":{value:function toString(){
+        return '[object HttpEvent]';
+    }},
+    "valueOf":{value:function valueOf(){
+        return '[object HttpEvent]';
+    }}
+});
+HttpEvent.prototype.data=null;
+HttpEvent.prototype.url=null;
+HttpEvent.prototype.loaded = 0;
+HttpEvent.prototype.total = 0;
+HttpEvent.LOAD_START = 'httpLoadStart';
+HttpEvent.SUCCESS = 'httpSuccess';
+HttpEvent.PROGRESS = 'httpProgress';
+HttpEvent.ERROR   = 'httpError';
+HttpEvent.CANCELED  = 'httpCanceled';
+HttpEvent.TIMEOUT = 'httpTimeout';
+
+//属性事件
+Event.registerEvent(function ( type , target, originalEvent )
+{
+    if( originalEvent instanceof HttpEvent )return originalEvent;
+});
+},
+
+/***** System system/Http.js *****/
+
+"system/Http.js": function(module,require){
+/*
+ * EaseScript
+ * Copyright © 2017 EaseScript All rights reserved.
+ * Released under the MIT license
+ * https://github.com/51breeze/EaseScript
+ * @author Jun Ye <664371281@qq.com>
+* @require System,Object,EventDispatcher,JSON,HttpEvent
+*/
+
+/**
+ * HTTP 请求类
+ * @param options
+ * @returns {Http}
+ * @constructor
+ */
+function Http( options )
+{
+    if( !isSupported )throw new Error('Http the client does not support');
+    if ( !(this instanceof Http) )return new Http(options);
+    EventDispatcher.call(this);
+    Object.defineProperty(this,"__options__", {value:Object.merge(true,{},setting, options)});
+    options = this.__options__;
+    options.xhr = null;
+    options.loading = false;
+    options.setHeader = false;
+    options.queues = [];
+    options.param = null;
+    options.responseHeaders = {};
+    options.timeoutTimer = null;
+}
+
+module.exports = Http;
+var Object =require("system/Object.js");
+var EventDispatcher =require("system/EventDispatcher.js");
+var System =require("system/System.js");
+var JSON =require("system/JSON.js");
+var HttpEvent =require("system/HttpEvent.js");
+var isSupported=false;
+var XHR=null;
+var localUrl='';
+var patternUrl = /^([\w\+\.\-]+:)(?:\/\/([^\/?#:]*)(?::(\d+))?)?/;
+var protocol = /^(?:about|app|app\-storage|.+\-extension|file|res|widget):$/;
+var patternHeaders = /^(.*?):[ \t]*([^\r\n]*)\r?$/mg;
+var localUrlParts=[];
+var setting = {
+    async: true
+    , dataType: 'html'
+    , method: 'GET'
+    , timeout: 30
+    , charset: 'UTF-8'
+    , header: {
+        'contentType': 'application/x-www-form-urlencoded'
+        ,'Accept': "text/html"
+        ,'X-Requested-With': 'XMLHttpRequest'
+    }
+};
+
+if( typeof window !=="undefined" )
+{
+    XHR = window.XMLHttpRequest || window.ActiveXObject;
+    isSupported= !!XHR;
+    localUrl = window.location.href;
+    localUrlParts = patternUrl.exec( localUrl.toLowerCase() ) || [];
+}
+
+/**
+ * @private
+ * 完成请求
+ * @param event
+ */
+function done(event)
+{
+    var options = this.__options__;
+    var xhr = options.xhr;
+    if (xhr.readyState !== 4 || xhr.status==0 )return;
+    var match, result = null, headers = {};
+    System.clearTimeout(options.timeoutTimer);
+    options.timeoutTimer = null;
+
+    //获取响应头信息
+    if( typeof xhr.getAllResponseHeaders === "function" )
+    {
+        while ( ( match = patternHeaders.exec(xhr.getAllResponseHeaders()) ) )
+        {
+            headers[match[1].toLowerCase()] = match[2];
+        }
+    }
+    options.loading=false;
+    options.responseHeaders=headers;
+    if (xhr.status >= 200 && xhr.status < 300)
+    {
+        result = xhr.responseXML;
+        if (options.dataType.toLowerCase() === Http.TYPE_JSON)
+        {
+            try {
+                result = JSON.parse( xhr.responseText );
+            } catch (e) {
+                throw new Error('Invalid JSON the ajax response');
+            }
+        }
+    }
+
+    var e = new HttpEvent( HttpEvent.SUCCESS );
+    e.originalEvent = event;
+    e.data = result || {};
+    e.status = xhr.status;
+    e.url = options.url;
+    e.param = options.param;
+    this.dispatchEvent(e);
+    if( options.queues.length>0)
+    {
+        var queue = options.queues.shift();
+        this.load.apply(this, queue);
+    }
+}
+function loadStart(event)
+{
+    var e = new HttpEvent(HttpEvent.LOAD_START);
+    var xhr = event.currentTarget;
+    e.url = xhr.__url__;
+    e.originalEvent = event;
+    this.dispatchEvent(e);
+}
+
+function progress(event)
+{
+    var e = new HttpEvent(HttpEvent.PROGRESS);
+    var xhr = event.currentTarget;
+    e.url = xhr.__url__;
+    e.originalEvent = event;
+    e.loaded = event.loaded;
+    e.total = event.total;
+    this.dispatchEvent(e);
+}
+
+function error()
+{
+    var e = new HttpEvent(HttpEvent.ERROR);
+    var xhr = event.currentTarget;
+    e.url = xhr.__url__;
+    e.originalEvent = event;
+    this.dispatchEvent(e);
+}
+
+function getXHR( target )
+{
+    var xhr = window.XMLHttpRequest ? new window.XMLHttpRequest() : new window.ActiveXObject("Microsoft.XMLHTTP");
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4)done.call( target );
+    };
+    return xhr;
+}
+
+/**
+ * Difine constan Http accept type
+ */
+Http.ACCEPT_XML= "application/xml,text/xml";
+Http.ACCEPT_HTML= "text/html";
+Http.ACCEPT_TEXT="text/plain";
+Http.ACCEPT_JSON= "application/json, text/javascript";
+Http.ACCEPT_ALL= "*/*";
+
+/**
+ * Difine constan Http contentType data
+ */
+Http.HEADER_TYPE_URLENCODED= "application/x-www-form-urlencoded";
+Http.HEADER_TYPE_FORM_DATA="multipart/form-data";
+Http.HEADER_TYPE_PLAIN="text/plain";
+Http.HEADER_TYPE_JSON="application/json";
+
+/**
+ * Difine constan Http dataType format
+ */
+Http.TYPE_HTML= 'html';
+Http.TYPE_XML= 'xml';
+Http.TYPE_JSON= 'json';
+Http.TYPE_JSONP= 'jsonp';
+
+/**
+ * Difine Http method
+ */
+Http.METHOD_GET='GET';
+Http.METHOD_POST='POST';
+Http.METHOD_PUT='PUT';
+Http.METHOD_DELETE='DELETE';
+
+/**
+ * 继承事件类
+ * @type {Object|Function}
+ */
+Http.prototype = Object.create( EventDispatcher.prototype,{
+    "constructor":{value:Http}
+});
+
+/**
+ * 取消请求
+ * @returns {Boolean}
+ */
+Object.defineProperty(Http.prototype,"option", {value:function option(name, value)
+{
+    var options = this.__options__;
+    if( value == null ){
+        return options[ name ];
+    }
+    options[ name ] = value;
+    return this;
+}});
+
+/**
+ * 取消请求
+ * @returns {Boolean}
+ */
+Object.defineProperty(Http.prototype,"abort", {value:function abort()
+{
+    var options = this.__options__;
+    if (options.xhr)
+    {
+        try{options.xhr.abort();}catch(e){}
+        var event = new HttpEvent(HttpEvent.CANCELED);
+        event.data = null;
+        event.status = -1;
+        event.url = this.__url__;
+        this.dispatchEvent(event);
+        return true;
+    }
+    return false;
+}});
+
+/**
+ * 发送请求
+ * @param data
+ * @returns {boolean}
+ */
+Object.defineProperty(Http.prototype,"load",{value:function load(url, data, method)
+{
+    if (typeof url !== "string")throw new Error('Invalid url');
+    var options = this.__options__;
+    var method = method || options.method;
+    var async = !!options.async;
+    var xhr;
+
+    if( options.loading ===true )
+    {
+        options.queues.push( [url, data, method] );
+        return false;
+    }
+
+    options.loading=true;
+    options.url= url;
+    options.param= data;
+
+    if (typeof method === 'string')
+    {
+        method = method.toUpperCase();
+        if ( Http["METHOD_"+method] !==method )throw new Error('Invalid method for ' + method);
+    }
+
+    try
+    {
+        if( options.dataType.toLowerCase() === Http.TYPE_JSONP )
+        {
+            xhr = new ScriptRequest( async );
+            xhr.addEventListener(HttpEvent.SUCCESS, function (event)
+            {
+                if ( options.timeoutTimer )
+                {
+                    System.clearTimeout( options.timeoutTimer );
+                    options.timeoutTimer = null;
+                }
+                options.loading=false;
+                event.url=options.url;
+                this.dispatchEvent(event);
+
+            }, false, 0, this);
+            xhr.send(url, data, method);
+
+        } else
+        {
+            xhr = options.xhr = getXHR( this );
+            data = data != null ? System.serialize(data, 'url') : null;
+            if (method === Http.METHOD_GET && data)
+            {
+                if (data != '')url += /\?/.test(url) ? '&' + data : '?' + data;
+                data = null;
+            }
+            options.url = url;
+            xhr.open(method, url, async);
+            if( options.setHeader===false )
+            {
+                //设置请求头 如果请求方法为post
+                if( method === Http.METHOD_POST)
+                {
+                    options.header.contentType = Http.HEADER_TYPE_URLENCODED;
+                }
+
+                //设置编码
+                if (!/charset/i.test(options.header.contentType))
+                {
+                    options.header.contentType += ';' + options.charset;
+                }
+
+                try {
+                    var name;
+                    for (name in options.header) {
+                        xhr.setRequestHeader(name, options.header[name]);
+                    }
+                } catch (e) {}
+
+                //设置可以接收的内容类型
+                try {
+                    xhr.overrideMimeType(options.header.Accept);
+                } catch (e) {}
+            }
+            options.setHeader=true;
+            xhr.send(data);
+        }
+
+    } catch (e)
+    {
+        throw new Error('Http the client does not support('+e.message+')');
+    }
+
+    //设置请求超时
+    options.timeoutTimer = System.setTimeout((function (url,self)
+    {
+        return function () {
+            self.abort();
+            if(self.hasEventListener(HttpEvent.TIMEOUT))
+            {
+                var event = new HttpEvent(HttpEvent.TIMEOUT);
+                event.data =null;
+                event.status = 408;
+                event.url = url;
+                self.dispatchEvent(event);
+            }
+            if (self.__timeoutTimer__)
+            {
+                System.clearTimeout(self.__timeoutTimer__);
+                options.timeoutTimer = null;
+            }
+        }
+    })(url,this), options.timeout * 1000);
+    return true;
+}});
+
+/**
+ * 设置Http请求头信息
+ * @param name
+ * @param value
+ * @returns {Http}
+ */
+Object.defineProperty(Http.prototype,"setRequestHeader",{value:function setRequestHeader(name, value)
+{
+    var options = this.__options__;
+    if (typeof value !== "undefined" )
+    {
+        options.header[name] = value;
+    }
+    return this;
+}});
+
+/**
+ * 获取已经响应的头信息
+ * @param name
+ * @returns {null}
+ */
+Object.defineProperty(Http.prototype,"getResponseHeader",{value:function getResponseHeader(name) {
+    var options = this.__options__;
+    if( !options.responseHeaders )return '';
+    return typeof name === 'string' ? options.responseHeaders[ name.toLowerCase() ] || '' : options.responseHeaders;
+}});
+
+//脚本请求队列
+var queues = [];
+
+/**
+ * 通过脚本请求服务器
+ * @returns {ScriptRequest}
+ * @constructor
+ */
+function ScriptRequest( async )
+{
+    if (!(this instanceof ScriptRequest))
+    {
+        return new ScriptRequest();
+    }
+    var target = document.createElement('script');
+    target.setAttribute('type', 'text/javascript');
+    EventDispatcher.call(this, target);
+    queues.push(this);
+    this.__key__ = 's'+queues.length+System.uid();
+    this.__target__ = target;
+    this.__async__ = !!async;
+}
+
+ScriptRequest.prototype = Object.create(EventDispatcher.prototype,{
+    "constructor":{value:ScriptRequest}
+});
+ScriptRequest.prototype.__key__ = null;
+ScriptRequest.prototype.__target__ = null;
+ScriptRequest.prototype.__async__ = null;
+ScriptRequest.prototype.__sended__ = false;
+
+var headElement = null;
+
+/**
+ * 开始请求数据
+ * @param url
+ * @param data
+ * @param async
+ */
+ScriptRequest.prototype.send = function send(url, data)
+{
+    if (this.__sended__)return false;
+    this.__sended__ = true;
+    if (typeof url !== 'string')throw new Error('Invalid url.');
+    var param = [];
+    if(data!=null)param.push( System.serialize(data, 'url') );
+    param.push('k=' + this.__key__ );
+    param.push('JSONP_CALLBACK=JSONP_CALLBACK');
+    param = param.join('&');
+    url += !/\?/.test(url) ? '?' + param : '&' + param;
+    var target = this.__target__;
+    if( this.__async__ )target.setAttribute('async', 'async');
+    target.setAttribute('src', url);
+    if( headElement === null )
+    {
+        headElement = document.head || document.getElementsByTagName("head")[0];
+    }
+
+    if( !headElement || !headElement.parentNode )
+    {
+        throw new ReferenceError("Head element is not exist.");
+    }
+
+    if (!target.parentNode)
+    {
+        headElement.appendChild(target);
+    }
+};
+
+/**
+ * 终止请求
+ */
+ScriptRequest.prototype.abort = function ()
+{
+    this.__canceled__ = true;
+    var target = this.__target__;
+    if (target && target.parentNode) {
+        target.parentNode.removeChild(target);
+    }
+    return true;
+};
+
+/**
+ * 脚本请求后的响应回调函数
+ * @param data 响应的数据集
+ * @param key 向服务器请求时的 key。 此 key 是通知每个请求对象做出反应的唯一编号。
+ * @public
+ */
+Http.JSONP_CALLBACK = function JSONP_CALLBACK(data, key)
+{
+    var index = Math.max(queues.length - 1, 0);
+    if (typeof key !== "undefined") while (index > 0) {
+        if (queues[index].__key__ == key)break;
+        index--;
+    }
+    if (queues[index] && queues[index].__key__ == key)
+    {
+        var target = queues.splice(index, 1).pop();
+        if (!target.__canceled__) {
+            var event = new HttpEvent(HttpEvent.SUCCESS);
+            event.data = data;
+            event.status = 200;
+            target.dispatchEvent(event);
+        }
+    }
+};
+
+if( typeof window !=="undefined" )
+{
+   window.JSONP_CALLBACK=Http.JSONP_CALLBACK;
+}
+},
+
+/***** System system/DataSourceEvent.js *****/
+
+"system/DataSourceEvent.js": function(module,require){
+/*
+ * EaseScript
+ * Copyright © 2017 EaseScript All rights reserved.
+ * Released under the MIT license
+ * https://github.com/51breeze/EaseScript
+ * @author Jun Ye <664371281@qq.com>
+ * @require System,Event,Object
+ */
+
+function DataSourceEvent(type, bubbles,cancelable)
+{
+    if( !System.instanceOf(this,DataSourceEvent) )return new DataSourceEvent(type, bubbles,cancelable);
+    Event.call(this, type, bubbles,cancelable );
+    return this;
+}
+
+module.exports = DataSourceEvent;
+var System =require("system/System.js");
+var Object =require("system/Object.js");
+var Event =require("system/Event.js");
+
+
+DataSourceEvent.prototype= Object.create(Event.prototype,{
+    "constructor":{value:DataSourceEvent}
+});
+DataSourceEvent.prototype.condition=null;
+DataSourceEvent.prototype.index=NaN;
+DataSourceEvent.prototype.data=null;
+DataSourceEvent.prototype.oldValue=null;
+DataSourceEvent.prototype.newValue=null;
+DataSourceEvent.prototype.current = NaN;
+DataSourceEvent.prototype.offset = NaN;
+DataSourceEvent.prototype.waiting=false;
+DataSourceEvent.prototype.totalSize=NaN;
+DataSourceEvent.prototype.pageSize=NaN;
+DataSourceEvent.prototype.totalSize=NaN;
+
+DataSourceEvent.APPEND='dataSourceAppend';
+DataSourceEvent.REMOVE='dataSourceRemove';
+DataSourceEvent.UPDATE='dataSourceUpdate';
+DataSourceEvent.SELECT ='dataSourceSelect';
+DataSourceEvent.CHANGED='dataSourceChanged';
+
+//属性事件
+Event.registerEvent(function ( type , target, originalEvent )
+{
+    if( originalEvent instanceof DataSourceEvent )return originalEvent;
+    switch ( type ){
+        case DataSourceEvent.APPEND :
+        case DataSourceEvent.REMOVE :
+        case DataSourceEvent.UPDATE :
+        case DataSourceEvent.SELECT :
+        case DataSourceEvent.CHANGED :
+            return new DataSourceEvent( type );
+    }
+});
+},
+
+/***** System system/DataGrep.js *****/
+
+"system/DataGrep.js": function(module,require){
+/*
+ * EaseScript
+ * Copyright © 2017 EaseScript All rights reserved.
+ * Released under the MIT license
+ * https://github.com/51breeze/EaseScript
+ * @author Jun Ye <664371281@qq.com>
+ * @require Object,Array,Function,Error,Symbol
+ */
+
+/**
+ * 筛选条件组合
+ * @param column
+ * @param value
+ * @param operational
+ * @param logic
+ * @returns {DataGrep}
+ */
+function strainer( column , value, operational, logic ,type )
+{
+    logic = logic==='or' ? '||' : '&&';
+    this[ this.length ]= {'logic':logic,'column':column,'value':value,'operational':operational,'type':type};
+    this.length++;
+    return this;
+};
+
+/**
+ * 根据据指定的条件生成筛选器
+ * @returns {Function|*}
+ */
+function createFilter()
+{
+    var i=0, item,type,value,refvalue,command=[];
+    for( ; i < this.length ; i++ )
+    {
+        item =  this[i];
+        command.length===0 || command.push(item.logic);
+        type = typeof item.value;
+        value = 'this[' + i + '].value';
+
+        if( item.value instanceof DataGrep )
+        {
+            command.push( '!!this[' + i + '].value.filter().call(this[' + i + '].value,arguments[0])' );
+
+        }else if( type === "function" )
+        {
+            command.push( 'this[' + i + '].value.call(this,arguments[0])' );
+
+        }else if( item.operational=='index' || item.operational=='notindex')
+        {
+            var index= "arguments[1]";
+            var flag = item.operational === 'notindex' ? '!' : '';
+            value = value.split(',');
+            command.push( flag+"("+value[0]+" >= "+index+" && "+value[1]+" <= "+index+")" );
+
+        }else
+        {
+            refvalue= "arguments[0][\"" + item.column + "\"]";
+            if( item.operational==='like' || item.operational==='notlike' )
+            {
+                var flag = item.operational === 'notlike' ? '!' : '';
+                if( item.type === 'right' )
+                {
+                    command.push(flag+"new RegExp('^'+"+value+" ).test("+refvalue+")");
+                }else if( item.type === 'left' )
+                {
+                    command.push(flag+"new RegExp("+value+"+'$' ).test("+refvalue+")");
+                }else
+                {
+                    command.push(flag+"new RegExp( "+value+" ).test("+refvalue+")");
+                }
+
+            }else if( item.operational=='range' || item.operational=='notrange')
+            {
+                var flag = item.operational === 'notrange' ? '!' : '';
+                value = value.split(',');
+                command.push( flag+"("+value[0]+" >= "+refvalue+" && "+value[1]+" <= "+refvalue+")" );
+
+            }else
+            {
+                command.push( refvalue + item.operational + value);
+            }
+        }
+    }
+    if( command.length === 0 )
+    {
+        return null;
+    }
+    return new Function('return ( '+command.join(' ')+' )' );
+};
+
+
+/**
+ * @returns {DataGrep}
+ * @constructor
+ */
+function DataGrep( dataItems )
+{
+    if( !(System.instanceOf(this,DataGrep)) )return new DataGrep( dataItems );
+    if( !System.instanceOf( dataItems, Array ) )throw new Error('error','Invalid data list');
+    storage(this,true,{
+        'dataItems':dataItems,
+        'filter':dataItems
+    });
+    Object.defineProperty(this,"length", {value:0,writable:true});
+}
+
+module.exports = DataGrep;
+var System =require("system/System.js");
+var Object =require("system/Object.js");
+var Internal =require("system/Internal.js");
+var Array =require("system/Array.js");
+var Function =require("system/Function.js");
+var Symbol =require("system/Symbol.js");
+
+var storage=Internal.createSymbolStorage( Symbol('DataGrep') );
+
+DataGrep.prototype = Object.create( Object.prototype,{
+    "constructor":{value:DataGrep},
+    
+/**
+ * 获取设置过滤器
+ * @param condition
+ * @returns {*}
+ */
+"filter":{value:function filter( condition )
+{
+    if( typeof condition === "undefined" )
+    {
+        storage(this,"filter", createFilter.call(this) );
+
+    }else if( typeof condition === 'function' )
+    {
+        storage(this,"filter",condition);
+
+    }else if ( typeof condition === 'string' && condition!='' )
+    {
+        var old = condition;
+        condition = condition.replace(/(\w+)\s*([\>\<\=\!])/g,function(a, b, c)
+        {
+            c = c.length==1 && c=='=' ? '==' : c;
+            return "arguments[0]['"+b+"']" + c;
+
+        }).replace(/(not[\s]*)?(index)\(([\d\,\s]+)\)/ig,function(a,b,c,d)
+        {
+            var value = d.split(',');
+            var start =value[0]>>0;
+            var end = Math.max(value[1]>>0,1);
+            var flag = typeof b=== "undefined" ? '' : '!';
+            return flag+"( arguments[1] >= "+start+" && arguments[1] < "+end+") ";
+
+        }).replace(/(\w+)\s+(not[\s]*)?(like|range|in)\(([^\)]*?)\)/ig,function(a,b,c,d,e)
+        {
+            var flag = typeof c=== "undefined" ? '' : '!';
+            var refvalue = "arguments[0]['"+b+"']";
+            if( /like/i.test(d) )
+            {
+                e= e.replace(/(%)?([^%]*?)(%)?/,function(a,b,c,d){
+                    return typeof b==='undefined' ? '^'+c : typeof d==='undefined' ? c+'$' : c;
+                });
+                e = flag+"new RegExp('"+e+"').test("+refvalue+")";
+
+            }else if( /in/i.test(d) )
+            {
+                e = flag+"( ["+e+"].indexOf("+refvalue+") >=0 )";
+
+            }else
+            {
+                var value = e.split(',');
+                e = flag+"("+refvalue+" >= "+value[0]+" && "+refvalue+" < "+value[1]+")";
+            }
+            return e;
+
+        }).replace(/\s+(or|and)\s+/gi,function(a,b)
+        {
+            return b.toLowerCase()=='or' ? ' || ' : ' && ';
+        });
+        storage(this,"filter",new Function('try{ return !!('+condition+') }catch(e){ throw new SyntaxError("is not grep:'+old+'");}') );
+
+    }else if( condition === null )
+    {
+        storage(this,"filter",null);
+    }
+    return storage(this,"filter");
+}},
+
+/**
+ * @returns {DataGrep}
+ */
+"clean":{value:function clean()
+{
+    for(var i=0; i<this.length; i++)
+    {
+        delete this[i];
+    }
+    storage(this,"filter",null);
+    this.length=0;
+    return this;
+}},
+
+/**
+ * 查询数据
+ * @param data
+ * @param filter
+ * @returns {*}
+ */
+"execute":{value:function execute(filter)
+{
+    var data=storage(this,"dataItems");
+    filter = this.filter( filter );
+    if( !filter )return data;
+    var result=[];
+    for(var i=0; i<data.length; i++ ) if( !!filter.call(this, data[i], i) )
+    {
+        result.push( data[i] );
+    }
+    return result;
+}},
+
+/**
+ * 指定范围
+ * @param column
+ * @param start
+ * @param end
+ * @param logic
+ * @returns {*}
+ */
+"range":{value:function range(column, start, end, logic)
+{
+    if(  start >= 0 || end > 0 )
+    {
+        strainer.call(this,column,start+','+end,'range',logic);
+    }
+    return this;
+}},
+
+
+/**
+ * 指定数据索引范围
+ * @param column
+ * @param start
+ * @param end
+ * @param logic
+ * @returns {DataGrep}
+ */
+"index":{value:function index(start, end, logic)
+{
+    if( start >= 0 || end > 0 )
+    {
+        end =  parseInt(end) || 1 ;
+        start =  parseInt(start) || 0;
+        strainer.call(this,'index',start+','+start+end,'index',logic);
+    }
+    return this;
+}},
+
+/**
+ * 筛选等于指定列的值
+ * @param column
+ * @param value
+ * @param logic
+ * @returns {DataGrep}
+ */
+"eq":{value:function eq(column, value, logic)
+{
+    strainer.call(this,column,value,'==',logic);
+    return this;
+}},
+
+/**
+ * 筛选不等于指定列的值
+ * @param column
+ * @param value
+ * @param logic
+ * @returns {DataGrep}
+ */
+"not":{value:function not(column, value, logic)
+{
+    strainer.call(this,column,value,'!=',logic);
+    return this;
+}},
+
+/**
+ * 筛选大于列的值
+ * @param column
+ * @param value
+ * @param logic
+ * @returns {DataGrep}
+ */
+"gt":{value:function gt(column, value, logic)
+{
+    strainer.call(this,column,value,'>',logic);
+    return this;
+}},
+
+/**
+ * 筛选小于列的值
+ * @param column
+ * @param value
+ * @param logic
+ * @returns {DataGrep}
+ */
+"lt":{value:function lt(column, value, logic)
+{
+    strainer.call(this,column,value,'<',logic);
+    return this;
+}},
+
+/**
+ * 筛选大于等于列的值
+ * @param column
+ * @param value
+ * @param logic
+ * @returns {DataGrep}
+ */
+"egt":{value:function egt(column, value, logic)
+{
+    strainer.call(this,column,value,'>=',logic);
+    return this;
+}},
+
+/**
+ * 筛选小于等于列的值
+ * @param column
+ * @param value
+ * @param logic
+ * @returns {DataGrep}
+ */
+"elt":{value:function elt(column, value, logic)
+{
+    strainer.call(this,column,value,'<=',logic);
+    return this;
+}},
+
+/**
+ * 筛选模糊匹配列的值
+ * @param column
+ * @param value
+ * @param logic
+ * @returns {DataGrep}
+ */
+"like":{value:function like(column, value, type, logic)
+{
+    strainer.call(this,column,value,'like',logic,type);
+    return this;
+}},
+
+/**
+ * 筛选排除模糊匹配列的值
+ * @param column
+ * @param value
+ * @param logic
+ * @returns {DataGrep}
+ */
+"notLike":{value:function notLike(column, value, type, logic)
+{
+    strainer.call(this,column,value,'notlike',logic,type);
+    return this;
+}}
+
+});
+
+DataGrep.LIKE_LEFT='left';
+DataGrep.LIKE_RIGHT='right';
+DataGrep.LIKE_BOTH='both';
+
+},
+
+/***** System system/DataSource.js *****/
+
+"system/DataSource.js": function(module,require){
+/*
+ * EaseScript
+ * Copyright © 2017 EaseScript All rights reserved.
+ * Released under the MIT license
+ * https://github.com/51breeze/EaseScript
+ * @author Jun Ye <664371281@qq.com>
+ * @require System,Symbol,Array,DataArray,Object,EventDispatcher,Http,HttpEvent,PropertyEvent,DataSourceEvent,DataGrep
+ */
+
+function DataSource()
+{
+    if( !System.instanceOf(this,DataSource) )return new DataSource();
+    EventDispatcher.call(this);
+    storage(this,true,{
+        "options":{
+            'method': Http.METHOD_GET,
+            'dataType':Http.TYPE_JSON,
+            'timeout':30,
+            'param':{},
+            'url':null,
+            //服务器响应后的json对象
+            'responseProfile':{
+                'data':'data',     //数据集
+                'total':'total',   //数据总数
+                'code': 'code',    //状态码
+                'error': 'error',  //错误消息
+                "successCode" : 0  //成功时的状态码
+            },
+            //向服务器请求时需要添加的参数
+            'requestProfile':{
+                'offset':'offset', //数据偏移量
+                'rows'  :'rows' //每次获取取多少行数据
+            }
+        }
+        ,"items":new Array()
+        ,"cached":{
+            'queues':new Array()
+            ,'lastSegments':null
+            ,"loadSegments":new Array()
+        }
+        ,"isRemote":false
+        ,"source":null
+        ,"nowNotify":false
+        ,"loading":false
+        ,"loadCompleted":false
+        ,"pageSize":20
+        ,"current":1
+        ,"buffer":3
+        ,"totalSize":NaN
+        ,"grep":null
+    });
+}
+
+module.exports = DataSource;
+var System =require("system/System.js");
+var Object =require("system/Object.js");
+var Internal =require("system/Internal.js");
+var Array =require("system/Array.js");
+var Symbol =require("system/Symbol.js");
+
+var DataArray =require("system/DataArray.js");
+var EventDispatcher =require("system/EventDispatcher.js");
+var Http =require("system/Http.js");
+var HttpEvent =require("system/HttpEvent.js");
+var PropertyEvent =require("system/PropertyEvent.js");
+var DataSourceEvent =require("system/DataSourceEvent.js");
+var DataGrep =require("system/DataGrep.js");
+var storage=Internal.createSymbolStorage( Symbol('DataSource') );
+
+/**
+ * @private
+ * @param name
+ * @param value
+ * @returns {*}
+ */
+function access( name, value)
+{
+    var options = storage(this,"options");
+    if( value == null ){
+        return options[ name ];
+    }
+    options[name] = value;
+    if( this.isRemote() )
+    {
+        var source = storage(this,"source");
+        if ( source instanceof Http )
+        {
+            source.option( name, value )
+        }
+    }
+    return this;
+}
+
+
+
+/**
+ * @private
+ * 数据加载成功时的回调
+ * @param event
+ */
+function success(event)
+{
+    var options = storage(this,'options');
+    var data = null;
+    var total = 0;
+    var status=0;
+    var successCode = 200;
+    if( typeof options.responseProfile === "function" )
+    {
+        var profile = Array.prototype.map.call(["data","total","status","successCode"],function (name) {
+            return options.responseProfile(event.data,name);
+        });
+        data = profile[0];
+        total = profile[1];
+        status = profile[2];
+        successCode = profile[3];
+        if ( status != successCode )
+        {
+            throw new Error('Loading data failed. current status:' + status);
+        }
+
+    }else
+    {
+        var totalProfile = options.responseProfile.total;
+        var dataProfile = options.responseProfile.data;
+        var stateProfile = options.responseProfile.code;
+        if (event.data[stateProfile] != options.responseProfile.successCode) {
+            throw new Error('Loading data failed. current status:' + event.data[options.responseProfile.error]);
+        }
+        if (!System.isArray(event.data))
+        {
+            if ((dataProfile && typeof event.data[dataProfile] === 'undefined') || (totalProfile && event.data[totalProfile] === 'undefined')) {
+                throw new Error('Response data profile fields is not correct.');
+            }
+            total = totalProfile ? event.data[totalProfile] >> 0 : 0;
+            data = event.data[dataProfile];
+            if (total === 0 && data) total = data.length >> 0;
+        } else {
+            data = event.data[dataProfile];
+            total = data.length >> 0;
+        }
+    }
+
+    //必须是返回一个数组
+    if( !System.isArray(data) )throw new Error('Response data set must be an array');
+
+    //当前获取到数据的长度
+    var len = data.length >> 0;
+    total = Math.max( total, len );
+
+    //先标记为没有数据可加载了
+    storage(this,'loadCompleted', true);
+
+    //标没有在加载
+    storage(this,'loading', false);
+
+    //预计总数据量
+    storage(this,'totalSize', total);
+    var rows = this.pageSize();
+    var cached = storage(this,'cached');
+    var items =  storage(this,'items');
+    var current = this.current();
+
+    //当前加载分页数的偏移量
+    var offset = Array.prototype.indexOf.call(cached.loadSegments, cached.lastSegments) * rows;
+
+    //合并数据项
+    Array.prototype.splice.apply( items , [offset, 0].concat( data ) );
+
+    //发送数据
+    if( storage(this,'nowNotify')  &&  Array.prototype.indexOf.call( cached.loadSegments,current) >=0 )
+    {
+        nowNotify.call(this,current, offset, rows);
+    }
+    //还有数据需要加载
+    if( items.length < total )
+    {
+        storage(this,'loadCompleted', false);
+
+        //继续载数据
+        doload.call(this);
+    }
+
+}
+
+function isload( cached, page )
+{
+    return cached.lastSegments != page && cached.loadSegments.indexOf(page) < 0 && cached.queues.indexOf(page) < 0;
+}
+
+/**
+ * 向远程服务器开始加载数据
+ */
+function doload()
+{
+    var loading = storage(this,'loading');
+    var isRemote = storage(this,'isRemote');
+    var loadCompleted = storage(this,'loadCompleted');
+    if( !isRemote || loadCompleted )return;
+    var page = this.current();
+    var cached= storage(this,'cached');
+    var queue = cached.queues;
+    var rows = this.pageSize();
+    var buffer = this.maxBuffer();
+    if( isload( cached, page ) )
+    {
+        queue.unshift( page );
+
+    }else if( queue.length === 0 )
+    {
+        var p = 1;
+        var t = this.totalPage();
+        while( buffer > p )
+        {
+            var next = page+p;
+            var prev = page-p;
+            if( next <= t && isload( cached, next ) )
+            {
+                queue.push( next );
+            }
+            if(  prev > 0 && isload( cached, prev ) )
+            {
+                queue.push( prev );
+            }
+            p++;
+        }
+    }
+
+    if( !loading && queue.length > 0 )
+    {
+        storage(this,'loading', true);
+        page = queue.shift();
+        cached.lastSegments = page;
+        cached.loadSegments.push(page);
+        if (cached.loadSegments.length > 1)cached.loadSegments.sort(function (a, b) {
+            return a - b;
+        });
+        var start = ( page - 1 ) * rows;
+        var source = storage(this,'source');
+        var options = storage(this,'options');
+        var param = Object.merge({}, options.param);
+        param[options.requestProfile.offset] = start;
+        param[options.requestProfile.rows] = rows;
+        source.load(options.url, param, options.method);
+    }
+}
+/**
+ * 发送数据通知
+ * @private
+ */
+function nowNotify(current, start, rows )
+{
+    if( storage(this,'nowNotify') !==true )return;
+    var result = this.grep().execute();
+    var end = Math.min(start + rows, this.realSize() );
+    var data  = result.slice(start, end);
+    var event = new DataSourceEvent(DataSourceEvent.SELECT);
+    event.current = current;
+    event.offset = start;
+    event.data = data;
+    event.waiting = false;
+    event.pageSize = this.pageSize();
+    event.totalPage = this.totalPage();
+    event.totalSize = this.totalSize();
+    storage(this,'nowNotify', false);
+    this.dispatchEvent(event);
+}
+
+DataSource.prototype = Object.create( EventDispatcher.prototype,{
+    "constructor":{value:DataSource},
+        
+    /**
+     * 是否为一个远程数据源
+     * @returns {boolean}
+     */
+    "isRemote":{value:function isRemote()
+    {
+        return storage(this,"isRemote");
+    }},
+
+    /**
+     * 获取或者设置数据选项
+     * @param object options
+     * @returns {*}
+     */
+    "options":{value:function options( opt )
+    {
+        if( System.isObject(opt) )
+        {
+            Object.merge( storage(this,"options") , opt);
+        }
+        return this;
+    }},
+
+    /**
+     * 设置数据的响应类型
+     * @param value
+     * @returns {*}
+     */
+    "dataType":{value:function dataType( value )
+    {
+        return access.call(this,'dataType', value);
+    }},
+
+    /**
+     * 设置数据的请求方法
+     * @param value
+     * @returns {*}
+     */
+    "method":{value:function method( value )
+    {
+        return access.call(this,'method', value);
+    }},
+
+    /**
+     * 设置请求超时
+     * @param value
+     * @returns {*}
+     */
+    "timeout":{value:function timeout( value )
+    {
+        return access.call(this,'timeout', value);
+    }},
+
+    /**
+     * 设置请求的参数对象
+     * @param value
+     * @returns {*}
+     */
+    "parameter":{value:function parameter( value )
+    {
+        return access.call(this,'param', value);
+    }},
+
+    /**
+     * 设置获取数据源
+     * 允许是一个数据数组或者是一个远程请求源
+     * @param Array source | String url | Http httpObject
+     * @returns {DataSource}
+     */
+    "source":{value:function source( resource )
+    {
+        var old_source = storage(this,"source");
+        if( old_source === resource )return this;
+
+        var options = storage(this,"options");
+        if( typeof resource === "undefined" )
+        {
+            return storage(this,"isRemote") ? options.url : old_source;
+        }
+
+        //本地数据源数组
+        if( System.instanceOf(resource, Array) )
+        {
+            storage(this,"items", resource.slice(0) );
+            storage(this,"source", resource );
+            storage(this,"isRemote", false );
+            if( storage(this,'selected')===true )
+            {
+                storage(this, "grep", null);
+                this.select();
+            }
+        }
+        //远程数据源
+        else if( resource )
+        {
+            if( typeof resource === 'string' )
+            {
+                options.url = resource;
+                resource = new Http( options );
+            }
+            if ( resource instanceof Http )
+            {
+                storage(this,"source", resource );
+                storage(this,"isRemote", true );
+                //请求远程数据源侦听器
+                resource.addEventListener( HttpEvent.SUCCESS, success , false,0, this);
+            }
+        }
+
+        //清空数据源
+        if( resource === null )
+        {
+            var items = storage(this,"items");
+            var cached = storage(this,"cached");
+            items.splice(0, items.length);
+            cached.lastSegments=null;
+            cached.loadSegments=new Array();
+            cached.queues      =new Array();
+            storage(this,"nowNotify",false);
+            storage(this,"loadCompleted",false);
+            return this;
+        }
+
+        var source = storage(this,"source");
+
+        //移除加载远程数据侦听事件
+        if ( !storage(this,"isRemote") && System.is(source ,Http) )
+        {
+            source.removeEventListener(HttpEvent.SUCCESS,success);
+        }
+        return this;
+    }},
+
+    /**
+     * 每页需要显示数据的行数
+     * @param number rows
+     * @returns {DataSource}
+     */
+    "pageSize":{value:function pageSize( size )
+    {
+        var old = storage(this,"pageSize");
+        if( size >= 0 && old !== size )
+        {
+            storage(this,"pageSize", size);
+            var event = new PropertyEvent( PropertyEvent.CHANGE );
+            event.property = 'pageSize';
+            event.newValue = size;
+            event.oldValue = old;
+            this.dispatchEvent( event );
+            if( storage(this,"selected")  )
+            {
+                var items = storage(this,"items");
+                var cached = storage(this,"cached");
+                items.splice(0, items.length);
+                cached.lastSegments=null;
+                cached.loadSegments=new Array();
+                cached.queues      =new Array();
+                storage(this,"nowNotify",false);
+                storage(this,"loadCompleted",false);
+                this.select();
+            }
+            return this;
+        }
+        return old;
+    }},
+
+    /**
+     * 获取当前分页数
+     * @param num
+     * @returns {*}
+     */
+    "current":{value:function current()
+    {
+        return storage(this,"current");
+    }},
+
+    /**
+     * 获取总分页数。
+     * 如果是一个远程数据源需要等到请求响应后才能得到正确的结果,否则返回 NaN
+     * @return number
+     */
+    "totalPage":{value:function totalPage()
+    {
+        return this.totalSize() > 0 ? Math.max( Math.ceil( this.totalSize() / this.pageSize() ) , 1) : NaN;
+    }},
+
+    /**
+     * 最大缓冲几个分页数据。有效值为1-10
+     * @param Number num
+     * @returns {DataSource}
+     */
+    "maxBuffer":{value:function maxBuffer(num )
+    {
+        if( num > 0 )
+        {
+            storage(this,"buffer", Math.min(10, num) );
+            return this;
+        }
+        return  storage(this,"buffer");
+    }},
+
+    /**
+     * 获取实际数据源的总数
+     * 如果是一个远程数据源，每请求成功后都会更新这个值。
+     * 是否需要向远程数据源加载数据这个值非常关键。 if( 分段数 * 行数 < 总数 )do load...
+     * @param number num
+     * @returns {DataSource}
+     */
+    "realSize":{value:function realSize()
+    {
+        return storage(this,"items").length;
+    }},
+
+    /**
+     * @private
+     */
+    "__totalSize__":{value:0},
+
+    /**
+     * 预计数据源的总数
+     * 如果是一个远程数据源，每请求成功后都会更新这个值。
+     * 是否需要向远程数据源加载数据这个值非常关键。 if( 分段数 * 行数 < 预计总数 )do load...
+     * @param number num
+     * @returns {DataSource}
+     */
+    "totalSize":{value:function totalSize()
+    {
+        return Math.max( storage(this,"totalSize"), this.realSize() );
+    }},
+
+    /**
+     * 获取数据检索对象
+     * @returns {*|DataGrep}
+     */
+    "grep":{value:function grep()
+    {
+        return storage(this,"grep") || storage(this,"grep", new DataGrep( storage(this,"items") ) );
+    }},
+
+    /**
+     * 设置筛选数据的条件
+     * @param condition
+     * @returns {DataSource}
+     */
+    "filter":{value:function filter( condition )
+    {
+        this.grep().filter( condition );
+        return this;
+    }},
+
+    /**
+     * 对数据进行排序。
+     * 只有数据源全部加载完成的情况下调用此方法才有效（本地数据源除外）。
+     * @param column 数据字段
+     * @param type   排序类型
+     */
+    "orderBy":{value:function orderBy(column,type)
+    {
+        var orderObject = storage(this,"order") || storage(this,"order",{});
+        var t = typeof column;
+        if( t === "undefined" )
+        {
+            return orderObject;
+        }
+        if( t === "object" )
+        {
+            orderObject = storage(this,"order",column);
+
+        }else if( t === "string" )
+        {
+            orderObject[ column ] = type || DataArray.ASC;
+        }
+        DataArray.prototype.orderBy.call( storage(this,"items"), orderObject );
+        return this;
+    }},
+
+    /**
+     * 当前页的索引值在当前数据源的位置
+     * @param index 位于当前页的索引值
+     * @returns {number}
+     */
+    "offsetAt":{value:function offsetAt( index )
+    {
+        var index = index>>0;
+        if( isNaN(index) )return index;
+        return ( this.current()-1 ) * this.pageSize() + index;
+    }},
+
+    /**
+     * 添加数据项到指定的索引位置
+     * @param item
+     * @param index
+     * @returns {DataSource}
+     */
+    "append":{value:function append(item,index)
+    {
+        index = typeof index === 'number' ? index : this.realSize();
+        index = index < 0 ? index + this.realSize()+1 : index;
+        index = Math.min( this.realSize(), Math.max( index, 0 ) );
+        item = System.instanceOf(item, Array) ? item : [item];
+        var ret = [];
+        var e;
+        for(var i=0;i<item.length;i++)
+        {
+            e = new DataSourceEvent( DataSourceEvent.CHANGED );
+            e.index = index+i;
+            e.newValue=item[i];
+            if( this.dispatchEvent( e ) )
+            {
+                Array.prototype.splice.call(this.__items__, e.index, 0, item[i]);
+                ret.push( item[i] );
+            }
+        }
+        e = new DataSourceEvent( DataSourceEvent.APPEND );
+        e.index = index;
+        e.data  = ret;
+        this.dispatchEvent( e );
+        return ret.length;
+    }},
+
+    /**
+     * 移除指定索引下的数据项
+     * @param condition
+     * @returns {boolean}
+     */
+    "remove":{value:function remove( condition )
+    {
+        var index;
+        var result = this.grep().execute( condition );
+        var e;
+        var data=[];
+        for (var i = 0; i < result.length; i++)
+        {
+            index = Array.prototype.indexOf.call(result,result[i]);
+            if (index >= 0)
+            {
+                e = new DataSourceEvent( DataSourceEvent.CHANGED );
+                e.index = index;
+                e.oldValue=result[i];
+                if( this.dispatchEvent( e ) )
+                {
+                    data.push( Array.prototype.splice.call(this.__items__, e.index, 1) );
+                }
+            }
+        }
+        if( data.length > 0 )
+        {
+            e = new DataSourceEvent(DataSourceEvent.REMOVE);
+            e.condition = condition;
+            e.data = data;
+            this.dispatchEvent(e);
+        }
+        return data.length;
+    }},
+
+    /**
+     * 修改数据
+     * @param value 数据列对象 {'column':'newValue'}
+     * @param condition
+     * @returns {boolean}
+     */
+    "update":{value:function update( value, condition)
+    {
+        var result = this.grep().execute( condition );
+        var data=[];
+        var flag=false;
+        var e;
+        for (var i = 0; i < result.length; i++)
+        {
+            flag=false;
+            var newValue = Object.merge({}, result[i] );
+            for(var c in value)
+            {
+                if ( typeof newValue[c] !== "undefined" && newValue[c] != value[c] )
+                {
+                    newValue[c] = value[c];
+                    flag=true;
+                }
+            }
+            if( flag )
+            {
+                e = new DataSourceEvent(DataSourceEvent.CHANGED);
+                e.newValue = newValue;
+                e.oldValue = result[i];
+                if( this.dispatchEvent(e) )
+                {
+                    Object.merge(result[i], newValue);
+                    data.push( result[i] );
+                }
+            }
+        }
+        e = new DataSourceEvent( DataSourceEvent.UPDATE );
+        e.data=data;
+        e.condition = condition;
+        e.newValue=value;
+        this.dispatchEvent( e );
+        return data.length;
+    }},
+
+    /**
+     * 获取指定索引的元素
+     * @param index
+     * @returns {*}
+     */
+    "itemByIndex":{value:function itemByIndex( index )
+    {
+        if( typeof index !== 'number' || index < 0 || index >= this.realSize() )return null;
+        return storage(this,'items')[index] || null;
+    }},
+
+    /**
+     * 获取指定元素的索引
+     * 如果不存在则返回 -1
+     * @param item
+     * @returns {Object}
+     */
+    "indexByItem":{value:function indexByItem( item )
+    {
+        return storage(this,'items').indexOf(item);
+    }},
+
+    /**
+     * 获取指定索引范围的元素
+     * @param start 开始索引
+     * @param end   结束索引
+     * @returns {Array}
+     */
+    "range":{value:function range( start, end )
+    {
+        return storage(this,'items').slice(start, end);
+    }},
+
+    /**
+     * 选择数据集
+     * @param Number segments 选择数据的段数, 默认是1
+     * @returns {DataSource}
+     */
+    "select":{value:function select( page )
+    {
+        var total = this.totalPage();
+        page = page > 0 ? page : this.current();
+        page = Math.min( page , isNaN(total)?page:total );
+        storage(this,'current', page );
+        var rows  = this.pageSize();
+        var start=( page-1 ) * rows;
+        var cached = storage(this,'cached');
+        var loadCompleted = storage(this,'loadCompleted');
+        var isRemote = storage(this,'isRemote');
+        var items = storage(this,'items');
+        var index = !loadCompleted && isRemote ? cached.loadSegments.indexOf(page) : page-1;
+        var waiting = index < 0 || ( items.length < (index*rows+rows) );
+
+        //数据准备好后需要立即通知
+        storage(this,'nowNotify', true);
+        storage(this,'selected', true);
+
+        //需要等待加载数据
+        if( isRemote && waiting && !loadCompleted )
+        {
+            var event = new DataSourceEvent( DataSourceEvent.SELECT );
+            event.current = page;
+            event.offset = start;
+            event.data=null;
+            event.waiting = true;
+            this.dispatchEvent(event);
+
+        }else
+        {
+            nowNotify.call(this,page,index*rows,rows);
+        }
+        //加载数据
+        if( isRemote )
+        {
+            doload.call(this);
+        }
+        return this;
+    }}
+});
+},
+
+/***** Class es/components/PopUp.es *****/
+
+"es/components/PopUp.es": function(module,require){
+function PopUp(componentId){
+	Object.defineProperty(this,__PRIVATE__,{value:{"_type":"box"}});
+
+	if(componentId === void 0 ){
+		componentId="11";
+	}
+	BasePopUp.call(this,componentId);
+};
+module.exports=PopUp;
+var Container=require("es/core/Container.es");
+var Skin=require("es/core/Skin.es");
+var IContainer=require("es/interfaces/IContainer.es");
+var PopUpManage=require("es/components/popup/PopUpManage.es");
+var BasePopUp=require("es/components/popup/BasePopUp.es");
+var PopUpSkin=require("es/skins/PopUpSkin.html");
+var SkinEvent=require("es/events/SkinEvent.es");
+var JSON=require("system/JSON.js");
+var Object=require("system/Object.js");
+var Element=require("system/Element.js");
+var Symbol=require("system/Symbol.js");
+var Internal=require("system/Internal.js");
+var __PRIVATE__=Symbol("es.components.PopUp").valueOf();
+var method={"B38__instance":{"writable":true,"value":null,"type":8}
+,"skinClass":{"writable":true,"value":PopUpSkin,"type":8}
+,"B38_getInstance":{"value":function getInstance(skinClass){
+	if(skinClass === void 0 ){
+		skinClass=null;
+	}
+	if(!skinClass)skinClass=PopUpSkin;
+	if(!PopUp.B38__instance){
+		PopUp.B38__instance=new PopUp("11");
+		PopUp.B38__instance.setSkinClass(skinClass);
+		PopUp.B38__instance[__PRIVATE__]._type="box";
+	}
+	if(skinClass&&PopUp.B38__instance.getSkinClass()!==skinClass){
+		PopUp.B38__instance.setSkinClass(skinClass);
+	}
+	return PopUp.B38__instance;
+},"type":1}
+,"B38_modalityInstance":{"writable":true,"value":null,"type":8}
+,"B38_getModalityInstance":{"value":function getModalityInstance(skinClass){
+	if(skinClass === void 0 ){
+		skinClass=null;
+	}
+	if(!skinClass)skinClass=PopUpSkin;
+	if(!PopUp.B38_modalityInstance){
+		PopUp.B38_modalityInstance=new PopUp("11");
+		PopUp.B38_modalityInstance.setSkinClass(skinClass);
+		PopUp.B38_modalityInstance[__PRIVATE__]._type="modality";
+	}
+	if(skinClass&&PopUp.B38_modalityInstance.getSkinClass()!==skinClass){
+		PopUp.B38_modalityInstance.setSkinClass(skinClass);
+	}
+	return PopUp.B38_modalityInstance;
+},"type":1}
+,"box":{"value":function box(message,options){
+	if(options === void 0 ){
+		options={};
+	}
+	return PopUp.B38_getInstance(options.skinClass).B26_show(Object.merge(true,{"mask":true,"disableScroll":false,"profile":{"currentState":"tips","content":message},"skinStyle":{"background":"none","borderRadius":"0px","boxShadow":"none","border":"none"}},options));
+},"type":1}
+,"tips":{"value":function tips(message,options){
+	if(options === void 0 ){
+		options={};
+	}
+	return PopUp.B38_getInstance(options.skinClass).B26_show(Object.merge(true,{"timeout":2,"vertical":"top","mask":false,"isModalWindow":false,"profile":{"currentState":"tips","content":message},"disableScroll":false},options));
+},"type":1}
+,"title":{"value":function title(message,options){
+	if(options === void 0 ){
+		options={};
+	}
+	return PopUp.B38_getInstance(options.skinClass).B26_show(Object.merge(true,{"timeout":2,"vertical":"top","mask":false,"isModalWindow":false,"profile":{"currentState":"title","content":message},"disableScroll":false},options));
+},"type":1}
+,"alert":{"value":function alert(message,options){
+	if(options === void 0 ){
+		options={};
+	}
+	return PopUp.B38_getInstance(options.skinClass).B26_show(Object.merge(true,{"mask":true,"isModalWindow":false,"vertical":"top","profile":{"currentState":"alert","content":message}},options));
+},"type":1}
+,"confirm":{"value":function confirm(message,callback,options){
+	if(options === void 0 ){
+		options={};
+	}
+	return PopUp.B38_getInstance(options.skinClass).B26_show(Object.merge(true,{"mask":true,"callback":callback,"vertical":"top","isModalWindow":false,"profile":{"currentState":"confirm","content":message},"offsetY":2},options));
+},"type":1}
+,"modality":{"value":function modality(title,content,options){
+	if(options === void 0 ){
+		options={};
+	}
+	return PopUp.B38_getModalityInstance(options.skinClass).B26_show(Object.merge(true,{"mask":true,"isModalWindow":true,"profile":{"currentState":"modality","titleText":title,"content":content},"animation":{"fadeIn":{"name":"fadeIn"},"fadeOut":{"name":"fadeOut"}}},options));
+},"type":1}
+};
+for(var prop in method){
+	Object.defineProperty(PopUp, prop, method[prop]);
+}
+var proto={"constructor":{"value":PopUp},"B38__type":{"writable":true,"value":"box","type":8}
+,"B26_show":{"value":function show(options){
+	if(options === void 0 ){
+		options={};
+	}
+	this.setOption(options);
+	this.display();
+	return this;
+},"type":1}
+,"B26_getContainer":{"value":function getContainer(){
+	return this.getSkin().getPopupContainer();
+},"type":1}
+,"B26_initializing":{"value":function initializing(){
+	BasePopUp.prototype.B26_initializing.call(this);
+	var skin=this.getSkin();
+	skin.addEventListener(SkinEvent.UNINSTALL,function(e){
+		if(this[__PRIVATE__]._type==="box"){
+			PopUp.B38__instance=null;
+		}
+		else {
+			PopUp.B38_modalityInstance=null;
+		}
+	},false,0,this);
+},"type":1}
+,"display":{"value":function display(){
+	var opt;
+	if(!this.B26_getState()){
+		opt=this.getOption();
+		BasePopUp.prototype.B26_show.call(this,opt);
+		BasePopUp.prototype.display.call(this);
+		PopUpManage.show(this,!!opt.isModalWindow,this.getOwner());
+	}
+	return this.getElement();
+},"type":1}
+};
+PopUp.prototype=Object.create( BasePopUp.prototype , proto);
+Internal.defineClass("es.components.PopUp",PopUp,{
+	"extends":BasePopUp,
+	"package":"es.components",
+	"classname":"PopUp",
+	"uri":["B38","B26","B37"],
+	"privateSymbol":__PRIVATE__,
+	"method":method,
+	"proto":proto
+},1);
+
+},
+
+/***** Class es/components/popup/BasePopUp.es *****/
+
+"es/components/popup/BasePopUp.es": function(module,require){
+function BasePopUp(){
+Object.defineProperty(this,__PRIVATE__,{value:{"timeoutId":NaN,"_option":null,"state":false,"maskIntance":null,"animationEnd":true,"actionButtons":["cancel","submit","close"],"_owner":null,"_title":null}});
+SkinComponent.apply(this,arguments);
+};
+module.exports=BasePopUp;
+var SkinComponent=require("es/core/SkinComponent.es");
+var Container=require("es/core/Container.es");
+var Display=require("es/core/Display.es");
+var Skin=require("es/core/Skin.es");
+var IContainer=require("es/interfaces/IContainer.es");
+var SystemManage=require("es/core/SystemManage.es");
+var SkinEvent=require("es/events/SkinEvent.es");
+var PopUpManage=require("es/components/popup/PopUpManage.es");
+var Object=require("system/Object.js");
+var System=require("system/System.js");
+var Function=require("system/Function.js");
+var Reflect=require("system/Reflect.js");
+var Element=require("system/Element.js");
+var Array=require("system/Array.js");
+var Event=require("system/Event.js");
+var ElementEvent=require("system/ElementEvent.js");
+var MouseEvent=require("system/MouseEvent.js");
+var Symbol=require("system/Symbol.js");
+var Internal=require("system/Internal.js");
+var __PRIVATE__=Symbol("es.components.popup.BasePopUp").valueOf();
+var method={};
+var proto={"constructor":{"value":BasePopUp},"B26_getTimeoutId":{"value":function(){
+	return this[__PRIVATE__].timeoutId;
+},"type":2},"B26_setTimeoutId":{"value":function(val){
+	return this[__PRIVATE__].timeoutId=val;
+},"type":2},"b39__option":{"writable":true,"value":null,"type":8}
+,"getOption":{"value":function option(){
+	if(this[__PRIVATE__]._option===null){
+		this[__PRIVATE__]._option=Object.merge(true,{},PopUpManage.defaultOptions);
+	}
+	return this[__PRIVATE__]._option;
+},"type":2},"setOption":{"value":function option(value){
+	this[__PRIVATE__]._option=Object.merge(true,{},PopUpManage.defaultOptions,value);
+},"type":4},"B26_getState":{"value":function(){
+	return this[__PRIVATE__].state;
+},"type":2},"B26_setState":{"value":function(val){
+	return this[__PRIVATE__].state=val;
+},"type":2},"B26_getMaskIntance":{"value":function(){
+	return this[__PRIVATE__].maskIntance;
+},"type":2},"B26_setMaskIntance":{"value":function(val){
+	return this[__PRIVATE__].maskIntance=val;
+},"type":2},"B26_getAnimationEnd":{"value":function(){
+	return this[__PRIVATE__].animationEnd;
+},"type":2},"B26_setAnimationEnd":{"value":function(val){
+	return this[__PRIVATE__].animationEnd=val;
+},"type":2},"action":{"value":function action(type){
+	var fadeOut;
+	var container;
+	var fn;
+	var options=this.getOption();
+	if(System.typeOf(options["on"+type])==="function"){
+		fn=options["on"+type];
+		if(fn()===false){
+			return false;
+		}
+	}
+	if(options.callback){
+		if(Reflect.call(BasePopUp,options,"callback",[type])===false){
+			return false;
+		}
+	}
+	if(this.B26_getMaskIntance()){
+		PopUpManage.mask(this.B26_getMaskIntance());
+	}
+	if(!System.isNaN(this.B26_getTimeoutId())){
+		System.clearTimeout(this.B26_getTimeoutId());
+		this.B26_setTimeoutId(NaN);
+	}
+	if(options.disableScroll){
+		SystemManage.enableScroll();
+	}
+	var animation=options.animation;
+	var skin=this.getSkin();
+	if(this.B26_getState()&&animation&&animation.enabled){
+		container=this.B26_getContainer();
+		fadeOut=animation.fadeOut;
+		this.B26_setAnimationEnd(false);
+		container.style("animation",fadeOut.name+" "+fadeOut.duration+"s "+fadeOut.timing+" "+fadeOut.delay+"s "+fadeOut.fillMode);
+		System.setTimeout(function(obj){
+			skin.setVisible(false);
+			obj.B26_setState(false);
+			obj.B26_setAnimationEnd(true);
+			PopUpManage.close(obj);
+		},(fadeOut.delay+fadeOut.duration)*1000,this);
+	}
+	else {
+		this.B26_setState(false);
+		skin.setVisible(false);
+		PopUpManage.close(this);
+	}
+	return true;
+},"type":1}
+,"B26_getContainer":{"value":function getContainer(){
+	return this.getSkin();
+},"type":1}
+,"B26_position":{"value":function position(){
+	if(!this.B26_getState()){
+		return ;
+	}
+	var opt=this.getOption();
+	var horizontal=opt.horizontal;
+	var vertical=opt.vertical;
+	var skin=this.B26_getContainer();
+	if(System.typeOf(opt.x)==="string"&&Reflect.call(BasePopUp,opt.x,"slice",[-1])==="%"||!System.isNaN(opt.x)){
+		skin.style("left",opt.x);
+		horizontal='';
+	}
+	if(System.typeOf(opt.y)==="string"&&Reflect.call(BasePopUp,opt.y,"slice",[-1])==="%"||!System.isNaN(opt.y)){
+		skin.style("top",opt.y);
+		vertical='';
+	}
+	var offsetX=parseInt(opt.offsetX);
+	var offsetY=parseInt(opt.offsetY);
+	var win=SystemManage.getWindow();
+	var winX=win.width();
+	var winY=win.height();
+	switch(horizontal){
+		case "left":skin.setLeft(Math.max(offsetX,0));
+		break ;
+		case "right":skin.setLeft(this.b39_getMaxAndMin(offsetX+(winX-skin.getWidth()),winX,skin.getWidth()));
+		break ;
+		case "center":skin.setLeft(this.b39_getMaxAndMin(offsetX+(winX-skin.getWidth())/2,winX,skin.getWidth()));
+		break ;
+	}
+	switch(vertical){
+		case "top":skin.setTop(Math.max(offsetY,0));
+		break ;
+		case "bottom":skin.setTop(this.b39_getMaxAndMin(offsetY+(winY-skin.getHeight()),winY,skin.getHeight()));
+		break ;
+		case "middle":skin.setTop(this.b39_getMaxAndMin(offsetY+(winY-skin.getHeight())/2,winY,skin.getHeight()));
+		break ;
+	}
+},"type":1}
+,"b39_getMaxAndMin":{"value":function getMaxAndMin(val,winSize,skinSize){
+	return Math.max(Math.max(val,0),Math.min(val,winSize-skinSize));
+},"type":1}
+,"b39_actionButtons":{"writable":true,"value":["cancel","submit","close"],"type":8}
+,"B26_initializing":{"value":function initializing(){
+	SkinComponent.prototype.B26_initializing.call(this);
+	var skin=this.getSkin();
+	SystemManage.getWindow().addEventListener(Event.RESIZE,this.B26_position,false,0,this);
+	this.B26_getContainer().addEventListener(ElementEvent.ADD,this.B26_position,false,0,this);
+	skin.addEventListener(SkinEvent.UPDATE_DISPLAY_LIST,this.B26_position,false,0,this);
+	var main=this.B26_getContainer();
+	var opt=this.getOption();
+	main.removeEventListener(MouseEvent.MOUSE_OUTSIDE);
+	main.addEventListener(MouseEvent.MOUSE_OUTSIDE,function(e){
+		if(this.B26_getState()){
+			if(opt.isModalWindow){
+				if(opt.clickOutsideClose===true){
+					this.close();
+				}
+			}
+			else if(this.B26_getAnimationEnd()){
+				this.B26_setAnimationEnd(false);
+				main.getElement().animation("shake",0.2);
+				System.setTimeout(function(target){
+					target.B26_setAnimationEnd(true);
+				},300,this);
+			}
+		}
+	},false,0,this);
+},"type":1}
+,"B26_show":{"value":function show(options){
+	if(options === void 0 ){
+		options={};
+	}
+	this.B26_setState(true);
+	if(options.disableScroll){
+		SystemManage.disableScroll();
+	}
+	if(options.mask===true){
+		this.B26_setMaskIntance(PopUpManage.mask(null,options.maskStyle));
+	}
+	return this;
+},"type":1}
+,"b39__owner":{"writable":true,"value":null,"type":8}
+,"getOwner":{"value":function owner(){
+	if(this[__PRIVATE__]._owner===null){
+		this[__PRIVATE__]._owner=new Container(SystemManage.getBody());
+	}
+	return this[__PRIVATE__]._owner;
+},"type":2},"setOwner":{"value":function owner(value){
+	this[__PRIVATE__]._owner=value;
+},"type":4},"b39__title":{"writable":true,"value":null,"type":8}
+,"getTitle":{"value":function title(){
+	return this[__PRIVATE__]._title;
+},"type":2},"setTitle":{"value":function title(value){
+	this[__PRIVATE__]._title=value;
+},"type":4},"getOnSubmit":{"value":function onSubmit(){
+	return this.getOption().onsubmit;
+},"type":2},"setOnSubmit":{"value":function onSubmit(value){
+	this.getOption().onsubmit=value;
+},"type":4},"getOnCancel":{"value":function onCancel(){
+	return this.getOption().oncancel;
+},"type":2},"setOnCancel":{"value":function onCancel(value){
+	this.getOption().oncancel=value;
+},"type":4},"getOnClose":{"value":function onClose(){
+	return this.getOption().onclose;
+},"type":2},"setOnClose":{"value":function onClose(value){
+	this.getOption().onclose=value;
+},"type":4},"setSkin":{"value":function skin(skinObj){
+	var uninstall;
+	var old;
+	if(this.B26_getInitialized()){
+		old=this.getSkin();
+		if(skinObj!==old){
+			if(old){
+				old.removeEventListener(SkinEvent.UPDATE_DISPLAY_LIST,this.B26_position);
+			}
+			skinObj.addEventListener(SkinEvent.UPDATE_DISPLAY_LIST,this.B26_position,false,0,this);
+			if(this.B26_getState()){
+				SkinComponent.prototype.setSkin.call(this,skinObj);
+				this.B26_setProfile();
+			}
+			else if(old&&old.hasEventListener(SkinEvent.UNINSTALL)){
+				uninstall=new SkinEvent(SkinEvent.UNINSTALL);
+				uninstall.setOldSkin(old);
+				uninstall.setNewSkin(skinObj);
+				old.dispatchEvent(uninstall);
+			}
+		}
+	}
+	else {
+		SkinComponent.prototype.setSkin.call(this,skinObj);
+	}
+},"type":4},"B26_setProfile":{"value":function setProfile(){
+	var skin=this.getSkin();
+	var options=this.getOption();
+	var profile=options.profile;
+	if(System.env.platform('IE',8)){
+		skin.style('position','absolute');
+	}
+	if(this[__PRIVATE__]._title!=null){
+		profile.titleText=this[__PRIVATE__]._title;
+	}
+	Object.forEach(profile,function(value,prop){
+		switch(prop){
+			case "currentState":skin.setCurrentState(value);
+			break ;
+			case "content":if(value){
+				skin.setChildren(System.instanceOf(value, Array)?value:[value]);
+			}
+			default :skin.assign(prop,value);
+		}
+	},this);
+	if(options.width>0){
+		skin.setWidth(options.width);
+	}
+	if(options.height>0){
+		skin.setHeight(options.height);
+	}
+	this.B26_position();
+},"type":1}
+,"display":{"value":function display(){
+	var fadeIn;
+	var skin=this.getSkin();
+	var options=this.getOption();
+	this.B26_setProfile();
+	var elem=SkinComponent.prototype.display.call(this);
+	elem.show();
+	var container=this.B26_getContainer();
+	var animation=options.animation;
+	var timeout=options.timeout*1000;
+	if(animation.enabled&&!animation.running){
+		this.B26_setAnimationEnd(false);
+		fadeIn=animation.fadeIn;
+		container.style("animation",fadeIn.name+" "+fadeIn.duration+"s "+fadeIn.timing+" "+fadeIn.delay+"s "+fadeIn.fillMode);
+		timeout=(options.timeout+fadeIn.delay+fadeIn.duration)*1000;
+		System.setTimeout(function(obj){
+			obj.B26_setAnimationEnd(true);
+		},timeout,this);
+	}
+	if(options.timeout>0){
+		this.B26_setTimeoutId(System.setTimeout(function(obj){
+			obj.action("close");
+		},timeout,this));
+	}
+	return elem;
+},"type":1}
+,"close":{"value":function close(){
+	this.action("close");
+},"type":1}
+};
+BasePopUp.prototype=Object.create( SkinComponent.prototype , proto);
+Internal.defineClass("es.components.popup.BasePopUp",BasePopUp,{
+	"extends":SkinComponent,
+	"package":"es.components.popup",
+	"classname":"BasePopUp",
+	"abstract":true,
+	"uri":["b39","B26","K40"],
+	"privateSymbol":__PRIVATE__,
+	"method":method,
+	"proto":proto
+},1);
+
+},
+
+/***** Class es/components/popup/PopUpManage.es *****/
+
+"es/components/popup/PopUpManage.es": function(module,require){
+function PopUpManage(){
+Object.defineProperty(this,__PRIVATE__,{value:{}});
+};
+module.exports=PopUpManage;
+var IContainer=require("es/interfaces/IContainer.es");
+var IDisplay=require("es/interfaces/IDisplay.es");
+var SystemManage=require("es/core/SystemManage.es");
+var BasePopUp=require("es/components/popup/BasePopUp.es");
+var Display=require("es/core/Display.es");
+var Array=require("system/Array.js");
+var Reflect=require("system/Reflect.js");
+var Element=require("system/Element.js");
+var Symbol=require("system/Symbol.js");
+var Object=require("system/Object.js");
+var Internal=require("system/Internal.js");
+var __PRIVATE__=Symbol("es.components.popup.PopUpManage").valueOf();
+var method={"MASK_LEVEL":{"value":99900,"type":16}
+,"WINDOW_LEVEL":{"value":99910,"type":16}
+,"TOP_LEVEL":{"value":99999,"type":16}
+,"defaultOptions":{"writable":true,"value":{"profile":{"titleText":"提示","currentState":"modality"},"disableScroll":false,"isModalWindow":true,"mask":true,"callback":null,"timeout":0,"maskStyle":null,"clickOutsideClose":false,"animation":{"enabled":true,"fadeIn":{"name":"fadeInDown","duration":0.2,"timing":"linear","delay":0,"fillMode":"forwards"},"fadeOut":{"name":"fadeOutUp","duration":0.2,"timing":"linear","delay":0,"fillMode":"forwards"}},"horizontal":"center","vertical":"middle","offsetX":0,"offsetY":0,"x":NaN,"y":NaN},"type":8}
+,"Y41_count":{"writable":true,"value":0,"type":8}
+,"Y41_maskInstance":{"writable":true,"value":null,"type":8}
+,"Y41_systemPopUpInstance":{"writable":true,"value":null,"type":8}
+,"Y41_modalityInstances":{"writable":true,"value":[],"type":8}
+,"Y41_maskActiveCount":{"writable":true,"value":0,"type":8}
+,"mask":{"value":function mask(target,options){
+	if(options === void 0 ){
+		options=null;
+	}
+	if(target === void 0 ){
+		target=null;
+	}
+	if(target){
+		Reflect.decre(PopUpManage,PopUpManage,"maskActiveCount");
+		if(PopUpManage.Y41_maskActiveCount<1){
+			target.fadeOut();
+			PopUpManage.Y41_maskActiveCount=0;
+		}
+		return target;
+	}
+	var obj=PopUpManage.Y41_maskInstance;
+	if(obj==null){
+		obj=new MaskDisplay(SystemManage.getBody());
+		obj.style("zIndex",PopUpManage.MASK_LEVEL);
+		PopUpManage.Y41_maskInstance=obj;
+	}
+	if(options){
+		obj.options(options);
+	}
+	Reflect.incre(PopUpManage,PopUpManage,"maskActiveCount");
+	obj.fadeIn();
+	return obj;
+},"type":1}
+,"show":{"value":function show(target,isModalWindow,viewport){
+	if(viewport === void 0 ){
+		viewport=null;
+	}
+	if(isModalWindow === void 0 ){
+		isModalWindow=false;
+	}
+	var elem;
+	Reflect.incre(PopUpManage,PopUpManage,"count");
+	var level=PopUpManage.WINDOW_LEVEL;
+	if(isModalWindow===true){
+		if(PopUpManage.Y41_modalityInstances.indexOf(target)<0){
+			PopUpManage.Y41_modalityInstances.push(target);
+		}
+		PopUpManage.active(target);
+	}
+	else {
+		if(PopUpManage.Y41_systemPopUpInstance&&target!==PopUpManage.Y41_systemPopUpInstance){
+			elem=PopUpManage.Y41_systemPopUpInstance.getElement();
+			if(PopUpManage.Y41_systemPopUpInstance.getParent()){
+				PopUpManage.Y41_systemPopUpInstance.getParent().removeChild(PopUpManage.Y41_systemPopUpInstance);
+			}
+		}
+		PopUpManage.Y41_systemPopUpInstance=target;
+		level=PopUpManage.TOP_LEVEL;
+	}
+	target.getElement().style("zIndex",level);
+	if(target.getElement().parent().isEmpty()){
+		viewport.addChild(target);
+	}
+},"type":1}
+,"active":{"value":function active(target){
+	var skin;
+	var obj;
+	var index=0;
+	var len=PopUpManage.Y41_modalityInstances.length;
+	var at=0;
+	for(;index<len;index++){
+		obj=PopUpManage.Y41_modalityInstances[index];
+		skin=target.getSkin();
+		if(target===obj){
+			at=index;
+			skin.getElement().style('zIndex',PopUpManage.WINDOW_LEVEL);
+			skin.getElement().addClass("active");
+		}
+		else {
+			skin.getElement().style('zIndex',PopUpManage.WINDOW_LEVEL-1);
+			skin.getElement().removeClass("active");
+		}
+	}
+	if(at>0){
+		PopUpManage.Y41_modalityInstances.splice(at,1);
+		PopUpManage.Y41_modalityInstances.push(target);
+	}
+},"type":1}
+,"close":{"value":function close(target){
+	var parent;
+	if(PopUpManage.Y41_count>0){
+		Reflect.decre(PopUpManage,PopUpManage,"count");
+	}
+	var index=PopUpManage.Y41_modalityInstances.indexOf(target);
+	if(index>=0){
+		parent=target.getParent();
+		if(parent){
+			parent.removeChild(target);
+		}
+		PopUpManage.Y41_modalityInstances.splice(index,1);
+		if(PopUpManage.Y41_modalityInstances.length>0){
+			PopUpManage.active(PopUpManage.Y41_modalityInstances[PopUpManage.Y41_modalityInstances.length-1]);
+		}
+		return target;
+	}
+	return null;
+},"type":1}
+};
+for(var prop in method){
+	Object.defineProperty(PopUpManage, prop, method[prop]);
+}
+var proto={"constructor":{"value":PopUpManage}};
+PopUpManage.prototype=Object.create( Object.prototype , proto);
+Internal.defineClass("es.components.popup.PopUpManage",PopUpManage,{
+	"package":"es.components.popup",
+	"classname":"PopUpManage",
+	"uri":["Y41","e43","K40"],
+	"privateSymbol":__PRIVATE__,
+	"method":method,
+	"proto":proto
+},1);
+var MaskDisplay = (function(){
+function MaskDisplay(viewport){
+	Object.defineProperty(this,__PRIVATE__,{value:{"_options":null,"_state":false,"timeoutId":NaN}});
+
+	Display.call(this,new Element('<div tabIndex="-1" />'));
+	this[__PRIVATE__]._options=MaskDisplay.Y42_defaultOptions;
+	this.style("cssText",System.serialize(MaskDisplay.Y42_defaultOptions.style,"style"));
+	this.setVisible(false);
+	viewport.addChild(this.getElement());
+};
+var Display=require("es/core/Display.es");
+var Element=require("system/Element.js");
+var System=require("system/System.js");
+var Object=require("system/Object.js");
+var Symbol=require("system/Symbol.js");
+var Internal=require("system/Internal.js");
+var __PRIVATE__=Symbol("MaskDisplay").valueOf();
+var method={"Y42_defaultOptions":{"writable":true,"value":{"animation":{"enabled":true,"fadeIn":0.2,"fadeOut":0.2},"style":{"backgroundColor":"#000000","opacity":0.7,"position":"fixed","left":"0px","top":"0px","right":"0px","bottom":"0px"}},"type":8}
+};
+for(var prop in method){
+	Object.defineProperty(MaskDisplay, prop, method[prop]);
+}
+var proto={"constructor":{"value":MaskDisplay},"Y42__options":{"writable":true,"value":null,"type":8}
+,"Y42__state":{"writable":true,"value":false,"type":8}
+,"options":{"value":function options(option){
+	this[__PRIVATE__]._options=Object.merge(true,{},MaskDisplay.Y42_defaultOptions,option);
+},"type":1}
+,"fadeIn":{"value":function fadeIn(){
+	var animation;
+	if(!System.isNaN(this[__PRIVATE__].timeoutId)){
+		System.clearTimeout(this[__PRIVATE__].timeoutId);
+		this[__PRIVATE__].timeoutId=NaN;
+	}
+	else if(!this[__PRIVATE__]._state){
+		animation=MaskDisplay.Y42_defaultOptions.animation;
+		if(animation.fadeIn>0){
+			this.getElement().fadeIn(animation.fadeIn,this[__PRIVATE__]._options.style.opacity);
+		}
+	}
+	else {
+		this.getElement().style("opacity",this[__PRIVATE__]._options.style.opacity);
+		this.getElement().style("animation","none");
+	}
+	this[__PRIVATE__]._state=true;
+	this.setVisible(true);
+},"type":1}
+,"Y42_timeoutId":{"writable":true,"value":NaN,"type":8}
+,"fadeOut":{"value":function fadeOut(){
+	if(this[__PRIVATE__]._state){
+		this[__PRIVATE__]._state=false;
+		this[__PRIVATE__].timeoutId=System.setTimeout(function(target){
+			var animation=MaskDisplay.Y42_defaultOptions.animation;
+			var fadeOut=animation.fadeOut;
+			if(animation.fadeOut>0){
+				target.getElement().fadeOut(animation.fadeOut,target[__PRIVATE__]._options.style.opacity);
+			}
+			System.setTimeout(function(){
+				target.setVisible(false);
+				target.getElement().style("animation","none");
+			},(fadeOut)*1000);
+			System.clearTimeout(target[__PRIVATE__].timeoutId);
+		},100,this);
+	}
+},"type":1}
+};
+MaskDisplay.prototype=Object.create( Display.prototype , proto);
+Internal.defineClass("MaskDisplay",MaskDisplay,{
+	"ns":"K40",
+	"extends":Display,
+	"package":"es.components.popup",
+	"classname":"MaskDisplay",
+	"uri":["Y42","j2","K40"],
+	"privateSymbol":__PRIVATE__,
+	"method":method,
+	"proto":proto
+},1);
+return MaskDisplay;
+}());
+
+},
+
+/***** Class es/core/SystemManage.es *****/
+
+"es/core/SystemManage.es": function(module,require){
+function SystemManage(){
+Object.defineProperty(this,__PRIVATE__,{value:{}});
+EventDispatcher.apply(this,arguments);
+};
+module.exports=SystemManage;
+var EventDispatcher=require("system/EventDispatcher.js");
+var Element=require("system/Element.js");
+var Symbol=require("system/Symbol.js");
+var Object=require("system/Object.js");
+var Internal=require("system/Internal.js");
+var __PRIVATE__=Symbol("es.core.SystemManage").valueOf();
+var method={"W44__window":{"writable":true,"value":undefined,"type":8}
+,"getWindow":{"value":function getWindow(){
+	if(!SystemManage.W44__window)SystemManage.W44__window=new Element(window);
+	return SystemManage.W44__window;
+},"type":1}
+,"W44__document":{"writable":true,"value":undefined,"type":8}
+,"getDocument":{"value":function getDocument(){
+	if(!SystemManage.W44__document)SystemManage.W44__document=new Element(document);
+	return SystemManage.W44__document;
+},"type":1}
+,"W44__body":{"writable":true,"value":undefined,"type":8}
+,"getBody":{"value":function getBody(){
+	if(!SystemManage.W44__body)SystemManage.W44__body=new Element(document.body);
+	return SystemManage.W44__body;
+},"type":1}
+,"W44__disableScroll":{"writable":true,"value":false,"type":8}
+,"disableScroll":{"value":function disableScroll(){
+	var body;
+	if(!SystemManage.W44__disableScroll){
+		SystemManage.W44__disableScroll=true;
+		body=SystemManage.getBody();
+		body.style("overflowX","hidden");
+		body.style("overflowY","hidden");
+	}
+},"type":1}
+,"enableScroll":{"value":function enableScroll(){
+	var body;
+	if(SystemManage.W44__disableScroll===true){
+		SystemManage.W44__disableScroll=false;
+		body=SystemManage.getBody();
+		body.style("overflowX","auto");
+		body.style("overflowY","auto");
+	}
+},"type":1}
+};
+for(var prop in method){
+	Object.defineProperty(SystemManage, prop, method[prop]);
+}
+var proto={"constructor":{"value":SystemManage}};
+SystemManage.prototype=Object.create( EventDispatcher.prototype , proto);
+Internal.defineClass("es.core.SystemManage",SystemManage,{
+	"extends":null,
+	"package":"es.core",
+	"classname":"SystemManage",
+	"uri":["W44","a45","Q5"],
+	"privateSymbol":__PRIVATE__,
+	"method":method,
+	"proto":proto
+},1);
+
+},
+
+/***** System system/MouseEvent.js *****/
+
+"system/MouseEvent.js": function(module,require){
+/*
+ * EaseScript
+ * Copyright © 2017 EaseScript All rights reserved.
+ * Released under the MIT license
+ * https://github.com/51breeze/EaseScript
+ * @author Jun Ye <664371281@qq.com>
+ * @require System,Event,Object;
+ */
+function MouseEvent( type, bubbles,cancelable  )
+{
+    if( !(this instanceof MouseEvent) )return new MouseEvent(type, bubbles,cancelable);
+    Event.call(this, type, bubbles,cancelable );
+}
+
+module.exports = MouseEvent;
+var Object =require("system/Object.js");
+var Event =require("system/Event.js");
+var System =require("system/System.js");
+var Element =require("system/Element.js");
+
+MouseEvent.prototype=Object.create( Event.prototype,{
+    "constructor":{value:MouseEvent}
+});
+MouseEvent.prototype.wheelDelta= null;
+MouseEvent.prototype.pageX= NaN;
+MouseEvent.prototype.pageY= NaN;
+MouseEvent.prototype.offsetX=NaN;
+MouseEvent.prototype.offsetY=NaN;
+MouseEvent.prototype.screenX= NaN;
+MouseEvent.prototype.screenY= NaN;
+MouseEvent.MOUSE_DOWN='mousedown';
+MouseEvent.MOUSE_UP='mouseup';
+MouseEvent.MOUSE_OVER='mouseover';
+MouseEvent.MOUSE_OUT='mouseout';
+MouseEvent.MOUSE_OUTSIDE='mouseoutside';
+MouseEvent.MOUSE_MOVE='mousemove';
+MouseEvent.MOUSE_WHEEL='mousewheel';
+MouseEvent.CLICK='click';
+MouseEvent.DBLCLICK='dblclick';
+
+
+//鼠标事件
+Event.registerEvent(function ( type , target, originalEvent ) {
+
+    if( type && /^mouse|click$/i.test(type) )
+    {
+        var event =new MouseEvent( type );
+        event.pageX= originalEvent.x || originalEvent.clientX || originalEvent.pageX;
+        event.pageY= originalEvent.y || originalEvent.clientY || originalEvent.pageY;
+        event.offsetX = originalEvent.offsetX;
+        event.offsetY = originalEvent.offsetY;
+        event.screenX= originalEvent.screenX;
+        event.screenY= originalEvent.screenY;
+        if( typeof event.offsetX !=='number' && target )
+        {
+            event.offsetX=originalEvent.pageX-target.offsetLeft;
+            event.offsetY=originalEvent.pageY-target.offsetTop;
+        }
+        if( type === MouseEvent.MOUSE_WHEEL )
+        {
+            event.wheelDelta=originalEvent.wheelDelta || ( originalEvent.detail > 0 ? -originalEvent.detail : Math.abs( originalEvent.detail ) );
+        }
+        return event;
+    }
+});
+
+if( System.env.platform( System.env.BROWSER_FIREFOX ) )
+{
+    Event.fix.map[ MouseEvent.MOUSE_WHEEL ] = 'DOMMouseScroll';
+}
+
+Event.fix.hooks[ MouseEvent.MOUSE_OUTSIDE ]=function(listener, dispatcher)
+{
+    var doc = window;
+    var target = this;
+    var elem = new Element( this );
+    var type = Event.fix.prefix+MouseEvent.CLICK;
+    listener.proxyTarget = doc;
+    listener.proxyType = [type];
+    listener.proxyHandle = function(event)
+    {
+        var e = Event.create(event);
+        var range = elem.getBoundingRect();
+        if (!(e.pageX >= range.left && e.pageX <= range.right && e.pageY >= range.top && e.pageY <= range.bottom))
+        {
+            e.type = MouseEvent.MOUSE_OUTSIDE;
+            e.currentTarget = target;
+            listener.dispatcher.dispatchEvent( e );
+        }
+    }
+    //防止当前鼠标点击事件向上冒泡后触发。
+    setTimeout(function () {
+        doc.addEventListener ? doc.addEventListener(type, listener.proxyHandle ) : doc.attachEvent(type, listener.proxyHandle );
+    },10);
+}
+},
+
+/***** Class es/skins/PopUpSkin.html *****/
+
+"es/skins/PopUpSkin.html": function(module,require){
+function PopUpSkin(hostComponent){
+	Object.defineProperty(this,__PRIVATE__,{value:{"properties":{},"head":null,"body":null,"footer":null,"popupContainer":null,"_hostComponent":undefined,"_makeMap":{},"hasSetHeight":false}});
+
+	if(hostComponent === void 0 ){
+		hostComponent=null;
+	}
+	this[__PRIVATE__]._hostComponent=hostComponent;
+	Skin.call(this,"div");
+	var __var14__=new State();
+	__var14__.setName("tips");
+	__var14__.setStateGroup(["simple"]);
+	var __var15__=new State();
+	__var15__.setName("title");
+	__var15__.setStateGroup(["simple"]);
+	var __var16__=new State();
+	__var16__.setName("alert");
+	__var16__.setStateGroup(["normal"]);
+	var __var17__=new State();
+	__var17__.setName("confirm");
+	__var17__.setStateGroup(["normal"]);
+	var __var18__=new State();
+	__var18__.setName("modality");
+	__var18__.setStateGroup(["normal"]);
+	this.setStates([__var14__,__var15__,__var16__,__var17__,__var18__]);
+	this.setCurrentState("alert");
+	var attrs={"__var4__":{"class":"popup-head"},"__var6__":{"class":"popup-title"},"__var8__":{"type":"button","class":"close"},"__var9__":{"class":"popup-body"},"__var10__":{"class":"popup-footer"},"__var12__":{"type":"button"},"__var19__":{"class":"popup","tabindex":-1}};
+	this[__PRIVATE__].properties=attrs;
+	var head=(this.j2_createComponent(0,3,Container,"div",null,attrs.__var4__));
+	this.setHead(head);
+	var body=(this.j2_createComponent(0,6,Container,"div",null,attrs.__var9__));
+	this.setBody(body);
+	var footer=(this.j2_createComponent(0,7,Container,"div",null,attrs.__var10__));
+	this.setFooter(footer);
+	var popupContainer=(this.j2_createComponent(0,2,Container,"div"));
+	this.setPopupContainer(popupContainer);
+	this.attributes(this.getElement(),attrs.__var19__);
+};
+module.exports=PopUpSkin;
+var Skin=require("es/core/Skin.es");
+var State=require("es/core/State.es");
+var IDisplay=require("es/interfaces/IDisplay.es");
+var PopUp=require("es/components/PopUp.es");
+var Container=require("es/core/Container.es");
+var View=require("es/core/View.es");
+var Application=require("es/core/Application.es");
+var SkinComponent=require("es/core/SkinComponent.es");
+var Array=require("system/Array.js");
+var System=require("system/System.js");
+var Reflect=require("system/Reflect.js");
+var Object=require("system/Object.js");
+var Function=require("system/Function.js");
+var Symbol=require("system/Symbol.js");
+var Internal=require("system/Internal.js");
+var __PRIVATE__=Symbol("es.skins.PopUpSkin").valueOf();
+var method={};
+var proto={"constructor":{"value":PopUpSkin},"s46_properties":{"writable":true,"value":{},"type":8}
+,"getHead":{"value":function(){
+	return this[__PRIVATE__].head;
+},"type":2},"setHead":{"value":function(val){
+	return this[__PRIVATE__].head=val;
+},"type":2},"getBody":{"value":function(){
+	return this[__PRIVATE__].body;
+},"type":2},"setBody":{"value":function(val){
+	return this[__PRIVATE__].body=val;
+},"type":2},"getFooter":{"value":function(){
+	return this[__PRIVATE__].footer;
+},"type":2},"setFooter":{"value":function(val){
+	return this[__PRIVATE__].footer=val;
+},"type":2},"getPopupContainer":{"value":function(){
+	return this[__PRIVATE__].popupContainer;
+},"type":2},"setPopupContainer":{"value":function(val){
+	return this[__PRIVATE__].popupContainer=val;
+},"type":2},"s46__hostComponent":{"writable":true,"value":undefined,"type":8}
+,"j2_getHostComponent":{"value":function hostComponent(){
+	return this[__PRIVATE__]._hostComponent;
+},"type":2},"j2_render":{"value":function render(){
+	var dataset=this.getDataset();
+	var stateGroup=this.j2_getCurrentStateGroup();
+	if(!stateGroup){
+		throw new TypeError("State group is not defined for 'stateGroup'");
+	}
+	var titleText=dataset.titleText||"title",
+	closeText=dataset.closeText||"×",
+	submitText=dataset.submitText||"确 定",
+	cancelText=dataset.cancelText||"取 消",
+	headHeight=dataset.headHeight||NaN,
+	footerHeight=dataset.footerHeight||NaN,
+	left=dataset.left||NaN,
+	top=dataset.top||NaN,
+	right=dataset.right||NaN,
+	bottom=dataset.bottom||NaN;
+	var attrs=this[__PRIVATE__].properties;
+	var head=(!stateGroup.includeIn("tips")?this.getHead():null);
+	var body=this.getBody();
+	var footer=(!stateGroup.includeIn("simple")?this.getFooter():null);
+	var popupContainer=this.getPopupContainer();
+	if(head){
+		head.setHeight(headHeight);
+		this.j2_updateChildren(head,[this.j2_createElement(0,4,"span",titleText,attrs.__var6__),!stateGroup.includeIn("title")?this.j2_createElement(0,5,"button",closeText,attrs.__var8__,null,{"click":(this.s46_makeAction('close'))}):null]);
+	}
+	this.j2_updateChildren(body,this.getChildren());
+	if(footer){
+		footer.setHeight(footerHeight);
+		this.j2_updateChildren(footer,[!stateGroup.includeIn("alert")?this.j2_createElement(0,8,"button",cancelText,attrs.__var12__,{"class":stateGroup.includeIn("modality")?"btn btn-default":"btn btn-sm btn-default"},{"click":(this.s46_makeAction('cancel'))}):null,this.j2_createElement(0,9,"button",submitText,attrs.__var12__,{"class":stateGroup.includeIn("modality")?"btn btn-sm btn-primary":"btn btn-sm btn-primary"},{"click":(this.s46_makeAction('submit'))})]);
+	}
+	popupContainer.setLeft(left);
+	popupContainer.setTop(top);
+	popupContainer.setRight(right);
+	popupContainer.setBottom(bottom);
+	this.attributes(popupContainer.getElement(),{"class":stateGroup.includeIn("modality")?"popup-container fixed popup-lg":"popup-container fixed"});
+	this.j2_updateChildren(popupContainer,[head,body,footer]);
+	return [popupContainer];
+},"type":1}
+,"s46__makeMap":{"writable":true,"value":{},"type":8}
+,"s46_makeAction":{"value":function makeAction(name){
+	if(this[__PRIVATE__]._makeMap.hasOwnProperty(name)){
+		return this[__PRIVATE__]._makeMap[name];
+	}
+	var fn=this.j2_getHostComponent().action.bind(this.j2_getHostComponent(),name);
+	this[__PRIVATE__]._makeMap[name]=fn;
+	return fn;
+},"type":1}
+,"getWidth":{"value":function width(){
+	return this.getPopupContainer().getWidth();
+},"type":2},"setWidth":{"value":function width(val){
+	this.getPopupContainer().setWidth(val);
+},"type":4},"s46_hasSetHeight":{"writable":true,"value":false,"type":8}
+,"getHeight":{"value":function height(){
+	return this.getPopupContainer().getHeight();
+},"type":2},"setHeight":{"value":function height(val){
+	this.getPopupContainer().setHeight(val);
+	this[__PRIVATE__].hasSetHeight=true;
+},"type":4},"j2_updateDisplayList":{"value":function updateDisplayList(){
+	Skin.prototype.j2_updateDisplayList.call(this);
+	var h=this.getPopupContainer().getHeight();
+	var stateGroup=this.j2_getCurrentStateGroup();
+	if(!stateGroup.includeIn("tips")){
+		h-=this.getHead().getHeight();
+	}
+	if(!stateGroup.includeIn("simple")){
+		h-=this.getFooter().getHeight();
+	}
+	this.getBody().setHeight(h);
+},"type":1}
+};
+PopUpSkin.prototype=Object.create( Skin.prototype , proto);
+Internal.defineClass("es.skins.PopUpSkin",PopUpSkin,{
+	"extends":Skin,
+	"package":"es.skins",
+	"classname":"PopUpSkin",
+	"uri":["s46","j2","G47"],
+	"privateSymbol":__PRIVATE__,
+	"method":method,
+	"proto":proto
+},1);
+
+},
+
+/***** Class es/skins/DataGridSkin.html *****/
+
+"es/skins/DataGridSkin.html": function(module,require){
+function DataGridSkin(hostComponent){
+	Object.defineProperty(this,__PRIVATE__,{value:{"properties":{},"head":null,"body":null,"pagination":null,"foot":null,"_hostComponent":undefined}});
+
+	if(hostComponent === void 0 ){
+		hostComponent=null;
+	}
+	this[__PRIVATE__]._hostComponent=hostComponent;
+	Skin.call(this,"table");
+	var attrs={"__var42__":{"style":"height: 25px;"},"__var49__":{"colspan":3},"__var51__":{"class":"table data-grid-skin"}};
+	this[__PRIVATE__].properties=attrs;
+	var head=this.j2_createElement(0,2,"thead");
+	this.setHead(head);
+	var body=this.j2_createElement(0,7,"tbody");
+	this.setBody(body);
+	var pagination=(this.j2_createComponent(0,15,Pagination));
+	this.setPagination(pagination);
+	var foot=this.j2_createElement(0,12,"tfoot");
+	this.setFoot(foot);
+	this.attributes(this.getElement(),attrs.__var51__);
+};
+module.exports=DataGridSkin;
+var Skin=require("es/core/Skin.es");
+var IDisplay=require("es/interfaces/IDisplay.es");
+var DataGrid=require("es/components/DataGrid.es");
+var Pagination=require("es/components/Pagination.es");
+var View=require("es/core/View.es");
+var Application=require("es/core/Application.es");
+var SkinComponent=require("es/core/SkinComponent.es");
+var PaginationSkin=require("es/skins/PaginationSkin.html");
+var System=require("system/System.js");
+var Reflect=require("system/Reflect.js");
+var Array=require("system/Array.js");
+var Object=require("system/Object.js");
+var Element=require("system/Element.js");
+var DataSource=require("system/DataSource.js");
+var DataSourceEvent=require("system/DataSourceEvent.js");
+var Symbol=require("system/Symbol.js");
+var Internal=require("system/Internal.js");
+var __PRIVATE__=Symbol("es.skins.DataGridSkin").valueOf();
+var method={};
+var proto={"constructor":{"value":DataGridSkin},"U48_properties":{"writable":true,"value":{},"type":8}
+,"getHead":{"value":function(){
+	return this[__PRIVATE__].head;
+},"type":2},"setHead":{"value":function(val){
+	return this[__PRIVATE__].head=val;
+},"type":2},"getBody":{"value":function(){
+	return this[__PRIVATE__].body;
+},"type":2},"setBody":{"value":function(val){
+	return this[__PRIVATE__].body=val;
+},"type":2},"getPagination":{"value":function(){
+	return this[__PRIVATE__].pagination;
+},"type":2},"setPagination":{"value":function(val){
+	return this[__PRIVATE__].pagination=val;
+},"type":2},"getFoot":{"value":function(){
+	return this[__PRIVATE__].foot;
+},"type":2},"setFoot":{"value":function(val){
+	return this[__PRIVATE__].foot=val;
+},"type":2},"U48__hostComponent":{"writable":true,"value":undefined,"type":8}
+,"j2_getHostComponent":{"value":function hostComponent(){
+	return this[__PRIVATE__]._hostComponent;
+},"type":2},"j2_render":{"value":function render(){
+	var dataset=this.getDataset();
+	var attrs=this[__PRIVATE__].properties;
+	var __FOR0__=0;
+	var __var40__=this.j2_createElement(0,3,"tr");
+	var head=this.getHead();
+	var __FOR1__=0;
+	var body=this.getBody();
+	var pagination=this.getPagination();
+	var foot=this.getFoot();
+	var __var39__=[];
+	Object.forEach(dataset.columns,function(name,key){
+		__var39__.push(this.j2_createElement(__FOR0__,4,"th",[name,this.j2_createElement(__FOR0__,6,"span")],null,{"style":"height:"+dataset.headHeight+"px;line-height:"+dataset.headHeight+"px;"}));
+		__FOR0__++;
+	},this);
+	this.j2_updateChildren(__var40__,__var39__);
+	this.j2_updateChildren(head,[__var40__]);
+	var __var47__=[];
+	Object.forEach(dataset.datalist,function(item,key){
+		var __var44__=[];
+		Object.forEach(dataset.columns,function(val,field){
+			switch(field){
+				case "name":__var44__.push(this.j2_createElement(__FOR1__,9,"td",[this.j2_createElement(__FOR1__,10,"input",null,attrs.__var42__,{"value":(Reflect.get(DataGridSkin,item,field))})],null,{"data-column":field,"style":"height:"+dataset.rowHeight+"px;line-height:"+dataset.rowHeight+"px;"}));
+				break ;
+				default :__var44__.push(this.j2_createElement(__FOR1__,11,"td",(Reflect.get(DataGridSkin,item,field)),null,{"data-column":field,"style":"height:"+dataset.rowHeight+"px;line-height:"+dataset.rowHeight+"px;"}));
+			}
+			__FOR1__++;
+		},this);
+		var __var46__=this.j2_createElement(__FOR1__,8,"tr");
+		this.j2_updateChildren(__var46__,__var44__);
+		__var47__.push(__var46__);
+		__FOR1__++;
+	},this);
+	this.j2_updateChildren(body,__var47__);
+	pagination.setRadius(3);
+	pagination.setAsync(true);
+	pagination.setSkinClass(PaginationSkin);
+	this.j2_updateChildren(foot,[this.j2_createElement(0,13,"tr",[this.j2_createElement(0,14,"td",[pagination],attrs.__var49__)])]);
+	return [head,body,foot];
+},"type":1}
+,"j2_updateDisplayList":{"value":function updateDisplayList(){
+	Skin.prototype.j2_updateDisplayList.call(this);
+	var hostComponent=this.j2_getHostComponent();
+	var radius=hostComponent.getRadius()+'px';
+	var table=this.getElement();
+	table.style('borderRadius',radius);
+	Element('thead > tr:first-child >th:first-child',table).style('borderTopLeftRadius',radius);
+	Element('thead > tr:first-child >th:last-child',table).style('borderTopRightRadius',radius);
+	Element('tfoot > tr:last-child >td:first-child',table).style('borderBottomLeftRadius',radius);
+	Element('tfoot > tr:last-child >td:last-child',table).style('borderBottomRightRadius',radius);
+	Element('td',this.getFoot()).height(hostComponent.getFootHeight());
+},"type":1}
+,"j2_initializing":{"value":function initializing(){
+	var dataProfile;
+	var body;
+	var dataSource;
+	var hostComponent=this.j2_getHostComponent();
+	if(hostComponent.isNeedCreateSkin()){
+		dataSource=hostComponent.getDataSource();
+		body=this;
+		dataProfile=hostComponent.getDataProfile();
+		this.getPagination().setDataSource(dataSource);
+		body.assign('rowHeight',hostComponent.getRowHeight());
+		body.assign('headHeight',hostComponent.getHeadHeight());
+		body.assign(dataProfile,[]);
+		body.assign(hostComponent.getColumnProfile(),hostComponent.getColumns());
+		body.assign(hostComponent.getColumnProfile(),hostComponent.getColumns());
+		dataSource.addEventListener(DataSourceEvent.SELECT,function(event){
+			if(!event.waiting){
+				body.assign(dataProfile,event.data);
+				body.display();
+			}
+		});
+		dataSource.select(this.getPagination().getCurrent());
+	}
+	Skin.prototype.j2_initializing.call(this);
+},"type":1}
+};
+DataGridSkin.prototype=Object.create( Skin.prototype , proto);
+Internal.defineClass("es.skins.DataGridSkin",DataGridSkin,{
+	"extends":Skin,
+	"package":"es.skins",
+	"classname":"DataGridSkin",
+	"uri":["U48","j2","G47"],
+	"privateSymbol":__PRIVATE__,
+	"method":method,
+	"proto":proto
+},1);
+
+},
+
+/***** Class es/components/Pagination.es *****/
+
+"es/components/Pagination.es": function(module,require){
+function Pagination(componentId){
+	Object.defineProperty(this,__PRIVATE__,{value:{"_dataSource":null,"_profile":'page',"_url":'',"_pageSize":NaN,"_current":NaN,"_link":7,"_radius":0}});
+
+	if(componentId === void 0 ){
+		componentId="12";
+	}
+	SkinComponent.call(this,componentId);
+};
+module.exports=Pagination;
+var SkinComponent=require("es/core/SkinComponent.es");
+var Skin=require("es/core/Skin.es");
+var PaginationEvent=require("es/events/PaginationEvent.es");
+var Display=require("es/core/Display.es");
+var DataSource=require("system/DataSource.js");
+var DataSourceEvent=require("system/DataSourceEvent.js");
+var Locator=require("system/Locator.js");
+var System=require("system/System.js");
+var Reflect=require("system/Reflect.js");
+var MouseEvent=require("system/MouseEvent.js");
+var Symbol=require("system/Symbol.js");
+var Object=require("system/Object.js");
+var Internal=require("system/Internal.js");
+var __PRIVATE__=Symbol("es.components.Pagination").valueOf();
+var method={};
+var proto={"constructor":{"value":Pagination},"Y49__dataSource":{"writable":true,"value":null,"type":8}
+,"getDataSource":{"value":function dataSource(){
+	return this[__PRIVATE__]._dataSource;
+},"type":2},"setDataSource":{"value":function dataSource(value){
+	var self;
+	var old=this[__PRIVATE__]._dataSource;
+	if(old!==value){
+		this[__PRIVATE__]._dataSource=value;
+		self=this;
+		value.addEventListener(DataSourceEvent.SELECT,function(e){
+			if(!e.waiting&&self.B26_getInitialized()){
+				self.B26_commitPropertyAndUpdateSkin();
+			}
+		});
+		if(this.B26_getInitialized()){
+			value.select(this.getCurrent());
+		}
+	}
+},"type":4},"Y49__profile":{"writable":true,"value":'page',"type":8}
+,"getProfile":{"value":function profile(){
+	return this[__PRIVATE__]._profile;
+},"type":2},"setProfile":{"value":function profile(value){
+	var curr;
+	if(this[__PRIVATE__]._profile!==value){
+		this[__PRIVATE__]._profile=value;
+		if(this.B26_getInitialized()){
+			curr=parseInt(Locator.query(value,1));
+			this.setCurrent(System.isNaN(curr)?1:curr);
+		}
+	}
+},"type":4},"Y49__url":{"writable":true,"value":'',"type":8}
+,"getUrl":{"value":function url(){
+	return this[__PRIVATE__]._url;
+},"type":2},"setUrl":{"value":function url(value){
+	if(this[__PRIVATE__]._url!==value){
+		this[__PRIVATE__]._url=value;
+		if(this.B26_getInitialized()){
+			this.B26_commitPropertyAndUpdateSkin();
+		}
+	}
+},"type":4},"getTotalPage":{"value":function totalPage(){
+	var dataSource=this.getDataSource();
+	if(dataSource){
+		return dataSource.totalPage()||1;
+	}
+	return 1;
+},"type":2},"getTotalSize":{"value":function totalSize(){
+	var dataSource=this.getDataSource();
+	if(dataSource){
+		return dataSource.totalSize();
+	}
+	return NaN;
+},"type":2},"Y49__pageSize":{"writable":true,"value":NaN,"type":8}
+,"getPageSize":{"value":function pageSize(){
+	var dataSource=this.getDataSource();
+	if(dataSource){
+		return dataSource.pageSize();
+	}
+	return this[__PRIVATE__]._pageSize;
+},"type":2},"setPageSize":{"value":function pageSize(num){
+	var dataSource;
+	if(this[__PRIVATE__]._pageSize!==num){
+		this[__PRIVATE__]._pageSize=num;
+		dataSource=this.getDataSource();
+		if(dataSource){
+			dataSource.pageSize(num);
+			if(this.B26_getInitialized()){
+				dataSource.select(this.getCurrent());
+			}
+		}
+	}
+},"type":4},"Y49__current":{"writable":true,"value":NaN,"type":8}
+,"getCurrent":{"value":function current(){
+	var curr;
+	var dataSource=this.getDataSource();
+	if(System.isNaN(this[__PRIVATE__]._current)){
+		curr=parseInt(Locator.query(this[__PRIVATE__]._profile,1));
+		this[__PRIVATE__]._current=System.isNaN(curr)?1:curr;
+	}
+	if(dataSource&&this.B26_getInitialized()){
+		return this.getDataSource().current();
+	}
+	return this[__PRIVATE__]._current;
+},"type":2},"setCurrent":{"value":function current(num){
+	var dataSource;
+	var linkUrl;
+	var createUrl;
+	var profile;
+	var event;
+	num=System.isNaN(this.getTotalSize())?num:Math.min(Math.max(1,num),this.getTotalPage());
+	var current=this.getCurrent();
+	if(num!==current){
+		this[__PRIVATE__]._current=num;
+		event=new PaginationEvent(PaginationEvent.CHANGE);
+		event.setOldValue(current);
+		event.setNewValue(num);
+		profile=this.getProfile();
+		createUrl=this.getUrl();
+		if(System.typeOf(createUrl)!=="function"){
+			linkUrl=this.getUrl();
+			event.setUrl((Reflect.get(Pagination,linkUrl,"length")>0?(Reflect.call(Pagination,linkUrl,"indexOf",['?'])>=0?linkUrl+'&'+profile+'='+num:linkUrl+'?'+profile+'='+num):('?'+this.getProfile()+'='+num)));
+		}
+		else {
+			event.setUrl(createUrl(num,profile));
+		}
+		if(this.dispatchEvent(event)){
+			if(this.getAsync()){
+				dataSource=this.getDataSource();
+				if(dataSource)dataSource.select(num);
+			}
+		}
+	}
+},"type":4},"Y49__link":{"writable":true,"value":7,"type":8}
+,"getLink":{"value":function link(){
+	return this[__PRIVATE__]._link;
+},"type":2},"setLink":{"value":function link(num){
+	if(this[__PRIVATE__]._link!==num){
+		this[__PRIVATE__]._link=num;
+		if(this.B26_getInitialized()){
+			this.B26_commitPropertyAndUpdateSkin();
+		}
+	}
+},"type":4},"getWheelTarget":{"value":function wheelTarget(){
+	return this.B26_pull("wheelTarget");
+},"type":2},"setWheelTarget":{"value":function wheelTarget(value){
+	var self;
+	var old=this.B26_pull("wheelTarget");
+	if(old!==value&&value){
+		this.B26_push("wheelTarget",value);
+		if(old){
+			old.removeEventListener(MouseEvent.MOUSE_WHEEL);
+		}
+		self=this;
+		value.addEventListener(MouseEvent.MOUSE_WHEEL,function(e){
+			var page;
+			e.preventDefault();
+			if(self.getAsync()){
+				page=self.getCurrent();
+				page=e.wheelDelta>0?page+1:page-1;
+				self.setCurrent(page);
+			}
+		},false,0,this);
+	}
+},"type":4},"Y49__radius":{"writable":true,"value":0,"type":8}
+,"getRadius":{"value":function radius(){
+	return this[__PRIVATE__]._radius;
+},"type":2},"setRadius":{"value":function radius(val){
+	if(this[__PRIVATE__]._radius!==val){
+		this[__PRIVATE__]._radius=val;
+		if(this.B26_getInitialized()){
+			this.B26_commitPropertyAndUpdateSkin();
+		}
+	}
+},"type":4},"B26_initializing":{"value":function initializing(){
+	var size;
+	var dataSource;
+	SkinComponent.prototype.B26_initializing.call(this);
+	if(this.isNeedCreateSkin()){
+		dataSource=this[__PRIVATE__]._dataSource;
+		if(!dataSource)throw new ReferenceError('dataSource is not defined');
+		size=this.getPageSize();
+		if(!System.isNaN(size))dataSource.pageSize(size);
+		dataSource.select(this.getCurrent());
+	}
+},"type":1}
+,"B26_commitPropertyAndUpdateSkin":{"value":function commitPropertyAndUpdateSkin(){
+	var linkUrl;
+	if(!this.B26_getInitialized())return ;
+	var skin=this.getSkin();
+	var current=this.getCurrent();
+	var totalPage=this.getTotalPage();
+	var pageSize=this.getPageSize();
+	var link=this.getLink();
+	var url=this.getUrl();
+	var offset=Math.max(current-Math.ceil(link/2),0);
+	if(System.typeOf(url)!=="function"){
+		linkUrl=url;
+		url=Reflect.get(Pagination,linkUrl,"length")>0?function(page,profile){
+			return Reflect.call(Pagination,linkUrl,"indexOf",['?'])>=0?linkUrl+'&'+profile+'='+page:linkUrl+'?'+profile+'='+page;
+		}:function(page,profile){
+			return '?'+profile+'='+page;
+		};
+	}
+	offset=(offset+link)>totalPage?offset-(offset+link-totalPage):offset;
+	skin.assign('totalPage',totalPage);
+	skin.assign('pageSize',pageSize);
+	skin.assign('offset',(current-1)*pageSize);
+	skin.assign('profile',this.getProfile());
+	skin.assign('url',url);
+	skin.assign('current',current);
+	skin.assign('first',1);
+	skin.assign('prev',Math.max(current-1,1));
+	skin.assign('next',Math.min(current+1,totalPage));
+	skin.assign('last',totalPage);
+	skin.assign('link',System.range(Math.max(1+offset,1),link+offset,1));
+	SkinComponent.prototype.B26_commitPropertyAndUpdateSkin.call(this);
+},"type":1}
+};
+Pagination.prototype=Object.create( SkinComponent.prototype , proto);
+Internal.defineClass("es.components.Pagination",Pagination,{
+	"extends":SkinComponent,
+	"package":"es.components",
+	"classname":"Pagination",
+	"uri":["Y49","B26","B37"],
+	"privateSymbol":__PRIVATE__,
+	"method":method,
+	"proto":proto
+},1);
+
+},
+
+/***** System system/Locator.js *****/
+
+"system/Locator.js": function(module,require){
+/*
+ * Copyright © 2017 EaseScript All rights reserved.
+ * Released under the MIT license
+ * https://github.com/51breeze/EaseScript
+ * @author Jun Ye <664371281@qq.com>
+ * @require System,Object,TypeError
+ */
+
+/**
+ * 资源定位器
+ * @constructor
+ */
+function Locator()
+{
+    throw new TypeError("Locator is not constructor");
+}
+
+module.exports = Locator;
+var Object =require("system/Object.js");
+
+var System =require("system/System.js");
+var urlSegments={};
+
+/**
+ * 返回地址栏中的URL
+ * @returns {string|*}
+ */
+Locator.url=function url()
+{
+    return urlSegments.url;
+}
+
+/**
+ * 返回地址栏中的URI
+ * @returns {string}
+ */
+Locator.uri=function uri()
+{
+    return urlSegments.uri;
+}
+
+/**
+ * 返回地址栏中请求的路径部分。如查指定index则返回位于index索引的路径名，否则返回一个数组。
+ * 给定的index必须是一个从0开始的整数
+ * @param index
+ * @returns {*}
+ */
+Locator.path = function path( index )
+{
+    if( index >= 0 )
+    {
+        return urlSegments.path[index];
+    }
+    return urlSegments.path.slice(0);
+}
+
+/**
+ * 返回地址栏中请求的主机名称
+ * @returns {string}
+ */
+Locator.host = function host()
+{
+    return urlSegments.host;
+}
+
+/**
+ * 返回地址栏中的资源地址
+ * 通常是一个带有请求协议的主机名
+ * @returns {string}
+ */
+Locator.origin = function origin()
+{
+   return urlSegments.origin;
+}
+
+/**
+ * 返回地址样中的请求协议
+ * 通常为http,https
+ * @returns {string}
+ */
+Locator.scheme = function scheme()
+{
+    return urlSegments.scheme;
+}
+
+/**
+ * 返回端口号
+ * @returns {string|*}
+ */
+Locator.port = function port()
+{
+    return urlSegments.port;
+}
+
+/**
+ * 返回指定位置的片段名（锚点名）, 从URL的左边开始索引
+ * 如果没有指定索引则返回一个数组
+ * @param index
+ * @returns {Array}
+ */
+Locator.fragment = function fragment( index )
+{
+    if( index >=0 )
+    {
+        return urlSegments.fragment[ index ] || null;
+    }
+    return urlSegments.fragment.slice(0);
+}
+
+/**
+ * 返回指定名称的值， 如果没有返回指定的默认值
+ * @param name 查询指定的key名称
+ * @param defaultValue 默认值，默认返回null
+ * @returns {*}
+ */
+Locator.query = function query(name, defaultValue)
+{
+    if( typeof name === "string" )
+    {
+        defaultValue = typeof defaultValue === "undefined" ? null : defaultValue;
+        return urlSegments.query[name] || defaultValue;
+    }
+    return Object.merge({}, urlSegments.query);
+}
+
+/**
+ * 将一个url的片段组装成url
+ * @param urlSegments
+ * @return {string}
+ */
+Locator.toUrl=function toUrl( urlSegments )
+{
+    var query = System.serialize(urlSegments.query||{},"url",true);
+    if( urlSegments.fragment )
+    {
+        if( typeof urlSegments.fragment === "string" )
+        {
+            query+="#"+urlSegments.fragment;
+        }else if( urlSegments.fragment.length > 0)
+        {
+            query+="#"+urlSegments.fragment.join("#");
+        }
+    }
+    return (urlSegments.scheme||location.protocol||"http")+"://"+(urlSegments.host||location.hostname)
+        +(urlSegments.port ? ":"+urlSegments.port : "")
+        +( urlSegments.path && urlSegments.path.length>0? "/"+urlSegments.path.join("/") : "" )
+        +(query?"?"+query:"");
+}
+
+var cached={};
+
+/**
+ * 创建一个指定的url的分段信息
+ * @param url  一个完整的url信息
+ * @param name 返回指定的段名部分
+ * @return {}
+ */
+Locator.create=function create(url,name)
+{
+    if( typeof url !== "string" )return false;
+    url = System.trim(url);
+    if( !/^(https?|file|ftp|udp|tcp)\:\/\//i.test(url) )
+    {
+        var http = location.protocol+"//"+location.hostname+(location.port ? ":"+location.port : "");
+        url = url.charAt(0) === "/" || url.charAt(0) === "?" ? http+url : http+"/"+url;
+    }
+
+    var segments = cached[ url ];
+    if( !segments )
+    {
+        segments= cached[ url ] = {};
+
+        var pos = url.indexOf(":");
+        segments.scheme = pos > 0 && pos < 6 ? url.slice(0,pos).toLowerCase() : null;
+        segments.url = url;
+
+        url = url.slice(pos+1).replace(/^\/+/g,'');
+        pos = url.indexOf( segments.scheme==="file" ? ":" : "/");
+
+        segments.host = pos > 0 ? url.slice( 0, pos ) : null;
+        segments.uri  = (pos > 0 ? url.slice( segments.scheme==="file" ? pos+1 : pos ) : url).replace(/^\/\//g,'/');
+        segments.path = segments.uri;
+        segments.fragment=[];
+        segments.query = {};
+        url = segments.uri;
+
+        if( segments.host && segments.host.indexOf("@") > 0 )
+        {
+            var info = segments.host.split("@",2);
+            if( info[0] )
+            {
+                var userinfo = info[0].split(":",2);
+                segments.username = userinfo[0];
+                segments.password = userinfo[1];
+            }
+
+            if( info[1] )
+            {
+               segments.host = info[1];
+            }
+        }
+
+        if( segments.host && segments.host.indexOf(":") > 0 )
+        {
+            var hostinfo = segments.host.split(":");
+            if( hostinfo[0] ){
+               segments.host = hostinfo[0];
+            }
+            if( hostinfo[1] ){
+                segments.port = hostinfo[1];
+            }
+        }
+      
+        var query = null;
+        pos = url.indexOf("?");
+        if( pos >=0 )
+        {
+            segments.path = url.slice(0, pos);
+            url = url.slice( pos+1 );
+            query = url;
+        }
+
+        if( segments.path )
+        {
+            var path = segments.path.replace(/^\/+|\/+$/g,"");
+            segments.path = path ? path.split("/") : [];
+        }
+
+        pos = url.indexOf("#");
+        if( pos >= 0 )
+        {
+            if( query )
+            {
+                query = url.slice(0,pos)
+            }
+            url = url.slice(pos+1);
+            if( url ){
+                segments.fragment = url.split("#");
+            }
+        }
+        
+        if( query )
+        {
+            query = query.split("&");
+            for(var i=0;i<query.length;i++)
+            {
+                var item = query[i].split("=",2);
+                segments.query[ System.trim(item[0]) ] = item.length > 1 ? window.decodeURIComponent( item[1] ) : "";
+            }
+        }
+    }
+    return name ? segments[name] : segments;
+}
+
+
+/**
+ * 返回一个匹配的路由服务提供者
+ * @param name
+ * @return {*}
+ */
+Locator.match = function match( name )
+{
+    var segments = name;
+    if( typeof name === "string" ) {
+        segments = Locator.create(name);
+    }
+    if( !segments )return null;
+    if( segments.host !== location.hostname ){
+        return null;
+    }
+    var pathName = System.environments("URL_PATH_NAME");
+    if( typeof segments.query[ pathName ] !== "undefined" )
+    {
+        name = segments.query[ pathName ];
+    }else{
+        name = '/'+segments.path.join('/');
+    }
+
+    var routes = System.environments("HTTP_ROUTES");
+    
+    for(var method in routes)
+    {
+        var route = routes[method];
+        if( typeof route[name] !== "undefined" )
+        {
+            return route[name];
+        }
+    }
+    return null;
+}
+urlSegments = Locator.create(location.href)||{
+    "host":"",
+    "origin":"",
+    "scheme":"",
+    "port":"",
+    "uri":"",
+    "url":location.href,
+    "path":[],
+    "query":{},
+    "fragment":[]
+};
+},
+
+/***** Class es/events/PaginationEvent.es *****/
+
+"es/events/PaginationEvent.es": function(module,require){
+function PaginationEvent(type,bubbles,cancelable){
+	Object.defineProperty(this,__PRIVATE__,{value:{"newValue":null,"oldValue":null,"url":null}});
+
+	if(cancelable === void 0 ){
+		cancelable=true;
+	}
+	if(bubbles === void 0 ){
+		bubbles=true;
+	}
+	Event.call(this,type,bubbles,cancelable);
+};
+module.exports=PaginationEvent;
+var Event=require("system/Event.js");
+var Symbol=require("system/Symbol.js");
+var Object=require("system/Object.js");
+var Internal=require("system/Internal.js");
+var __PRIVATE__=Symbol("es.events.PaginationEvent").valueOf();
+var method={"CHANGE":{"value":'paginationChange',"type":16}
+,"REFRESH":{"value":'paginationRefreshList',"type":16}
+};
+for(var prop in method){
+	Object.defineProperty(PaginationEvent, prop, method[prop]);
+}
+var proto={"constructor":{"value":PaginationEvent},"getNewValue":{"value":function(){
+	return this[__PRIVATE__].newValue;
+},"type":2},"setNewValue":{"value":function(val){
+	return this[__PRIVATE__].newValue=val;
+},"type":2},"getOldValue":{"value":function(){
+	return this[__PRIVATE__].oldValue;
+},"type":2},"setOldValue":{"value":function(val){
+	return this[__PRIVATE__].oldValue=val;
+},"type":2},"getUrl":{"value":function(){
+	return this[__PRIVATE__].url;
+},"type":2},"setUrl":{"value":function(val){
+	return this[__PRIVATE__].url=val;
+},"type":2}};
+PaginationEvent.prototype=Object.create( Event.prototype , proto);
+Internal.defineClass("es.events.PaginationEvent",PaginationEvent,{
+	"extends":null,
+	"package":"es.events",
+	"classname":"PaginationEvent",
+	"uri":["s50","k51","Z22"],
+	"privateSymbol":__PRIVATE__,
+	"method":method,
+	"proto":proto
+},1);
+
+},
+
+/***** Class es/skins/PaginationSkin.html *****/
+
+"es/skins/PaginationSkin.html": function(module,require){
+function PaginationSkin(hostComponent){
+	Object.defineProperty(this,__PRIVATE__,{value:{"properties":{},"_hostComponent":undefined}});
+
+	if(hostComponent === void 0 ){
+		hostComponent=null;
+	}
+	this[__PRIVATE__]._hostComponent=hostComponent;
+	Skin.call(this,"div");
+	var attrs={"__var22__":{"class":"first"},"__var26__":{"class":"prev"},"__var31__":{"class":"next"},"__var34__":{"class":"last"},"__var35__":{"class":"pagination"}};
+	this[__PRIVATE__].properties=attrs;
+	this.attributes(this.getElement(),attrs.__var35__);
+};
+module.exports=PaginationSkin;
+var Skin=require("es/core/Skin.es");
+var Pagination=require("es/components/Pagination.es");
+var View=require("es/core/View.es");
+var Application=require("es/core/Application.es");
+var SkinComponent=require("es/core/SkinComponent.es");
+var System=require("system/System.js");
+var Reflect=require("system/Reflect.js");
+var Array=require("system/Array.js");
+var Function=require("system/Function.js");
+var Object=require("system/Object.js");
+var MouseEvent=require("system/MouseEvent.js");
+var Element=require("system/Element.js");
+var Symbol=require("system/Symbol.js");
+var Internal=require("system/Internal.js");
+var __PRIVATE__=Symbol("es.skins.PaginationSkin").valueOf();
+var method={};
+var proto={"constructor":{"value":PaginationSkin},"f52_properties":{"writable":true,"value":{},"type":8}
+,"f52__hostComponent":{"writable":true,"value":undefined,"type":8}
+,"j2_getHostComponent":{"value":function hostComponent(){
+	return this[__PRIVATE__]._hostComponent;
+},"type":2},"j2_render":{"value":function render(){
+	var dataset=this.getDataset();
+	var url=dataset.url,
+	first=dataset.first,
+	prev=dataset.prev,
+	next=dataset.next,
+	last=dataset.last,
+	profile=dataset.profile,
+	current=dataset.current||1,
+	link=dataset.link;
+	var attrs=this[__PRIVATE__].properties;
+	var __FOR0__=0;
+	var __var23__=[];
+	__var23__.push(this.j2_createElement(0,2,"li",[this.j2_createElement(0,3,"a","第一页",null,{"href":(url(first,profile))})],attrs.__var22__));
+	__var23__.push(this.j2_createElement(0,4,"li",[this.j2_createElement(0,5,"a","上一页",null,{"href":(url(prev,profile)),"class":(current===1?"disabled":"")})],attrs.__var26__));
+	Object.forEach(link,function(val,key){
+		__var23__.push(this.j2_createElement(__FOR0__,6,"li",[this.j2_createElement(__FOR0__,7,"a",val,null,{"href":(url(val,profile))})],null,{"class":"link "+(val==current?'current':'')}));
+		__FOR0__++;
+	},this);
+	__var23__.push(this.j2_createElement(0,8,"li",[this.j2_createElement(0,9,"a","下一页",null,{"href":(url(next,profile))})],attrs.__var31__));
+	__var23__.push(this.j2_createElement(0,10,"li",[this.j2_createElement(0,11,"a","最后页",null,{"href":(url(last,profile))})],attrs.__var34__));
+	return __var23__;
+},"type":1}
+,"j2_initializing":{"value":function initializing(){
+	var host=this.j2_getHostComponent();
+	var profile=new RegExp(host.getProfile()+'\\s*=\\s*(\\d+)');
+	this.addEventListener(MouseEvent.CLICK,function(e){
+		var page;
+		var _profile;
+		var url;
+		if(host.getAsync()&&Element.getNodeName(e.target)==='a'){
+			e.preventDefault();
+			url=Element(e.target).property('href');
+			_profile=url.match(profile);
+			page=System.parseInt(_profile?_profile[1]:0);
+			if(page>0){
+				host.setCurrent(page);
+			}
+		}
+	});
+},"type":1}
+,"j2_updateDisplayList":{"value":function updateDisplayList(){
+	Skin.prototype.j2_updateDisplayList.call(this);
+	var hostComponent=this.j2_getHostComponent();
+	var _radius=hostComponent.getRadius();
+	if(_radius>0){
+		Element('.link',this.getElement()).style('borderRadius',_radius+'px');
+	}
+},"type":1}
+};
+PaginationSkin.prototype=Object.create( Skin.prototype , proto);
+Internal.defineClass("es.skins.PaginationSkin",PaginationSkin,{
+	"extends":Skin,
+	"package":"es.skins",
+	"classname":"PaginationSkin",
+	"uri":["f52","j2","G47"],
+	"privateSymbol":__PRIVATE__,
+	"method":method,
+	"proto":proto
+},1);
+
+}}));
