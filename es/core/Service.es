@@ -27,31 +27,13 @@ package es.core
         * @param cmd
         * @return {*}
         */
-       protected static function pipeline(target:EventDispatcher,type:String,name:String, args:Array )
+       protected static function pipeline(target:EventDispatcher,type:String,name:String, cmd:String, args:Array, callback:Function )
        {
            var event:PipelineEvent = new PipelineEvent( type );
            event.name = name;
-           event.cmd = (String)args[0];
-           if( args.length > 1 )
-           {
-               if( args[1] instanceof Function )
-               {
-                  event.callback = (Function)args[1];
-               }else{
-                  event.params = (Array)args[1];
-               }
-
-               if( args.length > 2 )
-               {
-                  if( args[2] instanceof Function )
-                  {
-                     event.callback = (Function)args[2];
-                  }else{
-                     event.params = (Array)args[2];
-                  }
-               }
-           }
-
+           event.cmd = cmd;
+           event.callback = callback;
+           event.params = args;
            if( target.hasEventListener(type) )
            {
                target.dispatchEvent( event );
@@ -65,50 +47,54 @@ package es.core
         * @param sql
         * @param params
         * @param callback
-        * @return {*}
+        * @return {PipelineEvent}
         */
-       protected function query( sql:String  )
+       protected function query( sql:String,...args):PipelineEvent
        {
-           return Service.pipeline(this, PipelineEvent.PIPELINE_DATABASE, "select", Array.from(arguments) );
+           const callback:Function = args.pop() as Function;
+           return Service.pipeline(this, PipelineEvent.PIPELINE_DATABASE, "select", sql, args, callback );
        }
 
        /**
         * 更新数据
         *
         * @param sql
-        * @return {*}
+        * @return {PipelineEvent}
         */
-       protected function save( sql:String)
+       protected function save( sql:String,...args):PipelineEvent
        {
-           return Service.pipeline(this,PipelineEvent.PIPELINE_DATABASE, "update", Array.from(arguments) );
+           const callback:Function = args.pop() as Function;
+           return Service.pipeline(this,PipelineEvent.PIPELINE_DATABASE, "update", sql,args, callback );
        }
 
        /**
         * 追加数据
         * @param sql
-        * @return {*}
+        * @return {PipelineEvent}
         */
-       protected function append(sql:String )
+       protected function insert(sql:String,...args):PipelineEvent
        {
-           return Service.pipeline(this,PipelineEvent.PIPELINE_DATABASE, "insert", Array.from(arguments) );
+           const callback:Function = args.pop() as Function;
+           return Service.pipeline(this,PipelineEvent.PIPELINE_DATABASE, "insert", sql,args, callback );
        }
 
        /**
         * 删除数据
         * @param sql
-        * @return {*}
+        * @return {PipelineEvent}
         */
-       protected function remove( sql:String )
+       protected function remove( sql:String,...args):PipelineEvent
        {
-           return Service.pipeline(this,PipelineEvent.PIPELINE_DATABASE, "delete", Array.from(arguments) );
+           const callback:Function = args.pop() as Function;
+           return Service.pipeline(this,PipelineEvent.PIPELINE_DATABASE, "delete",sql,args, callback );
        }
 
        /**
         * 成功时的响应数据结构
         * @param data
-        * @return {Object}
+        * @return {void}
         */
-       protected function success( data:* )
+       protected function success( data:* ):void
        {
            if( data instanceof Array )
            {
@@ -121,7 +107,8 @@ package es.core
            {
                data = (data as Object).valueOf();
            }
-           return this._response = {"data":data, "status":200};
+
+           this.response({"data":data, "status":200});
        }
 
        /**
@@ -129,26 +116,25 @@ package es.core
         * @param message
         * @param errorCode
         * @param status
-        * @return {Object}
+        * @return {void}
         */
-       protected function failed(message:String, errorCode:int=500, status:int=200)
+       protected function failed(message:String, errorCode:int=500, status:int=200):void
        {
-            return this._response = {"message":message,"errorCode":errorCode,"status":status};
+             this.response({
+                "message":message,
+                "errorCode":errorCode,
+                "status":status
+             },status);
        }
-
-       private var _response:Object = null;
 
       /**
        * 发送响应数据对象
        */
-       public function get response():Object
+       public function response(data:*,status:int=200):void
        {
-            var res:Object = this._response;
-            if( res.data instanceof PipelineEvent )
-            {
-                res.data = res.data.valueOf();
-            }
-            return res;
+           const response:* = System.environments("HTTP_RESPONSE");
+           response.send( data );
+           response.status( status );
        }
    }
 }

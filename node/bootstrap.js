@@ -29,57 +29,45 @@ const env={
 
 Object.merge(Internal.env, env);
 
-var db = ()=>{
-    throw new Error("No db connection");
-}
-
-if( config.database )
-{
-    var dbconfig = Array.isArray( config.database ) ? config.database[0] : config.database;
-    if(dbconfig)
-    {
-        const drives={
-            mysql(){
-                const Mysql= require("mysql");
-                const connection = Mysql.createConnection({
-                    host     :dbconfig.host     || '127.0.0.1',
-                    port     :dbconfig.port     || '3306',
-                    user     :dbconfig.user     || 'root',
-                    password :dbconfig.password || '',
-                    database :dbconfig.dbname
-                });
-            
-                connection.connect();
-                process.on('SIGINT', () => {
-                    connection.end();
-                });
-
-                return ( sql, callback )=>{
-                    connection.query(sql, function (err, rows, fields) {
-                        if (err) throw err;
-                        callback( rows, fields);
-                    });
-                }
-            }
-        }
-        const driver = drives[ dbconfig.driver.toLowerCase() ];
-        db = driver ? driver() : db;
-    }
-}
-
+const _serverProvier = {};
 
 class Bootstrap{
 
-    constructor( app, assetFactory )
+    constructor( app )
     {
-         this.app = app;
-         this.assetFactory = assetFactory;
+        this.app = app;
     }
 
-    router( factory )
+    serviceProvider( name , factory )
     {
-        bind(routes, method)
+        switch( name.toLowerCase() )
         {
+            case "database" :
+                name = PipeLineEvent.PIPELINE_DATABASE;
+            break;
+            case "redis" :
+                name = PipeLineEvent.PIPELINE_REDIS;
+            break;
+            default:
+                throw TypeError( name + " is not supported.");
+        }
+        _serverProvier[ name ]=factory;
+    }
+
+    getConfig()
+    {
+        return env.APP_CONFIG;
+    }
+
+    getEnv( name )
+    {
+        return name ? env[ name ] || null : env;
+    }
+
+    start( factory )
+    {
+        const bindRoute = (routes, method)=>{
+
             Object.forEach(routes,function(provider,route)
             {
                 factory(method,route.replace(/\{(\w+)\}/g,':$1'),function(req, res)
@@ -102,72 +90,39 @@ class Bootstrap{
                             "uri":req.originalUrl,
                             "url":req.protocol + '://' + req.get('host') + req.originalUrl,
                         }
-                        
                         Internal.env.HTTP_RESPONSE = res;
-    
                         const moduleClass = require( Path.join(root_path, controller.replace(/\./g,'/')+".js") );
                         const obj = new moduleClass();
-                        obj.addEventListener(PipeLineEvent.PIPELINE_DATABASE,function(e){
-                            db( e.getCmd(), function( result ){
-                                e.setData( result );
-                                res.status(200)
-                                res.send( e.valueOf() );
+                        for( var name in _serverProvier )
+                        {
+                            obj.addEventListener(name, function(e){
+                                var callback =  e.getCallback();
+                                if( !callback )
+                                {
+                                    throw new Error("PipeLineEvent is must assig a callback function.");
+                                }else{
+                                   _serverProvier[ name ]( e.getCmd(), e.getParams(), callback);
+                                }
                             });
-                        });
+                        }
+                       
                         obj[ method ].apply(obj, Object.values( req.params ) );
     
                     }catch(e)
                     {
                         console.log( "Error:"+ e.message );
-                        if( this.assetFactory )
-                        {
-                            this.assetFactory(req, res, "error.html", e);
-                        }
                     }
                 });
             });
         }
 
-        Object.forEach( env.HTTP_SERVER_ROUTES,bind,this);
+        Object.forEach( env.HTTP_SERVER_ROUTES,bindRoute,this);
 
         if( env.ORIGIN_SYNTAX !=="javascript" )
         {
-            Object.forEach( env.HTTP_VIEW_ROUTES,bind,this);
+            Object.forEach( env.HTTP_VIEW_ROUTES,bindRoute,this);
         }
     }
 }
 
-
-module.exports={
-    createRouter(app, factory, staticAsset )
-    {
-       
-        Object.forEach( env.HTTP_VIEW_ROUTES, function(routes, method)
-        {
-            Object.forEach(routes,function(provider,route){
-                factory(method,route.replace(/\{(\w+)\}/g,':$1'),function(req, res){
-                    try{
-
-                        const file = Path.join(__dirname, env.WORKSPACE, "index.html");
-                        if( fs.existsSync(file) )
-                        {
-                            res.status(200);
-                            res.sendFile( file );
-
-                        }else if( staticAsset )
-                        {
-                            staticAsset(req, res, "index.html");
-                        }else{
-                            throw new Error("Not find source file.")
-                        }
-
-                    }catch(e)
-                    {
-                        console.log( "Error:"+ e.message );
-                        staticAsset(req, res, "error.html", e);
-                    }
-                });
-            });
-        });
-    }
-};
+module.exports=Bootstrap;

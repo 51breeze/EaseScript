@@ -1,9 +1,9 @@
 package{
 
 
-   import es.core.Application;
+   //import es.core.Application;
 
-   public class Test  extends Application
+   public class Test extends Object
    {
       public Test()
       {
@@ -13,9 +13,9 @@ package{
 
                  console.log( this, this.index({}) );
 
-                  name():Array{
+                  name(jj:*={},...arg):Array{
 
-                      var b:Function = (item:*)=>item;
+                      var b:Function = (item:*,...sas)=>item;
                       return [];
 
                   }
@@ -24,9 +24,9 @@ package{
             };
       }
 
-      public index(obj:Object):Object{
+      public index( sss:*,dd:int=0, ...args):Object{
 
-          this.render( new view.TestView(this) );
+         // this.render( new view.TestView(this) );
           //return new es.core.Application();
 
           return {};
