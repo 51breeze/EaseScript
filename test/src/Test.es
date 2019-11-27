@@ -1,9 +1,9 @@
 package{
 
 
-   //import es.core.Application;
+   import es.core.Application;
 
-   public class Test extends Object
+   public class Test extends Application
    {
       public Test()
       {
@@ -13,15 +13,25 @@ package{
 
                  console.log( this, this.index({}) );
 
-                  name(jj:*={},...arg):Array{
+                 var map:Object={
+                   
+                     name123:name(jj:*={},...arg):Array{
 
-                      var b:Function = (item:*,...sas)=>item;
-                      return [];
+                        var b:Function = (item:*,...sas)=>item;
+                        console.log(this, b ,  jj, arg );
+                        return [];
 
-                  }
+                     }
+                  
+                  };
+
+                  map.name123();
 
                  return item;
             };
+
+            b();
+
       }
 
       public index( sss:*,dd:int=0, ...args):Object{
