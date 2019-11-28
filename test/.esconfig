@@ -39,7 +39,7 @@
 	"serverEnable":false,
 	"module_exports":false,
 	"build_pack":true,
-	"hot_replacement":true,
+	"hot_replacement":false,
 	"syntax":"javascript",
 	"root_path":"D:/workspace/EaseScript",
 	"build":{

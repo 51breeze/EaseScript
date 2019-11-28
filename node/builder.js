@@ -16,6 +16,11 @@ const excludeMap={
     "console":true,
     "JSON":true,
     "Function":true,
+    "MouseEvent":true,
+    "TouchEvent":true,
+    "TouchPinchEvent":true,
+    "TouchSwipeEvent":true,
+    "TouchDragEvent":true,
 };
 
 /**

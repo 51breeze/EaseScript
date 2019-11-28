@@ -16,7 +16,7 @@
 
             PopUp.confirm("Are you ok?", (e:String)=>{
 
-                this.answer.innerHTML = e==="submit" ? "很好" : "一般"
+                //this.answer.innerHTML = e==="submit" ? "很好" : "一般"
 
             },{profile:{
                 submitText:"很好",
@@ -104,7 +104,7 @@
        
         <!--这是一个组件，是否需要渲染在当前DOM受状态机控制，如果需要去掉 includeIn 即可 -->
         <!--弹框组件是直接渲染在 body 中，所以放在哪个位置都一样。如果要实现这样的功能只需要在组件中设置 owner 即可 -->
-        <c:PopUp title="弹框组件" includeIn="show">
+        <!-- <c:PopUp title="弹框组件" includeIn="show">
            
             <p style="text-align: center;">
                 <div>这里是弹框内容</div>
@@ -115,12 +115,12 @@
             <p style="text-align: center;">
                 <div>
                     您选择的结果是? 
-                    <!-- id="@answer" 是在本类中声明此属性，在其它组件可以直接引用 -->
+                    id="@answer" 是在本类中声明此属性，在其它组件可以直接引用
                     <span style="color: red;margin: 0px 12px;" id="@answer"></span>
                 </div>
             </p>
 
-        </c:PopUp>
+        </c:PopUp> -->
 
         <div includeIn="text" style="text-align: center;margin: 15px auto;" >
 

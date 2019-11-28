@@ -64,6 +64,7 @@ program
 .option('--animate [enable|disabled]', '是否需要加载所有的CSS3动画库',"enable")
 .option('--font [enable|disabled]', '是否需要启用CSS字体库',"enable")
 .option('--strict-type [enable|disabled]', '启用强类型模式,对于声明的变量、属性、函数的返回值必须指定类型',"enable")
+.option('--hot [enable|disabled]', '启用热替换', "disabled")
 
 .option('--type-check', '在运行时检查参数类型(会增加编译后的文件体积)')
 .option('--error-debug', '针对javascript在程序中抛错时添加当前源码的位置信息')
@@ -122,6 +123,7 @@ var mapKeys={
     "initConfig":"init",
     "minimal":"minimal",
     "assets_hash":"hash",
+    "hot_replacement":"hot",
     "build_pack":"pack"
 }
 
@@ -146,6 +148,7 @@ for( var key in mapKeys )
             case "browser" :
             case "minify" :
             case "font" :
+            case "hot" :
                 val = val === 'enable';
             break;
         }

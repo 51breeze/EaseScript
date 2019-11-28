@@ -27,7 +27,7 @@ package es.core
         * @param cmd
         * @return {*}
         */
-       protected static function pipeline(target:EventDispatcher,type:String,name:String, cmd:String, args:Array, callback:Function )
+       private static function pipeline(target:EventDispatcher,type:String,name:String, cmd:String, args:Array, callback:Function )
        {
            var event:PipelineEvent = new PipelineEvent( type );
            event.name = name;
@@ -42,6 +42,25 @@ package es.core
            throw new ReferenceError("No binding to the specified '"+type+"' pipeline.");
        }
 
+      /**
+       * 生成一个响应结果的回调函数
+       * 如需要实现自定义响应逻辑，请在子类中覆盖此方法
+       */
+       protected function makeCallback(args:Array,name:String=''):Function
+       {
+           if( args.length > 0 && args[ args.length - 1 ] instanceof Function )
+           {
+                return args.pop() as Function;
+           }
+           return (result:*)=>{
+                if( result !== false ){
+                    this.success( result );
+                }else{
+                    this.failed( result );
+                }
+           };
+       }
+
        /**
         * 查询数据
         * @param sql
@@ -51,7 +70,7 @@ package es.core
         */
        protected function query( sql:String,...args):PipelineEvent
        {
-           const callback:Function = args.pop() as Function;
+           const callback:Function = this.makeCallback(args, 'query');
            return Service.pipeline(this, PipelineEvent.PIPELINE_DATABASE, "select", sql, args, callback );
        }
 
@@ -63,7 +82,7 @@ package es.core
         */
        protected function save( sql:String,...args):PipelineEvent
        {
-           const callback:Function = args.pop() as Function;
+           const callback:Function = this.makeCallback(args, 'save');
            return Service.pipeline(this,PipelineEvent.PIPELINE_DATABASE, "update", sql,args, callback );
        }
 
@@ -74,7 +93,7 @@ package es.core
         */
        protected function insert(sql:String,...args):PipelineEvent
        {
-           const callback:Function = args.pop() as Function;
+           const callback:Function = this.makeCallback(args, 'insert');
            return Service.pipeline(this,PipelineEvent.PIPELINE_DATABASE, "insert", sql,args, callback );
        }
 
@@ -85,7 +104,7 @@ package es.core
         */
        protected function remove( sql:String,...args):PipelineEvent
        {
-           const callback:Function = args.pop() as Function;
+           const callback:Function = this.makeCallback(args, 'remove');
            return Service.pipeline(this,PipelineEvent.PIPELINE_DATABASE, "delete",sql,args, callback );
        }
 

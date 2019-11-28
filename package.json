@@ -9,7 +9,7 @@
   },
   "scripts": {
     "version": "node ./bin/es.js -V",
-    "dev":"node ./bin/es.js -p ./test -o ./build --clean --source-file --minify disabled"
+    "dev":"node ./bin/es.js -p ./test -o ./build --clean --source-file --minify disabled -s js -m production"
   },
   "repository": {
     "type": "git",
