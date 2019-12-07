@@ -7,14 +7,10 @@
  * @require System,HTMLElement
  */
 
- import HTMLElement from 'HTMLElement.js';
- import System from 'System.js';
-
-export default class Document extends HTMLElement
+const HTMLElement = require("./HTMLElement.js");
+const System = require("./System.js");
+class Document extends HTMLElement
 {
-
-    static document = null;
-
     constructor()
     {
         super();
@@ -81,19 +77,25 @@ export default class Document extends HTMLElement
 
     static querySelectorAll( selector , context=null )
     {
-        selector = 'thead > tr:first-child>th:first-child';
+        //selector = 'thead > tr:first-child>th:first-child';
         // thead tr.name td[attr=123]
        // selector
 
         if( context === null )
         {
-            context = System.document();
+            context = Document.document;
 
-        }else if( is_string(context) )
+        }
+        
+        if( typeof context ==="string" )
         {
             context = Document.querySelectorAll( context );
-            if( !isset(context[0]) )return array();
-            context = context[0];
+            var results = [];
+            for(var i=0;i<context.length;i++)
+            {
+                results = results.concat( Document.querySelectorAll( selector, context[i] ) );
+            }
+            return results;
         }
 
         if( !(context instanceof HTMLElement) )
@@ -107,3 +109,4 @@ export default class Document extends HTMLElement
 }
 
 Document.document = new Document();
+module.exports = Document;

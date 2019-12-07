@@ -157,16 +157,18 @@ var classValueMap={
 var modules = {};
 Internal.defineClass=function(name,classFactory,desc,type)
 {
-    Internal.defineProperty(classFactory,"name",{enumerable: false, value: name,configurable:false});
+    var p = desc["package"];
+    var classname = p ? p+"."+desc.classname : desc.classname
+    Internal.defineProperty(classFactory,"name",{enumerable: false, value: classname,configurable:false});
     if( type != 3 )
     {
         Internal.defineProperty(classFactory, "valueOf", { enumerable: false, value:function valueOf(){
-            return "["+classValueMap[type]+" "+name+"]";
+            return "["+classValueMap[type]+" "+classname+"]";
         },configurable:false});
     }
 
     Internal.defineProperty(classFactory, "toString", { enumerable: false, value:function toString(){
-        return "["+classValueMap[type]+" "+name+"]";
+        return "["+classValueMap[type]+" "+classname+"]";
     },configurable:false});
 
     Internal.defineProperty(classFactory, "constructor", { enumerable: false, value:classFactory,configurable:false});

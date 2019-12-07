@@ -17,7 +17,6 @@ package es.components.popup
     import es.events.SkinEvent;
     import es.components.popup.PopUpManage;
 
-    [RunPlatform("client")]
     public abstract class BasePopUp extends SkinComponent
     {
         /**

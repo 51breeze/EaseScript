@@ -405,6 +405,7 @@ package es.components
             skin.assign('last', totalPage);
             skin.assign('link', System.range( Math.max(1 + offset, 1 ), link + offset, 1) );
             super.commitPropertyAndUpdateSkin();
+
         }
     }
 }

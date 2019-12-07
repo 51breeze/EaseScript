@@ -8,7 +8,7 @@
 
        override protected function initializing()
        {
-            var host:Pagination = this.hostComponent;
+            var host:Pagination = this.hostComponent as Pagination;
             var profile:RegExp = new RegExp( host.profile+'\\s*=\\s*(\\d+)');
             this.addEventListener(MouseEvent.CLICK, function (e:MouseEvent)
             {
@@ -29,11 +29,11 @@
         override protected function updateDisplayList()
         {
              super.updateDisplayList();
-             var hostComponent:Pagination = this.hostComponent;
+             var hostComponent:Pagination = this.hostComponent as Pagination;
              var _radius:int = hostComponent.radius;
              if(_radius>0)
              {
-                Element('.link' , this.element ).style('borderRadius', _radius+'px' );
+                (new Element('.link' , this.element )).style('borderRadius', _radius+'px' );
              }
         }
     ]]>

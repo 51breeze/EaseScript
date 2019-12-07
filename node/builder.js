@@ -10,19 +10,6 @@ const rootPath =  utils.getResolvePath( __dirname );
  */
 const makedSystemModules={};
 
-const excludeMap={
-    "arguments":true,
-    "Console":true,
-    "console":true,
-    "JSON":true,
-    "Function":true,
-    "MouseEvent":true,
-    "TouchEvent":true,
-    "TouchPinchEvent":true,
-    "TouchSwipeEvent":true,
-    "TouchDragEvent":true,
-};
-
 /**
  * 获取指定的文件模块
  * @param filepath
@@ -30,6 +17,13 @@ const excludeMap={
 function include(contents, name , filepath, config )
 {
     name = utils.getGlobalTypeMap(name)
+
+    var excludeMode = utils.EXCLUDE_GLOBAL | utils.EXCLUDE_EVENT | utils.EXCLUDE_ERROR  | utils.EXCLUDE_SYSTEM;
+    if( utils.excludeLoadSystemFile(name, excludeMode) || ( config.globals.hasOwnProperty(name) && config.globals[name].notLoadFile===true ) )
+    {
+        return;
+    }
+
     if( makedSystemModules[ name ] )
     {
         contents[ name ] = makedSystemModules[ name ];
@@ -37,12 +31,6 @@ function include(contents, name , filepath, config )
     }
 
     makedSystemModules[ name ] = {};
-
-    if( excludeMap[ name ] ||  utils.excludeLoadSystemFile( name ) || ( config.globals.hasOwnProperty(name) && config.globals[name].notLoadFile===true ) )
-    {
-        return;
-    }
-
     if( !filepath )
     {
         filepath = rootPath + '/system/' + name + '.js';
@@ -56,6 +44,10 @@ function include(contents, name , filepath, config )
         str += utils.getContents( filepath );
         str = str.replace(/\=\s*require\s*\(\s*([\"\'])(.*?)\1\s*\)/g,function(a,b,c){
              var info = path.parse(c);
+             if( utils.excludeLoadSystemFile( info.name, excludeMode ) || ( config.globals.hasOwnProperty(info.name) && config.globals[info.name].notLoadFile===true ) )
+             {
+                return '';
+             }
              var filename = info.name+".js";
              var identifier = path.isAbsolute(c) ? c : './'+path.relative(context , path.resolve( context, filename ) );
              include(contents, info.name , null, config );
@@ -226,7 +218,7 @@ function builder(config, localModules,  replacements )
     const index_path = path.join(webroot_dir,"index.js");
     replacements.BOOTSTRAP_FILE_BUILD_PATH = path.join(bootstrap_dir, replacements.BOOTSTRAP_CLASS_FILE_NAME );
     replacements.ROOT_PATH = path.relative( bootstrap_dir, app_dir ).replace(/\\/g,'/');
-    replacements.WEBROOT_PATH = path.relative( bootstrap_dir, webroot_dir ).replace(/\\/g,'/');
+    replacements.WEBROOT_PATH = path.relative( bootstrap_dir, app_dir ).replace(/\\/g,'/');
 
 
     //生成引导文件

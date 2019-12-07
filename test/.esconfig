@@ -10,7 +10,7 @@
 	"compat_version":{
 		"ie":11
 },
-	"build_path":"D:/workspace/EaseScript/test/build",
+	"build_path":"D:/workspace/node",
 	"project_path":"D:/workspace/EaseScript/test",
 	"workspace":"./src",
 	"skin_file_suffix":".html",
@@ -21,7 +21,7 @@
 	"strictType":true,
 	"service_provider_syntax":"php",
 	"static_url_path_name":"PATH",
-	"enable_webroot":false,
+	"enable_webroot":true,
 	"command_switch":0,
 	"script_part_load":true,
 	"system_lib_path_name":"es",
@@ -40,54 +40,54 @@
 	"module_exports":false,
 	"build_pack":true,
 	"hot_replacement":false,
-	"syntax":"javascript",
+	"syntax":"node",
 	"root_path":"D:/workspace/EaseScript",
 	"build":{
-		"path":"D:/workspace/EaseScript/test/build",
-		"name":"build",
+		"path":"D:/workspace/node",
+		"name":"node",
 		"child":{
 			"assets":{
-				"path":"D:/workspace/EaseScript/test/build/public/assets",
+				"path":"D:/workspace/node/public/assets",
 				"name":"assets"
 		},
 			"js":{
-				"path":"D:/workspace/EaseScript/test/build/public/js",
+				"path":"D:/workspace/node/public/js",
 				"name":"js"
 		},
 			"img":{
-				"path":"D:/workspace/EaseScript/test/build/public/assets",
+				"path":"D:/workspace/node/public/assets",
 				"name":"assets"
 		},
 			"css":{
-				"path":"D:/workspace/EaseScript/test/build/public/css",
+				"path":"D:/workspace/node/public/css",
 				"name":"css"
 		},
 			"font":{
-				"path":"D:/workspace/EaseScript/test/build/public/assets",
+				"path":"D:/workspace/node/public/assets",
 				"name":"assets"
 		},
 			"view":{
-				"path":"D:/workspace/EaseScript/test/build/server/view",
+				"path":"D:/workspace/node/server/view",
 				"name":"view"
 		},
 			"html":{
-				"path":"D:/workspace/EaseScript/test/build/public/html",
+				"path":"D:/workspace/node/public/html",
 				"name":"html"
 		},
 			"webroot":{
-				"path":"D:/workspace/EaseScript/test/build/public",
+				"path":"D:/workspace/node/public",
 				"name":"public"
 		},
 			"core":{
-				"path":"D:/workspace/EaseScript/test/build/public/js",
+				"path":"D:/workspace/node/public/js",
 				"name":"js"
 		},
 			"bootstrap":{
-				"path":"D:/workspace/EaseScript/test/build/server/bootstrap",
+				"path":"D:/workspace/node/server/bootstrap",
 				"name":"bootstrap"
 		},
 			"application":{
-				"path":"D:/workspace/EaseScript/test/build/server",
+				"path":"D:/workspace/node/server",
 				"name":"server"
 		}
 	}

@@ -6,22 +6,9 @@
  * @author Jun Ye <664371281@qq.com>
  * @require System,BaseObject,Node,SyntaxError,ReferenceError
  */
-
-import System from "System.js";
-import Node from "Node.js";
-import Document from "Document.js";
-
-export default class HTMLElement extends Node
+const Node = require("./Node.js");
+class HTMLElement extends Node
 {
-    /**
-     * 节点类型
-     * @var array
-     */
-    static typeMap ={
-        'text':3,
-        'document':9,
-    };
-
     /**
      * 为子级设置相对根文档是可见的
      * @param Node child
@@ -31,7 +18,7 @@ export default class HTMLElement extends Node
         child.visible = true;
         if( child instanceof HTMLElement  )
         {
-            child.children.forEach(function(item){
+            child._children.forEach(function(item){
                 HTMLElement.setVisibleForChild( item );
             });
         }
@@ -45,9 +32,7 @@ export default class HTMLElement extends Node
      */
     constructor(name='div', type = 1, attr={} )
     {
-        this.nodeName = name;
-
-        this.nodeType = type;
+        super(name, type, attr);
 
         /**
          * 元素的值属性(一般用于input元素)
@@ -70,7 +55,7 @@ export default class HTMLElement extends Node
         /**
          * @var array
          */
-        this._children=array();
+        this._children=[];
 
         /**
          * 是否需要重新解析对象为html字符串
@@ -82,9 +67,7 @@ export default class HTMLElement extends Node
          * 一个标志是否需要解析内部元素
          * @var bool
          */
-        this._hasInnerHTML = false;
-
-        super(name, type, attr);
+        this._hasInnerHTML = false;       
     }
 
     /**
@@ -212,7 +195,7 @@ export default class HTMLElement extends Node
      */
      removeChild(child)
     {
-        index = this._children.indexOf(child);
+        var index = this._children.indexOf(child);
         if( index>=0 )
         {
             return this.removeChildAt( index );
@@ -231,7 +214,7 @@ export default class HTMLElement extends Node
         index = index<0 ? this._children.length+index : index;
         if( this._children[index] )
         {
-            child =  this._children.splice(index, 1);
+            var child =  this._children.splice(index, 1);
             child = child[0];
             child.parentNode = null;
             this._parseHtml = true;
@@ -259,7 +242,27 @@ export default class HTMLElement extends Node
         return this._children.length>0;
     }
 
-     getAttribute(name)
+    replaceChild(newNode,oldNode)
+    {
+        if( !(newNode instanceof Node) )
+        {
+            throw new TypeError('Invaild node in replaceChild');
+        }
+
+        var index = this._children.indexOf( oldNode );
+        if( index >= 0 )
+        {
+            this._children.splice( index, 1, newNode);
+            newNode.parentNode = this;
+
+        }else
+        {
+            throw new TypeError('Old node is not exists. in replaceChild');
+        }
+
+    }
+
+    getAttribute(name)
     {
         return this.attr[name] || null;
     }
@@ -278,8 +281,8 @@ export default class HTMLElement extends Node
         if( this._parseHtml===true )
         {
             this._parseHtml = false;
-            html = this._innerHTML;
-            if( !this.hasInnerHTML )
+            var html = this._innerHTML;
+            if( !this._hasInnerHTML )
             {
                 html = '';
                 this._children.forEach(function(item){
@@ -288,12 +291,12 @@ export default class HTMLElement extends Node
                 this._innerHTML = html;
             }
 
-            attr = '';
-            attrStr = System.serialize(this.attr, 'attr');
-            styleStr = System.serialize(this.style, 'style');
+            var attr = '';
+            var attrStr = System.serialize(this.attr, 'attr');
+            var styleStr = System.serialize(this.style, 'style');
             if (attrStr) attr += ' ' + attrStr;
             if (styleStr) attr += ' style="' + styleStr + '"';
-            nodename = this.nodeName;
+            var nodename = this.nodeName;
             if( nodename === 'link' || nodename === 'meta' || nodename==="input" )
             {
                 this._outerHTML = '<' + this.nodeName + attr + ' />';
@@ -301,15 +304,15 @@ export default class HTMLElement extends Node
 
             } else
             {
-                if( (nodename ==="html" || nodename==="head" || nodename==="body" ) && html.test( new RegExp( '<\\/'+nodename+'>' )))
+                if( (nodename ==="html" || nodename==="head" || nodename==="body" ) && ( new RegExp('<\/'+nodename+'>$') ).test(html) )
                 {
                     this._outerHTML = html;
                     return html;
                 }
 
-                left = '<' + this.nodeName + attr + '>';
-                right = '</' + this.nodeName + '>';
-                if (!html) html = this.content;
+                var left = '<' + this.nodeName + attr + '>';
+                var right = '</' + this.nodeName + '>';
+                if (!html) html = this.textContent || this.content || "";
                 if( this.nodeName != '#documentFragment' )
                 {
                     html = left + html + right;
@@ -323,7 +326,7 @@ export default class HTMLElement extends Node
     get innerHTML()
     {
         this.toString();
-        return this.innerHTML;
+        return this._innerHTML;
     }
 
     set innerHTML( value )
@@ -338,13 +341,13 @@ export default class HTMLElement extends Node
     get outerHTML()
     {
         this.toString();
-        return this.outerHTML;
+        return this._outerHTML;
     }
 
     set outerHTML( value )
     {
         this._children=[];
-        this.outerHTML = value;
+        this._outerHTML = value;
         this._parseHtml=true;
         this._hasInnerHTML = true;
         return value;
@@ -377,4 +380,10 @@ export default class HTMLElement extends Node
 
 }
 
-
+HTMLElement.typeMap ={
+    'text':3,
+    'document':9,
+};
+module.exports = HTMLElement;
+const System = require("./System.js");
+const Document = require("./Document.js");

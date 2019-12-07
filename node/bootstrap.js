@@ -7,7 +7,7 @@ const System  = require("[CODE[REQUIRE_IDENTIFIER(System)]]");
 const Event   = require("[CODE[REQUIRE_IDENTIFIER(Event)]]");
 const PipeLineEvent = require("[CODE[REQUIRE_IDENTIFIER(es.events.PipelineEvent)]]");
 const root_path = "[CODE[ROOT_PATH]]";
-const config = require("./config.json");
+const config = fs.existsSync( "./config.json" ) ? require("./config.json") : {};
 
 /**
  * 运行环境相关信息
@@ -110,7 +110,7 @@ class Bootstrap{
     
                     }catch(e)
                     {
-                        console.log( "Error:"+ e.message );
+                        console.log( e );
                     }
                 });
             });

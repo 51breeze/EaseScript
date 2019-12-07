@@ -290,13 +290,14 @@ Locator.match = function match( name )
     }
     return null;
 }
-urlSegments = Locator.create(location.href)||{
+var _REQUEST = System.environments("HTTP_REQUEST") || {url:""};
+urlSegments = Locator.create( _REQUEST.url )||{
     "host":"",
     "origin":"",
     "scheme":"",
     "port":"",
     "uri":"",
-    "url":location.href,
+    "url":_REQUEST.url,
     "path":[],
     "query":{},
     "fragment":[]

@@ -6,18 +6,38 @@
  * @author Jun Ye <664371281@qq.com>
  * @require System,HTMLElement,Document,Node,EventDispatcher
  */
+const EventDispatcher = require("./EventDispatcher.js");
+const attrpx = {
+    "width":"px",
+    "height":"px",
+    "left":"px",
+    "top":"px",
+    "bottom":"px",
+    "right":"px",
+    "border-radius":"px",
+};
+function setStyle(node, name, value)
+{
+    name = name.replace(/([A-Z])/g,function(a,b){
+        return "-"+ b.toLowerCase();
+    });
+    if( name.charAt(0) === "-" )
+    {
+        name = name.substr(1);
+    }
+    var pix  = "";
+    if( attrpx[name] && !/(px|em|rem)$/i.test(value) )
+    {
+        pix = "px";
+    }
+    node.style[ name ]=value+pix;
+}
 
-import System from "System.js";
-import EventDispatcher from "EventDispatcher.js";
-import Node from "Node.js";
-
-export default class Element extends EventDispatcher
+module.exports = class Element extends EventDispatcher
 {
     constructor( selector, context=null )
     {
-        this.length = 0;
-        this.items=[];
-
+        super();
         if( typeof selector === 'string' )
         {
             selector = System.trim( selector );
@@ -45,9 +65,11 @@ export default class Element extends EventDispatcher
         }else{
             selector = [];
         }
-        this.items = selector;
         this.length =  selector.length;
-        super();
+        for(var i in selector)
+        {
+            this[i] = selector[i];
+        }
     }
 
     static createElement( html )
@@ -56,15 +78,18 @@ export default class Element extends EventDispatcher
         var name = html;
         var attr = {};
         var match = html.match(/^<(\w+)([^>]*?)\/>/);
-
         if( match )
         {
             if( match[2] )
             {
-                attr = match[2].match( /(\w+)\s*\=\s*([\'\"])([^\\2]*?)\\2/g );
-                if( attr )
+                var matchAttrs = match[2].match( /(\w+)\s*\=\s*([\'\"])([^\2]*?)\2/g );
+                if( matchAttrs )
                 {
-                   // attr = array_combine( attr[1], attr[3] );
+                    for(var i=0;i<matchAttrs.length;i++)
+                    {
+                        var value = matchAttrs[i].split("=");
+                        attr[ System.trim(value[0]) ] = value[1].slice(1,-1);
+                    }
                 }
             }
             name = match[1];
@@ -83,7 +108,7 @@ export default class Element extends EventDispatcher
             return elem;
         }
 
-        switch ( name.strtolower(name) )
+        switch ( name.toLowerCase(name) )
         {
             case 'body' :
                 return System.document().body;
@@ -101,13 +126,12 @@ export default class Element extends EventDispatcher
 
         if( name.match(/^\w+/) )
         {
-            elem = new HTMLElement( name, 1, attr);
-
-        }else
-        {
-            elem = new Node();
-            elem.content = html;
+           return new HTMLElement( name, 1, attr);
         }
+        
+        var elem = new Node();
+        elem.attr = attr;
+        elem.content = html;
         return elem;
     }
 
@@ -118,6 +142,14 @@ export default class Element extends EventDispatcher
 
     static contains( parent, child )
     {
+        if( child.parentNode )
+        {
+            while( child && child.parentNode !== parent  )
+            {
+                child = child.parentNode;
+            }
+            return child && child.parentNode === parent;
+        }
         return false;
     }
 
@@ -131,21 +163,22 @@ export default class Element extends EventDispatcher
         return element ? element.nodeName : '';
     }
 
-
     html( value=null )
     {
         if( value != null && typeof value === "string" )
         {
-            this.items.forEach( function(item){
-                item.innerHTML= value;
-            });
+            for(var i=0;i<this.length;i++)
+            {
+                this[i].innerHTML= value;
+            }
             return this;
         }
+        var node =  this.current();
         if( value===true )
         {
-            return this.items[0] ? this.items[0].outerHTML : '';
+            return node ? node.outerHTML : '';
         }
-        return this.items[0] ? this.items[0].innerHTML : '';
+        return node ? node.innerHTML : '';
     }
 
     addChild(child)
@@ -155,17 +188,18 @@ export default class Element extends EventDispatcher
 
     addChildAt(child, index=-1 )
     {
-        child = child instanceof Element ? child.items : child;
-        if( !isset(this.items[0]) ){
+        var parentNode = this.current();
+        child = child instanceof Element ? child.current() : child;
+        if( !child ){
             throw new TypeError("Invalid element");
         }
-        return this.items[0].addChildAt(child, index);
+        return parentNode.addChildAt(child, index);
 
     }
 
     removeChild( child )
     {
-        child = child instanceof Element ? child.items[0] : child;
+        child = child instanceof Element ? child.current() : child;
         if( !(child instanceof Node) )
         {
             throw new TypeError("child is not Node Element");
@@ -179,7 +213,7 @@ export default class Element extends EventDispatcher
 
     removeChildAt( index )
     {
-        child = this.items[0];
+        var child = this.current();
         if( child.parentNode )
         {
             return child.parentNode.removeChildAt( index );
@@ -189,12 +223,12 @@ export default class Element extends EventDispatcher
 
      getChildIndex( child )
     {
-        child = child instanceof Element ? child.items[0] : child;
+        child = child instanceof Element ? child.current() : child;
         if( !(child instanceof Node) )
         {
             throw new TypeError("child is not Node Element");
         }
-        parent = child.parentNode;
+        var parent = child.parentNode;
         if( parent instanceof HTMLElement )
         {
             index = parent.childNodes.indexOf( child );
@@ -215,92 +249,216 @@ export default class Element extends EventDispatcher
 
     current( elem=null )
     {
-        return current(this.items);
+        if( elem )
+        {
+            this._current = elem;
+            return this;
+        }
+        return this[0];
     }
 
-    property(name, value=null)
+    fadeIn()
     {
-        item = this.items[0];
-        if( value===null )
+
+    }
+
+    fadeOut()
+    {
+
+    }
+
+    parent()
+    {
+       var node = this.current();
+       if( node && node.parentNode )
+       {
+          return new Element( node.parentNode );
+       }
+       return new Element();
+    }
+
+    isEmpty()
+    {
+        return this.length < 1;
+    }
+
+    property(name, value)
+    {
+        var item = this.current();
+        if( value === void 0 )
         {
-            if( System.isObject(name) )
+            var isObject = System.isObject(name);
+            for(var i=0;i<this.length;i++)
             {
-                item.attr = Object.merge(item.attr,name);
-                return this;
+                var item = this[i];
+                if( isObject )
+                {
+                    item.attr = Object.merge(item.attr,name);
+                }
             }
-            return item.name;
+            return isObject ? this : item.name;
         }
-        item.attr.name = value;
+        item.attr[ name ] = value;
         return this;
     }
 
     properties( object )
     {
-        item = this.items[0];
-        item.attr = object;
+        for(var i=0;i<this.length;i++)
+        {
+            var item = this[i];
+            item.attr = Object.merge(item.attr,object);
+        }
         return this;
     }
 
-    hasProperty(prop){
-
+    hasProperty(prop)
+    {
+        var item = this.current();
+        return item.hasOwnProperty( prop );
     }
 
-    data(name, value ){
-
+    data(name, value )
+    {
+       var map = this[ privateSymbol ] || (this[ privateSymbol ]={});
+       if( value !== void 0 )
+       {
+          map[name] = value;
+       }
+       return map[name];
     }
 
     style(name, value=null)
     {
-        item = this.items[0];
+        var item = this.current();
+        if( name==="cssText" )
+        {
+            if( typeof value ==="string")
+            {
+                name = System.unserialize(value);
+                value = null;
+            }
+        }
+
+        if( typeof name ==="object" && item )
+        {
+            Object.forEach( name, function(value,prop){
+                setStyle(item,prop,value);
+            });
+            return this;
+        }
+
         if( value != null )
         {
             if( item )
             {
-                var attrpx = {
-                    "width":"px",
-                    "height":"px",
-                    "left":"px",
-                    "top":"px",
-                    "bottom":"px",
-                    "right":"px",
-                    "borderRadius":"px",
-                };
-                item.style[name]=value+( attrpx[name] ? attrpx[name] : '' );
+                setStyle(item,name,value);
             }
             return this;
         }
         return item ? item.style.name : null;
     }
-    show(){}
-    hide(){}
-    text( value ){}
-    value( val ){}
-    hasClass(className ){}
-    addClass(className ){}
-    removeClass(className ){}
+    show()
+    {
+        this.style("display","block");
+    }
+    hide()
+    {
+        this.style("display","none");
+    }
+    text( value )
+    {
+       this.property("textContent", value);
+    }
+    value( val )
+    {
+        var nodename = this.nodeName.toLowerCase();
+        if( nodename ==="input" || nodename ==="select" )
+        {
+            this.property("value", value); 
+        }
+    }
+    hasClass( className )
+    {
+        var oldClassName = this.property("class");
+        if( oldClassName ){
+           return (new RegExp("\\b"+className+"\\b")).test( oldClassName );
+        }
+        return false;
+    }
+    addClass( className )
+    {
+        var classStr = this.property("class");
+        className = System.trim( className );
+        if( classStr )
+        {
+            classStr =  className.split(/\s+/);
+            if( classStr.indexOf( className ) < 0 )
+            {
+                classStr.push( className )
+                this.property("class", classStr.join(" ") );
+            }
+        }
 
-    slice(){}
-    splice(){}
-    concat(){}
-    indexOf(){}
+    }
+    removeClass(className)
+    {
+        var classStr = this.property("class");
+        className = System.trim( className );
+        if( classStr )
+        {
+            classStr =  className.split(/\s+/);
+            var index = classStr.indexOf( className );
+            if( index >= 0 )
+            {
+                classStr.splice(index,1);
+                this.property("class", classStr.join(" ") );
+            }
+        }
+    }
+
+    slice()
+    {
+        return [].slice.call(this,0);
+    }
+    splice()
+    {
+        return [].splice.apply(this, Array.from(arguments) ); 
+    }
+    concat()
+    {
+        return [].concat.apply(this, Array.from(arguments) ); 
+    }
+    indexOf( obj )
+    {
+        return [].indexOf.call(this, obj );   
+    }
 
     isNodeInDocumentChain()
     {
-        if( isset(this.items[0]) )
+        var elem = this.current();
+        if( elem )
         {
-            return this.items[0].isNodeInDocumentChain();
+            return elem.isNodeInDocumentChain();
         }
         return false;
     }
 
     toString()
     {
-        return isset( this.items[0] ) ? this.items[0].outerHTML : '';
+        var elem = this.current();
+        return elem ? elem.outerHTML : '';
     }
 
     count()
     {
         return this.length;
     }
-
 }
+
+const privateSymbol = Symbol("Element::data");
+const System = require("./System.js");
+const Node = require("./Node.js");
+const Object = require("./Object.js");
+const Document = require("./Document.js");
+const HTMLElement = require("./HTMLElement.js");

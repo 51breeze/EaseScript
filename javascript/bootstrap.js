@@ -64,6 +64,7 @@ var EaseScript = window[ handle ] = {
     "Load":{},
     "Environments":env
 };
+Internal.require = require;
 
 if( typeof window[ handle ] === "object" )
 {

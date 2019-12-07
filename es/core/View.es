@@ -30,10 +30,23 @@ package es.core
          * 视图类
          * @constructor
          */
-        public function View( context:Application )
+        public function View( context:Application)
         {
-            super( context.getContainer() );
             _context = context;
+            super( context.getContainer() );
+        }
+
+        /**
+         * @override
+         */
+        override protected function get hostComponent():Object
+        {
+            return _context;
+        }
+
+        override protected function getUniqueKey( key:String = '', flag:Boolean = true ):String
+        {
+            return flag ? "es"+key : key;
         }
 
         /**

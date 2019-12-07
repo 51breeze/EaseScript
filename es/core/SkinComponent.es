@@ -18,16 +18,10 @@ package es.core
 
     public class SkinComponent extends Component implements IDisplay,IContainer
     {
-        private static var componentIdHash:Object={};
         private var _componentId:String;
-        public function SkinComponent( componentId:String )
+        public function SkinComponent( componentId:String = UIDInstance() )
         {
             super();
-            if( System.isDefined( componentIdHash[ componentId ] ) )
-            {
-               // throw new TypeError("Component id already exists. for '"+componentId+"'");
-            }
-            componentIdHash[ componentId ] = true;
             _componentId = componentId;
         }
 
@@ -35,9 +29,9 @@ package es.core
          * 获取此组件的唯一ID
          * @returns {String}
          */
-        public function getComponentId( prefix:String="" ):String
+        public function getComponentId( uid:String="" ):String
         {
-            return prefix ? prefix+'-'+_componentId : _componentId;
+            return uid ? _componentId+'-'+uid : _componentId;
         }
 
         /**
@@ -690,16 +684,29 @@ package es.core
          */
         public function display():Element
         {
-            if( !this.initialized )
-            {
-                this.initializing();
-                this.commitPropertyAndUpdateSkin();
 
-            }else if( !this.skin.parent )
+            when( RunPlatform(server) )
             {
-               this.nowUpdateSkin();
+                if( !this.initialized )
+                {
+                    this.initializing();
+                    this.commitPropertyAndUpdateSkin();
+                }
+                return this.skin.element;
+
+            }then
+            {
+                if( !this.initialized )
+                {
+                    this.initializing();
+                    this.commitPropertyAndUpdateSkin();
+
+                }else if( !this.skin.parent )
+                {
+                    this.nowUpdateSkin();
+                }
+                return this.skin.element;
             }
-            return this.skin.element;
         };
 
         /**

@@ -13,7 +13,8 @@
             {
                 return _makeMap[name] as Function;
             }
-            var fn:Function = hostComponent.action.bind(hostComponent, name);
+            var host:PopUp = hostComponent as PopUp;
+            var fn:Function = host.action.bind(host, name);
             _makeMap[name] = fn;
             return fn;
         }

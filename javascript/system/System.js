@@ -120,6 +120,28 @@ System.instanceOf = function instanceOf(instanceObj, theClass)
     return Object(instanceObj) instanceof theClass;
 };
 
+
+/**
+ * 判断是否为某个类的子级
+ * @param subClass
+ * @param parentClass
+ * @returns {boolean}
+ */
+System.isSubClassOf=function isSubClassOf( subClass, parentClass )
+{
+    if( subClass.__CLASS__ && subClass.__RESOURCETYPE__ === 1 )
+    {
+        while ( subClass = subClass.__T__["extends"] )
+        {
+            if( subClass === parentClass )
+            {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 /**
  * 检查实例对象是否属于指定的类型(检查接口类型)
  * @param instanceObj

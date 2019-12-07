@@ -157,16 +157,18 @@ var classValueMap={
 var modules = {};
 Internal.defineClass=function(name,classFactory,desc,type)
 {
-    Internal.defineProperty(classFactory,"name",{enumerable: false, value: name,configurable:false});
+    var p = desc["package"];
+    var classname = p ? p+"."+desc.classname : desc.classname
+    Internal.defineProperty(classFactory,"name",{enumerable: false, value: classname,configurable:false});
     if( type != 3 )
     {
         Internal.defineProperty(classFactory, "valueOf", { enumerable: false, value:function valueOf(){
-            return "["+classValueMap[type]+" "+name+"]";
+            return "["+classValueMap[type]+" "+classname+"]";
         },configurable:false});
     }
 
     Internal.defineProperty(classFactory, "toString", { enumerable: false, value:function toString(){
-        return "["+classValueMap[type]+" "+name+"]";
+        return "["+classValueMap[type]+" "+classname+"]";
     },configurable:false});
 
     Internal.defineProperty(classFactory, "constructor", { enumerable: false, value:classFactory,configurable:false});
@@ -174,7 +176,7 @@ Internal.defineClass=function(name,classFactory,desc,type)
     Internal.defineProperty(classFactory, "__RESOURCETYPE__", { enumerable: false, value:type,configurable:false});
     Internal.defineProperty(classFactory, "__T__", { enumerable: false,value:desc,configurable:false});
 
-    modules[ name ] = classFactory;
+    modules[ classname ] = classFactory;
     return classFactory;
 }
 
@@ -183,6 +185,32 @@ Internal.getClassModule=function( name )
     if( modules.hasOwnProperty(name) )
     {
         return modules[name];
+    }
+
+    if( Internal.require.has(name) )
+    {
+        Internal.require( name );
+
+    }else
+    {
+        var suffix = [".es",".html",".js"];
+        var spase = Internal.env.WORKSPACE;
+        name = name.replace(/\./g,'/');
+        for(var i=0;i<suffix.length;i++)
+        {
+           if( Internal.require.has( name+suffix[i] ) )
+           {
+               return Internal.require( name+suffix[i] );
+
+           }else if( Internal.require.has( spase+name+suffix[i] ) )
+           {
+              return Internal.require( spase+name+suffix[i] );
+
+           }else if( Internal.require.has( "system/"+name+suffix[i] ) )
+           {
+              return Internal.require( "system/"+name+suffix[i] );
+           }
+        }
     }
     return null;
 }

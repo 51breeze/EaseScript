@@ -18,14 +18,13 @@ package es.core
     import es.components.layout.BaseLayout;
     import es.core.es_internal;
 
-
     public class Skin extends Container implements IBindable
     {
         /**
          * 皮肤类
          * @constructor
          */
-        function Skin( name:*, attr:Object=null)
+        function Skin( name:*, attr:Object=null )
         {
             var elem:Element = null;
             if( typeof name === "string" )
@@ -41,6 +40,44 @@ package es.core
             } 
             super( elem , attr );
             this.hotUpdate();
+        }
+
+        protected function getUniqueKey( key:String='', flag:Boolean = true ):String
+        {
+            var host:SkinComponent = this.hostComponent as SkinComponent;
+            return flag ? "es"+host.getComponentId( key ) : host.getComponentId( key );
+        }
+
+         /**
+         * 获取统一的属性名
+         * @protected
+         * @return {String}
+         */
+        protected function getAttrName( name:String ):String
+        {
+            return "es-"+name;
+        }
+
+        /**
+         * 服务端渲染时需要对此元素设置一个标识符
+         * @param elem Element
+         * @param prop String
+         * @param value String
+         * @protected
+         */
+        [RunPlatform(server)]
+        protected marker( elem:Object, prop:String, value:String ):void
+        {
+            if( elem )
+            {
+                if( elem is HTMLElement )
+                {
+                    (elem as HTMLElement).setAttribute(prop, value);
+                }else if( elem is IDisplay && (elem as IDisplay).element)
+                {
+                    (elem as IDisplay).element.property(prop, value); 
+                }
+            }
         }
 
         /**
@@ -181,10 +218,14 @@ package es.core
                 }
                 invalidate = true;
                 var nodes:Array= this.render();
-                this.updateChildren(this, nodes);
-                this.updateInstallState();
-                this.updateDisplayList();
+                when( Syntax(origin) )
+                {
+                    this.updateChildren(this, nodes);
+                    this.updateInstallState();
+                }
 
+                this.mount();
+                this.updateDisplayList();
                 if( this.hasEventListener(SkinEvent.UPDATE_DISPLAY_LIST) )
                 {
                     var e:SkinEvent = new SkinEvent( SkinEvent.UPDATE_DISPLAY_LIST );
@@ -193,6 +234,26 @@ package es.core
                 }
             }
         };
+
+        /**
+        * 一个运行在客户端的挂载函数，当子级元素完全显示在当前文档中时调度
+        * 所有要实现的逻辑请在子类中实现
+        */
+        [RunPlatform(client)]
+        protected function mount()
+        {
+
+        }
+
+        /**
+        * 一个运行在客户端的卸载函数，当前皮肤对象在文档中移除时调度
+        * 所有要实现的逻辑请在子类中实现
+        */
+        [RunPlatform(client)]
+        protected function unmount()
+        {
+
+        }
 
         /**
         * @private
@@ -212,8 +273,14 @@ package es.core
             var data:Object = bindEventMaps[uukey] as Object;
             if( !data )
             {
+                if( target instanceof Array )
+                {
+                   target = new Element( target );
+                }
+
                 data = {items:{},origin:target};
                 bindEventMaps[uukey] = data;
+                this.marker( target, "id", this.getUniqueKey( uniqueKey ) );
                 if( target instanceof EventDispatcher )
                 {
                     data.eventTarget = target;
@@ -229,6 +296,7 @@ package es.core
                     {
                         data.eventTarget.removeEventListener( p , data.items[ p ] );
                     }
+
                     if( events[p] )
                     {
                         data.items[ p ] = events[p];
@@ -236,6 +304,16 @@ package es.core
                     }
                 }
             }
+        }
+
+        /**
+        * 获取此皮肤对象的宿主组件
+        * 具体返回的内容由子类实现
+        * @return {Object}
+        */
+        protected function get hostComponent():Object
+        {
+            return null;
         }
 
         /**
@@ -283,7 +361,7 @@ package es.core
                     obj.textContent = children+"";
                 }  
             }
-            if( update)
+            if( update )
             {
                 this.attributes(obj,update);
             }
@@ -292,6 +370,44 @@ package es.core
                 this.bindEvent(index,uniqueKey,obj,events);
             }
             return obj;
+        }
+
+        [RunPlatform(client)]
+        protected function findElement(key:*=null, name:*=null, isArr:Boolean =false):Object
+        {
+            var attr:String = getUniqueKey( key as String );
+            if( isArr ){
+                var ret:Element = new Element( `[id="${attr}"]` , this.element.current() );
+                return ret.slice(0);
+            }else{
+                return new Element( `#${attr}` );
+            }
+        }
+
+        [RunPlatform(client)]
+        protected function findComponent(key:*=null, name:Class=null, isArr:Boolean =false):Object
+        {
+            var ret:Object = this.findElement(key, name, isArr);
+            if( ret && ret.length > 0 )
+            {
+                var componentName:String = ret.property( this.getAttrName("component") ) as String;
+                var componentClass:Class = ( componentName ? System.getDefinitionByName( componentName ) : null ) as Class;
+                if( componentClass && componentClass === name )
+                {
+                    if( System.isSubClassOf(componentClass, SkinComponent) )
+                    {
+                        var target:SkinComponent = new componentClass( this.getUniqueKey( key as String, false ) ) as SkinComponent;
+                        var skinClass:Class = System.getDefinitionByName( ret.property( this.getAttrName("skin") ) );
+                        target.skinClass = skinClass;
+                        return target;
+
+                    }else
+                    {
+                        return new componentClass( ret );
+                    }
+                }
+            }
+            return null;
         }
 
         /**
@@ -315,7 +431,7 @@ package es.core
                     obj = new classTarget( new Element( Element.createElement(tagName) ) ) as IDisplay;
 
                 }else{
-                    obj = new classTarget( uukey ) as IDisplay;
+                    obj = new classTarget( getUniqueKey( uniqueKey, false ) ) as IDisplay;
                 }
                 elementMaps[ uukey ] = obj;
                 if( attrs )
@@ -544,18 +660,25 @@ package es.core
         protected function nowUpdate(delay:int=200):void
         {
             invalidate=false;
-            if( timeoutId )
+            when( RunPlatform(client) )
             {
-                clearTimeout( timeoutId as Number );
-            }
+                if( timeoutId )
+                {
+                    clearTimeout( timeoutId as Number );
+                }
 
-            var callback:Function = this.callback;
-            if( !callback )
+                var callback:Function = this.callback;
+                if( !callback )
+                {
+                    callback = this.createChildren.bind(this);
+                    this.callback = callback;
+                }
+                timeoutId = setTimeout(callback,delay);
+
+            }then
             {
-                callback = this.createChildren.bind(this);
-                this.callback = callback;
+                this.createChildren();
             }
-            timeoutId = setTimeout(callback,delay);
         }
 
 
@@ -989,6 +1112,13 @@ package es.core
             {
                 initialized = true;
                 this.initializing();
+                var node:HTMLElement = this.element.current() as HTMLElement;
+                this.marker( node, getAttrName("skin"), __CLASS__ );
+                this.marker( node, getAttrName("component"), System.getQualifiedObjectName( this.hostComponent ) );
+                if( this.hostComponent is SkinComponent )
+                {
+                    this.marker( node, "id", this.getUniqueKey() );
+                }
             }
             super.display();
             this.nowUpdate(0);

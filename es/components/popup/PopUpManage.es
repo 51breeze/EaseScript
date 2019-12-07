@@ -14,7 +14,6 @@ package es.components.popup
     import es.core.SystemManage;
     import es.components.popup.BasePopUp;
 
-    [RunPlatform("client")]
     public class PopUpManage
     {
         /**
@@ -264,11 +263,15 @@ class MaskDisplay extends Display
     /**
      * 遮罩层构造函数
      */
-    public function MaskDisplay( viewport:Element )
+    public function MaskDisplay( viewport:Element, uid:String = UIDInstance() )
     {
-        super( new Element('<div tabIndex="-1" />') );
+        var elem:Element = new Element(`#popup-mask-${uid}`);
+        if( elem.length < 1 ){
+           elem = new Element(`<div tabIndex="-1" id="popup-mask-${uid}" />`);
+        }
+        super( elem );
         this._options = defaultOptions;
-        this.style( "cssText", System.serialize(defaultOptions.style,"style") );
+        this.style( defaultOptions.style );
         this.visible = false;
         viewport.addChild( this.element );
     }

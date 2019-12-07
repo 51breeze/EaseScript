@@ -569,8 +569,6 @@ System.hasClass = function hasClass(name)
     return !!Internal.getClassModule( name );
 };
 
-var map=['System','Class','Interface','Namespace','Reflect','Object','JSON','Array','String','RegExp','EventDispatcher','TypeError','Error','Symbol','Element'];
-
 /**
  * 返回类的完全限定类名
  * @param value 需要完全限定类名称的对象。
@@ -596,24 +594,6 @@ System.getQualifiedClassName = function getQualifiedClassName( target )
         }else if( valueof.indexOf("[Interface") === 0 )
         {
             return valueof.slice(11,-1);
-        }
-
-        var con  = target;
-        if( con )
-        {
-            var str = con.toString();
-            if( str.indexOf('[native code]')>0 )
-            {
-                str = str.substr(0, str.indexOf('(') );
-                return str.substr(str.lastIndexOf(' ')+1);
-            }
-            for (var b in map)
-            {
-                var obj = System[ map[b] ];
-                if (con === obj) {
-                    return map[b];
-                }
-            }
         }
     }
     throw new ReferenceError( 'target is not Class' );

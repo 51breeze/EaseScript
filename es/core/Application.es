@@ -18,12 +18,28 @@ package es.core
        static private var lastApp:Node=null;
        private var appContainer:Node=null;
        private var initiated:Boolean = false;
+       private var _componentId:String;
+
        public function Application()
        {
            super( document );
-           this.appContainer = Element.createElement("div");
-           this.appContainer.className="application";
+           when( Syntax(origin) ){
+                this.appContainer = Element.createElement("div");
+                this.appContainer.className="application";
+           }then{
+                var elem:Element = new Element(".application");
+                this.appContainer = elem.current() as Node;
+           }
        }
+
+        /**
+         * 获取此组件的唯一ID
+         * @returns {String}
+         */
+        public function getComponentId( prefix:String="" ):String
+        {
+            return prefix;
+        }
 
        /**
         * 视图的根节点容器
@@ -53,7 +69,10 @@ package es.core
                         {
                             document.body.removeChild( lastApp );
                         }
-                        (document.body as Node).appendChild( container );
+                        if( !container.parentNode )
+                        {
+                           (document.body as Node).appendChild( container );
+                        }
                         lastApp = container;
                     }
                 }
@@ -212,15 +231,6 @@ package es.core
        }
 
        /**
-        * 获取此组件的唯一ID
-        * @returns {String}
-        */
-       public function getComponentId( prefix:String="" ):String
-       {
-           return "";
-       }
-
-       /**
         * 渲染并且显示一个视图
         */
        public function render( view:View ):View
@@ -231,6 +241,17 @@ package es.core
                var script:Node = new HTMLElement('script') as Node;
                script.content='window["'+Interaction.key+'"]='+ propertiesToJson();
                document.head.appendChild( script );
+
+               var main:Node = new HTMLElement('script') as Node;
+               main.setAttribute("src", "/js/test.js"); 
+               document.head.appendChild( main );
+
+               var link:Node = new HTMLElement('link') as Node;
+               link.setAttribute("href", "/css/test.css"); 
+               link.setAttribute("rel", "stylesheet"); 
+               document.head.appendChild( link );
+
+               System.environments("HTTP_RESPONSE").send( document.documentElement.outerHTML );
            }
            return view;
        }

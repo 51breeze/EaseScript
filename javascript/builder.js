@@ -47,26 +47,20 @@ function polyfill( config )
     return items;
 }
 
-const excludeSystemErrorFile = {
-    "Error":true,
-    "SyntaxError":true,
-    "ReferenceError":true,
-    "URIError":true,
-    "TypeError":true,
-    "EvalError":true,
-    "RangeError":true,
-};
-
-
 /**
  * 获取指定的文件模块
  * @param filepath
  */
 function include(contents, name , filepath, fix, libs, config )
 {
-    name = utils.getGlobalTypeMap(name)
+    name = utils.getGlobalTypeMap(name);
+    var excludeMode = utils.EXCLUDE_GLOBAL | utils.EXCLUDE_CLIENT | utils.EXCLUDE_ERROR;
+    if( config.runtime_error_debug  )
+    {
+        excludeMode ^= utils.EXCLUDE_ERROR;
+    }
 
-    if( !config.runtime_error_debug && excludeSystemErrorFile.hasOwnProperty(name) )
+    if( utils.excludeLoadSystemFile(name, excludeMode) || ( config.globals.hasOwnProperty(name) && config.globals[name].notLoadFile===true ) )
     {
         return;
     }
@@ -77,13 +71,7 @@ function include(contents, name , filepath, fix, libs, config )
         return;
     }
 
-    if( utils.excludeLoadSystemFile( name ) || ( config.globals.hasOwnProperty(name) && config.globals[name].notLoadFile===true ) )
-    {
-        return;
-    }
-
     makedSystemModules[ name ] = {};
-
     if( !filepath )
     {
         filepath = rootPath + '/system/' + name + '.js';
@@ -104,12 +92,7 @@ function include(contents, name , filepath, fix, libs, config )
         str = str.replace(/\bvar\s+(\w+)\s*\=\s*require\s*\(\s*([\"\'])([^\2]*?)\2\s*\)\s*\;?/g,function(a,b,d,c){
 
              var info = path.parse(c);
-             if( !config.runtime_error_debug && excludeSystemErrorFile.hasOwnProperty(info.name) )
-             {
-                 return '';
-             }
-
-             if( utils.excludeLoadSystemFile( info.name ) )
+             if( utils.excludeLoadSystemFile( info.name , excludeMode ) || ( config.globals.hasOwnProperty(info.name) && config.globals[info.name].notLoadFile===true ) )
              {
                 return '';
              }
@@ -353,11 +336,14 @@ function buildModuleToJsonString(config, modules)
                     if( data )
                     {
                         var deps = [];
-                        data.deps.forEach(function(name){
-                            if( !loaded[name] ){
-                                deps.push( {type:name} );
-                            }
-                        });
+                        if( data.deps )
+                        {
+                            data.deps.forEach(function(name){
+                                if( !loaded[name] ){
+                                    deps.push( {type:name} );
+                                }
+                            });
+                        }
 
                         var content = [];
                         if( deps.length > 0 )
@@ -421,10 +407,13 @@ function outputFiles(config, classModules, suffix )
             {
                 var deps = data.deps;
                 emitFile(file, data.content);
-                deps.forEach(function(name)
+                if( deps )
                 {
-                    emitSystemFile(name);
-                });
+                    deps.forEach(function(name)
+                    {
+                        emitSystemFile(name);
+                    });
+                }
             }
         }
     }
@@ -998,7 +987,6 @@ class Builder
                             const script = output.filter( (item)=>{ return item.suffix ===".js" });
                             const css = output.filter( (item)=>{ return item.suffix ===".css" });
                             const require = output.filter( (item)=>{ return item.require });
-                            
                             this.emit(
                                 path.resolve( utils.getBuildPath(config, 'build.webroot'), module.classname.toLowerCase()  +'.html' ),
                                 Builder.getBootstrapView(config,this.getViewOptions(config,{
@@ -1091,15 +1079,6 @@ class Builder
         }
         
         var suffix = config.suffix;
-        if( config.syntax === "node" || (config.syntax === "javascript" && !config.build_pack) )
-        {
-            suffix = ".js";
-        }
-        else if( config.syntax==="php")
-        {
-            suffix = ".php"; 
-        }
-    
         if( config.module_suffix )
         {
             suffix = config.module_suffix;

@@ -7,14 +7,12 @@
  * @require BaseObject,EventDispatcher,ReferenceError,Document
  */
 
-import Document from "Document.js";
-import EventDispatcher from "EventDispatcher.js";
-
-export default class Node extends EventDispatcher
+const EventDispatcher = require("./EventDispatcher.js");
+class Node extends EventDispatcher
 {
-   
     constructor(nodeName='text', nodeType=3, attr=null )
     {
+        super();
         this.nodeName = nodeName;
         this.nodeType = nodeType;
         this.content  = '';
@@ -23,7 +21,6 @@ export default class Node extends EventDispatcher
         this.style = {};
         this.depth = 0;
         this.visible = false;
-        super();
     }
 
     /**
@@ -41,7 +38,21 @@ export default class Node extends EventDispatcher
         return this.content;
     }
 
-    get ownerDocument(){
+    get className()
+    {
+        return this.attr["class"];
+    }
+
+    set className( value )
+    {
+        this.attr["class"] = value;
+    }
+
+    get ownerDocument()
+    {
         return Document.document;
     }
 }
+
+module.exports = Node;
+const Document = require("./Document.js");

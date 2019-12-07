@@ -19,7 +19,6 @@ package es.components
     import es.events.SkinEvent;
 
     [Skin(es.skins.PopUpSkin)]
-    [RunPlatform("client")]
     public class PopUp extends BasePopUp
     {
         public function PopUp(componentId:String = UIDInstance())
