@@ -248,18 +248,16 @@ class HTMLElement extends Node
         {
             throw new TypeError('Invaild node in replaceChild');
         }
-
         var index = this._children.indexOf( oldNode );
         if( index >= 0 )
         {
             this._children.splice( index, 1, newNode);
             newNode.parentNode = this;
-
+            oldNode.parentNode = null;
         }else
         {
             throw new TypeError('Old node is not exists. in replaceChild');
         }
-
     }
 
     getAttribute(name)

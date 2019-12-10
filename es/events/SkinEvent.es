@@ -13,6 +13,7 @@ package es.events
         static public const UPDATE_DISPLAY_LIST:String ='skinUpdateDisplayList';
         static public const INSTALL:String ='skinInstall';
         static public const UNINSTALL:String ='skinUnInstall';
+        static public const MOUNT_CLIENT:String ='skinMountClient';
 
         public var children:Array=null;
         public var oldSkin:Skin=null;

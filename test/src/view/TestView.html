@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<s:View xmlns:s="es.core"  xmlns:c="es.components" xmlns:g="@">
+<s:View xmlns:s="es.core"  xmlns:c="es.components" xmlns:g="@"  skinname="{message}" datavalue="{{inputValue}}">
     <s:Metadata>[HostComponent("Test")]</s:Metadata>
     <![CDATA[
          import es.core.Display;
@@ -16,7 +16,9 @@
 
             PopUp.confirm("Are you ok?", (e:String)=>{
 
-                //this.answer.innerHTML = e==="submit" ? "很好" : "一般"
+                this.answer.innerHTML = e==="submit" ? "很好" : "一般";
+
+                console.log(  e,  this.answer );
 
             },{profile:{
                 submitText:"很好",
@@ -36,6 +38,8 @@
 
          override protected mount()
          {
+
+            console.log( listItemsList );
 
          }
 
@@ -64,7 +68,7 @@
        <s:State name="show" stateGroup="fail,success"></s:State>
        <s:State name="grid" stateGroup="grid"></s:State>
        <s:State name="none"></s:State>
-       <s:State name="text" stateGroup="fail,success"></s:State>
+       <s:State name="text" stateGroup="group,access"></s:State>
     </s:states>
 
     <!--声明一组变量值 -->
@@ -76,7 +80,7 @@
     </s:Declare>
 
     <!--定义当前状态为 show ，来控制指了状态机的所有元素，当前匹配的是 show 、fail 、 success 的状态  -->
-    <s:currentState>text</s:currentState>
+    <s:currentState>show</s:currentState>
 
     <style>
         h1{
@@ -137,9 +141,23 @@
 
 
         <:foreach name="list" value="item">
-               <ul id="@listItems" name="{inputValue}">
-                   <span onClick="{testClick}">{item}</span>
+               <ul id="@listItems"  onClick="{testClick}" name="{inputValue}">
+                   <span>{item}</span>
                 </ul>
+
+                <:foreach name="list" value="item">
+                    <div id="@listItemsList" onClick="{testClick}" name="{inputValue}">
+                        <span>{item}</span>
+                    </div>  
+                </:foreach>
+
+        </:foreach>
+
+
+        <:foreach name="list" value="item">
+               <div id="@listItemsDiv"  onClick="{testClick}" name="{inputValue}">
+                   <span>{item}</span>
+               </div>
         </:foreach>
 
         <div includeIn="text" style="text-align: center;margin: 15px auto;" >
@@ -154,9 +172,9 @@
             <br />
 
             
-            <ul includeIn="success" onclick="{reset}">
+            <ul includeIn="access" onclick="{reset}">
                 <button onclick="{reset}">清空99999</button>
-                <c:DataGrid></c:DataGrid>
+                <c:DataGrid onClick="{testClick}"></c:DataGrid>
             </ul>
 
             <button onclick="{reset}">清空</button>

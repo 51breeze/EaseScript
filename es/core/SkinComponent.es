@@ -77,7 +77,7 @@ package es.core
             when( Syntax(origin,javascript) ){
                 return true;
             }then{
-                return  Syntax(javascript) ? this.async : !this.async;
+                return Syntax(javascript) ? this.async : !this.async;
             }
         }
 
@@ -684,7 +684,6 @@ package es.core
          */
         public function display():Element
         {
-
             when( RunPlatform(server) )
             {
                 if( !this.initialized )

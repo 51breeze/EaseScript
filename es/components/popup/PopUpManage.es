@@ -117,7 +117,9 @@ package es.components.popup
                 obj.options( options );
             }
             maskActiveCount++;
-            obj.fadeIn();
+            if( !obj.visible ){
+                obj.fadeIn();
+            }
             return obj;
         }
 

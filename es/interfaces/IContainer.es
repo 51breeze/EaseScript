@@ -8,7 +8,7 @@
 package es.interfaces
 {
     import es.interfaces.IDisplay;
-    public interface IContainer
+    public interface IContainer extends IDisplay
     {
         /**
          * 获取所有的子级元素

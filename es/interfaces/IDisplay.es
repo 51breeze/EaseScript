@@ -9,7 +9,6 @@ package es.interfaces
 {
     import es.core.es_internal;
     import es.interfaces.IContainer;
-
     public interface IDisplay
     {
         /**

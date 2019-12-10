@@ -213,10 +213,9 @@ function isInterfaceEqual(interfaceModule,interfaceClass)
     {
         return true;
     }
-    interfaceModule = interfaceModule.__T__["extends"];
     if( interfaceModule )
     {
-        if( interfaceModule instanceof Array )
+        if( System.isArray(interfaceModule) )
         {
             var len = interfaceModule.length;
             var i = 0;
@@ -228,8 +227,9 @@ function isInterfaceEqual(interfaceModule,interfaceClass)
                 }
             }
 
-        }else
+        }else if( interfaceModule.__T__ )
         {
+            interfaceModule = interfaceModule.__T__["extends"];
             return isInterfaceEqual(interfaceModule,interfaceClass);
         }
     }

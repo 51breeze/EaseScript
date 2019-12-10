@@ -42,10 +42,11 @@ package es.core
             this.hotUpdate();
         }
 
-        protected function getUniqueKey( key:String='', flag:Boolean = true ):String
+        protected function getUniqueKey( key:*, flag:Boolean = true ):String
         {
             var host:SkinComponent = this.hostComponent as SkinComponent;
-            return flag ? "es"+host.getComponentId( key ) : host.getComponentId( key );
+            key = key || host.getComponentId();
+            return flag ? "es-"+key : key;
         }
 
          /**
@@ -63,21 +64,13 @@ package es.core
          * @param elem Element
          * @param prop String
          * @param value String
+         * @param index int
          * @protected
          */
         [RunPlatform(server)]
-        protected marker( elem:Object, prop:String, value:String ):void
+        protected marker( elem:Node, prop:String, value:* ):void
         {
-            if( elem )
-            {
-                if( elem is HTMLElement )
-                {
-                    (elem as HTMLElement).setAttribute(prop, value);
-                }else if( elem is IDisplay && (elem as IDisplay).element)
-                {
-                    (elem as IDisplay).element.property(prop, value); 
-                }
-            }
+            elem.setAttribute(prop, value);
         }
 
         /**
@@ -216,12 +209,33 @@ package es.core
                     clearTimeout( timeoutId as Number );
                     timeoutId = null;
                 }
+
+                var async:Boolean = false;
+                if( this.hostComponent is SkinComponent )
+                {
+                    async = (this.hostComponent as SkinComponent).async;
+                }
+
                 invalidate = true;
-                var nodes:Array= this.render();
+                var nodes:Array = null;
                 when( Syntax(origin) )
                 {
+                    nodes= this.render();
                     this.updateChildren(this, nodes);
                     this.updateInstallState();
+
+                }then
+                {
+                    if( async )
+                    {
+                        nodes= this.render();
+                        this.updateChildren(this, nodes);
+                        this.updateInstallState();
+
+                    }else
+                    {
+                        this.__$initClient();
+                    }
                 }
 
                 this.mount();
@@ -234,6 +248,11 @@ package es.core
                 }
             }
         };
+
+        protected function __$initClient():Boolean
+        {
+            return false;
+        }
 
         /**
         * 一个运行在客户端的挂载函数，当子级元素完全显示在当前文档中时调度
@@ -267,20 +286,20 @@ package es.core
         * @param target
         * @param events
         */
+        [RunPlatform(client)]
         protected function bindEvent(index:int,uniqueKey:*,target:Object,events:Object):void
         {
             var uukey:String = (index+""+uniqueKey) as String;
             var data:Object = bindEventMaps[uukey] as Object;
             if( !data )
             {
-                if( target instanceof Array )
+                if( target is Array )
                 {
-                   target = new Element( target );
+                    target = new Element( target );
                 }
 
                 data = {items:{},origin:target};
                 bindEventMaps[uukey] = data;
-                this.marker( target, "id", this.getUniqueKey( uniqueKey ) );
                 if( target instanceof EventDispatcher )
                 {
                     data.eventTarget = target;
@@ -320,7 +339,60 @@ package es.core
         * @private
         * 所有子级元素对象的集合
         */
-        private var elementMaps:Object={};
+        private var _setElementMaps:Object={};
+
+        /**
+        * 建立元素的唯一对象
+        * @protected
+        * @key 唯一的键名
+        * @target 元素对象
+        * @return {Object}
+        */
+        protected function setUniqueElement(uniqueKey:String,target:Object):Object
+        {
+            return _setElementMaps[ uniqueKey ]=target;
+        }
+
+        /**
+        * 获取一个唯一的元素对象
+        * @protected
+        * @key 唯一的键名
+        * @return {Object}
+        */
+        protected function getUniqueElement(uniqueKey:String):Object
+        {
+            return _setElementMaps[ uniqueKey ] || null;
+        }
+
+        /**
+        * @private
+        */
+        private var _hashIndexMaps:Object={};
+
+        /**
+        * 获取一个在全局文档中唯一的元素索引(元素ID)
+        * @protected
+        * @index 循环中的次数
+        * @uniqueKey 唯一的键名
+        * @return {Object}
+        */
+        protected getUniqueIndex(index:int,uniqueKey:int):String
+        {
+            if( index > 0 )
+            {
+                var first:Node = this.getUniqueElement(uniqueKey+'0') as Node;
+                if( first )
+                {
+                    if( !this._hashIndexMaps[ uniqueKey ] )
+                    {
+                        this._hashIndexMaps[ uniqueKey ] = 1;
+                    }
+                    index = this._hashIndexMaps[ uniqueKey ]++;
+                    this.marker(first, getAttrName("max"), index+1 );
+                }
+            }
+            return uniqueKey+''+index;
+        }
 
         /**
         * 创建一个节点元素
@@ -332,18 +404,18 @@ package es.core
         * @param events 绑定元素的事件
         * @returns {Object} 一个表示当前节点元素的对象
         */ 
-        protected function createElement(index:int,uniqueKey:*, name:String, children:*=null, attrs:Object=null,update:Object=null,events:Object=null):Object
+        protected function createElement(index:int,uniqueKey:*, name:String, children:*=null, attrs:Object=null,update:Object=null,events:*=null):Object
         {
-            var uukey:String = (uniqueKey+''+index) as String;
-            var obj:Node = elementMaps[ uukey ] as Node;
+            var uukey:String = this.getUniqueIndex(index, uniqueKey);
+            var obj:Node = this.getUniqueElement( uukey ) as Node;
             if( !obj )
             {
-                obj = document.createElement( name );
-                elementMaps[ uukey ] = obj;
+                obj = this.setUniqueElement(uukey, document.createElement( name ) ) as Node;
                 if( attrs )
                 {
                     this.attributes(obj,attrs);
                 }
+                this.marker( obj, "id", this.getUniqueKey( uukey ) );
             }
 
             if( children )
@@ -373,38 +445,75 @@ package es.core
         }
 
         [RunPlatform(client)]
-        protected function findElement(key:*=null, name:*=null, isArr:Boolean =false):Object
+        protected function findElement(uniqueKey:int=0,isArr:Boolean=false):Object
         {
-            var attr:String = getUniqueKey( key as String );
-            if( isArr ){
-                var ret:Element = new Element( `[id="${attr}"]` , this.element.current() );
-                return ret.slice(0);
-            }else{
-                return new Element( `#${attr}` );
+            var uukey:String = this.getUniqueIndex(0, uniqueKey);
+            var attr:String = this.getUniqueKey(  uniqueKey > 0 ? uukey : 0 );
+            var node:Node = document.getElementById( attr );
+            if( uniqueKey === 0 )
+            {
+                return node;
+            }
+
+            if( isArr && node )
+            {
+                var max:int = (int)node.getAttribute( this.getAttrName("max") );
+                var result:Array = [ node ];
+                if( max > 0 )
+                {
+                    for(var i:int=1;i<max;i++)
+                    {
+                       uukey = this.getUniqueIndex(i, uniqueKey); 
+                       node = document.getElementById( this.getUniqueKey( uukey ) );
+                       if( node )
+                       {
+                           this.setUniqueElement(uukey,node);
+                           result.push( node );
+                       }
+                    }
+                }
+                return result;
+
+            }else
+            {
+                return this.setUniqueElement(uukey,node);
             }
         }
 
         [RunPlatform(client)]
-        protected function findComponent(key:*=null, name:Class=null, isArr:Boolean =false):Object
+        protected function findComponent(uniqueKey:int=0,isArr:Boolean =false):Object
         {
-            var ret:Object = this.findElement(key, name, isArr);
-            if( ret && ret.length > 0 )
+            var ret:Object = this.findElement(uniqueKey,isArr);
+            if( ret )
             {
-                var componentName:String = ret.property( this.getAttrName("component") ) as String;
-                var componentClass:Class = ( componentName ? System.getDefinitionByName( componentName ) : null ) as Class;
-                if( componentClass && componentClass === name )
-                {
-                    if( System.isSubClassOf(componentClass, SkinComponent) )
+                const factor:Function = (item:Node, index:int) =>{
+                    var componentName:String = item.getAttribute( this.getAttrName("component") ) as String;
+                    var componentClass:Class = ( componentName ? System.getDefinitionByName( componentName ) : null ) as Class;
+                    if( componentClass )
                     {
-                        var target:SkinComponent = new componentClass( this.getUniqueKey( key as String, false ) ) as SkinComponent;
-                        var skinClass:Class = System.getDefinitionByName( ret.property( this.getAttrName("skin") ) );
-                        target.skinClass = skinClass;
-                        return target;
-
-                    }else
-                    {
-                        return new componentClass( ret );
+                        var uukey:String = this.getUniqueIndex(index, uniqueKey);
+                        if( System.isSubClassOf(componentClass, SkinComponent) )
+                        {
+                            var target:SkinComponent = new componentClass( this.getUniqueKey(uukey, false) ) as SkinComponent;
+                            var skinClass:Class = System.getDefinitionByName( item.getAttribute( this.getAttrName("skin") ) );
+                            target.skinClass = skinClass;
+                            return this.setUniqueElement( uukey,target);
+                        }else
+                        {
+                            return this.setUniqueElement(uukey, new componentClass( new Element(item) ) );
+                        }
                     }
+                    return null;
+                };
+
+                if( ret is Array )
+                {
+                    return (ret as Array)
+                           .map( (item:Object,index:int)=>factor(item as Node, index) )
+                           .filter( (item:Object)=>return !!item );
+                }else
+                {
+                   return factor(ret as Node, 0);
                 }
             }
             return null;
@@ -420,20 +529,24 @@ package es.core
         * @param events 绑定元素的事件
         * @returns {Object} 一个表示当前节点元素的对象
         */ 
-        protected function createComponent(index:int,uniqueKey:*, classTarget:Class, tagName:String=null, children:*=null, attrs:Object=null,update:Object=null,events:Object=null):IDisplay
+        protected function createComponent(index:int,uniqueKey:*, classTarget:Class, tagName:String=null, children:*=null, attrs:Object=null,update:Object=null,events:*=null):IDisplay
         {
-            var uukey:String = (uniqueKey+''+index) as String;
-            var obj:IDisplay = elementMaps[ uukey ] as IDisplay;
+            var uukey:String = this.getUniqueIndex(index, uniqueKey);
+            var obj:IDisplay = this.getUniqueElement(uukey) as IDisplay;
             if( !obj )
             {
                 if( tagName )
                 {
-                    obj = new classTarget( new Element( Element.createElement(tagName) ) ) as IDisplay;
+                    var elem:Node = Element.createElement(tagName);
+                    this.marker(elem, "id", this.getUniqueKey(uukey) );
+                    this.marker(elem, this.getAttrName("component") , System.getQualifiedClassName( classTarget ), 0 );
+                    obj = new classTarget( new Element( elem ) ) as IDisplay;
 
-                }else{
-                    obj = new classTarget( getUniqueKey( uniqueKey, false ) ) as IDisplay;
+                }else
+                {
+                    obj = new classTarget( this.getUniqueKey( uukey, false ) ) as IDisplay;
                 }
-                elementMaps[ uukey ] = obj;
+                this.setUniqueElement(uukey,obj);
                 if( attrs )
                 {
                     this.attributes( obj.element, attrs);
@@ -860,6 +973,7 @@ package es.core
         * @param propName 目标属性名
         * @param sourceTarget 绑定的数据源对象, 不指定为当前对象
         */
+        [RunPlatform(client)]
         public function watch(name:String,target:Object,propName:String,sourceTarget:Object=null):void
         {
             var bindable:Bindable= this.bindable;
@@ -880,6 +994,7 @@ package es.core
         * @param target 目标对象
         * @param propName 目标属性名
         */
+        [RunPlatform(client)]
         public function unwatch(target:Object,propName:String=null,sourceTarget:Object=null):void
         {
             if( sourceTarget )
@@ -1115,9 +1230,12 @@ package es.core
                 var node:HTMLElement = this.element.current() as HTMLElement;
                 this.marker( node, getAttrName("skin"), __CLASS__ );
                 this.marker( node, getAttrName("component"), System.getQualifiedObjectName( this.hostComponent ) );
-                if( this.hostComponent is SkinComponent )
+                when( RunPlatform(server) )
                 {
-                    this.marker( node, "id", this.getUniqueKey() );
+                    if( this.hostComponent is SkinComponent )
+                    {
+                        this.marker( node, "id", this.getUniqueKey(0) );
+                    }
                 }
             }
             super.display();

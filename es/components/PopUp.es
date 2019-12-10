@@ -224,6 +224,7 @@ package es.components
         override protected function show(options:Object={}):BasePopUp
         {
             this.option = options;
+            this.async = true;
             this.display();
             return this;
         }

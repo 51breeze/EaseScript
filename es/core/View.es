@@ -44,9 +44,9 @@ package es.core
             return _context;
         }
 
-        override protected function getUniqueKey( key:String = '', flag:Boolean = true ):String
+        override protected function getUniqueKey( key:* = '', flag:Boolean = true ):String
         {
-            return flag ? "es"+key : key;
+            return flag ? "es-"+key : key;
         }
 
         /**

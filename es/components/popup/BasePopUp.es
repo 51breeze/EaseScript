@@ -460,18 +460,16 @@ package es.components.popup
             this.position();
         }
 
-
         /**
          * @inherit
          * @return
          */
         override public function display():Element
         {
+            var elem:Element = super.display();
             var skin:Skin = this.skin;
             var options:Object = this.option;
-
             this.setProfile();
-            var elem:Element = super.display();
 
             //应用效果
             elem.show();
