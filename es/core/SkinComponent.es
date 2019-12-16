@@ -7,16 +7,13 @@
 package es.core
 {
     import es.core.Component;
-    import es.events.ComponentEvent;
     import es.events.SkinEvent;
     import es.core.Skin;
     import es.interfaces.IContainer;
     import es.interfaces.IDisplay;
-    import es.core.Interaction;
-    import es.core.Position;
     import es.core.es_internal; 
 
-    public class SkinComponent extends Component implements IDisplay,IContainer
+    public class SkinComponent extends Component implements IContainer,IDisplay
     {
         private var _componentId:String;
         public function SkinComponent( componentId:String = UIDInstance() )
@@ -135,10 +132,7 @@ package es.core
                         old.dispatchEvent( uninstall );
                     }
 
-                    this.installChildren();
-                    this.commitProperty();
-                    this.nowUpdateSkin();
-                    
+                    this.commitProperties();
                     if( skinObj.hasEventListener( SkinEvent.INSTALL ) )
                     {
                         var install:SkinEvent = new SkinEvent( SkinEvent.INSTALL );
@@ -146,6 +140,7 @@ package es.core
                         install.newSkin = skinObj;
                         skinObj.dispatchEvent( install );
                     }
+                    this.nowUpdateSkin();
                 }
             } 
         }
@@ -190,10 +185,28 @@ package es.core
         }
 
         /**
+         * 设置表格的圆角值
+         * @param value
+         */
+        public function set radius(value:Number):void
+        {
+             this.setAssign("radius", value);
+        }
+
+        /**
+         * 获取表格的圆角值
+         * @param value
+         */
+        public function get radius():Number
+        {
+            return this.getAssign("radius", 5) as Number;
+        }
+
+        /**
          * 此组件的属性集
          * @protected
          */
-        protected var properties:Object={};
+        private var properties:Object={};
 
         /**
          * 获取此对象的高度
@@ -204,7 +217,7 @@ package es.core
             {
                 return this.skin.height;
             }
-            return properties.height;
+            return properties.height as uint;
         }
 
         /**
@@ -228,7 +241,7 @@ package es.core
             {
                 return this.skin.width;
             }
-            return properties.width;
+            return properties.width as uint;
         }
 
         /**
@@ -277,7 +290,7 @@ package es.core
             if( this.initialized ) {
                 return this.skin.visible;
             }
-            return properties.visible;
+            return properties.visible as Boolean;
         };
 
         /**
@@ -289,7 +302,7 @@ package es.core
             if( this.initialized ) {
                 return this.skin.left;
             }
-            return properties.left;
+            return properties.left as int;
         };
 
         /**
@@ -314,7 +327,7 @@ package es.core
             if( this.initialized ) {
                 return this.skin.top;
             }
-            return properties.top;
+            return properties.top as int;
         };
 
         /**
@@ -339,7 +352,7 @@ package es.core
             if( this.initialized ) {
                 return this.skin.right;
             }
-            return properties.right;
+            return properties.right as int;
         };
 
         /**
@@ -365,7 +378,7 @@ package es.core
             {
                 return this.skin.bottom;
             }
-            return properties.bottom;
+            return properties.bottom as int;
         };
 
         /**
@@ -689,7 +702,7 @@ package es.core
                 if( !this.initialized )
                 {
                     this.initializing();
-                    this.commitPropertyAndUpdateSkin();
+                    this.nowUpdateSkin();
                 }
                 return this.skin.element;
 
@@ -698,7 +711,7 @@ package es.core
                 if( !this.initialized )
                 {
                     this.initializing();
-                    this.commitPropertyAndUpdateSkin();
+                    this.nowUpdateSkin();
 
                 }else if( !this.skin.parent )
                 {
@@ -719,36 +732,61 @@ package es.core
             if( !this.initialized )
             {
                 super.initializing();
-                this.installChildren();
-                this.commitProperty();
+                this.commitProperties();
             }
         }
 
         /**
-         * 安装子级元素
-         * 对于新添加到组件的元素都要添加到皮肤对象上。
-         */
-        private function installChildren()
+        * @private
+        */
+        private var _dataset:Object= {};
+
+        /**
+        * 获取一个指定名称的值
+        */
+        protected function getAssign(name:String,defaultValue:*=null):*
         {
-            if( _children.length > 0 )
+            var val:* = null;
+            if( this.initialized )
             {
-                this.skin.children = _children;
+                val = this.skin.assign(name);
+            }else{
+                val = _dataset[ name ];
             }
+            return val == null ? defaultValue : _dataset[ name ];
         }
 
         /**
-         * 将组件属性提交到皮肤。
-         * 对于一个在初始化之前的组件有可能是没有指定皮肤对象的。所以需要把指定的属性统一管理起来稍后在初始化时统一提交到皮肤。
-         */
-        protected function commitProperty()
+        * 设置一个指定名称的值
+        */
+        protected function setAssign(name:String,value:*):void
+        {
+            if( this.initialized )
+            {
+                this.skin.assign(name,value);
+            } 
+            _dataset[ name ]=value;
+        }
+
+        /**
+        * 在第一次安装皮肤对象时调用。主要用来向皮肤对象初始化数据。
+        */
+        protected function commitProperties()
         {
             var skin:Skin = this.skin;
+            skin.dataset = _dataset;
+            if( _children.length > 0 )
+            {
+                skin.children = _children;
+            }
+
             Object.forEach(this.properties, function (value:*, name:String){
-                if( name in skin ) {
+                if( name in skin )
+                {
                     skin[name] = value;
                 }
             });
-
+            
             Object.forEach(this.events,function(listener:Array,type:String)
             {
                 var len:int = listener.length;
@@ -756,8 +794,8 @@ package es.core
                 for(;index<len;index++)
                 {
                     var item:Object= listener[index] as Object;
-                    skin.removeEventListener(type, item.callback);
-                    skin.addEventListener(type, item.callback, item.useCapture, item.priority, item.reference);
+                    skin.removeEventListener(type, item.callback as Function);
+                    skin.addEventListener(type, item.callback as Function, item.useCapture as Boolean, item.priority as int, item.reference as Object);
                 }
 
             },this);
@@ -765,23 +803,16 @@ package es.core
             if( _parent )
             {
                 skin.es_internal::setParentDisplay(_parent);
-            }  
-        }
-
-        /**
-         * 提交属性并且立即刷新视图
-         * 此方法只对使用模板渲染的皮肤对象才管用。
-         * 并且要在调用方法之前有重新分配过数据,才会重新创建视图。
-         * 调用此方法可能会消耗较多资源，请谨慎使用。
-         */
-        protected function commitPropertyAndUpdateSkin()
-        {
-            if( this.initialized  )
-            {
-                this.nowUpdateSkin();
             }
         }
 
+        /**
+        * 在更新皮肤对象之前调用此方法。主要实现向皮肤对象中更新需要的数据
+        */
+        protected function updateProperties()
+        {
+        }
+       
         /**
          * 立即刷新皮肤
          * 此方法只对使用模板渲染的皮肤对象才有效，并且要在调用该方法之前有重新为皮肤对象分配过数据。
@@ -789,37 +820,22 @@ package es.core
          */
         protected function nowUpdateSkin()
         {
-            var skin:Skin = this.skin;
-            when( RunPlatform(server) )
+            if( this.initialized  )
             {
-                if( this.async === false ){
+                var skin:Skin = this.skin;
+                this.updateProperties();
+                when( RunPlatform(server) )
+                {
+                    if( this.async === false )
+                    {
+                        skin.display();
+                    }
+
+                }then
+                {
                     skin.display();
                 }
-            }then
-            {
-                skin.display();
             }
-        }
-
-        /**
-         * 将属性推送到共享池(前后端互相访问)
-         * @param name
-         * @param value
-         * @returns {*}
-         */
-        protected function push(name:String, value:*):void
-        {
-            properties[name] = value;
-        }
-
-        /**
-         * 从共享池中拉取指定的属性值(前后端互相访问)
-         * @param name
-         * @returns {*}
-         */
-        protected function pull(name:String):*
-        {
-            return properties[name];
         }
 
         /**

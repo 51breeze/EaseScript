@@ -7,10 +7,9 @@
            import es.core.Display;
            import es.core.Skin;
 
-           [Syntax("javascript")]
-           override protected function updateDisplayList()
+           override protected function mount()
            {
-                super.updateDisplayList();
+                super.mount();
                 var hostComponent:DataGrid = this.hostComponent as DataGrid;
                 var radius:String= hostComponent.radius+'px';
                 var table:Element =  this.element;
@@ -19,63 +18,52 @@
                 Element('thead > tr:first-child >th:last-child' , table).style('borderTopRightRadius',radius );
                 Element('tfoot > tr:last-child >td:first-child' , table).style('borderBottomLeftRadius',radius );
                 Element('tfoot > tr:last-child >td:last-child' , table).style('borderBottomRightRadius',radius );
-                Element('td', this.foot).height( hostComponent.footHeight ); 
+                Element('td', this.foot).height( hostComponent.footHeight );
             }
 
-            override protected function initializing()
-            {
-                var hostComponent:DataGrid = this.hostComponent as DataGrid;
-                if( hostComponent.isNeedCreateSkin() )
-                {
-
-                    var dataSource:DataSource =  hostComponent.dataSource;
-                    var body:Skin = this;
-                    var dataProfile:String =  hostComponent.dataProfile;
-                    pagination.dataSource = dataSource;
-
-                    body.assign('rowHeight', hostComponent.rowHeight );
-                    body.assign('headHeight', hostComponent.headHeight );
-                    body.assign( dataProfile, [] );
-                    body.assign( hostComponent.columnProfile, hostComponent.columns);
-                    body.assign( hostComponent.columnProfile, hostComponent.columns );
-
-                    dataSource.addEventListener(DataSourceEvent.SELECT, function (event:DataSourceEvent)
-                    {
-                        if ( !event.waiting )
-                        {
-                            body.assign( dataProfile , event.data);
-                            body.display();
-                        }
-                    });
-                    dataSource.select( pagination.current );
-               }
-
-               super.initializing();
-            }
 
         ]]>
     </s:Script>
+
     <style file="DataGridStyle.less" />
+
+    <s:Declare>
+       const {
+           headHeight:int=25,
+           rowHeight:int=25,
+           footHeight:int=25,
+           dataList:Array=[],
+           columns:Object={},
+           current:int=NaN
+        } = dataset;
+
+        const getStyleHeight:Function = ( value:int )=>{
+            return `height:${value}px;line-height:${value}px;`;
+        };
+
+    </s:Declare>
+
+
     <thead id="@head">
         <tr>
-            <:foreach name="dataset.columns" value="name" >
-                <th style="height:{dataset.headHeight}px;line-height:{dataset.headHeight}px;">{name}<span></span></th>
+            <:foreach name="columns" value="name" >
+                <th setStyle="{getStyleHeight(headHeight)}">{name}<span></span></th>
             </:foreach>
         </tr>
     </thead>
 
     <tbody id="@body">
-        <:foreach name="dataset.datalist" value="item">
+        <:foreach name="dataList" value="item">
             <tr>
-                <:foreach name="dataset.columns" value="val" key="field">
-                    <:switch condition="field">
+                <:foreach name="columns" value="val" key="field">
+                    <:switch name="field">
                         <:case condition="name" break="true">
-                            <td data-column="{field}" style="height:{dataset.rowHeight}px;line-height:{dataset.rowHeight}px;">
-                                <input value="{item[field]}" style="height: 25px;" onClick="@()=>this" />
+                            <td data-column="{field}" setStyle="{getStyleHeight(rowHeight)}">
+                                <input value="{item[field]}" />
                             </td>
                         </:case>
                         <:default>
-                            <td data-column="{field}" style="height:{dataset.rowHeight}px;line-height:{dataset.rowHeight}px;">{item[field]}</td>
+                            <td data-column="{field}" setStyle="{getStyleHeight(rowHeight)}">{item[field]}</td>
                         </:default>
                     </:switch>
                 </:foreach>
@@ -83,13 +71,12 @@
         </:foreach>
     </tbody>
 
-    <tfoot id="@foot">
+    <tfoot includeIn="@hostComponent.pagination !== null">
          <tr>
-             <td colspan="3">
-                 <c:Pagination id="@pagination" radius="3">
-                 </c:Pagination>
+             <td colspan="3" setStyle="{getStyleHeight(footHeight)}" id="@foot">
+                {hostComponent.pagination}
              </td>
          </tr>
-    </tfoot>
+    </tfoot> 
 
 </s:Skin>

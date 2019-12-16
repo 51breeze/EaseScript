@@ -14,6 +14,9 @@
 
          private showTips(){
 
+
+            console.log("=======showTips=======");
+
             PopUp.confirm("Are you ok?", (e:String)=>{
 
                 this.answer.innerHTML = e==="submit" ? "很好" : "一般";
@@ -39,7 +42,7 @@
          override protected mount()
          {
 
-            console.log( listItemsList );
+           
 
          }
 
@@ -80,7 +83,7 @@
     </s:Declare>
 
     <!--定义当前状态为 show ，来控制指了状态机的所有元素，当前匹配的是 show 、fail 、 success 的状态  -->
-    <s:currentState>show</s:currentState>
+    <s:currentState>grid</s:currentState>
 
     <style>
         h1{
@@ -140,26 +143,6 @@
         </c:PopUp>
 
 
-        <:foreach name="list" value="item">
-               <ul id="@listItems"  onClick="{testClick}" name="{inputValue}">
-                   <span>{item}</span>
-                </ul>
-
-                <:foreach name="list" value="item">
-                    <div id="@listItemsList" onClick="{testClick}" name="{inputValue}">
-                        <span>{item}</span>
-                    </div>  
-                </:foreach>
-
-        </:foreach>
-
-
-        <:foreach name="list" value="item">
-               <div id="@listItemsDiv"  onClick="{testClick}" name="{inputValue}">
-                   <span>{item}</span>
-               </div>
-        </:foreach>
-
         <div includeIn="text" style="text-align: center;margin: 15px auto;" >
 
             <!-- 这两输入框的数据联动 [Bindable] 就是一个中间的驱动者，它是属性于元类型，元类型主要是告诉编译器，这部分应该怎么做。 -->
@@ -174,7 +157,7 @@
             
             <ul includeIn="access" onclick="{reset}">
                 <button onclick="{reset}">清空99999</button>
-                <c:DataGrid onClick="{testClick}"></c:DataGrid>
+               
             </ul>
 
             <button onclick="{reset}">清空</button>
@@ -196,9 +179,14 @@
         <c:DataGrid 
             id="@dataGrid"  
             includeIn="grid" 
-            onClick="{click}"
-            rowHeight="50"
+            rows="5"
             >
+
+ 
+             <c:pagination>
+                 <c:wheelTarget>@dataGrid</c:wheelTarget>
+             </c:pagination>
+    
 
             <!-- 这里是使用数据源自动加载数据  -->
             <!-- <c:source>http://local.working.com/json.php</c:source>
@@ -209,6 +197,57 @@
             <!-- 这里是配置的配置数据源 -->
             <c:source>
                 <g:Array>
+                    <g:Object>
+                        <id>1</id>
+                        <name>
+                            张三
+                        </name>
+                        <phone>15302662598</phone>
+                    </g:Object>
+                    <g:Object>
+                        <id>2</id>
+                        <name>李四</name>
+                        <phone>
+                            <s:Container name="ul" onclick="{(e:Event)=>console.log(e)}">
+                                 <div>sdfdsfdsfdsfsdfdsf</div>
+                             </s:Container>
+                        </phone>
+                    </g:Object>
+                     <g:Object>
+                        <id>2</id>
+                        <name>王五</name>
+                        <phone>1896325987</phone>
+                    </g:Object>
+                    <g:Object>
+                        <id>1</id>
+                        <name>张三</name>
+                        <phone>15302662598</phone>
+                    </g:Object>
+                    <g:Object>
+                        <id>2</id>
+                        <name>李四</name>
+                        <phone>1869875696</phone>
+                    </g:Object>
+                     <g:Object>
+                        <id>2</id>
+                        <name>王五</name>
+                        <phone>1896325987</phone>
+                    </g:Object>
+                    <g:Object>
+                        <id>1</id>
+                        <name>张三</name>
+                        <phone>15302662598</phone>
+                    </g:Object>
+                    <g:Object>
+                        <id>2</id>
+                        <name>李四</name>
+                        <phone>1869875696</phone>
+                    </g:Object>
+                     <g:Object>
+                        <id>2</id>
+                        <name>王五</name>
+                        <phone>1896325987</phone>
+                    </g:Object>
                     <g:Object>
                         <id>1</id>
                         <name>张三</name>

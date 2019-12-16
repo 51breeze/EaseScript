@@ -40,9 +40,10 @@ package es.core
                 {
                     element.html( attr.innerHTML );
                     delete attr.innerHTML;
+
                 }else if( attr.content )
                 {
-                    element.text( attr.content );
+                    element.text( (String)attr.content );
                     delete attr.content;
                 }
                 element.properties( attr );
@@ -160,7 +161,7 @@ package es.core
          * @param value
          * @returns {Object}
          */
-        public function style(name:String, value:*=null):Object
+        public function style(name:String, value:*=null):*
         {
              return _element.style(name,value);
         }

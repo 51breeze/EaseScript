@@ -160,7 +160,7 @@ package es.components.popup
             target.element.style("zIndex", level );
 
             //如果没有添加则添加到视口中
-            if( target.element.parent().isEmpty() )
+            if( !target.element.current().parentNode )
             {
                 viewport.addChild( target );
             }
@@ -273,7 +273,7 @@ class MaskDisplay extends Display
         }
         super( elem );
         this._options = defaultOptions;
-        this.style( defaultOptions.style );
+        this.style("cssText", defaultOptions.style );
         this.visible = false;
         viewport.addChild( this.element );
     }
@@ -297,7 +297,7 @@ class MaskDisplay extends Display
             var animation:Object = defaultOptions.animation as Object;
             if ( animation.fadeIn > 0 )
             {
-                this.element.fadeIn( animation.fadeIn, this._options.style.opacity as float );
+                this.element.fadeIn( animation.fadeIn as float, this._options.style.opacity as float );
             }
 
         }else

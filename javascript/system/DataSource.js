@@ -440,8 +440,13 @@ DataSource.prototype = Object.create( EventDispatcher.prototype,{
      * @param num
      * @returns {*}
      */
-    "current":{value:function current()
+    "current":{value:function current( num )
     {
+        if( num > 0 )
+        {
+            storage(this,"current",num);
+            return this;
+        }
         return storage(this,"current");
     }},
 
@@ -496,7 +501,7 @@ DataSource.prototype = Object.create( EventDispatcher.prototype,{
      */
     "totalSize":{value:function totalSize()
     {
-        return Math.max( storage(this,"totalSize"), this.realSize() );
+        return Math.max( storage(this,"totalSize")||0, this.realSize() );
     }},
 
     /**
@@ -699,6 +704,15 @@ DataSource.prototype = Object.create( EventDispatcher.prototype,{
     "range":{value:function range( start, end )
     {
         return storage(this,'items').slice(start, end);
+    }},
+
+    /**
+     * 判断是否有初始化数据
+     * @returns {Boolean}}
+     */
+    "selected":{value:function selected()
+    {
+        return storage(this,'selected');
     }},
 
     /**

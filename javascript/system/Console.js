@@ -23,7 +23,7 @@ function toString( args )
     var str=[ output ];
     for(var i=0; i<args.length; i++)
     {
-        if( args[i] && ( System.isObject(args[i],true) || typeof args[i] ==="function" ) )
+        if( args[i] && ( System.isObject(args[i],true) || typeof args[i] ==="function" ) && args[i].valueOf )
         {
             str.push( args[i].valueOf() );
         }else

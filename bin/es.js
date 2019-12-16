@@ -73,6 +73,7 @@ program
 .option('--block-scope', '是否需要启用块级域')
 .option('--chunk', '拆分文件')
 .option('--server', '是否启用服务')
+.option('--fetch', '当使用服务端渲染时是否需要在客户端保持元素一致性，开启后在每次创建元素之前先在dom中查找')
 .option('--webroot', '指示项目是部署在webroot下运行,否则为构建目录下运行')
 .option('--watch', '启用监听文件如有变动自动编译')
 .option('--source-file', '是否需要生成源文件')
@@ -120,6 +121,7 @@ var mapKeys={
     "watching":"watch",
     "serverEnable":"server",
     "sourceMap":"sourceMap",
+    "fetch":"fetch",
     "initConfig":"init",
     "minimal":"minimal",
     "assets_hash":"hash",

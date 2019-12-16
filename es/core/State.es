@@ -31,8 +31,12 @@ package es.core {
             return this._stateGroup;
         }
 
-        public function includeIn(value:String):Boolean
+        public function includeIn(value:*):Boolean
         {
+            if( value === true )
+            {
+                return true;
+            }
             return value === this._name || this._stateGroup.indexOf(value) >= 0;
         }
     }

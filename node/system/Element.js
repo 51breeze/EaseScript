@@ -254,7 +254,7 @@ module.exports = class Element extends EventDispatcher
             this._current = elem;
             return this;
         }
-        return this[0];
+        return this._current || this[0];
     }
 
     fadeIn()

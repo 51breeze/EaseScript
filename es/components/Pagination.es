@@ -42,13 +42,28 @@ package es.components
             super(componentId);
         }
 
-        /**
+          /**
          * @private
          */
-        private var _dataSource:DataSource=null;
+        private var _dataSource:DataSource = null;
 
         /**
-         * 设置需要分页的数据源
+         * 获取数据源对象
+         * @returns {DataSource}
+         */
+        public function get dataSource():DataSource
+        {
+            var dataSource:DataSource = this._dataSource;
+            if ( dataSource === null )
+            {
+                dataSource= new DataSource();
+                this.dataSource = dataSource;
+            }
+            return dataSource;
+        };
+
+         /**
+         * 设置数据源对象
          * @param value
          */
         public function set dataSource( value:DataSource ):void
@@ -57,34 +72,27 @@ package es.components
             if( old !== value )
             {
                 this._dataSource = value;
-                var self:Pagination = this;
-                value.addEventListener( DataSourceEvent.SELECT,function (e:DataSourceEvent)
-                {
-                    if( !e.waiting && self.initialized )
-                    {
-                        self.commitPropertyAndUpdateSkin();
-                    }
-                });
-                if( this.initialized )
-                {
-                    value.select( this.current );
-                }
             }
         }
 
         /**
-         * 获取老需要分页的数据源
-         * @returns DataSource;
+         * 设置数据源
+         * @param source
+         * @returns {void}
          */
-        public function get dataSource():DataSource
+        public function set source( data:* ):void
         {
-            return this._dataSource;
-        }
+            this.dataSource.source( data );
+        };
 
         /**
-         * @private
+         * 获取数据源
+         * @returns {Object}
          */
-        private var _profile:String='page';
+        public function get source():Object
+        {
+            return this.dataSource.source();
+        };
 
         /**
          * 获取分页在地址中的属性名
@@ -92,7 +100,7 @@ package es.components
          */
         public function get profile():String
         {
-            return  this._profile;
+            return this.getAssign("profile", 'page') as String;
         }
 
         /**
@@ -101,21 +109,13 @@ package es.components
          */
         public function set profile( value:String ):void
         {
-            if( this._profile !== value )
+            this.setAssign("profile", value);
+            if( this.initialized )
             {
-                this._profile = value;
-                if( this.initialized )
-                {
-                    var curr:int = (int)Locator.query(value, 1);
-                    this.current = isNaN( curr ) ? 1 : curr;
-                }
+                var curr:int = (int)Locator.query(value, 1);
+                this.current = isNaN( curr ) ? 1 : curr;
             }
         }
-
-        /**
-         * @private
-         */
-        private var _url:*='';
 
         /**
          * 设置返回一个回调函数,用来返回一个url地址
@@ -124,14 +124,7 @@ package es.components
          */
         public function set url( value:* ):void
         {
-           if( this._url !== value )
-           {
-               this._url = value;
-               if( this.initialized )
-               {
-                   commitPropertyAndUpdateSkin();
-               }
-           }
+            this.setAssign("url", value);
         };
 
         /**
@@ -140,7 +133,7 @@ package es.components
          */
         public function get url():*
         {
-            return this._url;
+            return  this.getAssign("url", null);
         };
 
         /**
@@ -150,12 +143,7 @@ package es.components
          */
         public function get totalPage():int
         {
-            var dataSource:DataSource = this.dataSource;
-            if( dataSource )
-            {
-                return dataSource.totalPage() || 1;
-            }
-            return 1;
+            return this.dataSource.totalPage() || 1;
         };
 
         /**
@@ -164,18 +152,8 @@ package es.components
          */
         public function get totalSize():int
         {
-            var dataSource:DataSource = this.dataSource;
-            if( dataSource )
-            {
-                return dataSource.totalSize();
-            }
-            return NaN;
+            return this.dataSource.totalSize();
         };
-
-        /**
-         * @private
-         */
-        private var _pageSize:int = NaN;
 
         /**
          * 获取每页显示多少行数据
@@ -183,35 +161,20 @@ package es.components
          */
         public function get pageSize():int
         {
-            var dataSource:DataSource = this.dataSource;
-            if( dataSource )
-            {
-                return dataSource.pageSize();
-            }
-            return this._pageSize;
+            return this.getAssign("pageSize", this.dataSource.pageSize() ) as int;
         };
 
         public function set pageSize(num:int):void
         {
-            if( this._pageSize !== num )
+            this.setAssign("pageSize",num);
+
+            var dataSource:DataSource = this.dataSource;
+            dataSource.pageSize( num );
+            if( this.initialized )
             {
-                this._pageSize = num;
-                var dataSource:DataSource = this.dataSource;
-                if( dataSource )
-                {
-                    dataSource.pageSize( num );
-                    if( this.initialized )
-                    {
-                        dataSource.select( this.current );
-                    }
-                }
+                dataSource.select();
             }
         };
-
-        /**
-         * @private
-         */
-        private var _current:int = NaN;
 
         /**
          * 设置当前需要显示的分页
@@ -219,17 +182,7 @@ package es.components
          */
         public function get current():int
         {
-            var dataSource:DataSource = this.dataSource;
-            if( isNaN(_current) )
-            {
-                var curr:int = (int)Locator.query(_profile, 1);
-                this._current = isNaN( curr ) ? 1 : curr;
-            }
-            if( dataSource && this.initialized )
-            {
-                return this.dataSource.current();
-            }
-            return this._current;
+            return this.getAssign("current", (int)Locator.query( this.profile, 1) ) as int;
         };
 
         /**
@@ -238,39 +191,28 @@ package es.components
          */
         public function set current(num:int):void
         {
-            num = isNaN( this.totalSize ) ? num :  Math.min( Math.max(1, num), this.totalPage );
             var current:int = this.current;
-            if( num !== current )
+            num = this.totalSize > 0 ? Math.min( Math.max(1, num), this.totalPage ) : num;
+            if( num !== current && !isNaN(num) )
             {
-                this._current = num;
-                var event:PaginationEvent = new PaginationEvent(PaginationEvent.CHANGE);
-                event.oldValue = current;
-                event.newValue = num;
-                var profile:String = this.profile;
-                var createUrl:* = this.url;
-                if( typeof createUrl !== "function" )
+                this.setAssign("current",num);
+                if( this.initialized )
                 {
-                    var linkUrl:* = this.url;
-                    event.url = ( linkUrl.length > 0 ? ( linkUrl.indexOf('?') >= 0 ? linkUrl + '&'+profile+'=' + num : linkUrl + '?'+profile+'=' + num )
-                        : ('?'+this.profile+'=' + num) ) as String;
-                }else{
-                    event.url=createUrl(num,profile) as String;
-                }
-                if( this.dispatchEvent(event) )
-                {
-                    if( this.async )
+                    var event:PaginationEvent = new PaginationEvent(PaginationEvent.CHANGE);
+                    event.oldValue = current;
+                    event.newValue = num;
+                    event.url =this.getUrlFactor( num, this.profile );
+
+                    if( this.dispatchEvent(event) )
                     {
-                        var dataSource: DataSource = this.dataSource;
-                        if (dataSource) dataSource.select(num);
+                        if( !this.jumpUrl )
+                        {
+                            this.dataSource.select( num );
+                        }
                     }
                 }
             }
         };
-
-        /**
-         * @private
-         */
-        private var _link:int = 7;
 
         /**
          * 获取分页的按扭数
@@ -278,7 +220,7 @@ package es.components
          */
         public function get link():int
         {
-            return this._link;
+            return this.getAssign("link",7) as int;
         }
 
         /**
@@ -287,14 +229,25 @@ package es.components
          */
         public function set link( num:int ):void
         {
-            if( this._link !== num )
-            {
-                this._link = num;
-                if( this.initialized )
-                {
-                    commitPropertyAndUpdateSkin();
-                }
-            }
+            this.setAssign("link",num);
+        }
+
+         /**
+         * 是否需要跳转地址
+         * @returns {void}
+         */
+        public function get jumpUrl():Boolean
+        {
+            return this.getAssign("jumpUrl",false) as Boolean;
+        }
+
+         /**
+         * 是否需要跳转地址
+         * @returns {void}
+         */
+        public function set jumpUrl(value:Boolean):void
+        {
+            this.getAssign("jumpUrl",value);
         }
 
         /**
@@ -302,9 +255,9 @@ package es.components
          * 此方法只对异步执行的组件起作用
          * @returns {Display};
          */
-        public function get wheelTarget():Display
+        public function get wheelTarget():Object
         {
-            return pull("wheelTarget") as Display;
+            return this.getAssign("wheelTarget") as Object;
         }
 
         /**
@@ -312,100 +265,85 @@ package es.components
          * 此方法只对异步执行的组件起作用
          * @param Display value
          */
-        public function set wheelTarget( value:Display )
+        public function set wheelTarget( value:Object )
         {
-            var old:Display = pull("wheelTarget") as Display;
+            var old:Object = this.getAssign("wheelTarget") as Object;
             if( old !== value && value )
             {
-                push("wheelTarget",value);
+                this.setAssign("wheelTarget", value);
                 when(RunPlatform(client))
                 {
-                    if (old) {
-                        old.removeEventListener(MouseEvent.MOUSE_WHEEL);
+                    if (old)
+                    {
+                        (new EventDispatcher( old )).removeEventListener(MouseEvent.MOUSE_WHEEL);
                     }
-                    var self: Pagination = this;
-                    value.addEventListener(MouseEvent.MOUSE_WHEEL, function (e: MouseEvent) {
+                    
+                    (new EventDispatcher( value )).addEventListener(MouseEvent.MOUSE_WHEEL, function (e: MouseEvent) {
                         e.preventDefault();
-                        if( self.async ) {
-                            var page: int = self.current;
+                        if( !this.jumpUrl ) 
+                        {
+                            var page: int = this.current;
                             page = e.wheelDelta > 0 ? page + 1 : page - 1;
-                            self.current = page;
+                            this.current = page;
                         }
                     }, false, 0, this);
                 }
             }
         }
 
-        private var _radius:int=0;
-        public function set radius( val:int ):void
-        {
-            if( _radius !== val )
-            {
-                _radius=val;
-                if( this.initialized )
-                {
-                    commitPropertyAndUpdateSkin();
-                }
-            }
-        }
-
-        public function get radius():int
-        {
-            return _radius;
-        }
         /**
          * @inherit
          */
-        [Syntax(origin)]
-        override protected function initializing()
+        override protected function commitProperties()
         {
-            super.initializing();
-            if( this.isNeedCreateSkin() ) {
-                var dataSource: DataSource = _dataSource;
-                if (!dataSource) throw new ReferenceError('dataSource is not defined');
-                var size: int = pageSize;
-                if (!isNaN(size)) dataSource.pageSize(size);
-                dataSource.select(this.current);
+            super.commitProperties();
+            if( !this.dataSource.selected() )
+            {
+               this.dataSource.select( this.current );
             }
         }
 
         /**
-         * 提交数据并且立即更新视图
+         * 组合url地址
+         * @returns {String}
          */
-        override protected function commitPropertyAndUpdateSkin()
+        private function getUrlFactor(page:int, profile:String):String
         {
-            if( !this.initialized )return;
+            var linkUrl:* = this.url;
+            if( linkUrl )
+            {
+                if( linkUrl instanceof Function )
+                {
+                    return linkUrl(page,profile) as String;
+                }
+                return linkUrl.indexOf('?') >= 0 ? linkUrl + '&'+profile+'=' + page : linkUrl + '?'+profile+'=' + page;
+            }
+            return '?'+profile+'=' + page;
+        }
+
+        /**
+         * 提交数据到皮肤
+         */
+        override protected function updateProperties()
+        {
             var skin:Skin = this.skin;
             var current:int = this.current;
             var totalPage:int = this.totalPage;
             var pageSize:int = this.pageSize;
             var link:int = this.link;
-            var url:* = this.url;
             var offset:Number = Math.max(current - Math.ceil(link / 2), 0);
-            if( typeof url !== "function" )
-            {
-                var linkUrl:* = url;
-                url = linkUrl.length > 0 ? function(page:int, profile:String) {
-                    return linkUrl.indexOf('?') >= 0 ? linkUrl + '&'+profile+'=' + page : linkUrl + '?'+profile+'=' + page;
-                }:function(page:int, profile:String) {
-                    return '?'+profile+'=' + page;
-                };
-            }
-
             offset = (offset + link) > totalPage ? offset - ( offset + link - totalPage ) : offset;
             skin.assign('totalPage', totalPage);
             skin.assign('pageSize', pageSize );
             skin.assign('offset',  (current - 1) * pageSize );
             skin.assign('profile', this.profile );
-            skin.assign('url', url );
+            skin.assign('urlFactor', skin.assign('urlFactor') || this.getUrlFactor.bind(this) );
             skin.assign('current', current);
             skin.assign('first', 1);
             skin.assign('prev', Math.max(current - 1, 1));
             skin.assign('next', Math.min(current + 1, totalPage));
             skin.assign('last', totalPage);
-            skin.assign('link', System.range( Math.max(1 + offset, 1 ), link + offset, 1) );
-            super.commitPropertyAndUpdateSkin();
-
+            skin.assign('linkBtn', System.range( Math.max(1 + offset, 1 ), link + offset, 1) );
         }
     }
 }

@@ -26,7 +26,7 @@ package es.components
         public function set radius(value:Number):void
         {
             _radius = value;
-            commitPropertyAndUpdateSkin();
+            verification();
         }
 
         /**

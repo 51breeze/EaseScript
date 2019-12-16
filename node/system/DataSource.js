@@ -440,8 +440,13 @@ DataSource.prototype = Object.create( EventDispatcher.prototype,{
      * @param num
      * @returns {*}
      */
-    "current":{value:function current()
+    "current":{value:function current(num)
     {
+        if( num > 0 )
+        {
+            storage(this,"current",num);
+            return this;
+        }
         return storage(this,"current");
     }},
 
@@ -496,7 +501,7 @@ DataSource.prototype = Object.create( EventDispatcher.prototype,{
      */
     "totalSize":{value:function totalSize()
     {
-        return Math.max( storage(this,"totalSize"), this.realSize() );
+        return Math.max( storage(this,"totalSize")||0, this.realSize() );
     }},
 
     /**
@@ -701,6 +706,15 @@ DataSource.prototype = Object.create( EventDispatcher.prototype,{
         return storage(this,'items').slice(start, end);
     }},
 
+    /**
+     * 判断是否有初始化数据
+     * @returns {Boolean}}
+     */
+    "selected":{value:function selected()
+    {
+        return storage(this,'selected');
+    }},
+    
     /**
      * 选择数据集
      * @param Number segments 选择数据的段数, 默认是1

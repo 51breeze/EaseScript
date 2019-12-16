@@ -21,6 +21,7 @@ var Object = require("./Object.js");
 var System = require("./System.js");
 var Internal = require("./Internal.js");
 var $Reflect = Internal.$Reflect;
+var $Object = Internal.$Object;
 var $has = Object.prototype.hasOwnProperty;
 var ATTR_TYPE={
     1:"function",
@@ -287,6 +288,19 @@ Reflect.has=function has(scope, target, propertyKey)
 
 Reflect.type=function type(value, typeClass)
 {
+    if( typeClass === String )
+    {
+       return $Object( value ).toString();
+
+    }else if( typeClass === Number )
+    {
+        return Number( value );
+
+    }else if( typeClass === Boolean )
+    {
+        return Boolean( value );
+    }
+
     if( typeof typeClass === "string" )
     {
         var original = value;
@@ -302,11 +316,11 @@ Reflect.type=function type(value, typeClass)
                  {
                     if (typeClass === "uint" && value < 0)
                     {
-                        throw new System.RangeError(original + " convert failed. can only be an unsigned Integer");
+                        throw new RangeError(original + " convert failed. can only be an unsigned Integer");
                     }
                     if (value > 2147483647 || value < -2147483648)
                     {
-                        throw new System.RangeError(original + " convert failed. the length of overflow Integer");
+                        throw new RangeError(original + " convert failed. the length of overflow Integer");
                     }
                 }
                 break;
@@ -317,7 +331,7 @@ Reflect.type=function type(value, typeClass)
             case "class" :
                if( !System.isClass(value) )
                {
-                   throw new TypeError(original + " is not Class.");
+                   throw new TypeError(original + " convert failed. is not class.");
                }
                break;
         }

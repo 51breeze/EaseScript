@@ -4,61 +4,51 @@
     <s:Script>
     <![CDATA[
 
-        import es.core.Display;
-
-       override protected function initializing()
+       private makeClick( page:int ):Function
        {
-            var host:Pagination = this.hostComponent as Pagination;
-            var profile:RegExp = new RegExp( host.profile+'\\s*=\\s*(\\d+)');
-            this.addEventListener(MouseEvent.CLICK, function (e:MouseEvent)
-            {
-                if ( host.async && Element.getNodeName(e.target) === 'a')
+           return this.hostComponent.jumpUrl ? null : (e:MouseEvent)=>{
+                if ( page > 0 )
                 {
                     e.preventDefault();
-                    var url:String = Element(e.target).property('href');
-                    var _profile:Array = url.match(profile);
-                    var page:Number = parseInt(_profile ? _profile[1] : 0);
-                    if(page > 0)
-                    {
-                        host.current = page;
-                    }
+                    this.hostComponent.current = page;
                 }
-            });
+           };
        }
 
-        override protected function updateDisplayList()
-        {
-             super.updateDisplayList();
-             var hostComponent:Pagination = this.hostComponent as Pagination;
-             var _radius:int = hostComponent.radius;
-             if(_radius>0)
-             {
-                (new Element('.link' , this.element )).style('borderRadius', _radius+'px' );
-             }
-        }
     ]]>
     </s:Script>
   <style file="PaginationStyle.less" />
 
   <s:Declare>
-      const {url:Function,first:int,prev:int,next:int,last:int,profile:*,current:int=1,link:Array} = dataset;
-  </s:Declare>
+      const {
+          urlFactor:Function,
+          first:int,
+          prev:int,
+          next:int,
+          last:int,
+          profile:*,
+          current:int=1,
+          radius:int=3,
+          linkBtn:Array
+      } = dataset;
+      const radiuStyle:string = `borderRadius:${radius}px`;
 
+  </s:Declare>
   <li class="first">
-      <a href="{url(first,profile)}">第一页</a>
+      <a href="{urlFactor(first,profile)}" onclick="{makeClick(first)}">第一页</a>
   </li>
   <li class="prev">
-      <a href="{url(prev,profile)}" class='{current===1?"disabled":""}'>上一页</a>
+      <a href="{urlFactor(prev,profile)}" class='{current===1?"disabled":""}' onclick="{makeClick(prev)}">上一页</a>
   </li>
-  <:foreach name="link" value="val">
-      <li class="link {val==current?'current':''}">
-          <a href="{url(val,profile)}">{val}</a>
+  <:foreach name="linkBtn" value="val">
+      <li class="link {val==current?'current':''}" setStyle="{radiuStyle}">
+          <a href="{urlFactor(val,profile)}" onclick="{makeClick(val as int)}">{val}</a>
       </li>
   </:foreach>
   <li class="next">
-      <a href="{url(next,profile)}">下一页</a>
+      <a href="{urlFactor(next,profile)}"  onclick="{makeClick(next)}">下一页</a>
   </li>
   <li class="last">
-      <a href="{url(last,profile)}">最后页</a>
+      <a href="{urlFactor(last,profile)}" onclick="{makeClick(last)}">最后页</a>
   </li>
 </s:Skin>

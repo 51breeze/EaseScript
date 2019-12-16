@@ -248,7 +248,7 @@ Locator.create=function create(url,name)
             for(var i=0;i<query.length;i++)
             {
                 var item = query[i].split("=",2);
-                segments.query[ System.trim(item[0]) ] = item.length > 1 ? window.decodeURIComponent( item[1] ) : "";
+                segments.query[ System.trim(item[0]) ] = item.length > 1 ? System.decodeURIComponent( item[1] ) : "";
             }
         }
     }

@@ -24,28 +24,43 @@ package es.core
          * 皮肤类
          * @constructor
          */
-        function Skin( name:*, attr:Object=null )
+        function Skin( name:* )
         {
             var elem:Element = null;
-            if( typeof name === "string" )
+            if( !elem )
             {
-                elem=new Element( document.createElement(name) );
-            }else if( name instanceof Element ){
-                elem=name as Element;
-            }else if( Element.isNodeElement(name) ){
-                elem = new Element( name );
-            }else if( name is IDisplay )
-            {
-                elem = (name as IDisplay).element;
-            } 
-            super( elem , attr );
+                if( typeof name === "string" )
+                {
+                    elem=new Element( document.createElement(name as String) );
+                }else if( name instanceof Element ){
+                    elem=name as Element;
+                }else if( Element.isNodeElement(name as Object) ){
+                    elem = new Element( name );
+                }else if( name is IDisplay )
+                {
+                    elem = (name as IDisplay).element;
+                }
+            }
+            super( elem );
+            this._inDomExists = !!elem.current().parentNode;
             this.hotUpdate();
         }
 
-        protected function getUniqueKey( key:*, flag:Boolean = true ):String
+        private var _inDomExists:Boolean = false;
+        protected function inDomExists():Boolean
+        {
+            return _inDomExists;
+        }
+
+         /**
+         * 获取一个唯一的元素键值
+         * @protected
+         * @return {String}
+         */
+        protected function getUniqueKey( key:String='', flag:Boolean = true ):String
         {
             var host:SkinComponent = this.hostComponent as SkinComponent;
-            key = key || host.getComponentId();
+            key = host.getComponentId( key );
             return flag ? "es-"+key : key;
         }
 
@@ -143,7 +158,8 @@ package es.core
             var currentState:String = this._currentState;
             if( !currentState )
             {
-                throw new ReferenceError('State is not define.');
+                return new State("default");
+                //throw new ReferenceError('State is not define.');
             }
 
             if( this._currentStateGroup )
@@ -172,7 +188,7 @@ package es.core
         }
 
         /**
-         * 在第一次调用 createChildren 之前调用此函数，用来初始化皮肤需要的一些参数
+         * 在第一次调用 create 之前调用此函数，用来初始化皮肤需要的一些参数
          * 如需要使用，请在子类中覆盖
          */
         protected function initializing(){}
@@ -188,91 +204,52 @@ package es.core
          * @private
          * 皮肤是否已初始化
          */
-        protected var initialized:Boolean=false;
+        private var initialized:Boolean=false;
 
         /**
          * @private
          * 一个标记用来区分是否需要重新生成子级列表
          */
-        private var invalidate:Boolean=false;
+        private var invalidate:Boolean=true;
 
         /**
-         * 创建一组子级元素
+         * 创建并更新子级元素
          * 当前皮肤被添加到视图中后会自动调用，无需要手动调用
          */
-        protected function createChildren()
+        private function create():void
         {
-            if( invalidate === false )
+            if( timeoutId )
             {
-                if( timeoutId )
-                {
-                    clearTimeout( timeoutId as Number );
-                    timeoutId = null;
-                }
+                clearTimeout( timeoutId as Number );
+                timeoutId = null;
+            }
 
-                var async:Boolean = false;
-                if( this.hostComponent is SkinComponent )
-                {
-                    async = (this.hostComponent as SkinComponent).async;
-                }
+            this.updateChildren(this, this.render() );
+            this.updateInstallState();
+            
+            this.mount();
+            this.updateDisplayList();
 
-                invalidate = true;
-                var nodes:Array = null;
-                when( Syntax(origin) )
-                {
-                    nodes= this.render();
-                    this.updateChildren(this, nodes);
-                    this.updateInstallState();
-
-                }then
-                {
-                    if( async )
-                    {
-                        nodes= this.render();
-                        this.updateChildren(this, nodes);
-                        this.updateInstallState();
-
-                    }else
-                    {
-                        this.__$initClient();
-                    }
-                }
-
-                this.mount();
-                this.updateDisplayList();
-                if( this.hasEventListener(SkinEvent.UPDATE_DISPLAY_LIST) )
-                {
-                    var e:SkinEvent = new SkinEvent( SkinEvent.UPDATE_DISPLAY_LIST );
-                    e.children = nodes;
-                    this.dispatchEvent( e );
-                }
+            if( this.hasEventListener(SkinEvent.UPDATE_DISPLAY_LIST) )
+            {
+                var e:SkinEvent = new SkinEvent( SkinEvent.UPDATE_DISPLAY_LIST );
+                this.dispatchEvent( e );
             }
         };
-
-        protected function __$initClient():Boolean
-        {
-            return false;
-        }
 
         /**
         * 一个运行在客户端的挂载函数，当子级元素完全显示在当前文档中时调度
         * 所有要实现的逻辑请在子类中实现
         */
         [RunPlatform(client)]
-        protected function mount()
-        {
-
-        }
+        protected function mount(){}
 
         /**
         * 一个运行在客户端的卸载函数，当前皮肤对象在文档中移除时调度
         * 所有要实现的逻辑请在子类中实现
         */
         [RunPlatform(client)]
-        protected function unmount()
-        {
-
-        }
+        protected function unmount(){}
 
         /**
         * @private
@@ -289,6 +266,7 @@ package es.core
         [RunPlatform(client)]
         protected function bindEvent(index:int,uniqueKey:*,target:Object,events:Object):void
         {
+            if( !(events && target) )return;
             var uukey:String = (index+""+uniqueKey) as String;
             var data:Object = bindEventMaps[uukey] as Object;
             if( !data )
@@ -297,7 +275,6 @@ package es.core
                 {
                     target = new Element( target );
                 }
-
                 data = {items:{},origin:target};
                 bindEventMaps[uukey] = data;
                 if( target instanceof EventDispatcher )
@@ -323,6 +300,18 @@ package es.core
                     }
                 }
             }
+        }
+
+        /**
+        * 根据指定的元素键名查找元素
+        * 此方法只会在客户端运行
+        * @param int uniqueKey
+        * @param Boolean isArr
+        */
+        [RunPlatform(client)]
+        protected function findElement(uukey:String):Node
+        {
+            return document.getElementById( uukey );
         }
 
         /**
@@ -365,11 +354,6 @@ package es.core
         }
 
         /**
-        * @private
-        */
-        private var _hashIndexMaps:Object={};
-
-        /**
         * 获取一个在全局文档中唯一的元素索引(元素ID)
         * @protected
         * @index 循环中的次数
@@ -378,19 +362,6 @@ package es.core
         */
         protected getUniqueIndex(index:int,uniqueKey:int):String
         {
-            if( index > 0 )
-            {
-                var first:Node = this.getUniqueElement(uniqueKey+'0') as Node;
-                if( first )
-                {
-                    if( !this._hashIndexMaps[ uniqueKey ] )
-                    {
-                        this._hashIndexMaps[ uniqueKey ] = 1;
-                    }
-                    index = this._hashIndexMaps[ uniqueKey ]++;
-                    this.marker(first, getAttrName("max"), index+1 );
-                }
-            }
             return uniqueKey+''+index;
         }
 
@@ -404,18 +375,26 @@ package es.core
         * @param events 绑定元素的事件
         * @returns {Object} 一个表示当前节点元素的对象
         */ 
-        protected function createElement(index:int,uniqueKey:*, name:String, children:*=null, attrs:Object=null,update:Object=null,events:*=null):Object
+        protected function createElement(index:int,uniqueKey:int, name:String, children:*=null, attrs:Object=null,update:Object=null,events:*=null):Object
         {
             var uukey:String = this.getUniqueIndex(index, uniqueKey);
             var obj:Node = this.getUniqueElement( uukey ) as Node;
             if( !obj )
             {
-                obj = this.setUniqueElement(uukey, document.createElement( name ) ) as Node;
+                when( RunPlatform(client) ){
+                    when( Syntax(origin,javascript,false) ){
+                        if( this.inDomExists() )
+                        {
+                            obj = this.findElement( this.getUniqueKey( uukey ) );
+                        } 
+                    }
+                }
+                obj = this.setUniqueElement(uukey, obj || document.createElement( name ) ) as Node;
                 if( attrs )
                 {
                     this.attributes(obj,attrs);
                 }
-                this.marker( obj, "id", this.getUniqueKey( uukey ) );
+                this.marker( obj, "id", this.getUniqueKey(uukey) );
             }
 
             if( children )
@@ -433,90 +412,14 @@ package es.core
                     obj.textContent = children+"";
                 }  
             }
+
             if( update )
             {
                 this.attributes(obj,update);
             }
-            if( events )
-            {
-                this.bindEvent(index,uniqueKey,obj,events);
-            }
+
+            this.bindEvent(index,uniqueKey,obj,events);  
             return obj;
-        }
-
-        [RunPlatform(client)]
-        protected function findElement(uniqueKey:int=0,isArr:Boolean=false):Object
-        {
-            var uukey:String = this.getUniqueIndex(0, uniqueKey);
-            var attr:String = this.getUniqueKey(  uniqueKey > 0 ? uukey : 0 );
-            var node:Node = document.getElementById( attr );
-            if( uniqueKey === 0 )
-            {
-                return node;
-            }
-
-            if( isArr && node )
-            {
-                var max:int = (int)node.getAttribute( this.getAttrName("max") );
-                var result:Array = [ node ];
-                if( max > 0 )
-                {
-                    for(var i:int=1;i<max;i++)
-                    {
-                       uukey = this.getUniqueIndex(i, uniqueKey); 
-                       node = document.getElementById( this.getUniqueKey( uukey ) );
-                       if( node )
-                       {
-                           this.setUniqueElement(uukey,node);
-                           result.push( node );
-                       }
-                    }
-                }
-                return result;
-
-            }else
-            {
-                return this.setUniqueElement(uukey,node);
-            }
-        }
-
-        [RunPlatform(client)]
-        protected function findComponent(uniqueKey:int=0,isArr:Boolean =false):Object
-        {
-            var ret:Object = this.findElement(uniqueKey,isArr);
-            if( ret )
-            {
-                const factor:Function = (item:Node, index:int) =>{
-                    var componentName:String = item.getAttribute( this.getAttrName("component") ) as String;
-                    var componentClass:Class = ( componentName ? System.getDefinitionByName( componentName ) : null ) as Class;
-                    if( componentClass )
-                    {
-                        var uukey:String = this.getUniqueIndex(index, uniqueKey);
-                        if( System.isSubClassOf(componentClass, SkinComponent) )
-                        {
-                            var target:SkinComponent = new componentClass( this.getUniqueKey(uukey, false) ) as SkinComponent;
-                            var skinClass:Class = System.getDefinitionByName( item.getAttribute( this.getAttrName("skin") ) );
-                            target.skinClass = skinClass;
-                            return this.setUniqueElement( uukey,target);
-                        }else
-                        {
-                            return this.setUniqueElement(uukey, new componentClass( new Element(item) ) );
-                        }
-                    }
-                    return null;
-                };
-
-                if( ret is Array )
-                {
-                    return (ret as Array)
-                           .map( (item:Object,index:int)=>factor(item as Node, index) )
-                           .filter( (item:Object)=>return !!item );
-                }else
-                {
-                   return factor(ret as Node, 0);
-                }
-            }
-            return null;
         }
 
         /**
@@ -529,7 +432,7 @@ package es.core
         * @param events 绑定元素的事件
         * @returns {Object} 一个表示当前节点元素的对象
         */ 
-        protected function createComponent(index:int,uniqueKey:*, classTarget:Class, tagName:String=null, children:*=null, attrs:Object=null,update:Object=null,events:*=null):IDisplay
+        protected function createComponent(index:int,uniqueKey:int, classTarget:Class, tagName:String=null, children:*=null, attrs:Object=null,update:Object=null,events:*=null):IDisplay
         {
             var uukey:String = this.getUniqueIndex(index, uniqueKey);
             var obj:IDisplay = this.getUniqueElement(uukey) as IDisplay;
@@ -537,11 +440,7 @@ package es.core
             {
                 if( tagName )
                 {
-                    var elem:Node = Element.createElement(tagName);
-                    this.marker(elem, "id", this.getUniqueKey(uukey) );
-                    this.marker(elem, this.getAttrName("component") , System.getQualifiedClassName( classTarget ), 0 );
-                    obj = new classTarget( new Element( elem ) ) as IDisplay;
-
+                    obj = new classTarget( new Element( this.createElement(index,uniqueKey,tagName) ) ) as IDisplay;
                 }else
                 {
                     obj = new classTarget( this.getUniqueKey( uukey, false ) ) as IDisplay;
@@ -557,8 +456,9 @@ package es.core
             {
                 if( !(children instanceof Array) )
                 {
-                    children = [ typeof children === "object" ? children : children+""];
+                    children = [ children ];
                 }
+
                 if( obj instanceof SkinComponent )
                 {
                     (obj as SkinComponent).children = children as Array;
@@ -573,11 +473,7 @@ package es.core
             {
                 this.attributes(obj.element,update);
             }
-
-            if( events )
-            {
-                this.bindEvent(index,uniqueKey,obj,events);
-            }
+            this.bindEvent(index,uniqueKey,obj,events);
             return obj;
         }
 
@@ -615,7 +511,8 @@ package es.core
         protected function updateChildren(parentNode:Object,children:Array):void
         {
             if(!parentNode)return;
-            var parentDisplay:IDisplay=null;
+
+            var parentDisplay:IContainer=this;
             if( parentNode instanceof SkinComponent )
             {
                 (parentNode as SkinComponent).children = children;
@@ -623,17 +520,22 @@ package es.core
 
             }else if( parentNode is IDisplay )
             {
-                parentDisplay = parentNode as IDisplay;
+                if( parentNode is IContainer)
+                {
+                   parentDisplay = parentNode as IContainer;
+                }
                 parentNode = (parentNode as IDisplay).element.current() as Object; 
             }
      
             children = this.meregChildren( children );
+
             var parent:Node = parentNode as Node;
             var totalNodes:int = parent.childNodes.length;
             var totalChilds:int = children.length;
             var len:int = Math.max(totalChilds, totalNodes);
             var i:int=0;
             var offset:int = 0;
+
             while( i<len )
             {
                 var newNode:Node=null;
@@ -658,23 +560,24 @@ package es.core
 
                 }else if( childItem )
                 { 
-                    if( typeof childItem === "string" )
+                    if( !(childItem instanceof Node) )
                     {
+                        var strChild:String = (String)childItem;
                         if( Element.getNodeName(oldNode) === "text" )
                         {
-                            if( oldNode.textContent !== childItem )
+                            if( oldNode.textContent !== strChild )
                             {
-                                oldNode.textContent = childItem as String;
+                                oldNode.textContent = strChild;
                             }
                             newNode = oldNode;
 
                         }else
                         {
                             newNode = Element.createElement("text") as Node;
-                            newNode.textContent = childItem as String;
+                            newNode.textContent = strChild;
                         }
-
-                    }else 
+                        
+                    }else
                     {
                         newNode = childItem as Node;
                     }
@@ -735,9 +638,11 @@ package es.core
                     if( newNode && isDisplay )
                     {
                         var childDisplay:IDisplay = childItem as IDisplay;
-                        if( parentDisplay ){
-                            childDisplay.es_internal::setParentDisplay( parentDisplay as IContainer );
+                        if( parentDisplay )
+                        {
+                            childDisplay.es_internal::setParentDisplay( parentDisplay );
                         }
+                        
                         var e:ElementEvent=new ElementEvent( ElementEvent.ADD );
                         e.parent = parentDisplay || parent;
                         e.child = newNode;
@@ -770,27 +675,30 @@ package es.core
         * 每一次调用此方法都会延迟执行来解决重复刷新的问题
         * @private
         */
-        protected function nowUpdate(delay:int=200):void
+        protected function nowUpdate(delay:int=10):void
         {
-            invalidate=false;
-            when( RunPlatform(client) )
+            if( this.invalidate===true )
             {
-                if( timeoutId )
+                this.invalidate = false;
+                when( RunPlatform(client) )
                 {
-                    clearTimeout( timeoutId as Number );
-                }
+                    if( timeoutId )
+                    {
+                        clearTimeout( timeoutId as Number );
+                    }
 
-                var callback:Function = this.callback;
-                if( !callback )
+                    var callback:Function = this.callback;
+                    if( !callback )
+                    {
+                        callback = this.create.bind(this);
+                        this.callback = callback;
+                    }
+                    timeoutId = setTimeout(callback,delay);
+
+                }then
                 {
-                    callback = this.createChildren.bind(this);
-                    this.callback = callback;
+                    this.create();
                 }
-                timeoutId = setTimeout(callback,delay);
-
-            }then
-            {
-                this.createChildren();
             }
         }
 
@@ -811,8 +719,9 @@ package es.core
             if( dataset[name] !== value )
             {
                 dataset[name] = value;
-                if( initialized )
+                if( this.initialized )
                 {
+                    this.invalidate=true;
                     this.nowUpdate();
                 }
             }
@@ -838,11 +747,14 @@ package es.core
         public function set dataset(value:Object):void
         {
             _dataset = value;
-            if( initialized  )
+            if( this.initialized  )
             {
+                this.invalidate=true;
                 this.nowUpdate();
             }
         }
+
+        private var _elemInstanceProxy:Element = null;
 
         /**
         * 设置一组指定的属性
@@ -853,49 +765,34 @@ package es.core
         {
             if( target == null )return;
             var isElem:Boolean = target instanceof Element;
+            var elem:Element = null;
+            if( !isElem )
+            {
+               elem = _elemInstanceProxy || ( _elemInstanceProxy = new Element() );
+               elem.current( target );
+
+            }else
+            {
+               elem = target as Element;
+            }
+
             Object.forEach(attrs,function(value:*,name:String)
             {
-                if( isElem )
+                if( name ==="content" )
                 {
-                    var elem:Element = target as Element;
-                    if( name ==="content" && elem.text() !== value )
-                    {
-                        elem.text( value );
-                          
-                    }else if( name ==="innerHTML" && target.innerHTML !== value)
-                    {
-                        elem.html( value as String );
+                    elem.text( value as String );
+                        
+                }else if( name ==="innerHTML" )
+                {
+                    elem.html( value as String );
 
-                    }else if( elem.property(name) != value )
-                    {
-                        elem.property(name, value );
-                    }
+                }else if( name ==="setStyle" )
+                {
+                    elem.style("cssText", value );
 
                 }else
                 {
-                    if( name ==="content" )
-                    {
-                        var prop:String = typeof target.textContent === "string" ? "textContent" : "innerText";
-                        if( target[prop] !== value )
-                        {
-                            target[prop] = value;
-                        }
-                          
-                    }else if( name ==="innerHTML" && target.innerHTML !== value)
-                    {
-                        target.innerHTML = value as String;
-
-                    }else if( name ==="class" || name==="className")
-                    {
-                        if( target.className !== attrs[name] )
-                        {
-                            target.className=attrs[name];
-                        }
-    
-                    }else if( target.getAttribute(name) != attrs[name] )
-                    {
-                        target.setAttribute(name, attrs[name] );
-                    }
+                    elem.property(name, value );
                 }
             });
         }
@@ -911,18 +808,22 @@ package es.core
         private function installer(child:IDisplay, viewport:IContainer):void
         {
             var map:Map = this._installer;
-            if( map === null ){
+            if( map === null )
+            {
                 map = new Map();
                 this._installer = map;
             }
+
             var install:Object = map.get(child);
             if( !install )
             {
                 install = {
-                    "viewport":viewport
+                    "viewport":viewport,
+                    "state":false
                 };
                 map.set(child , install);
             }
+
             if( !install.state )
             {
                 viewport.addChild( child );
@@ -938,7 +839,8 @@ package es.core
             var map:Map = this._installer;
             if( map )
             {
-                map.forEach(function(value:Object, key:IDisplay){
+                map.forEach(function(value:Object, key:IDisplay)
+                {
                     if( value.state !== true && key.parent )
                     {
                         (value.viewport as IContainer).removeChild( key );
@@ -1035,7 +937,9 @@ package es.core
         override public function set children( value:Array ):void
         {
             this._children = value.slice(0);
-            if( initialized  ){
+            if( this.initialized  )
+            {
+                this.invalidate=true;
                 this.nowUpdate();
             }
         };
@@ -1093,7 +997,9 @@ package es.core
             index = index < 0 ? index+children.length+1 : index;
             children.splice(index,0,child);
             child.es_internal::setParentDisplay(this);
-            if( initialized  ){
+            if( this.initialized  )
+            {
+                this.invalidate=true;
                 this.nowUpdate();
             }
             return child;
@@ -1137,8 +1043,9 @@ package es.core
                 child.parent.removeChild( child );
             }
             child.es_internal::setParentDisplay(null);
-            if( initialized  )
+            if( this.initialized  )
             {
+                this.invalidate=true;
                 this.nowUpdate();
             }
             return child;
@@ -1203,6 +1110,7 @@ package es.core
                 this._currentStateGroup = null;
                 if( this.initialized )
                 {
+                    this.invalidate=true;
                     this.nowUpdate();
                 }
             }
@@ -1223,18 +1131,16 @@ package es.core
          */
         override public function display():Element
         {
-            if( initialized===false )
+            if( this.initialized===false )
             {
-                initialized = true;
+                this.initialized = true;
                 this.initializing();
                 var node:HTMLElement = this.element.current() as HTMLElement;
-                this.marker( node, getAttrName("skin"), __CLASS__ );
-                this.marker( node, getAttrName("component"), System.getQualifiedObjectName( this.hostComponent ) );
                 when( RunPlatform(server) )
                 {
                     if( this.hostComponent is SkinComponent )
                     {
-                        this.marker( node, "id", this.getUniqueKey(0) );
+                        this.marker( node, "id", this.getUniqueKey() );
                     }
                 }
             }

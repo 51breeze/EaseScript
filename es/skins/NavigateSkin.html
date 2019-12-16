@@ -42,21 +42,20 @@
 
     <s:Declare>
        const {
+           target:Boolean=false,
            datalist:Array=[],
-           openTarget:Boolean=false,
-           match:Function
         } = dataset;
     </s:Declare>
 
     <ul class="nav nav-pills">
         <:foreach name="datalist" value="item" key="link">
-            <:if condition="match(item,link)">
+            <:if condition="hostComponent.match(item,link)">
                 <li role="presentation" class="active">
-                    <a href="{item.link}" onClick="{this.onClick}" target="{openTarget? '_blank' : '_self'}">{item.label}</a>
+                    <a href="{item.link}" onClick="{this.onClick}" target="{target? '_blank' : '_self'}">{item.label}</a>
                 </li>
             <:else />
                 <li role="presentation">
-                    <a href="{item.link}" onClick="{this.onClick}" target="{openTarget ? '_blank' : '_self'}">{item.label}</a>
+                    <a href="{item.link}" onClick="{this.onClick}" target="{target ? '_blank' : '_self'}">{item.label}</a>
                 </li>
             </:if>
         </:foreach>

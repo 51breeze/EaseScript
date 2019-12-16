@@ -21,6 +21,7 @@ var Object = require("./Object.js");
 var System = require("./System.js");
 var Internal = require("./Internal.js");
 var $Reflect = Internal.$Reflect;
+var $Object = Internal.$Object;
 var $has = Object.prototype.hasOwnProperty;
 var ATTR_TYPE={
     1:"function",
@@ -287,15 +288,29 @@ Reflect.has=function has(scope, target, propertyKey)
 
 Reflect.type=function type(value, typeClass)
 {
+    if( typeClass === String )
+    {
+       return $Object( value ).toString();
+
+    }else if( typeClass === Number )
+    {
+        return Number( value );
+
+    }else if( typeClass === Boolean )
+    {
+        return Boolean( value );
+    }
+
     if( typeof typeClass === "string" )
     {
         var original = value;
         typeClass = typeClass.toLowerCase();
         switch ( typeClass )
         {
+            case "number":
+                return Number( value );
             case "integer" :
             case "int" :
-            case "number":
             case "uint":
                 value = parseInt(value);
                 if (typeClass !== "number")

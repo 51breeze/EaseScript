@@ -7,9 +7,9 @@
 package es.components
 {
     import es.core.SkinComponent;
+    import es.components.Pagination;
     import es.core.Display;
     import es.core.Skin;
-    import es.core.Interaction;
 
     [Skin("es.skins.DataGridSkin")]
     public class DataGrid extends SkinComponent
@@ -19,7 +19,7 @@ package es.components
             super( componentId );
         }
 
-        /**
+          /**
          * @private
          */
         private var _dataSource:DataSource = null;
@@ -33,11 +33,36 @@ package es.components
             var dataSource:DataSource = this._dataSource;
             if ( dataSource === null )
             {
-                dataSource = new DataSource();
-                this._dataSource = dataSource;
+                dataSource= new DataSource();
+                this.dataSource = dataSource;
             }
             return dataSource;
         };
+
+         /**
+         * 设置数据源对象
+         * @param value
+         */
+        public function set dataSource( value:DataSource ):void
+        {
+            var old:DataSource = this._dataSource;
+            if( old !== value )
+            {
+                this._dataSource = value;
+                var last:int = NaN;
+                value.addEventListener( DataSourceEvent.SELECT,(e:DataSourceEvent)=>{
+                    if( !e.waiting )
+                    {
+                        if( last != e.current )
+                        {
+                            last = e.current;
+                            this.setAssign( "current", e.current );
+                            this.setAssign( "dataList", e.data );
+                        }
+                    }
+                });
+            }
+        }
 
         /**
          * 设置数据源
@@ -59,16 +84,11 @@ package es.components
         };
 
         /**
-         * @private
-         */
-        private var _columns:Object = {};
-
-        /**
          * @returns {Object}
          */
         public function get columns():Object
         {
-            return this._columns;
+            return this.getAssign("columns",{}) as Object;
         };
 
         /**
@@ -77,8 +97,39 @@ package es.components
          */
         public function set columns( columns:Object ):void
         {
-            this._columns = isString(columns) ? columns.split(',') : columns;
+            this.setAssign("columns", isString(columns) ? columns.split(',') : columns );
         };
+
+         /**
+         * 获取一组数据
+         * @param value
+         */
+        public function get dataList():Array
+        {
+            return this.getAssign("dataList", []) as Array;
+        }
+
+        /**
+         * 每页显示数据的行数
+         * @param value
+         */
+        public function set current( value:int ):void
+        {
+            this.setAssign("current", value);
+            if( !isNullPagination )
+            {
+                this.pagination.current = value;
+            }
+        }
+
+        /**
+         * 每页显示数据的行数
+         * @param value
+         */
+        public function get current():int
+        {
+            return this.getAssign("current", NaN ) as int;
+        }
 
         /**
          * 每页显示数据的行数
@@ -87,6 +138,7 @@ package es.components
         public function set rows( value:Number ):void
         {
             this.dataSource.pageSize( value );
+            this.setAssign("rows", value);
         }
 
         /**
@@ -99,85 +151,12 @@ package es.components
         }
 
         /**
-         * @type {string}
-         * @private
-         */
-        private var _columnProfile:String = 'columns';
-
-        /**
-         * @param profile
-         * @returns {*}
-         */
-        public function get columnProfile():String
-        {
-            return this._columnProfile;
-        };
-        public function set columnProfile(value:String):void
-        {
-            this._columnProfile = value;
-        };
-
-        /**
-         * @type {string}
-         * @private
-         */
-        private var _dataProfile:String = 'datalist';
-
-        /**
-         * @param profile
-         * @returns {*}
-         */
-        public function set dataProfile(profile:String):void
-        {
-            this._dataProfile = profile;
-        };
-
-        /**
-         * @param profile
-         * @returns {*}
-         */
-        public function get dataProfile():String
-        {
-            return this._dataProfile;
-        };
-
-        /**
-         * @private
-         */
-        private var _radius:Number = 5;
-
-        /**
-         * 设置表格的圆角值
-         * @param value
-         */
-        public function set radius(value:Number):void
-        {
-            _radius = value;
-            commitPropertyAndUpdateSkin();
-        }
-
-        /**
-         * 获取表格的圆角值
-         * @param value
-         */
-        public function get radius():Number
-        {
-            return _radius;
-        }
-
-        /**
-         * @private
-         */
-        private var _rowHeight:Number = 25;
-
-        /**
          * 设置表格的圆角值
          * @param value
          */
         public function set rowHeight(value:Number):void
         {
-            _rowHeight = value;
-            commitPropertyAndUpdateSkin();
+            this.setAssign("rowHeight", value);
         }
 
         /**
@@ -186,13 +165,8 @@ package es.components
          */
         public function get rowHeight():Number
         {
-            return _rowHeight;
+            return this.getAssign("rowHeight", 25) as Number;
         }
-
-        /**
-         * @private
-         */
-        private var _headHeight:Number = 30;
 
         /**
          * 设置表格的圆角值
@@ -200,8 +174,7 @@ package es.components
          */
         public function set headHeight(value:Number):void
         {
-            _headHeight = value;
-            commitPropertyAndUpdateSkin();
+            this.setAssign("headHeight", value);
         }
 
         /**
@@ -210,13 +183,8 @@ package es.components
          */
         public function get headHeight():Number
         {
-            return _headHeight;
+            return this.getAssign("headHeight",30) as Number;
         }
-
-        /**
-         * @private
-         */
-        private var _footHeight:Number = 30;
 
         /**
          * 设置表格的圆角值
@@ -224,8 +192,7 @@ package es.components
          */
         public function set footHeight(value:Number):void
         {
-            _footHeight = value;
-            commitPropertyAndUpdateSkin();
+            this.setAssign("footHeight", value);
         }
 
         /**
@@ -234,7 +201,59 @@ package es.components
          */
         public function get footHeight():Number
         {
-            return _footHeight;
+            return this.getAssign("footHeight", 30) as Number;
+        }
+
+        /**
+        * 获取分显示组件
+        * @return {Pagination}
+        */
+        private var _pagination:Pagination=null;
+        private var isNullPagination:Boolean=false;
+        public function get pagination():Pagination
+        {
+            if( this.isNullPagination )
+            {
+                return null;
+            }
+            
+            var page:Pagination = this._pagination;
+            if( !page )
+            {
+               page = new Pagination();
+               page.async = false;
+               page.skinClass = es.skins.PaginationSkin;
+               page.dataSource = this.dataSource;
+               this._pagination = page;
+            }
+            return page;
+        }
+
+        /**
+        * 设置分显示组件
+        * @param value Pagination
+        */
+        public function set pagination( value:Pagination ):void
+        {
+            this.isNullPagination = value === null;
+            var page:Pagination = this._pagination;
+            if( value !== page )
+            {
+                this._pagination = value;
+                this.nowUpdateSkin();
+            }
+        }
+
+        /**
+         * @override
+         */
+        override protected function commitProperties()
+        {
+            super.commitProperties();
+            if( !this.dataSource.selected() )
+            {
+               this.dataSource.select(  !isNullPagination ? this.pagination.current : 1 );
+            }
         }
     }
 }

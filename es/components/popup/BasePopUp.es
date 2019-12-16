@@ -336,7 +336,7 @@ package es.components.popup
         */
         public function get onSubmit():Function
         {
-            return this.option.onsubmit;
+            return this.option.onsubmit as Function;
         }
 
         /**
@@ -352,7 +352,7 @@ package es.components.popup
         */
         public function get onCancel():Function
         {
-            return this.option.oncancel;
+            return this.option.oncancel as Function;
         }
 
         /**
@@ -368,7 +368,7 @@ package es.components.popup
         */
         public function get onClose():Function
         {
-            return this.option.onclose;
+            return this.option.onclose as Function;
         }
 
          /**

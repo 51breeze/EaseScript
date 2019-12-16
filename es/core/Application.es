@@ -26,9 +26,9 @@ package es.core
            when( Syntax(origin) ){
                 this.appContainer = Element.createElement("div");
                 this.appContainer.className="application";
+                this.appContainer.setAttribute("id","application");
            }then{
-                var elem:Element = new Element(".application");
-                this.appContainer = elem.current() as Node;
+                this.appContainer = document.getElementById("application");
            }
        }
 
@@ -65,13 +65,9 @@ package es.core
                     //如果不想替换根容器，需要在侦听器中添加 e.preventDefault(); 来阻止这一行为。
                     if( !event.defaultPrevented )
                     {
-                        if( lastApp )
+                        if( lastApp && lastApp.parentNode )
                         {
-                            document.body.removeChild( lastApp );
-                        }
-                        if( !container.parentNode )
-                        {
-                           (document.body as Node).appendChild( container );
+                           lastApp.parentNode.removeChild( lastApp );
                         }
                         lastApp = container;
                     }
@@ -128,7 +124,7 @@ package es.core
                var map:Object = {};
                var self:Application = this;
                var has:Boolean = false;
-               Object.forEach(value, function (item: *, name: String) {
+               Object.forEach(value as Object, function (item: *, name: String) {
                    item = self.valueToString( item );
                    if( item !== null )
                    {
@@ -235,7 +231,13 @@ package es.core
         */
        public function render( view:View ):View
        {
-           view.display();
+           var elem:Element = view.display();
+           var app:Node = this.appContainer;
+           if( !app.parentNode && elem.current() === app )
+           {
+               (document.body as Node).appendChild( app );
+           }
+
            when( RunPlatform(server) )
            {
                var script:Node = new HTMLElement('script') as Node;
@@ -247,7 +249,7 @@ package es.core
                document.head.appendChild( main );
 
                var link:Node = new HTMLElement('link') as Node;
-               link.setAttribute("href", "/css/test.css"); 
+               link.setAttribute("href", "/css/test.css");
                link.setAttribute("rel", "stylesheet"); 
                document.head.appendChild( link );
 

@@ -44,7 +44,7 @@ package es.core
             return _context;
         }
 
-        override protected function getUniqueKey( key:* = '', flag:Boolean = true ):String
+        override protected function getUniqueKey( key:String='', flag:Boolean = true ):String
         {
             return flag ? "es-"+key : key;
         }
@@ -71,20 +71,6 @@ package es.core
         public function set title(value:String):void
         { 
             _context.title=value;
-        }
-
-        /**
-         * 执行此视图，并初始化相关属性
-         */
-        override public function display():Element
-        {
-            var init:Boolean = initialized;
-            var elem:Element = super.display();
-            if( !init && this.hasEventListener("INTERNAL_BEFORE_CHILDREN") )
-            {
-                this.dispatchEvent( new Event("INTERNAL_BEFORE_CHILDREN") );
-            }
-            return elem;
         }
     }
 }

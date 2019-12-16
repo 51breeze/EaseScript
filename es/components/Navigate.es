@@ -25,107 +25,12 @@ package es.components
         }
 
         /**
-         * @private
-         */
-        private var _dataSource:DataSource = null;
-
-        /**
-         * 获取数据源对象
-         * @returns {DataSource}
-         */
-        public function get dataSource():DataSource
-        {
-            var dataSource:DataSource = this._dataSource;
-            if ( dataSource === null )
-            {
-                dataSource = new DataSource();
-                this._dataSource = dataSource;
-            }
-            return dataSource;
-        };
-
-        public function set dataSource(value:DataSource):void
-        {
-            this._dataSource = value;
-        };
-
-        /**
-         * 设置数据源
-         * @param source
-         * @returns {void}
-         */
-        [Remove(origin,expect=false)]
-        public function set source( data:* ):void
-        {
-            this.dataSource.source( data );
-        };
-
-        /**
-         * 获取数据源
-         * @returns {Object}
-         */
-        public function get source():Object
-        {
-            return this.dataSource.source();
-        };
-
-        /**
-         * @type {string}
-         * @private
-         */
-        private var _dataProfile:String = 'datalist';
-
-        /**
-         * @param profile
-         * @returns {*}
-         */
-        public function set dataProfile(profile:String):void
-        {
-            this._dataProfile = profile;
-        };
-
-        public function get dataProfile():String
-        {
-           return this._dataProfile;
-        };
-
-        /**
-         * @private
-         */
-        private var _radius:Number = 5;
-
-        /**
-         * 设置表格的圆角值
-         * @param value
-         */
-        public function set radius(value:Number):void
-        {
-            _radius = value;
-            commitPropertyAndUpdateSkin();
-        }
-
-        /**
-         * 获取表格的圆角值
-         * @param value
-         */
-        public function get radius():Number
-        {
-            return _radius;
-        }
-
-        /**
-         * @private
-         */
-        private var _rowHeight:Number = 25;
-
-        /**
          * 设置表格的圆角值
          * @param value
          */
         public function set rowHeight(value:Number):void
         {
-            _rowHeight = value;
-            commitPropertyAndUpdateSkin();
+            this.setAssign("rowHeight", value);
         }
 
         /**
@@ -134,13 +39,8 @@ package es.components
          */
         public function get rowHeight():Number
         {
-            return _rowHeight;
+            return this.getAssign("rowHeight", 25);
         }
-
-        /**
-         * @private
-         */
-        private var _current:*=null;
 
         /**
          * 获取当前匹配的导航项值
@@ -148,11 +48,7 @@ package es.components
          */
         public function get current():*
         {
-            if( _current===null )
-            {
-                return System.environments("HTTP_ROUTE_PATH")||0;
-            }
-            return _current;
+            return this.getAssign("current", System.environments("HTTP_ROUTE_PATH") || 0);
         }
 
         /**
@@ -161,20 +57,8 @@ package es.components
          */
         public function set current(value:*):void
         {
-            if(  _current != value  )
-            {
-                _current = value;
-                if( this.initialized )
-                {
-                    commitPropertyAndUpdateSkin();
-                }
-            }
+            this.getAssign("current", value);
         }
-
-        /**
-         * @private
-         */
-        private var _target:Boolean=true;
 
         /**
          * 设置链接的跳转动作。
@@ -183,7 +67,7 @@ package es.components
          */
         public function set target(value:Boolean):void
         {
-            _target = value;
+           this.setAssign("target", value);
         }
 
         /**
@@ -192,13 +76,8 @@ package es.components
          */
         public function get target():Boolean
         {
-            return _target;
+            return this.getAssign("target", true);
         }
-
-        /**
-         * @private
-         */
-        private var _transition:String=null;
 
         /**
          * 设置加载内容的过渡效果
@@ -206,7 +85,7 @@ package es.components
          */
         public function set transition(value:String):void
         {
-            _transition=value;
+            this.setAssign("transition",value);
         }
 
         /**
@@ -215,7 +94,7 @@ package es.components
          */
         public function get transition():String
         {
-            return _transition;
+            return this.getAssign("transition");
         }
 
         private var frameHash:Object={};
@@ -297,6 +176,36 @@ package es.components
             return true;
         }
 
+        /**
+        * 判断当前指定的值是否需要加载内容到指定的视口中
+        * @param item
+        * @param key
+        * @return {Boolean}
+        */
+        public function match(item:Object,key:*):Boolean
+        {
+            var matched: Boolean = false;
+            var current: * = this.current;
+            if (typeof current === "function")
+            {
+                matched = current(item, key) as Boolean;
+
+            } else if (current == key || current===item.link || item["label"] === current )
+            {
+                matched = true;
+
+            } else if (current)
+            {
+                var str:String = (String)current;
+                matched = new RegExp( str.replace(/([\/\?\:\.])/g,'\\$1') ).test( (String)item.link );
+            };
+
+            if( matched && item.content )
+            {
+                this.loadContent( item.content );
+            }
+            return matched;
+        }
 
         /**
          * @override
@@ -304,35 +213,6 @@ package es.components
         override protected function initializing()
         {
             super.initializing();
-            var hostComponent:Navigate = this;
-            var dataProfile:String =  this.dataProfile;
-            var container:Skin = this.skin;
-            container.assign(dataProfile, []);
-            container.assign("openTarget",this.target);
-            container.assign("match", function (item: Object, key: *) {
-                var matched: Boolean = false;
-                var current: * = hostComponent.current;
-                if (typeof current === "function") {
-                    matched = current(item, key) as Boolean;
-                } else if (current == key || current===item.link || item["label"] === current ) {
-                    matched = true;
-                } else if (current) {
-                    var str:String = (String)current;
-                    matched = new RegExp( str.replace(/([\/\?\:\.])/g,'\\$1') ).test( (String)item.link );
-                };
-                if (matched && System.isDefined(item.content) )
-                {
-                    hostComponent.loadContent( item.content );
-                }
-                return matched;
-            });
-            this.dataSource.addEventListener(DataSourceEvent.SELECT, function (event:DataSourceEvent)
-            {
-                if ( !event.waiting )
-                {
-                    container.assign( dataProfile , event.data );
-                }
-            });
             this.dataSource.select(1);
         }
 
@@ -349,7 +229,7 @@ package es.components
         {
             if( _viewport===null )
             {
-                this.addEventListener(NavigateEvent.URL_JUMP_BEFORE, function (e:NavigateEvent)
+                this.addEventListener(NavigateEvent.URL_JUMP_BEFORE, function(e:NavigateEvent)
                 {
                     var content:*= e.content || (e.item && e.item.link);
                     if( typeof content === "string" )
