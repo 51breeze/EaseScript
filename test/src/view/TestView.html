@@ -78,6 +78,7 @@
     <s:Declare>
        const {
            message:String="title is default",
+           current:int=6,
            list:Array=["one","two","three"]
         } = dataset;
     </s:Declare>
@@ -154,10 +155,12 @@
             <br />
             <br />
 
+
+            <div> {{inputValue}} </div>
+
             
             <ul includeIn="access" onclick="{reset}">
                 <button onclick="{reset}">清空99999</button>
-               
             </ul>
 
             <button onclick="{reset}">清空</button>
@@ -182,8 +185,8 @@
             rows="5"
             >
 
- 
              <c:pagination>
+             
                  <c:wheelTarget>@dataGrid</c:wheelTarget>
              </c:pagination>
     
@@ -208,9 +211,10 @@
                         <id>2</id>
                         <name>李四</name>
                         <phone>
-                            <s:Container name="ul" onclick="{(e:Event)=>console.log(e)}">
-                                 <div>sdfdsfdsfdsfsdfdsf</div>
-                             </s:Container>
+                           <name>{message}</name>
+                           <c:DataGrid>
+                               ========DataGrid========
+                           </c:DataGrid>
                         </phone>
                     </g:Object>
                      <g:Object>

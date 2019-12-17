@@ -362,7 +362,7 @@ package es.core
         */
         protected getUniqueIndex(index:int,uniqueKey:int):String
         {
-            return uniqueKey+''+index;
+            return (index > 0 ? uniqueKey+''+index : uniqueKey) as String;
         }
 
         /**
@@ -544,6 +544,12 @@ package es.core
                 var isDisplay:Boolean = childItem is IDisplay;
                 if( isDisplay )
                 {
+                    if( childItem is SkinComponent )
+                    {
+
+                        (childItem as SkinComponent).setComponentId( getUniqueKey( (childItem as SkinComponent).getComponentId() , false) );
+                    }
+
                     var elem:Element = (childItem as IDisplay).display();
                     var owner:IContainer = (childItem as IDisplay).owner;
                     if( owner )

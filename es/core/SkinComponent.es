@@ -28,7 +28,12 @@ package es.core
          */
         public function getComponentId( uid:String="" ):String
         {
-            return uid ? _componentId+'-'+uid : _componentId;
+            return uid ? _componentId+''+uid : _componentId;
+        }
+
+        public function setComponentId( uid:String ):void
+        {
+            _componentId = uid;
         }
 
         /**
