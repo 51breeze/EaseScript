@@ -174,26 +174,6 @@ package es.core
            }
        }
 
-        /**
-        * 获取当前应用的脚本路径
-        * @param type 
-        * @return {String}
-        */
-       [RunPlatform(server)]
-       protected function getScriptPath( type:String ):String
-       {
-           var classname:String = __CLASS__;
-           var name:String = classname.substr( classname.lastIndexOf(".")+1 ).toLowerCase();
-           switch( type.toLowerCase() )
-           {
-               case "js" :
-                 return `/js/${name}.js`;
-               case "css" :
-                 return `/css/${name}.css`;
-           }
-           return '';
-       }
-
        /**
        * 响应一个视图页面
        */
@@ -217,13 +197,13 @@ package es.core
                     if( type ==="js" )
                     {
                         var main:Node = new HTMLElement('script') as Node;
-                        main.setAttribute("src",  this.getScriptPath("js") ); 
+                        main.setAttribute("src", value ); 
                         document.body.appendChild( main );
 
                     }else if( type ==="css")
                     {
                         var link:Node = new HTMLElement('link') as Node;
-                        link.setAttribute("href",  this.getScriptPath("css") );
+                        link.setAttribute("href", value );
                         link.setAttribute("rel", "stylesheet"); 
                         document.head.appendChild( link );
                     }
