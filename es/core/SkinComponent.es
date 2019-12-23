@@ -12,14 +12,19 @@ package es.core
     import es.interfaces.IContainer;
     import es.interfaces.IDisplay;
     import es.core.es_internal; 
+    import es.core.Storage; 
 
     public class SkinComponent extends Component implements IContainer,IDisplay
     {
         private var _componentId:String;
+
+        private var _storage:Storage = null;
+  
         public function SkinComponent( componentId:String = UIDInstance() )
         {
             super();
-            _componentId = componentId;
+            this._componentId = componentId;
+            this._storage = new Storage( this );
         }
 
         /**
@@ -28,12 +33,17 @@ package es.core
          */
         public function getComponentId( uid:String="" ):String
         {
-            return uid ? _componentId+''+uid : _componentId;
+            return this._componentId+''+uid;
         }
 
         public function setComponentId( uid:String ):void
         {
-            _componentId = uid;
+            this._componentId = uid;
+        }
+
+        public function get storage():Storage
+        {
+            return this._storage;
         }
 
         /**
@@ -183,28 +193,22 @@ package es.core
                         event.property = 'skinClass';
                         this.dispatchEvent(event);
                     }
-
-                    this.skin = (Skin)new value( this );
+                    this.skin = new value( this ) as Skin;
                 }
             }
         }
 
         /**
-         * 设置表格的圆角值
-         * @param value
+         * 获取元素对象
+         * @returns {Element}
          */
-        public function set radius(value:Number):void
+        public function get element():Element
         {
-             this.setAssign("radius", value);
-        }
-
-        /**
-         * 获取表格的圆角值
-         * @param value
-         */
-        public function get radius():Number
-        {
-            return this.getAssign("radius", 5) as Number;
+            if( this.initialized )
+            {
+               return this.skin.element;
+            }
+            return null;
         }
 
         /**
@@ -260,17 +264,29 @@ package es.core
             properties.width=value;
         }
 
-        /**
-         * 获取元素对象
-         * @returns {Element}
+         /**
+         * 设置表格的圆角值
+         * @param value
          */
-        public function get element():Element
+        public function set radius(value:uint):void
+        {
+            if( this.initialized ) {
+                this.skin.radius = value;
+            }
+            properties.radius=value;
+        }
+
+        /**
+         * 获取表格的圆角值
+         * @param value
+         */
+        public function get radius():uint
         {
             if( this.initialized )
             {
-               return this.skin.element;
+                return this.skin.radius;
             }
-            return null;
+            return properties.radius as uint;
         }
 
         /**
@@ -292,7 +308,8 @@ package es.core
          */
         public function get visible():Boolean
         {
-            if( this.initialized ) {
+            if( this.initialized )
+            {
                 return this.skin.visible;
             }
             return properties.visible as Boolean;
@@ -742,35 +759,42 @@ package es.core
         }
 
         /**
-        * @private
-        */
-        private var _dataset:Object= {};
-
-        /**
         * 获取一个指定名称的值
         */
-        protected function getAssign(name:String,defaultValue:*=null):*
+        protected function pull(name:String,defaultValue:*=null):*
         {
-            var val:* = null;
-            if( this.initialized )
-            {
-                val = this.skin.assign(name);
-            }else{
-                val = _dataset[ name ];
-            }
-            return val == null ? defaultValue : _dataset[ name ];
+            return this.storage.pull(name,defaultValue);
         }
 
         /**
         * 设置一个指定名称的值
         */
-        protected function setAssign(name:String,value:*):void
+        protected function push(name:String,value:*):void
+        {
+            this.storage.push(name,value);
+        }
+
+        /**
+        * @private
+        */
+        private var _dataset:Object = {};
+
+        /**
+        * @protected
+        */
+        protected function assign(name:String, value:*= null ):*
         {
             if( this.initialized )
             {
-                this.skin.assign(name,value);
-            } 
-            _dataset[ name ]=value;
+                return this.skin.assign(name,value) || null;
+            }
+
+            if( value === null )
+            {
+                return _dataset[ name ] || null;
+            }
+
+            return _dataset[ name ] = value;
         }
 
         /**
@@ -780,6 +804,7 @@ package es.core
         {
             var skin:Skin = this.skin;
             skin.dataset = _dataset;
+
             if( _children.length > 0 )
             {
                 skin.children = _children;
@@ -849,7 +874,7 @@ package es.core
         private var _owner:IContainer=null;
 
         /**
-        * 获取一个承载此元素的容器
+        * 获取一个承载此元素的根容器
         * 默认返回null在当前节点中添加
         */
         public function get owner():IContainer
@@ -858,7 +883,7 @@ package es.core
         }
 
         /**
-        * 设置一个承载此元素的容器
+        * 设置一个承载此元素的根容器
         * 可以是任何元素节点对象
         */
         public function set owner(value:IContainer):void

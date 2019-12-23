@@ -12,6 +12,72 @@ package es.core
 
     public class SystemManage extends EventDispatcher
     {
+        public function SystemManage()
+        {
+            super();
+        }
+
+        /**
+        * @private
+        */
+        static private var doneCallback:Function=null;
+
+        /**
+        * 当所有的服务完成后的调用
+        * @param callback
+        */
+        static public function done( callback:Function ):void
+        {
+            SystemManage.doneCallback = callback;
+            if( SystemManage.callServerCouter < 1 )
+            {
+                callback();
+            }
+        }
+
+        /**
+        * 统计服务调用数
+        */
+        static private var callServerCouter:int=0;
+
+        /**
+        * 在每次调用服务调用此方法来累计服务调用次数
+        */
+        [RunPlatform(server)]
+        static public function incrementServerCouter():int
+        {
+            return callServerCouter++;
+        }
+
+        /**
+        * 在每次调用服务调用此方法来减去服务调用数
+        */
+        [RunPlatform(server)]
+        static public function decrementServerCouter():int
+        {
+            var val:int=--callServerCouter;
+            if( val < 1 && SystemManage.doneCallback )
+            {
+               SystemManage.doneCallback();
+            }
+            return val;
+        }
+
+        /**
+         * @pirvate
+         */
+        static private var _systemManage:SystemManage=null;
+        static public function getSystemManage()
+        {
+            var systemManage:SystemManage = SystemManage._systemManage;
+            if( systemManage === null )
+            {
+                systemManage = new SystemManage();
+                SystemManage._systemManage = systemManage;
+            }
+            return systemManage;
+        }
+
         /**
          * @pirvate
          */

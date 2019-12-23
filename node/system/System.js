@@ -552,10 +552,6 @@ System.getGlobalEvent=function getGlobalEvent()
  */
 System.getDefinitionByName = function getDefinitionByName(name)
 {
-    if( has.call(System, name) )
-    {
-        return System[name];
-    }
     var module = Internal.getClassModule(name);
     if( module )
     {

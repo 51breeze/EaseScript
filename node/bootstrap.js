@@ -14,8 +14,7 @@ const config = fs.existsSync( "./config.json" ) ? require("./config.json") : {};
  */
 const env={
     "HTTP_DEFAULT_ROUTE":"[CODE[DEFAULT_BOOTSTRAP_ROUTER_PROVIDER]]",
-    "HTTP_SERVER_ROUTES":[CODE[SERVICE_ROUTE_LIST]],
-    "HTTP_VIEW_ROUTES":[CODE[VIEW_ROUTE_LIST]],
+    "HTTP_ROUTES":[CODE[SERVICE_ROUTE_LIST]],
     "HTTP_ROUTE_PATH":null,
     "MODE":[CODE[MODE]],
     "ORIGIN_SYNTAX":"[CODE[ORIGIN_SYNTAX]]",
@@ -24,7 +23,9 @@ const env={
     "COMMAND_SWITCH":[CODE[COMMAND_SWITCH]],
     "VERSION":[CODE[VERSION]],
     "WORKSPACE":"[CODE[WEBROOT_PATH]]",
-    "APP_CONFIG":config
+    "APP_CONFIG":config,
+    "LOAD_SCRIPTS":[CODE[LOAD_SCRIPTS]],
+    "ROOT_PATH":Path.resolve(__dirname, root_path )
 };
 
 Object.merge(Internal.env, env);
@@ -64,64 +65,70 @@ class Bootstrap{
         return name ? env[ name ] || null : env;
     }
 
+    bindPipeline( obj )
+    {
+        for( var name in _serverProvier )
+        {
+            obj.addEventListener(name, function(e){
+                var callback =  e.getCallback();
+                if( !callback )
+                {
+                    throw new Error("PipeLineEvent is must assig a callback function.");
+                }else{
+                   _serverProvier[ name ]( e.getCmd(), e.getParams(), callback);
+                }
+            });
+        }
+    }
+
+    dispatch( provider, params )
+    {
+        const route = provider.split("@");
+        const controller = route[0];
+        const method = route[1];
+        try{
+
+            const moduleClass = require( Path.join(root_path, controller.replace(/\./g,'/')+".js") );
+            const obj = new moduleClass();
+            this.bindPipeline(obj);
+            obj[ method ].apply(obj, Object.values( params ) );
+
+        }catch(e)
+        {
+            console.log( e );
+        }
+    }
+
     start( factory )
     {
+        const obj = this;
         const bindRoute = (routes, method)=>{
 
             Object.forEach(routes,function(provider,route)
             {
                 factory(method,route.replace(/\{(\w+)\}/g,':$1'),function(req, res)
                 {
-                    const route = provider.split("@");
-                    const controller = route[0];
-                    const method = route[1];
-                    try{
-    
-                        Internal.env.HTTP_REQUEST ={
-                            "method":req.method,
-                            "path":req.path,
-                            "body":req.body,
-                            "query":req.query,
-                            "params":req.params,
-                            "host":req.get("host"),
-                            "port":req.get("host").split(":")[1] || null,
-                            "protocol":req.protocol,
-                            "cookie":req.cookies || null,
-                            "uri":req.originalUrl,
-                            "url":req.protocol + '://' + req.get('host') + req.originalUrl,
-                        }
-                        Internal.env.HTTP_RESPONSE = res;
-                        const moduleClass = require( Path.join(root_path, controller.replace(/\./g,'/')+".js") );
-                        const obj = new moduleClass();
-                        for( var name in _serverProvier )
-                        {
-                            obj.addEventListener(name, function(e){
-                                var callback =  e.getCallback();
-                                if( !callback )
-                                {
-                                    throw new Error("PipeLineEvent is must assig a callback function.");
-                                }else{
-                                   _serverProvier[ name ]( e.getCmd(), e.getParams(), callback);
-                                }
-                            });
-                        }
-                       
-                        obj[ method ].apply(obj, Object.values( req.params ) );
-    
-                    }catch(e)
-                    {
-                        console.log( e );
+                    Internal.env.HTTP_REQUEST ={
+                        "method":req.method,
+                        "path":req.path,
+                        "body":req.body,
+                        "query":req.query,
+                        "params":req.params,
+                        "host":req.get("host"),
+                        "port":req.get("host").split(":")[1] || null,
+                        "protocol":req.protocol,
+                        "cookie":req.cookies || null,
+                        "uri":req.originalUrl,
+                        "url":req.protocol + '://' + req.get('host') + req.originalUrl,
                     }
+                    Internal.env.HTTP_RESPONSE = res;
+                    Internal.env.BOOT_APP = obj;
+                    obj.dispatch( provider , req.params );
                 });
             });
         }
 
-        Object.forEach( env.HTTP_SERVER_ROUTES,bindRoute,this);
-
-        if( env.ORIGIN_SYNTAX !=="javascript" )
-        {
-            Object.forEach( env.HTTP_VIEW_ROUTES,bindRoute,this);
-        }
+        Object.forEach( env.HTTP_ROUTES,bindRoute,this);
     }
 }
 

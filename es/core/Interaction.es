@@ -9,7 +9,7 @@ package es.core
     /**
      * 服务端与客户的交互类
      * 此类用来把服务端的指定属性推送到前端，前端用此类来拉取服务端推送的属性。
-     * @param properties
+     * @param dataset
      * @constructor
      */
     static public class Interaction
@@ -23,16 +23,7 @@ package es.core
         * 交互数据属性
         * @private
         */
-       static private var properties:Object={};
-
-        /**
-         * 获取所有的交互属性
-         * @returns {Object}
-         */
-       static public function getProperties():Object
-       {
-            return properties;
-       }
+       static public var dataset:Object={};
 
         /**
          * 是否有初始属性
@@ -51,11 +42,11 @@ package es.core
                {
                    initialized = true;
                    if( System.isObject(window[Interaction.key]) ){
-                       properties = window[Interaction.key] as Object;
+                       Interaction.dataset = window[Interaction.key] as Object;
                    }
                }
            }
-           return System.isDefined( properties[ key ] ) ? properties[ key ] : null;
+           return System.isDefined( Interaction.dataset[ key ] ) ? Interaction.dataset[ key ] : null;
        }
 
        /**
@@ -65,11 +56,11 @@ package es.core
         */
        static public function push(key:String, data:Object)
        {
-           if( System.isDefined( properties[ key ] ) )
+           if( System.isDefined( Interaction.dataset[ key ] ) )
            {
-               properties[ key ] = Object.merge( properties[ key ], data );
+               Interaction.dataset[ key ] = Object.merge( Interaction.dataset[ key ], data );
            }else {
-               properties[ key ] = data;
+               Interaction.dataset[ key ] = data;
            }
        }
    }

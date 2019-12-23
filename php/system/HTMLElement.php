@@ -5,7 +5,7 @@
  * Released under the MIT license
  * https://github.com/51breeze/EaseScript
  * @author Jun Ye <664371281@qq.com>
- * @require System,BaseObject,Node,SyntaxError,ReferenceError
+ * @require System,BaseObject,Node,SyntaxError,ReferenceError,ArrayList
  */
 class HTMLElement extends Node
 {
@@ -80,6 +80,7 @@ class HTMLElement extends Node
         $this->nodeName = $name;
         $this->nodeType = $type;
         parent::__construct($name, $type, $attr);
+        $this->children = new ArrayList();
     }
 
     /**
@@ -155,15 +156,6 @@ class HTMLElement extends Node
     }
 
     /**
-     * 获取元素的所有节点元素
-     * @return array
-     */
-    public function childNodes()
-    {
-        return array_slice( $this->children, 0);
-    }
-
-    /**
      * 添加一个子级元素
      * @param Node $child
      * @return Node
@@ -184,6 +176,22 @@ class HTMLElement extends Node
     {
         return $this->addChildAt($child, -1 );
     }
+    
+    public function replaceChild( Node $newNode, Node $oldNode )
+    {
+        $index = $this->children->indexOf( $oldNode );
+        if( $index >= 0 )
+        {
+            $this->children->splice( $index, 1, $newNode);
+            $newNode->parentNode = $this;
+            $oldNode->parentNode = null;
+
+        }else
+        {
+            throw new TypeError('Old node is not exists. in replaceChild');
+        }
+    }
+
 
     /**
      * 添加一个子级元素到指定的索引位置
@@ -205,7 +213,7 @@ class HTMLElement extends Node
         {
             $child->parentNode->removeChild( $child );
         }
-        array_splice( $this->children,$index,0, array($child) );
+        $this->children->splice($index, 0, $child );
         $child->parentNode = $this;
         $this->parseHtml = true;
         if( $this->visible )
@@ -223,7 +231,7 @@ class HTMLElement extends Node
      */
     public function removeChild(Node $child)
     {
-        $index = array_search($child, $this->children, true);
+        $index = $this->children->indexOf($child);
         if( $index>=0 )
         {
             return $this->removeChildAt( $index );
@@ -242,7 +250,7 @@ class HTMLElement extends Node
         $index = $index<0 ? count($this->children)+$index : $index;
         if( isset($this->children[$index]) )
         {
-            $child =  array_splice($this->children, $index, 1);
+            $child = $this->children->splice($index, 1);
             $child = $child[0];
             $child->parentNode = null;
             $this->parseHtml = true;
@@ -258,7 +266,7 @@ class HTMLElement extends Node
      */
     public function getChildIndex(Node $child)
     {
-        return array_search($child, $this->children, true );
+        return $this->children->indexOf($child);
     }
 
     /**
@@ -356,7 +364,7 @@ class HTMLElement extends Node
             case 'head' :
                 return System::document()->__get( $name );
             case 'childNodes':
-                return new ArrayList( array_slice($this->children,0) );
+                return $this->children;
         }
         return parent::__get($name);
     }
@@ -372,7 +380,7 @@ class HTMLElement extends Node
         switch ($name)
         {
             case 'innerHTML' :
-                $this->children=[];
+                $this->children->splice(0, $this->children->length);
                 $this->innerHTML = $value;
                 $this->parseHtml=true;
                 $this->hasInnerHTML = true;

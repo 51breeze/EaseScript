@@ -20,7 +20,7 @@ function strainer( column , value, operational, logic ,type )
     logic = logic==='or' ? '||' : '&&';
     this[ this.length ]= {'logic':logic,'column':column,'value':value,'operational':operational,'type':type};
     this.length++;
-    return this;
+    storage(this,"changed",true);
 };
 
 /**
@@ -29,6 +29,14 @@ function strainer( column , value, operational, logic ,type )
  */
 function createFilter()
 {
+    var changed = storage(this,"changed");
+    var filter  = storage(this,"whereFilter");
+    if( !changed )
+    {
+        return filter;
+    }
+
+    storage(this,"changed", false);
     var i=0, item,type,value,refvalue,command=[];
     for( ; i < this.length ; i++ )
     {
@@ -85,7 +93,9 @@ function createFilter()
     {
         return null;
     }
-    return new Function('return ( '+command.join(' ')+' )' );
+    var fn = new Function('return ( '+command.join(' ')+' )' );
+    storage(this,"whereFilter", fn);
+    return fn;
 };
 
 
@@ -99,7 +109,10 @@ function DataGrep( dataItems )
     if( !System.instanceOf( dataItems, Array ) )throw new Error('error','Invalid data list');
     storage(this,true,{
         'dataItems':dataItems,
-        'filter':dataItems
+        'filter':null,
+        'strainer':'',
+        'changed':true,
+        'whereFilter':null,
     });
     Object.defineProperty(this,"length", {value:0,writable:true});
 }
@@ -124,15 +137,12 @@ DataGrep.prototype = Object.create( Object.prototype,{
  */
 "filter":{value:function filter( condition )
 {
-    if( typeof condition === "undefined" )
-    {
-        storage(this,"filter", createFilter.call(this) );
-
-    }else if( typeof condition === 'function' )
+    storage(this,"strainer",condition);
+    if( typeof condition === 'function' )
     {
         storage(this,"filter",condition);
 
-    }else if ( typeof condition === 'string' && condition!='' )
+    }else if ( typeof condition === 'string' && condition )
     {
         var old = condition;
         condition = condition.replace(/(\w+)\s*([\>\<\=\!])/g,function(a, b, c)
@@ -180,7 +190,7 @@ DataGrep.prototype = Object.create( Object.prototype,{
     {
         storage(this,"filter",null);
     }
-    return storage(this,"filter");
+    return storage(this,"strainer");
 }},
 
 /**
@@ -205,11 +215,21 @@ DataGrep.prototype = Object.create( Object.prototype,{
  */
 "execute":{value:function execute(filter)
 {
+    if( filter )
+    {
+        this.filter( filter );
+    }
+
     var data=storage(this,"dataItems");
-    filter = this.filter( filter );
-    if( !filter )return data;
+    filter = storage(this,"filter") || createFilter.call(this);
+    if( !filter )
+    {
+        return data;
+    }
+
     var result=[];
-    for(var i=0; i<data.length; i++ ) if( !!filter.call(this, data[i], i) )
+    for(var i=0; i<data.length; i++ )
+    if( !!filter.call(this, data[i], i) )
     {
         result.push( data[i] );
     }

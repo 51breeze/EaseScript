@@ -14,11 +14,11 @@ package es.core
     import es.interfaces.IDisplay;
     import es.core.Display;
     import es.interfaces.IContainer;
-    import es.interfaces.IBindable;
     import es.components.layout.BaseLayout;
     import es.core.es_internal;
+    import Map;
 
-    public class Skin extends Container implements IBindable
+    public class Skin extends Container
     {
         /**
          * 皮肤类
@@ -546,7 +546,6 @@ package es.core
                 {
                     if( childItem is SkinComponent )
                     {
-
                         (childItem as SkinComponent).setComponentId( getUniqueKey( (childItem as SkinComponent).getComponentId() , false) );
                     }
 
@@ -859,11 +858,13 @@ package es.core
         /*
         * @private
         */
+        [RunPlatform(client)]
         private var _watchMap:Map=null;
 
         /*
         * @private
         */
+        [RunPlatform(client)]
         private function get watchMap():Map
         {
             var dict:Map = this._watchMap;

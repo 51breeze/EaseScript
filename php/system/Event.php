@@ -11,6 +11,7 @@ class Event extends BaseObject
 {
     const CLICK = 'click';
     const READY = 'ready';
+    const RESIZE = 'resize';
     const MOUSEOVER = 'mouseover';
     const MOUSEDOWN = 'mousedown';
 

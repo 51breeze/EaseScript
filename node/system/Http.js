@@ -15,139 +15,74 @@
  */
 function Http( options )
 {
-    if( !isSupported )throw new Error('Http the client does not support');
     if ( !(this instanceof Http) )return new Http(options);
     EventDispatcher.call(this);
-    Object.defineProperty(this,"__options__", {value:Object.merge(true,{},setting, options)});
-    options = this.__options__;
-    options.xhr = null;
-    options.loading = false;
-    options.setHeader = false;
-    options.queues = [];
-    options.param = null;
-    options.responseHeaders = {};
-    options.timeoutTimer = null;
+    this.options = options;
+    this.loading = false;
+    this.queues = [];
+    this.responseHeaders = {};
 }
 
 module.exports = Http;
-var Object = require("./Object.js");
-var EventDispatcher = require("./EventDispatcher.js");
-var System = require("./System.js");
-var HttpEvent = require("./HttpEvent.js");
-var isSupported=false;
-var XHR=null;
-var localUrl='';
-var patternUrl = /^([\w\+\.\-]+:)(?:\/\/([^\/?#:]*)(?::(\d+))?)?/;
-var protocol = /^(?:about|app|app\-storage|.+\-extension|file|res|widget):$/;
-var patternHeaders = /^(.*?):[ \t]*([^\r\n]*)\r?$/mg;
-var localUrlParts=[];
-var setting = {
-    async: true
-    , dataType: 'html'
-    , method: 'GET'
-    , timeout: 30
-    , charset: 'UTF-8'
-    , header: {
-        'contentType': 'application/x-www-form-urlencoded'
-        ,'Accept': "text/html"
-        ,'X-Requested-With': 'XMLHttpRequest'
-    }
-};
 
-if( typeof window !=="undefined" )
-{
-    XHR = window.XMLHttpRequest || window.ActiveXObject;
-    isSupported= !!XHR;
-    localUrl = window.location.href;
-    localUrlParts = patternUrl.exec( localUrl.toLowerCase() ) || [];
-}
+var Object = require("./Object.js");
+var axios = require("@axios");
+var EventDispatcher = require("./EventDispatcher.js");
+var HttpEvent = require("./HttpEvent.js");
+var System = require("./System.js");
 
 /**
  * @private
  * 完成请求
  * @param event
  */
-function done(event)
+function done(response, url, data, method)
 {
-    var options = this.__options__;
-    var xhr = options.xhr;
-    if (xhr.readyState !== 4 || xhr.status==0 )return;
-    var match, result = null, headers = {};
-    System.clearTimeout(options.timeoutTimer);
-    options.timeoutTimer = null;
-
-    //获取响应头信息
-    if( typeof xhr.getAllResponseHeaders === "function" )
-    {
-        while ( ( match = patternHeaders.exec(xhr.getAllResponseHeaders()) ) )
-        {
-            headers[match[1].toLowerCase()] = match[2];
-        }
-    }
-    options.loading=false;
-    options.responseHeaders=headers;
-    if (xhr.status >= 200 && xhr.status < 300)
-    {
-        result = xhr.responseXML;
-        if (options.dataType.toLowerCase() === Http.TYPE_JSON)
-        {
-            try {
-                result = JSON.parse( xhr.responseText );
-            } catch (e) {
-                throw new Error('Invalid JSON the ajax response');
-            }
-        }
-    }
+    this.loading=false;
+    this.responseHeaders=response.headers;
 
     var e = new HttpEvent( HttpEvent.SUCCESS );
-    e.originalEvent = event;
-    e.data = result || {};
-    e.status = xhr.status;
-    e.url = options.url;
-    e.param = options.param;
+    e.data = response.data || {};
+    e.status = response.status;
+    e.url = url;
+    e.param = data;
+    e.method = method;
+
     this.dispatchEvent(e);
-    if( options.queues.length>0)
+    if( this.queues.length>0)
     {
-        var queue = options.queues.shift();
+        var queue = this.queues.shift();
         this.load.apply(this, queue);
     }
 }
-function loadStart(event)
-{
-    var e = new HttpEvent(HttpEvent.LOAD_START);
-    var xhr = event.currentTarget;
-    e.url = xhr.__url__;
-    e.originalEvent = event;
-    this.dispatchEvent(e);
-}
 
-function progress(event)
-{
-    var e = new HttpEvent(HttpEvent.PROGRESS);
-    var xhr = event.currentTarget;
-    e.url = xhr.__url__;
-    e.originalEvent = event;
-    e.loaded = event.loaded;
-    e.total = event.total;
-    this.dispatchEvent(e);
-}
 
-function error()
+function error(error, url, data, method)
 {
     var e = new HttpEvent(HttpEvent.ERROR);
-    var xhr = event.currentTarget;
-    e.url = xhr.__url__;
-    e.originalEvent = event;
-    this.dispatchEvent(e);
-}
+    e.url = url;
+    e.status = 500;
+    if( error.response )
+    {
+        e.data =  error.response.data || {};
+        e.status =  error.response.status;
+        this.responseHeaders=error.response.headers;
 
-function getXHR( target )
-{
-    var xhr = window.XMLHttpRequest ? new window.XMLHttpRequest() : new window.ActiveXObject("Microsoft.XMLHTTP");
-    xhr.onreadystatechange = function () {
-        if (xhr.readyState === 4)done.call( target );
-    };
-    return xhr;
+    }else 
+    {
+        e.data = error.message;
+    }
+
+    e.url = url;
+    e.param = data;
+    e.method = method;
+    this.dispatchEvent(e);
+
+    if( this.queues.length>0)
+    {
+        var queue = this.queues.shift();
+        this.load.apply(this, queue);
+    }
 }
 
 /**
@@ -197,7 +132,12 @@ Http.prototype = Object.create( EventDispatcher.prototype,{
  */
 Object.defineProperty(Http.prototype,"option", {value:function option(name, value)
 {
-    var options = this.__options__;
+    if( typeof name  === "object" ){
+        this.options = name;
+        return this;
+    }
+
+    var options = this.options;
     if( value == null ){
         return options[ name ];
     }
@@ -211,14 +151,15 @@ Object.defineProperty(Http.prototype,"option", {value:function option(name, valu
  */
 Object.defineProperty(Http.prototype,"abort", {value:function abort()
 {
-    var options = this.__options__;
-    if (options.xhr)
+    if( this.cancel )
     {
-        try{options.xhr.abort();}catch(e){}
+        this.cancel();
         var event = new HttpEvent(HttpEvent.CANCELED);
         event.data = null;
         event.status = -1;
-        event.url = this.__url__;
+        event.url = this.cancel.url;
+        event.param = this.cancel.data;
+        event.method = this.cancel.method;
         this.dispatchEvent(event);
         return true;
     }
@@ -233,113 +174,65 @@ Object.defineProperty(Http.prototype,"abort", {value:function abort()
 Object.defineProperty(Http.prototype,"load",{value:function load(url, data, method)
 {
     if (typeof url !== "string")throw new Error('Invalid url');
-    var options = this.__options__;
-    var method = method || options.method;
-    var async = !!options.async;
-    var xhr;
 
-    if( options.loading ===true )
+    var options = this.options;
+    var method = method || options.method;
+    if( this.loading ===true )
     {
         options.queues.push( [url, data, method] );
         return false;
     }
 
-    options.loading=true;
-    options.url= url;
-    options.param= data;
-
-    if (typeof method === 'string')
+    this.loading=true;
+    if ( typeof method === 'string' )
     {
         method = method.toUpperCase();
-        if ( Http["METHOD_"+method] !==method )throw new Error('Invalid method for ' + method);
+        if( Http["METHOD_"+method] !==method )
+        {
+            throw new Error('Invalid method for ' + method);
+        }
     }
 
-    try
+    var request = System.environments("HTTP_REQUEST");
+    var baseURL = undefined;
+    if( request )
     {
-        if( options.dataType.toLowerCase() === Http.TYPE_JSONP )
-        {
-            xhr = new ScriptRequest( async );
-            xhr.addEventListener(HttpEvent.SUCCESS, function (event)
-            {
-                if ( options.timeoutTimer )
-                {
-                    System.clearTimeout( options.timeoutTimer );
-                    options.timeoutTimer = null;
-                }
-                options.loading=false;
-                event.url=options.url;
-                this.dispatchEvent(event);
-
-            }, false, 0, this);
-            xhr.send(url, data, method);
-
-        } else
-        {
-            xhr = options.xhr = getXHR( this );
-            data = data != null ? System.serialize(data, 'url') : null;
-            if (method === Http.METHOD_GET && data)
-            {
-                if (data != '')url += /\?/.test(url) ? '&' + data : '?' + data;
-                data = null;
-            }
-            options.url = url;
-            xhr.open(method, url, async);
-            if( options.setHeader===false )
-            {
-                //设置请求头 如果请求方法为post
-                if( method === Http.METHOD_POST)
-                {
-                    options.header.contentType = Http.HEADER_TYPE_URLENCODED;
-                }
-
-                //设置编码
-                if (!/charset/i.test(options.header.contentType))
-                {
-                    options.header.contentType += ';' + options.charset;
-                }
-
-                try {
-                    var name;
-                    for (name in options.header) {
-                        xhr.setRequestHeader(name, options.header[name]);
-                    }
-                } catch (e) {}
-
-                //设置可以接收的内容类型
-                try {
-                    xhr.overrideMimeType(options.header.Accept);
-                } catch (e) {}
-            }
-            options.setHeader=true;
-            xhr.send(data);
-        }
-
-    } catch (e)
-    {
-        throw new Error('Http the client does not support('+e.message+')');
+        baseURL = request.protocol+"://"+request.host;
     }
 
-    //设置请求超时
-    options.timeoutTimer = System.setTimeout((function (url,self)
-    {
-        return function () {
-            self.abort();
-            if(self.hasEventListener(HttpEvent.TIMEOUT))
-            {
-                var event = new HttpEvent(HttpEvent.TIMEOUT);
-                event.data =null;
-                event.status = 408;
-                event.url = url;
-                self.dispatchEvent(event);
-            }
-            if (self.__timeoutTimer__)
-            {
-                System.clearTimeout(self.__timeoutTimer__);
-                options.timeoutTimer = null;
-            }
-        }
-    })(url,this), options.timeout * 1000);
-    return true;
+    var target = this;
+    axios({
+        method: method,
+        url:url,
+        baseURL:baseURL,
+        data: method === "GET" ? undefined : data,
+        params: method === "GET" ? data : undefined,
+        headers:options.header || undefined,
+        timeout:options.timeout || 3000,
+        withCredentials:!!options.withCredentials,
+        auth:options.auth || undefined,
+        responseType:options.dataType || Http.TYPE_JSON,
+        responseEncoding:options.responseEncoding || "utf8",
+        xsrfCookieName:options.xsrfCookieName || "XSRF-TOKEN",
+        xsrfHeaderName:options.xsrfHeaderName || "X-XSRF-TOKEN",
+        onUploadProgress:options.onUploadProgress || undefined,
+        onDownloadProgress:options.onDownloadProgress || undefined,
+        maxContentLength:options.maxContentLength || 2000,
+        validateStatus:options.validateStatus || undefined,
+        maxRedirects:options.maxRedirects || 5,
+        socketPath:options.socketPath || null,
+        proxy:options.proxy || undefined,
+        cancelToken:new axios.CancelToken( (cancel)=>{
+            cancel.url = url;
+            cancel.data = data;
+            cancel.method = method;
+            this.cancel = cancel;
+        })
+      }).then(function(response) {
+          done.call(target, response, url, data, method );
+      }).catch(function(err){
+         error.call(target, err, url, data, method );
+      });
 }});
 
 /**
@@ -364,119 +257,6 @@ Object.defineProperty(Http.prototype,"setRequestHeader",{value:function setReque
  * @returns {null}
  */
 Object.defineProperty(Http.prototype,"getResponseHeader",{value:function getResponseHeader(name) {
-    var options = this.__options__;
-    if( !options.responseHeaders )return '';
-    return typeof name === 'string' ? options.responseHeaders[ name.toLowerCase() ] || '' : options.responseHeaders;
+
+    return typeof name === 'string' ? this.responseHeaders[ name.toLowerCase() ] || '' : this.responseHeaders;
 }});
-
-//脚本请求队列
-var queues = [];
-
-/**
- * 通过脚本请求服务器
- * @returns {ScriptRequest}
- * @constructor
- */
-function ScriptRequest( async )
-{
-    if (!(this instanceof ScriptRequest))
-    {
-        return new ScriptRequest();
-    }
-    var target = document.createElement('script');
-    target.setAttribute('type', 'text/javascript');
-    EventDispatcher.call(this, target);
-    queues.push(this);
-    this.__key__ = 's'+queues.length+System.uid();
-    this.__target__ = target;
-    this.__async__ = !!async;
-}
-
-ScriptRequest.prototype = Object.create(EventDispatcher.prototype,{
-    "constructor":{value:ScriptRequest}
-});
-ScriptRequest.prototype.__key__ = null;
-ScriptRequest.prototype.__target__ = null;
-ScriptRequest.prototype.__async__ = null;
-ScriptRequest.prototype.__sended__ = false;
-
-var headElement = null;
-
-/**
- * 开始请求数据
- * @param url
- * @param data
- * @param async
- */
-ScriptRequest.prototype.send = function send(url, data)
-{
-    if (this.__sended__)return false;
-    this.__sended__ = true;
-    if (typeof url !== 'string')throw new Error('Invalid url.');
-    var param = [];
-    if(data!=null)param.push( System.serialize(data, 'url') );
-    param.push('k=' + this.__key__ );
-    param.push('JSONP_CALLBACK=JSONP_CALLBACK');
-    param = param.join('&');
-    url += !/\?/.test(url) ? '?' + param : '&' + param;
-    var target = this.__target__;
-    if( this.__async__ )target.setAttribute('async', 'async');
-    target.setAttribute('src', url);
-    if( headElement === null )
-    {
-        headElement = document.head || document.getElementsByTagName("head")[0];
-    }
-
-    if( !headElement || !headElement.parentNode )
-    {
-        throw new ReferenceError("Head element is not exist.");
-    }
-
-    if (!target.parentNode)
-    {
-        headElement.appendChild(target);
-    }
-};
-
-/**
- * 终止请求
- */
-ScriptRequest.prototype.abort = function ()
-{
-    this.__canceled__ = true;
-    var target = this.__target__;
-    if (target && target.parentNode) {
-        target.parentNode.removeChild(target);
-    }
-    return true;
-};
-
-/**
- * 脚本请求后的响应回调函数
- * @param data 响应的数据集
- * @param key 向服务器请求时的 key。 此 key 是通知每个请求对象做出反应的唯一编号。
- * @public
- */
-Http.JSONP_CALLBACK = function JSONP_CALLBACK(data, key)
-{
-    var index = Math.max(queues.length - 1, 0);
-    if (typeof key !== "undefined") while (index > 0) {
-        if (queues[index].__key__ == key)break;
-        index--;
-    }
-    if (queues[index] && queues[index].__key__ == key)
-    {
-        var target = queues.splice(index, 1).pop();
-        if (!target.__canceled__) {
-            var event = new HttpEvent(HttpEvent.SUCCESS);
-            event.data = data;
-            event.status = 200;
-            target.dispatchEvent(event);
-        }
-    }
-};
-
-if( typeof window !=="undefined" )
-{
-   window.JSONP_CALLBACK=Http.JSONP_CALLBACK;
-}

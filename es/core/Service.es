@@ -8,6 +8,8 @@
 package es.core
 {
    import es.events.PipelineEvent;
+   import es.core.SystemManage;
+   import es.events.SystemManageEvent;
 
    [RunPlatform(server)]
    public class Service extends EventDispatcher
@@ -27,7 +29,7 @@ package es.core
         * @param cmd
         * @return {*}
         */
-       private static function pipeline(target:EventDispatcher,type:String,name:String, cmd:String, args:Array, callback:Function )
+       private static function pipeline(target:EventDispatcher,type:String,name:String, cmd:String, args:Array, callback:Function ):PipelineEvent
        {
            var event:PipelineEvent = new PipelineEvent( type );
            event.name = name;
@@ -42,22 +44,39 @@ package es.core
            throw new ReferenceError("No binding to the specified '"+type+"' pipeline.");
        }
 
+       /**
+       * @private 
+       */ 
+       static private var asynchCallCouter:int = 0;
+
       /**
        * 生成一个响应结果的回调函数
        * 如需要实现自定义响应逻辑，请在子类中覆盖此方法
        */
        protected function makeCallback(args:Array,name:String=''):Function
        {
+           var fn:Function = null;
            if( args.length > 0 && args[ args.length - 1 ] instanceof Function )
            {
-                return args.pop() as Function;
+                fn = args.pop() as Function;
            }
+
+           SystemManage.incrementServerCouter();
            return (result:*)=>{
-                if( result !== false ){
-                    this.success( result );
-                }else{
-                    this.failed( result );
+               
+                if( fn )
+                {
+                    fn( result );
+
+                }else
+                {
+                    if( result !== false ){
+                        this.success( result );
+                    }else{
+                        this.failed( result as String );
+                    }
                 }
+                SystemManage.decrementServerCouter();
            };
        }
 
@@ -151,6 +170,16 @@ package es.core
        */
        public function response(data:*,status:int=200):void
        {
+           if( this.hasEventListener(PipelineEvent.RESPONSE_BEFORE)  )
+           {
+                var event:PipelineEvent = new PipelineEvent( PipelineEvent.RESPONSE_BEFORE );
+                event.data = data;
+                if( !this.dispatchEvent( event ) )
+                {
+                    return;
+                }
+           }
+
            const response:* = System.environments("HTTP_RESPONSE");
            response.send( data );
            response.status( status );

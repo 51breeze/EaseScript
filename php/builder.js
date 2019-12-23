@@ -186,12 +186,12 @@ function builder(path , config , localModules, requirements , replacements )
     //生成引导文件
     var content = utils.getContents( config.root_path+"/php/bootstrap.php");
     content = replaceContent(content, replacements,config);
-    utils.setContents( bootstrap_dir+'/'+replacements["BOOTSTRAP_CLASS_FILE_NAME"],  content );
+    utils.setContents( bootstrap_dir+'/index.php',  content );
 
     //生成入口文件
     content = utils.getContents( config.root_path+"/php/index.php");
     content = replaceContent(content, replacements, config);
-    utils.setContents( webroot_dir+"/index.php",  content );
+    //utils.setContents( webroot_dir+"/index.php",  content );
 }
 
 function replaceContent(content, data, config)

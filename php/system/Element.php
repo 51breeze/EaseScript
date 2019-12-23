@@ -87,20 +87,20 @@ class Element extends EventDispatcher implements \ArrayAccess,\Countable
 
     public $length = 0;
     private $items=array();
-    public function __construct( $selector, $context=null )
+    public function __construct( $selector=null, $context=null )
     {
         if( is_string($selector) )
         {
             $selector = trim($selector);
             if( $selector==="body")
             {
-                $selector = [System::document()->body];
+                $selector = [\es\system\Document::documet()->body];
             }else if( $selector==="document")
             {
-                $selector = [System::document()];
+                $selector = [\es\system\Document::documet()];
             }else if( $selector==="window")
             {
-                $selector = [System::window()];
+                $selector = [ \es\system\Window::window() ];
 
             }else if( substr( $selector, 0, 1) ==='<' )
             {
@@ -110,12 +110,15 @@ class Element extends EventDispatcher implements \ArrayAccess,\Countable
                 $selector = Document::querySelectorAll( $selector, $context );
             }
 
-        }else if( $selector instanceof Node )
+        }else if( $selector instanceof Node ||  $selector === \es\system\Window::window() ||  $selector === \es\system\Document::documet() )
         {
             $selector = [$selector];
-        }else{
+
+        }else
+        {
             $selector = [];
         }
+
         $this->items = $selector;
         $this->length = count( $selector );
         parent::__construct( isset($selector[0]) ? $selector[0] : null );
@@ -203,14 +206,20 @@ class Element extends EventDispatcher implements \ArrayAccess,\Countable
         return $this->style('height', $value);
     }
 
+    private $_current = null;
     public function current( $elem=null )
     {
-        return current($this->items);
+        if( $elem )
+        {
+            $this->_current = $elem;
+            return $this;
+        }
+        return $this->_current ?: current($this->items);
     }
 
     public function property($name, $value=null)
     {
-        $item = $this->items[0];
+        $item = $this->current();
         if( $value===null )
         {
             if( System::isObject($name) )
@@ -226,38 +235,86 @@ class Element extends EventDispatcher implements \ArrayAccess,\Countable
 
     public function properties( $object )
     {
-        $item = $this->items[0];
+        $item = $this->current();
         $item->attr = $object;
         return $this;
     }
 
 
     public function hasProperty($prop){}
-    public function data($name, $value ){}
+    public function data(){}
+    public function fadeIn(){}
+    public function fadeOut(){}
+
+    static private function setStyle($node, $name, $value)
+    {
+        static $attrpx = array(
+            "width"=>"px",
+            "height"=>"px",
+            "left"=>"px",
+            "top"=>"px",
+            "bottom"=>"px",
+            "right"=>"px",
+            "border-radius"=>"px",
+        );
+       
+        $name = preg_replace_callback('/([A-Z])/',function($a){
+            return "-". strtolower($a[1]);
+        },$name);
+
+        if( $name[0] === "-" )
+        {
+            $name = substr($name,1);
+        }
+        $pix  = "";
+
+        if( isset($attrpx[$name]) && !preg_match('/(px|em|rem)$/i', $value ) )
+        {
+            $pix = "px";
+        }
+        $node->style->$name=$value.$pix;
+    }
+
+
     public function style($name, $value=null)
     {
-        $item = @$this->items[0];
-        if( $value != null )
+        $item = $this->current();
+        if( !$item )return null;
+        if( $name==="cssText" )
         {
-            if( $item )
+            if( is_string($value) )
             {
-                static $attrpx = array(
-                    "width"=>"px",
-                    "height"=>"px",
-                    "left"=>"px",
-                    "top"=>"px",
-                    "bottom"=>"px",
-                    "right"=>"px",
-                    "borderRadius"=>"px",
-                );
-                $item->style->$name=$value.( isset($attrpx[$name]) ? $attrpx[$name] : '' );
+                $name = \es\system\System::unserialize($value);
+            }else{
+                $name = $value;
+            }
+            $value = null;
+        }
+
+        if( is_object($name) )
+        {
+            foreach( $name as $prop=>$value )
+            {
+                static::setStyle($item,$prop,$value);
             }
             return $this;
         }
-        return $item ? $item->style->$name : null;
+
+        if( $value != null )
+        {
+            static::setStyle($item,$name,$value);
+            return $this;
+        }
+        return isset( $item->style->$name) ? $item->style->$name : null;
     }
     public function show(){}
     public function hide(){}
+    public function left(){}
+    public function top(){}
+    public function right(){}
+    public function bottom(){}
+
+
     public function text( $value ){}
     public function value( $val ){}
     public function hasClass($className ){}

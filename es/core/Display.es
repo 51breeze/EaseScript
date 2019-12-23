@@ -117,6 +117,33 @@ package es.core
         /**
          * @private
          */
+        private var _radius:uint = NaN;
+
+        /**
+         * 设置表格的圆角值
+         * @param value
+         */
+        public function set radius(value:uint):void
+        {
+            if( !isNaN( value ) )
+            {
+               this.style("borderRadius", value);
+            }
+            this._radius=value;
+        }
+
+        /**
+         * 获取表格的圆角值
+         * @param value
+         */
+        public function get radius():uint
+        {
+            return (isNaN(_radius) ? parseInt(_element.style("borderRadius")) : this._radius) as uint;
+        }
+
+        /**
+         * @private
+         */
         private var _visible:Boolean=false;
         private var _visibleFlag:Boolean = false;
 

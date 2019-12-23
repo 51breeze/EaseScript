@@ -83,6 +83,7 @@ ListIterator.prototype = Object.create( Object.prototype, {
         }
         var items = storage(this, "items");
         var result = false;
+        var isorigin = items === storage(this, "target");
         if( items.length > 0 )
         {
             var cursor = storage(this, "cursor", "increment") + 1;
@@ -90,9 +91,16 @@ ListIterator.prototype = Object.create( Object.prototype, {
             if( result )
             {
                 var item = items[ cursor ];
-                storage(this, "current", item.value );
-                storage(this, "key", item.key );
-                return Object.merge({}, item);
+                if( isorigin )
+                {
+                    storage(this, "current", item );
+                    storage(this, "key", cursor );
+
+                }else
+                {
+                    storage(this, "current", item.value );
+                    storage(this, "key", item.key );
+                }
 
             }else if ( cursor > 0 )
             {

@@ -1,13 +1,11 @@
 <?php
-$start = microtime(true);
 define("EASESCRIPT_ROOT", realpath( __DIR__."[CODE[EASESCRIPT_ROOT]]") );
 define("URL_PATH_NAME", "[CODE[STATIC_URL_PATH_NAME]]");
 spl_autoload_register(function( $name )
 {
-    static $globals=['BaseObject','Function','Array','String','Number','EventDispatcher','Event',"PropertyEvent",
-    'Boolean','Math','Date','RegExp','Error','ReferenceError','TypeError','SyntaxError','Locator',
-    'JSON','Reflect','Symbol','console','System','Element','Document','HTMLElement','Node','Console','Namespaces',
-    'Render','DataSource','Http','HttpEvent','MouseEvent','DataSourceEvent','DataGrep','DataGrep','Request'];
+    static $globals=['BaseObject','ArrayList','String','EventDispatcher','Event',"PropertyEvent",
+    'Date','RegExp','Error','ReferenceError','TypeError','SyntaxError','Locator','JSON','Reflect','console',
+    'System','Element','Document','HTMLElement','Node','Console','Namespaces','Http','HttpEvent','DataGrep'];
 
     if( in_array($name,$globals) )
     {
@@ -21,6 +19,77 @@ spl_autoload_register(function( $name )
     }
 
 },true,true);
+
+
+class Request
+{
+    private $request = null;
+    private $params = null;
+    public function __construct(Illuminate\Http\Request $request, $params)
+    {
+        $this->request = $request;
+        $this->params = $params;
+    }
+
+    public function __get($name)
+    {
+        $request = $this->request;
+        switch( strtolower($name) )
+        {
+            case "method":
+               return $request->method();
+            case "path":
+                return $request->path();
+            case "body":
+                return new \es\system\BaseObject( $request->request->all() );
+            case "query":
+                return new \es\system\BaseObject( $request->query->all() );
+            case "params":
+                return new \es\system\BaseObject( $this->params );
+            case "host":
+                return $request->request->server->get("HTTP_HOST");
+            case "port":
+                return $request->request->server->get("SERVER_PORT");
+            case "protocol":
+                return $request->request->server->get("HTTPS")==="on" ? "https" : "http";
+            case "cookie":
+                return new BaseObject( $request->cookies->all() );
+            case "uri":
+                return $request->getUri();
+            case "url":
+                return $request->fullUrl();
+        }
+    }
+}
+
+
+class Response
+{
+    private $response = null;
+    public function __construct(Illuminate\Http\Response $response)
+    {
+        $this->response = $response;
+    }
+
+    public function send( $content )
+    {
+        $this->response->setContent( $content );
+    }
+
+    public function sendFile(){
+
+    }
+
+    public function status( $code )
+    {
+        $this->response->setStatusCode( $code );
+    }
+
+    public function end()
+    {
+
+    }
+}
 
 
 function Element($selector,  $context = null)
@@ -37,32 +106,18 @@ class EaseScript extends \es\system\EventDispatcher
     {
         parent::__construct( \es\system\Document::document() );
         $this->routes = &$routes;
-        $environmentMap = new \es\system\BaseObject(array(
-            "HTTP_DEFAULT_ROUTE"=>"[CODE[DEFAULT_BOOTSTRAP_ROUTER_PROVIDER]]",
-            "HTTP_ROUTES"=>&$routes,
-            "URL_PATH_NAME"=>URL_PATH_NAME,
-            "VERSION"=>[CODE[VERSION]],
-            "ROOT_PATH"=>EASESCRIPT_ROOT,
-            "HTTP_ROUTE_CONTROLLER"=>null,
-            "HTTP_ROUTE_PATH"=>null,
-            "COMMAND_SWITCH"=>[CODE[COMMAND_SWITCH]],
-            "LOAD_JS_PATH"=>"[CODE[JS_LOAD_PATH]]",
-            "LOAD_CSS_PATH"=>"[CODE[CSS_LOAD_PATH]]",
-        ));
 
-        $this->environmentMap = $environmentMap;
-        \es\system\Reflect::set(\es\system\System::class, \es\system\System::class, "environmentMap", $environmentMap);
-        $this->addEventListener( \es\system\RouteEvent::HTTP_MATCH,function ($event)use($routes, $environmentMap ){
-            $result = $this->match($event->request->method(), $event->request->path() );
-            if( $result )
-            {
-                $environmentMap->HTTP_ROUTE_CONTROLLER = $result["provider"];
-                $environmentMap->HTTP_ROUTE_PATH = $event->request->path();
-                list($module,$method) = explode("@", $result["provider"]);
-                $event->response = $this->response( $module,  $method, $result["param"] );
-                $event->matched = true;
-            }
-        });
+        $env = \es\system\System::$env;
+        $env->HTTP_DEFAULT_ROUTE = "[CODE[DEFAULT_BOOTSTRAP_ROUTER_PROVIDER]]";
+        $env->HTTP_ROUTES = $routes;
+        $env->URL_PATH_NAME = URL_PATH_NAME;
+        $env->VERSION =[CODE[VERSION]];
+        $env->ROOT_PATH = EASESCRIPT_ROOT;
+        $env->COMMAND_SWITCH =[CODE[COMMAND_SWITCH]];
+        $env->LOAD_JS_PATH ="[CODE[JS_LOAD_PATH]]";
+        $env->LOAD_CSS_PATH ="[CODE[CSS_LOAD_PATH]]";
+        $env->LOAD_SCRIPTS = new \es\system\BaseObject( json_decode('[CODE[LOAD_SCRIPTS]]') );
+        $this->environmentMap = $env;
     }
 
     /**
@@ -139,44 +194,11 @@ class EaseScript extends \es\system\EventDispatcher
         array_push($this->pipelines, [$name, $callback, $priority]);
     }
 
-    /**
-     * 响应请求的数据
-     * @param $controller
-     * @return string
-     */
-    public function response( $module , $method , $args=array() )
+    public function bindPipeline( \es\system\EventDispatcher $target )
     {
-        $obj = new $module();
-
-        //添加管道服务
         foreach ($this->pipelines as $pipe)
         {
-            $obj->addEventListener($pipe[0], $pipe[1], false, $pipe[2]);
-        }
-        $response = call_user_func_array( array($obj, $method), $args);
-        if( class_exists('\es\events\PipelineEvent',false) && method_exists($obj,"dispatchEvent") )
-        {
-            $event = new \es\events\PipelineEvent( \es\events\PipelineEvent::RESPONSE_BEFORE );
-            $event->data = $response;
-            $obj->dispatchEvent( $event );
-            $response = $event->data;
-        }
-
-        if( class_exists('\es\core\View',false) && is_a($response,'\es\core\View') )
-        {
-            return "<!DOCTYPE html>\r\n".(\es\system\Document::document()->documentElement->outerHTML);
-        }else if( class_exists('\es\core\Skin',false) && is_a($response,'\es\core\Skin') )
-        {
-            return $response->Get_element()->html(true);
-        }else if( is_a($response,'\es\system\Element') )
-        {
-            return $response->html(true);
-        }else if( is_a($response,'\es\system\BaseObject') )
-        {
-            return $response->valueOf();
-        }else
-        {
-            return $response;
+            $target->addEventListener($pipe[0], $pipe[1], false, $pipe[2]);
         }
     }
 
@@ -186,17 +208,28 @@ class EaseScript extends \es\system\EventDispatcher
      */
     public function bindRoute(\Closure $callback)
     {
-        $environmentMap = $this->environmentMap;
+        $env = $this->environmentMap;
+        $env->BOOT_APP = $this;
         foreach ( $this->routes as $method => $route )
         {
-            foreach ($route as $name => $controller )
+            foreach ($route as $name => $provider )
             {
-                $callback($method, $name , function(...$args)use( $controller , $name, $environmentMap )
+                call_user_func($callback, $method, $name,
+                function( Illuminate\Http\Request $request, Illuminate\Http\Response $response, $params )
+                use( $provider , $name, $env )
                 {
-                     $environmentMap->HTTP_ROUTE_CONTROLLER = $controller;
-                     $environmentMap->HTTP_ROUTE_PATH = $name;
-                     list($module,$method) = explode("@", $controller);
-                     return $this->response( $module, $method, $args );
+                     $env->HTTP_ROUTE_CONTROLLER = $provider;
+                     $env->HTTP_ROUTE_PATH = $name;
+                     list($module,$method) = explode("@", $provider);
+                     $module = str_replace('.','\\',$module);
+
+                     $env->HTTP_REQUEST  = new Request( $request, $params );
+                     $env->HTTP_RESPONSE = new Response( $response );
+                    
+                     $obj = new $module();
+                     $this->bindPipeline( $obj );
+                     call_user_func_array( array($obj, $method), $params);
+                     return $response;
                 });
             }
         }
@@ -204,7 +237,3 @@ class EaseScript extends \es\system\EventDispatcher
 }
 $routes=[CODE[SERVICE_ROUTE_LIST]];
 return new EaseScript($routes);
-
-
-
-

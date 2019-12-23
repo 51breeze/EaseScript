@@ -24,6 +24,11 @@ package es.components.popup
          */
         protected var timeoutId:Number=NaN;
 
+        public function BasePopUp(componentId:String = UIDInstance())
+        {
+            super(componentId);
+        }
+
         /**
          * @private
          */

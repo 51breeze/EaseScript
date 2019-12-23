@@ -6,6 +6,9 @@
  * @author Jun Ye <664371281@qq.com>
  */
 
+var PATH = require("@path");
+var FS = require("@fs");
+
 module.exports =(function(
 Internal,
 $Object,
@@ -182,11 +185,18 @@ Internal.defineClass=function(name,classFactory,desc,type)
 
 Internal.getClassModule=function( name )
 {
+    if( typeof name !=="string" )return null;
     if( modules.hasOwnProperty(name) )
     {
         return modules[name];
     }
+     var file = PATH.join( Internal.env.ROOT_PATH, name.replace(/\./g,'/')+".js");
+     if( FS.existsSync(file) )
+     {
+        return require( file );
+     }
     return null;
+
 }
 
 Internal.$Object = $Object;

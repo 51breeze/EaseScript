@@ -42,17 +42,26 @@ function include(contents, name , filepath, config )
         var context = path.dirname( filepath );
         var dependencies = [];
         str += utils.getContents( filepath );
-        str = str.replace(/\=\s*require\s*\(\s*([\"\'])(.*?)\1\s*\)/g,function(a,b,c){
-             var info = path.parse(c);
-             if( utils.excludeLoadSystemFile( info.name, excludeMode ) || ( config.globals.hasOwnProperty(info.name) && config.globals[info.name].notLoadFile===true ) )
-             {
-                return '';
-             }
-             var filename = info.name+".js";
-             var identifier = path.isAbsolute(c) ? c : './'+path.relative(context , path.resolve( context, filename ) );
-             include(contents, info.name , null, config );
-             dependencies.push( info.name );
-             return '=require("'+identifier.replace(/\\/g,'/')+'")';
+        str = str.replace(/\bvar\s+(\w+)\s*\=\s*require\s*\(\s*([\"\'])([^\2]*?)\2\s*\)\s*\;?/g,function(a,b,d,c){
+
+            var info = path.parse(c);
+            if( utils.excludeLoadSystemFile( info.name , excludeMode ) || ( config.globals.hasOwnProperty(info.name) && config.globals[info.name].notLoadFile===true ) )
+            {
+               return '';
+            }
+
+            if( info.name.charAt(0) ==="@" )
+            {
+                return 'var '+b+'=require("'+c.substr(1)+'");';
+
+            }else
+            {
+                var filename = info.name+".js";
+                var identifier = path.isAbsolute(c) ? c : './'+path.relative(context , path.resolve( context, filename ) );
+                include(contents, info.name , null, config );
+                dependencies.push( info.name );
+                return 'var '+b+'=require("'+identifier.replace(/\\/g,'/')+'");';
+            }
         });
 
         if( name ==="Internal" )

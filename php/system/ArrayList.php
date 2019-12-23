@@ -29,7 +29,7 @@ class ArrayList extends BaseObject implements \Countable
     {
         if( func_num_args() === 1 && System::isArray( func_get_arg(0) ) )
         {
-            call_user_func_array("array_splice", array_merge( array(&$this->dataItems,0,0), array( func_get_arg(0) ) ) );
+            $this->dataItems=func_get_arg(0);
         }else{
             $this->dataItems=func_get_args();
         }
@@ -37,22 +37,23 @@ class ArrayList extends BaseObject implements \Countable
 
     public function slice($offset, $length = null, $preserve_keys = null)
     {
-        return array_slice($this->dataItems, $offset, $length, $preserve_keys);
+        return new ArrayList( array_slice($this->dataItems, $offset, $length, $preserve_keys) );
     }
 
-    public function splice($offset, $length = null, $replacement = null)
+    public function splice($offset, $length = null, $replacement=null )
     {
         if( $replacement===null )
         {
             return array_splice($this->dataItems, $offset, $length);
         }
-        return array_splice($this->dataItems, $offset, $length, array( $replacement ) );
+        $replacement = array_slice( func_get_args(), 2);
+        return array_splice($this->dataItems, $offset, $length, $replacement );
     }
 
     public function concat()
     {
         $param = array_merge( array( $this->dataItems ) , func_get_args() );
-        return new ArrayList( call_user_func_array("array_merge", $param ) );
+        return new ArrayList( $param  );
     }
 
     public function join( $glue="" )
@@ -94,13 +95,14 @@ class ArrayList extends BaseObject implements \Countable
 
     public function indexOf( $value )
     {
-        return array_search($value, $this->dataItems, true );
+        $index = array_search($value, $this->dataItems, true );
+        return $index === false ? -1 : $index;
     }
 
     public function map( $callback, $thisArg = null )
     {
         if( $thisArg == null )$thisArg=$this;
-        $callback = System::bind($thisArg,$callback);
+        $callback = System::bind($callback,$thisArg);
         return new ArrayList( array_map( $callback , $this->dataItems ) );
     }
 

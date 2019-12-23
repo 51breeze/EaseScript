@@ -10,8 +10,10 @@ package es.core
    import es.core.View;
    import es.core.Skin;
    import es.core.Interaction;
+   import es.core.Storage;
    import es.events.ApplicationEvent;
    import es.interfaces.IDisplay;
+   import es.core.SystemManage;
 
    public class Application extends EventDispatcher
    {
@@ -23,12 +25,21 @@ package es.core
        public function Application()
        {
            super( document );
-           when( Syntax(origin) ){
+           when( Syntax(origin) )
+           {
                 this.appContainer = Element.createElement("div");
                 this.appContainer.className="application";
                 this.appContainer.setAttribute("id","application");
-           }then{
+
+           }then
+           {
                 this.appContainer = document.getElementById("application");
+                if( !this.appContainer )
+                {
+                    this.appContainer = Element.createElement("div");
+                    this.appContainer.className="application";
+                    this.appContainer.setAttribute("id","application");
+                }
            }
        }
 
@@ -76,69 +87,6 @@ package es.core
                 this.appContainer = container;
            }
            return container;
-       }
-
-       /**
-        * 获取所有交互数据转成JSON字符串
-        * @returns {String}
-        */
-       [RunPlatform(server)]
-       protected function propertiesToJson():String
-       {
-           var object:Object = Interaction.getProperties().valueOf() as Object;
-           var data:Object={};
-           var self:Application = this;
-           Object.forEach(object,function (value:*,name:*) {
-               value = self.valueToString(value);
-               if( value !== null ) {
-                   data[name] =value;
-               }
-           });
-           return JSON.stringify( data );
-       }
-
-       [RunPlatform(server)]
-       protected function valueToString( value:* ):*
-       {
-           if( typeof value === "boolean" )
-           {
-               return value;
-           }else if( typeof value === "Number" )
-           {
-               return value;
-           }else if( value == null )
-           {
-               return null;
-           }
-           if( value instanceof Skin )
-           {
-               var elem:Element = (value as Skin).element;
-               if(  elem.isNodeInDocumentChain() ) {
-                  // return '#' + (value as Skin).generateId();
-               }else{
-                   return null;
-               }
-
-           }else if( value instanceof Object || value instanceof Array )
-           {
-               var map:Object = {};
-               var self:Application = this;
-               var has:Boolean = false;
-               Object.forEach(value as Object, function (item: *, name: String) {
-                   item = self.valueToString( item );
-                   if( item !== null )
-                   {
-                       map[name] = item;
-                       has = true;
-                   }
-               });
-               if( has ) {
-                   return map;
-               }else{
-                   return null;
-               }
-           }
-           return value;
        }
 
        /**
@@ -226,6 +174,68 @@ package es.core
            }
        }
 
+        /**
+        * 获取当前应用的脚本路径
+        * @param type 
+        * @return {String}
+        */
+       [RunPlatform(server)]
+       protected function getScriptPath( type:String ):String
+       {
+           var classname:String = __CLASS__;
+           var name:String = classname.substr( classname.lastIndexOf(".")+1 ).toLowerCase();
+           switch( type.toLowerCase() )
+           {
+               case "js" :
+                 return `/js/${name}.js`;
+               case "css" :
+                 return `/css/${name}.css`;
+           }
+           return '';
+       }
+
+       /**
+       * 响应一个视图页面
+       */
+       [RunPlatform(server)]
+       protected responser()
+       {
+            SystemManage.done(()=>{
+
+                document.title = this.title || "title";
+
+                var script:Node = new HTMLElement('script') as Node;
+                script.content='window["'+Interaction.key+'"]='+ JSON.stringify( Interaction.dataset );
+                document.head.appendChild( script );
+
+                var scripts:Object = System.environments("LOAD_SCRIPTS");
+                var classname:String = __CLASS__;
+                var items:Array = scripts[classname] || [];
+                for(var value:String of items )
+                {
+                    var type:String = value.substr(value.lastIndexOf(".")+1);
+                    if( type ==="js" )
+                    {
+                        var main:Node = new HTMLElement('script') as Node;
+                        main.setAttribute("src",  this.getScriptPath("js") ); 
+                        document.body.appendChild( main );
+
+                    }else if( type ==="css")
+                    {
+                        var link:Node = new HTMLElement('link') as Node;
+                        link.setAttribute("href",  this.getScriptPath("css") );
+                        link.setAttribute("rel", "stylesheet"); 
+                        document.head.appendChild( link );
+                    }
+                }
+            
+                var res:Response = System.environments("HTTP_RESPONSE") as Response;
+                res.status( 200 );
+                res.send( document.documentElement.outerHTML );
+
+            });
+       }
+
        /**
         * 渲染并且显示一个视图
         */
@@ -237,24 +247,7 @@ package es.core
            {
                (document.body as Node).appendChild( app );
            }
-
-           when( RunPlatform(server) )
-           {
-               var script:Node = new HTMLElement('script') as Node;
-               script.content='window["'+Interaction.key+'"]='+ propertiesToJson();
-               document.head.appendChild( script );
-
-               var main:Node = new HTMLElement('script') as Node;
-               main.setAttribute("src", "/js/test.js"); 
-               document.head.appendChild( main );
-
-               var link:Node = new HTMLElement('link') as Node;
-               link.setAttribute("href", "/css/test.css");
-               link.setAttribute("rel", "stylesheet"); 
-               document.head.appendChild( link );
-
-               System.environments("HTTP_RESPONSE").send( document.documentElement.outerHTML );
-           }
+           this.responser();
            return view;
        }
    }

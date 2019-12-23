@@ -120,7 +120,7 @@ class Document extends HTMLElement
 
         if( $context === null )
         {
-            $context = System::document();
+            $context = Document::$document;
 
         }else if( is_string($context) )
         {

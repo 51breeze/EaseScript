@@ -22,6 +22,8 @@ final class System
         echo call_user_func_array('sprintf',  $param );
     }
 
+    public static $env = null;
+
     /**
      * 全局唯一值
      * @returns {string}
@@ -278,7 +280,7 @@ final class System
                 }
                 $val = $type === 'attr' ? '"' . $val . '"' : $val;
             }
-            array_splice( $str, 0, 0, array( $key . $separate . $val ) );
+            array_push( $str, $key . $separate . $val  );
         }
         return implode($joint, $str);
     }
@@ -326,7 +328,17 @@ final class System
                 $object[ $item[0] ] = $item[1];
             }
         }
-        return $object;
+        return (object)$object;
+    }
+
+    static function getDefinitionByName( $name )
+    {
+        $name = str_replace(".",'\\',$name);
+        if( !class_exists( $name, true ) )
+        {
+            throw ReferenceError("is not exists ". $name );
+        }
+        return $name;
     }
 
     static function getQualifiedObjectName( $object )
@@ -350,19 +362,18 @@ final class System
         return static::$context;
     }
 
-    static private $environmentMap = array();
     static public function environments( $name=null )
     {
         if( is_string($name) )
         {
-            return static::$environmentMap[ $name ];
+            return static::$env->$name;
         }
-        return static::$environmentMap;
+        return static::$env;
     }
 
-    static public function setTimeout($callback, $timeout=0)
+    static public function setTimeout($callback, $timeout=0, $thisArg = null )
     {
-        call_user_func( $callback );
+        call_user_func( $callback, $thisArg );
     }
 
     static public function clearTimeout($id)
@@ -370,3 +381,29 @@ final class System
         
     }
 }
+
+class Env{
+
+    private $target = null;
+    public function __constructor()
+    {
+        $this->target = new \stdClass();
+    }
+
+    public function platform()
+    {
+        return false;
+    }
+
+    public function __get( $name )
+    {
+        return isset($this->target->$name) ? $this->target->$name : null;
+    }
+
+    public function __set($name , $value )
+    {
+        $this->target->$name = $value;
+    }
+}
+
+System::$env = new Env();

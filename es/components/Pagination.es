@@ -33,6 +33,8 @@ package es.components
     import es.core.Skin;
     import es.events.PaginationEvent;
     import es.core.Display;
+    import es.core.DataSource;
+    import es.events.DataSourceEvent;
 
     [Skin("es.skins.PaginationSkin")]
     public class Pagination extends SkinComponent
@@ -82,16 +84,16 @@ package es.components
          */
         public function set source( data:* ):void
         {
-            this.dataSource.source( data );
+            this.dataSource.source= data;
         };
 
         /**
          * 获取数据源
          * @returns {Object}
          */
-        public function get source():Object
+        public function get source():*
         {
-            return this.dataSource.source();
+            return this.dataSource.source;
         };
 
         /**
@@ -100,7 +102,7 @@ package es.components
          */
         public function get profile():String
         {
-            return this.getAssign("profile", 'page') as String;
+            return (this.assign("profile") || "page") as String;
         }
 
         /**
@@ -109,11 +111,14 @@ package es.components
          */
         public function set profile( value:String ):void
         {
-            this.setAssign("profile", value);
+            this.assign("profile", value);
             if( this.initialized )
             {
-                var curr:int = (int)Locator.query(value, 1);
-                this.current = isNaN( curr ) ? 1 : curr;
+                var curr:int = (int)Locator.query(value, 0);
+                if( curr > 0 )
+                {
+                    this.current = curr;
+                }
             }
         }
 
@@ -124,7 +129,7 @@ package es.components
          */
         public function set url( value:* ):void
         {
-            this.setAssign("url", value);
+            this.assign("url", value);
         };
 
         /**
@@ -133,7 +138,7 @@ package es.components
          */
         public function get url():*
         {
-            return  this.getAssign("url", null);
+            return this.assign("url");
         };
 
         /**
@@ -143,7 +148,12 @@ package es.components
          */
         public function get totalPage():int
         {
-            return this.dataSource.totalPage() || 1;
+            var dataSource:DataSource = this.dataSource;
+            if( dataSource )
+            {
+               return dataSource.totalPage || 1;
+            }
+            return 1;
         };
 
         /**
@@ -152,7 +162,12 @@ package es.components
          */
         public function get totalSize():int
         {
-            return this.dataSource.totalSize();
+            var dataSource:DataSource = this.dataSource;
+            if( dataSource )
+            {
+                return dataSource.totalSize;
+            }
+            return NaN;
         };
 
         /**
@@ -161,18 +176,25 @@ package es.components
          */
         public function get pageSize():int
         {
-            return this.getAssign("pageSize", this.dataSource.pageSize() ) as int;
+            var dataSource:DataSource = this.dataSource;
+            if( dataSource )
+            {
+                return dataSource.pageSize;
+            }
+            return (this.assign("pageSize") || 20) as int;
         };
 
         public function set pageSize(num:int):void
         {
-            this.setAssign("pageSize",num);
-
+            this.assign("pageSize",num);
             var dataSource:DataSource = this.dataSource;
-            dataSource.pageSize( num );
-            if( this.initialized )
+            if( dataSource )
             {
-                dataSource.select();
+                dataSource.pageSize=num;
+                if( this.initialized )
+                {
+                    dataSource.select();
+                }
             }
         };
 
@@ -182,7 +204,7 @@ package es.components
          */
         public function get current():int
         {
-            return this.getAssign("current", (int)Locator.query( this.profile, 1) ) as int;
+            return (this.assign("current") || parseInt(Locator.query( this.profile, 1))) as int;
         };
 
         /**
@@ -195,7 +217,7 @@ package es.components
             num = this.totalSize > 0 ? Math.min( Math.max(1, num), this.totalPage ) : num;
             if( num !== current && !isNaN(num) )
             {
-                this.setAssign("current",num);
+                this.assign("current",num);
                 if( this.initialized )
                 {
                     var event:PaginationEvent = new PaginationEvent(PaginationEvent.CHANGE);
@@ -220,7 +242,7 @@ package es.components
          */
         public function get link():int
         {
-            return this.getAssign("link",7) as int;
+            return (this.assign("link") || 7) as int;
         }
 
         /**
@@ -229,7 +251,7 @@ package es.components
          */
         public function set link( num:int ):void
         {
-            this.setAssign("link",num);
+            this.assign("link",num);
         }
 
          /**
@@ -238,7 +260,7 @@ package es.components
          */
         public function get jumpUrl():Boolean
         {
-            return this.getAssign("jumpUrl",false) as Boolean;
+            return !!this.assign("jumpUrl");
         }
 
          /**
@@ -247,7 +269,7 @@ package es.components
          */
         public function set jumpUrl(value:Boolean):void
         {
-            this.getAssign("jumpUrl",value);
+            this.assign("jumpUrl",value);
         }
 
         /**
@@ -257,7 +279,7 @@ package es.components
          */
         public function get wheelTarget():Object
         {
-            return this.getAssign("wheelTarget") as Object;
+            return this.assign("wheelTarget") as Object;
         }
 
         /**
@@ -267,10 +289,10 @@ package es.components
          */
         public function set wheelTarget( value:Object )
         {
-            var old:Object = this.getAssign("wheelTarget") as Object;
+            var old:Object = this.assign("wheelTarget") as Object;
             if( old !== value && value )
             {
-                this.setAssign("wheelTarget", value);
+                this.assign("wheelTarget", value);
                 when(RunPlatform(client))
                 {
                     if (old)

@@ -28,11 +28,13 @@
     <style file="DataGridStyle.less" />
 
     <s:Declare>
+    <![CDATA[
+
        const {
            headHeight:int=25,
            rowHeight:int=25,
            footHeight:int=25,
-           dataList:Array=[],
+           datalist:Array=[],
            columns:Object={},
            current:int=NaN
         } = dataset;
@@ -41,8 +43,11 @@
             return `height:${value}px;line-height:${value}px;`;
         };
 
-    </s:Declare>
+        const footer:Array = hostComponent.footer;
+        const showFoot:Boolean = !!(footer && footer.length);
 
+    ]]>
+    </s:Declare>
 
     <thead id="@head">
         <tr>
@@ -53,7 +58,7 @@
     </thead>
 
     <tbody id="@body">
-        <:foreach name="dataList" value="item">
+        <:foreach name="datalist" value="item">
             <tr>
                 <:foreach name="columns" value="val" key="field">
                     <:switch name="field">
@@ -71,10 +76,10 @@
         </:foreach>
     </tbody>
 
-    <tfoot includeIn="@hostComponent.pagination !== null">
+    <tfoot includeIn="@showFoot">
          <tr>
              <td colspan="3" setStyle="{getStyleHeight(footHeight)}" id="@foot">
-                {hostComponent.pagination}
+                {footer}
              </td>
          </tr>
     </tfoot> 

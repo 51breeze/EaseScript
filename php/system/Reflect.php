@@ -76,6 +76,12 @@ final class Reflect
             $type = 2;
             $name = $accessor.$name;
             $method = $reflect->getMethod( $name );
+
+        }else if(  $reflect->hasMethod( $name ) )
+        {
+            $type = 3;
+            $name = $name;
+            $method = $reflect->getMethod( $name );
         }
 
         $scopeReflect = null;
@@ -93,6 +99,12 @@ final class Reflect
             {
                 $type = 2;
                 $name = $accessor.$name;
+                $method = $scopeReflect->getMethod( $name );
+            
+            }else if(  $scopeReflect->hasMethod( $name ) )
+            {
+                $type = 3;
+                $name = $name;
                 $method = $scopeReflect->getMethod( $name );
             }
         }
@@ -157,11 +169,9 @@ final class Reflect
         }
         if( $thisArgument !=null )
         {
-            $obj = new \ReflectionFunction( $target );
-            $target = \Closure::bind( $obj->getClosure(), $thisArgument );
-            unset($obj);
+            $target = System::bind( $target, $thisArgument);
         }
-        return call_user_func_array( $target, $argumentsList==null ? array() :  $argumentsList );
+        return call_user_func_array( $target, $argumentsList==null ? array() : $argumentsList instanceof BaseObject ? $argumentsList->valueOf() : $argumentsList );
     }
 
     final static public function call( $scope, $target, $name=null, array $args=null, $thisArg=null, $ns=null )
@@ -230,7 +240,7 @@ final class Reflect
                         return count($target);
                 }
             }
-            return $target[$name];
+            return isset($target[$name]) ? $target[$name] : null;
         }
 
         if ( is_string($target) )
@@ -245,7 +255,11 @@ final class Reflect
         if( $desc )
         {
             list($type, $method) = $desc;
-            $desc = false;
+            if( $type === 3 )
+            {
+                return $method->getClosure($target);
+            }
+
             if( $type===2 )
             {
                 $thisArg = $thisArg==null ? $target : $thisArg;

@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<s:View xmlns:s="es.core"  xmlns:c="es.components" xmlns:g="@"  skinname="{message}" datavalue="{{inputValue}}">
+<s:View xmlns:s="es.core"  xmlns:c="es.components" xmlns:g="@"  skinname="{message}">
     <s:Metadata>[HostComponent("Test")]</s:Metadata>
     <![CDATA[
          import es.core.Display;
          import es.components.PopUp;
          import PropertyEvent;
+         import es.events.PaginationEvent;
         
          private click(e:Event)
          {
@@ -19,9 +20,9 @@
 
             PopUp.confirm("Are you ok?", (e:String)=>{
 
-                this.answer.innerHTML = e==="submit" ? "很好" : "一般";
+               // this.answer.innerHTML = e==="submit" ? "很好" : "一般";
 
-                console.log(  e,  this.answer );
+                //console.log(  e,  this.answer );
 
             },{profile:{
                 submitText:"很好",
@@ -41,14 +42,29 @@
 
          override protected mount()
          {
+         }
 
-           
+         override protected initializing()
+         {
+             super.initializing();
+             var dataGrid:DataGrid = this.dataGrid;
+             if( dataGrid.pagination )
+             {
+                dataGrid.pagination.addEventListener(PaginationEvent.CHANGE, (e:PaginationEvent)=>{
+
+                     this.dataset.current = e.newValue;
+                });
+
+             }
 
          }
+
+
 
          private testClick( e:MouseEvent )
          {
             console.log(  e.target ,"testClick" );
+
          }
 
          protected apply()
@@ -78,7 +94,7 @@
     <s:Declare>
        const {
            message:String="title is default",
-           current:int=6,
+           current:int=3,
            list:Array=["one","two","three"]
         } = dataset;
     </s:Declare>
@@ -182,14 +198,14 @@
         <c:DataGrid 
             id="@dataGrid"  
             includeIn="grid" 
-            rows="5"
+            pageSize="5"
             >
 
              <c:pagination>
-             
                  <c:wheelTarget>@dataGrid</c:wheelTarget>
              </c:pagination>
-    
+
+
 
             <!-- 这里是使用数据源自动加载数据  -->
             <!-- <c:source>http://local.working.com/json.php</c:source>
@@ -198,7 +214,7 @@
             </c:dataSource> -->
 
             <!-- 这里是配置的配置数据源 -->
-            <c:source>
+            <!-- <c:source>
                 <g:Array>
                     <g:Object>
                         <id>1</id>
@@ -268,13 +284,24 @@
                         <phone>1896325987</phone>
                     </g:Object>
                 </g:Array>
+            </c:source> -->
+
+            <c:source>
+                @ServiceProvider("/News/match","server.News@match","get")
             </c:source>
 
             <!-- 数据源对列的关系名 -->
             <c:columns>
-                <id>ID</id>
-                <name>名称</name>
-                <phone>电话</phone>
+                <!-- <g:Object>
+                    <id>ID</id>
+                    <title>名称</title>
+                    <content>电话</content>
+                </g:Object> -->
+                <g:Object>
+                    <id>ID</id>
+                    <name>名称</name>
+                    <phone>电话</phone>
+                </g:Object>
             </c:columns>
             
         </c:DataGrid>

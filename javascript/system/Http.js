@@ -68,7 +68,7 @@ if( typeof window !=="undefined" )
  * 完成请求
  * @param event
  */
-function done(event)
+function done(url, data, method)
 {
     var options = this.__options__;
     var xhr = options.xhr;
@@ -104,8 +104,9 @@ function done(event)
     e.originalEvent = event;
     e.data = result || {};
     e.status = xhr.status;
-    e.url = options.url;
-    e.param = options.param;
+    e.method = method;
+    e.url = url;
+    e.param = data;
     this.dispatchEvent(e);
     if( options.queues.length>0)
     {
@@ -142,11 +143,11 @@ function error()
     this.dispatchEvent(e);
 }
 
-function getXHR( target )
+function getXHR( target, url, data, method )
 {
     var xhr = window.XMLHttpRequest ? new window.XMLHttpRequest() : new window.ActiveXObject("Microsoft.XMLHTTP");
     xhr.onreadystatechange = function () {
-        if (xhr.readyState === 4)done.call( target );
+        if (xhr.readyState === 4)done.call( target, url, data, method );
     };
     return xhr;
 }
@@ -199,6 +200,13 @@ Http.prototype = Object.create( EventDispatcher.prototype,{
 Object.defineProperty(Http.prototype,"option", {value:function option(name, value)
 {
     var options = this.__options__;
+
+    if( typeof name === "object" )
+    {
+       Object.merge(true,options, name);
+       return this;
+    }
+
     if( value == null ){
         return options[ name ];
     }
@@ -233,12 +241,14 @@ Object.defineProperty(Http.prototype,"abort", {value:function abort()
  */
 Object.defineProperty(Http.prototype,"load",{value:function load(url, data, method)
 {
-    if (typeof url !== "string")throw new Error('Invalid url');
+
     var options = this.__options__;
     var method = method || options.method;
     var async = !!options.async;
-    var xhr;
+    var xhr = null;
+    url = url || options.url;
 
+    if (typeof url !== "string")throw new Error('Invalid url');
     if( options.loading ===true )
     {
         options.queues.push( [url, data, method] );
@@ -268,7 +278,8 @@ Object.defineProperty(Http.prototype,"load",{value:function load(url, data, meth
                     options.timeoutTimer = null;
                 }
                 options.loading=false;
-                event.url=options.url;
+                event.url=url;
+                event.method=method;
                 this.dispatchEvent(event);
 
             }, false, 0, this);
@@ -276,7 +287,7 @@ Object.defineProperty(Http.prototype,"load",{value:function load(url, data, meth
 
         } else
         {
-            xhr = options.xhr = getXHR( this );
+            xhr = options.xhr = getXHR( this, url, data, method );
             data = data != null ? System.serialize(data, 'url') : null;
             if (method === Http.METHOD_GET && data)
             {

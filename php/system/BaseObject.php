@@ -84,7 +84,11 @@ class BaseObject extends \stdClass implements \Iterator, \ArrayAccess
                         }
                         if( $type==='array' )
                         {
-                            $target[ $key ]=BaseObject::merge( $deep, $cloneObj, $copy );
+                            if( is_int($key) ){
+                                array_push( $target, BaseObject::merge( $deep, $cloneObj, $copy ) );
+                            }else{
+                               $target[ $key ]=BaseObject::merge( $deep, $cloneObj, $copy );
+                            }
                         }else
                         {
                             $target->$key=BaseObject::merge( $deep, $cloneObj, $copy );
@@ -94,7 +98,12 @@ class BaseObject extends \stdClass implements \Iterator, \ArrayAccess
                     {
                         if( $type==='array' )
                         {
-                            $target[ $key ]=$copy;
+                            if( is_int($key) ){
+                               array_push( $target, $copy);
+                            }else{
+                                $target[ $key ]=$copy; 
+                            }
+                            
                         }else
                         {
                             $target->$key=$copy;

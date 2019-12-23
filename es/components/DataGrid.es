@@ -10,6 +10,8 @@ package es.components
     import es.components.Pagination;
     import es.core.Display;
     import es.core.Skin;
+    import es.core.DataSource;
+    import es.events.DataSourceEvent;
 
     [Skin("es.skins.DataGridSkin")]
     public class DataGrid extends SkinComponent
@@ -56,8 +58,7 @@ package es.components
                         if( last != e.current )
                         {
                             last = e.current;
-                            this.setAssign( "current", e.current );
-                            this.setAssign( "dataList", e.data );
+                            this.assign( "datalist", e.data);
                         }
                     }
                 });
@@ -71,16 +72,16 @@ package es.components
          */
         public function set source( data:* ):void
         {
-            this.dataSource.source( data );
+            this.dataSource.source= data;
         };
 
         /**
          * 获取数据源
          * @returns {Object}
          */
-        public function get source():Object
+        public function get source():*
         {
-            return this.dataSource.source();
+            return this.dataSource.source;
         };
 
         /**
@@ -88,7 +89,7 @@ package es.components
          */
         public function get columns():Object
         {
-            return this.getAssign("columns",{}) as Object;
+            return this.assign("columns") as Object;
         };
 
         /**
@@ -97,17 +98,8 @@ package es.components
          */
         public function set columns( columns:Object ):void
         {
-            this.setAssign("columns", isString(columns) ? columns.split(',') : columns );
+            this.assign("columns", isString(columns) ? columns.split(',') : columns );
         };
-
-         /**
-         * 获取一组数据
-         * @param value
-         */
-        public function get dataList():Array
-        {
-            return this.getAssign("dataList", []) as Array;
-        }
 
         /**
          * 每页显示数据的行数
@@ -115,11 +107,7 @@ package es.components
          */
         public function set current( value:int ):void
         {
-            this.setAssign("current", value);
-            if( !isNullPagination )
-            {
-                this.pagination.current = value;
-            }
+            this.assign("current", value);
         }
 
         /**
@@ -128,80 +116,95 @@ package es.components
          */
         public function get current():int
         {
-            return this.getAssign("current", NaN ) as int;
+            return this.assign( "current") as int;
         }
 
         /**
          * 每页显示数据的行数
          * @param value
          */
-        public function set rows( value:Number ):void
+        public function set pageSize( value:int ):void
         {
-            this.dataSource.pageSize( value );
-            this.setAssign("rows", value);
+            this.dataSource.pageSize = value;
         }
 
         /**
          * 每页显示数据的行数
          * @param value
          */
-        public function get rows():Number
+        public function get pageSize():int
         {
-            return this.dataSource.pageSize();
+            return this.dataSource.pageSize;
         }
 
         /**
          * 设置表格的圆角值
          * @param value
          */
-        public function set rowHeight(value:Number):void
+        public function set rowHeight(value:int):void
         {
-            this.setAssign("rowHeight", value);
+            this.assign("rowHeight", value);
         }
 
         /**
          * 获取表格的圆角值
          * @param value
          */
-        public function get rowHeight():Number
+        public function get rowHeight():int
         {
-            return this.getAssign("rowHeight", 25) as Number;
+            return this.assign("rowHeight") as int;
         }
 
         /**
          * 设置表格的圆角值
          * @param value
          */
-        public function set headHeight(value:Number):void
+        public function set headHeight(value:int):void
         {
-            this.setAssign("headHeight", value);
+            this.assign("headHeight", value);
         }
 
         /**
          * 获取表格的圆角值
          * @param value
          */
-        public function get headHeight():Number
+        public function get headHeight():int
         {
-            return this.getAssign("headHeight",30) as Number;
+            return this.assign("headHeight") as int;
         }
 
         /**
          * 设置表格的圆角值
          * @param value
          */
-        public function set footHeight(value:Number):void
+        public function set footHeight(value:int):void
         {
-            this.setAssign("footHeight", value);
+            this.assign("footHeight", value);
         }
 
         /**
          * 获取表格的圆角值
          * @param value
          */
-        public function get footHeight():Number
+        public function get footHeight():int
         {
-            return this.getAssign("footHeight", 30) as Number;
+            return this.assign("footHeight") as int;
+        }
+
+        private var _footer:Array = null;
+        public function set footer( value:Array ):void
+        {
+            this._footer=value;
+            this.nowUpdateSkin();
+        }
+
+        public function get footer():Array
+        {
+            if( _footer === null )
+            {
+                this._footer = [ this.pagination ];
+            }
+            return this._footer;
         }
 
         /**
@@ -209,19 +212,13 @@ package es.components
         * @return {Pagination}
         */
         private var _pagination:Pagination=null;
-        private var isNullPagination:Boolean=false;
+
         public function get pagination():Pagination
         {
-            if( this.isNullPagination )
-            {
-                return null;
-            }
-            
             var page:Pagination = this._pagination;
             if( !page )
             {
                page = new Pagination();
-               page.async = false;
                page.skinClass = es.skins.PaginationSkin;
                page.dataSource = this.dataSource;
                this._pagination = page;
@@ -235,7 +232,6 @@ package es.components
         */
         public function set pagination( value:Pagination ):void
         {
-            this.isNullPagination = value === null;
             var page:Pagination = this._pagination;
             if( value !== page )
             {
@@ -252,7 +248,7 @@ package es.components
             super.commitProperties();
             if( !this.dataSource.selected() )
             {
-               this.dataSource.select(  !isNullPagination ? this.pagination.current : 1 );
+               this.dataSource.select( this.pagination.current );
             }
         }
     }
