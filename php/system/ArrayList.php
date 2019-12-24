@@ -9,13 +9,44 @@
 class ArrayList extends BaseObject implements \Countable
 {
 
-    public static function from( $target, \Closure $callback = null )
+    public static function from( $target, \Closure $callback = null, $thisArg=null )
     {
-    
+        $items = new ArrayList();
+        if( $thisArg !==null && $callback !==null )
+        {
+            $callback = \es\system\System::bind($callback,$thisArg);
+        }
+
+        $length = is_a($target,'\Countable') ? count( $target ) : isset($target->length) ? $target->length : 0;
+        $is = \es\system\System::isIterator( $target ) && !\es\system\System::isObject($target);
+        if( $is )
+        {
+            foreach($target as $value)
+            {
+                if( $callback )
+                {
+                    $value = call_user_func($callback, $value);
+                }
+                $items->push($value);
+            }
+            return $items;
+        }
+        if( $length > 0 )
+        {
+            for( $i=0;$i<$length;$i++)
+            {
+                $items->push( $target[$i] );
+            }
+        }
+        return $items;
     }
 
     public static function of( $target )
     {
+        if( $target instanceof ArrayList)
+        {
+            return $target->slice(0);
+        }
         return array_slice($target,0);
     }
 
@@ -187,7 +218,6 @@ class ArrayList extends BaseObject implements \Countable
         } else {
             $this->dataItems[$offset] = $value;
         }
-        $this->length++;
     }
 
     public function offsetUnset($offset)
@@ -195,7 +225,6 @@ class ArrayList extends BaseObject implements \Countable
         if( $offset!=='length' )
         {
             unset($this->dataItems[$offset]);
-            $this->length--;
         }
     }
 
@@ -240,7 +269,7 @@ class ArrayList extends BaseObject implements \Countable
         {
             return count( $this->dataItems );
         }
-        return parent::__get($name);
+        return isset($this->dataItems[ $name ]) ? $this->dataItems[ $name ] : null;
     }
 
     public function __set($name, $value)
@@ -249,7 +278,7 @@ class ArrayList extends BaseObject implements \Countable
         {
             throw new ReferenceError('The length property is not writable');
         }
-        return parent::__set($name, $value);
+        $this->dataItems[ $name ] = $value;
     }
 
 }

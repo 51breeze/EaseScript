@@ -20,29 +20,52 @@ class Console
             if( $index > 0){
                 array_shift( $param );
             }
-            if( $index != $count ){
-                if($index>0) {
-                    $format .= str_repeat(",%s", count($param) - $index);
-                }else{
-                   $format = rtrim(str_repeat("%s,", count($param) ),',');
+            if( $index != $count )
+            {
+                if($index>0)
+                {
+                    $format .= str_repeat(" %s", count($param) - $index);
+                }else
+                {
+                   $format =str_repeat("%s ", count($param) );
                 }
             }
-        }else {
-            $format = rtrim(str_repeat("%s,", count($param) ),',');
+
+        }else
+        {
+            $format = str_repeat("%s ", count($param) );
         }
+
+        $format = trim( $format,' ');
+        $format.="\n";
+
         $param = array_map(function ($item){
             if( is_a($item, '\es\system\BaseObject') && !System::isObject($item,true) )
             {
+                if( is_a($item, '\es\system\ArrayList') )
+                {
+                    return var_export($item->valueOf(),true);
+                }
                 return "[object ".get_class($item)."]";
             }
-            if( is_a($item, '\es\system\BaseObject') ){
+
+            if( is_a($item, '\es\system\BaseObject') )
+            {
                 return var_export($item->valueOf(),true);
             }
-            if( !is_scalar($item) ){
+
+            if( is_bool($item) )
+            {
+                $item = $item === true ? "true" : "false";
+            }
+
+            if( !is_scalar($item) )
+            {
                 return var_export($item,true);
             }
             return $item;
         },$param);
+
         array_unshift( $param, $format );
         echo call_user_func_array("sprintf", $param );
     }

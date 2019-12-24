@@ -13,11 +13,25 @@ function ListIterator( target )
     if( !(this instanceof ListIterator) )return new ListIterator(target);
     var iteratorClass = Internal.getClassModule( Internal.iteratorClassName );
     var isIterator = target && iteratorClass && System.is(target, iteratorClass );
+    var origin = false;
+    if( target && Symbol.iterator && target[Symbol.iterator] )
+    {
+        var itarget = target[Symbol.iterator]();
+        if( typeof itarget.next ==="function" )
+        {
+            target = itarget;
+            isIterator = true;
+            origin = true;
+        }
+    }
+
     storage(this,true,{
+        "origin":origin,
         "isIterator":isIterator,
         "target":target,
         "items": isIterator ? null : Object.prototype.getEnumerableProperties.call( target ),
-        "cursor":-1,
+        "cursor":0,
+        "done":false,
         "key":undefined,
         "current":undefined
     });
@@ -26,14 +40,54 @@ function ListIterator( target )
 module.exports = ListIterator;
 var Object = require("./Object.js");
 var Symbol = require("./Symbol.js");
+var System = require("./System.js");
 var Internal = require("./Internal.js");
 var storage=Internal.createSymbolStorage( Symbol('ListIterator') );
 
-//@private
-function callMethod(target, name)
+function next(thisArg)
 {
-    target=storage(target,"target");
-    return target[name]();
+    var target = storage(thisArg, "target");
+    var current = target.next();
+    if(current.done===true)
+    {
+        storage(thisArg,"current", undefined );
+        storage(thisArg,"key", undefined );
+        storage(thisArg, "cursor", 0 );
+        storage(thisArg, "done", true);
+        return false;
+
+    }else
+    {
+       storage(thisArg,"current", current.value );
+       if( current.key ){
+           storage(thisArg,"key", current.key );
+       }else{
+           storage(thisArg,"key", storage(thisArg, "cursor") );
+       }
+    }
+    storage(thisArg, "cursor", "increment");
+}
+
+//@private
+function callMethod(thisArg, name)
+{
+    target=storage(thisArg,"target");
+    if( storage(thisArg,"origin") )
+    {
+        if( storage(thisArg, "cursor") < 1 || name ==="next" )
+        {
+            next(thisArg);
+        }
+        if( name ==="valid" )
+        {
+            return storage(thisArg,"done") !== true;
+        }
+        return name ==="next" ? null : storage(thisArg,name);
+
+    }else
+    {
+        return target[name]();
+    }
 }
 
 ListIterator.prototype = Object.create( Object.prototype, {
@@ -50,7 +104,24 @@ ListIterator.prototype = Object.create( Object.prototype, {
         {
             return callMethod(this,"key");
         }
-        return storage(this,"key");
+
+        var items = storage(this, "items");
+        var isorigin = items === storage(this, "target");
+        var cursor = storage(this, "cursor");
+        if( items && items.length > cursor )
+        {
+            var item = items[ cursor ];
+            if( isorigin )
+            {
+                return cursor;
+
+            }else
+            {
+                return item.key || cursor;
+            }
+        }
+        return null;
+
     }},
 
     /**
@@ -63,13 +134,27 @@ ListIterator.prototype = Object.create( Object.prototype, {
         {
             return callMethod(this,"current");
         }
-        return storage(this,"current");
+
+        var items = storage(this, "items");
+        var isorigin = items === storage(this, "target");
+        var cursor = storage(this, "cursor");
+        if( items && items.length > cursor )
+        {
+            var item = items[ cursor ];
+            if( isorigin )
+            {
+                return item;
+            }else
+            {
+                return item.value;
+            }
+        }
+        return null;
     }},
 
     /**
      * 将指针定位到下一个元素。
-     * 成功返回true，失败返回false
-     * @returns Boolean
+     * @returns
      */
     "next":{value:function next()
     {
@@ -77,33 +162,7 @@ ListIterator.prototype = Object.create( Object.prototype, {
         {
             return callMethod(this,"next");
         }
-        var items = storage(this, "items");
-        var result = false;
-        var isorigin = items === storage(this, "target");
-        if( items && items.length > 0 )
-        {
-            var cursor = storage(this, "cursor", "increment") + 1;
-            result = cursor < items.length;
-            if( result )
-            {
-                var item = items[ cursor ];
-                if( isorigin )
-                {
-                    storage(this, "current", item );
-                    storage(this, "key", cursor );
-
-                }else
-                {
-                    storage(this, "current", item.value );
-                    storage(this, "key", item.key );
-                }
-
-            }else if ( cursor > 0 )
-            {
-                this.rewind();
-            }
-        }
-        return result;
+        storage(this, "cursor", "increment");
     }},
 
     /**
@@ -118,10 +177,30 @@ ListIterator.prototype = Object.create( Object.prototype, {
 
         }else
         {
-            storage(this, "current", undefined);
-            storage(this, "key", undefined);
-            storage(this, "cursor", -1);
+            storage(this, "cursor", 0);
+            storage(this, "done", false);
         }
+    }},
+
+    /**
+     * 重置指针
+     * @returns {Boolean}
+     */
+    "valid":{value:function valid()
+    {
+        if( storage(this,"isIterator") )
+        {
+            return !!callMethod(this,"valid");
+
+        }else
+        {
+            var items = storage(this, "items");
+            if( items && items.length > 0 )
+            {
+                return storage(this, "cursor") < items.length;
+            }
+        }
+        return false;
     }}
 
 });

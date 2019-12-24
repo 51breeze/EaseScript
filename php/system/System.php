@@ -63,8 +63,9 @@ final class System
 
     public static function isIterator( $obj )
     {
-        static $iteratorClass = 'es\interfaces\IListIterator';
-        if( interface_exists($iteratorClass) )
+        //static $iteratorClass = 'es\interfaces\IListIterator';
+        static $iteratorClass = '\Iterator';
+        if( interface_exists($iteratorClass,false) )
         {
             return is_a($obj, $iteratorClass);
         }

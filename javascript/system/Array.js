@@ -32,6 +32,7 @@ module.exports = Array;
 var Internal = require("./Internal.js");
 var System = require("./System.js");
 var Object = require("./Object.js");
+var ListIterator = require("./ListIterator.js");
 var ReferenceError = require("./ReferenceError.js");
 var TypeError = require("./TypeError.js");
 var $Array = Internal.$Array;

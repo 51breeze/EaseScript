@@ -4,7 +4,8 @@ package es.interfaces
     {
         public function current():*;
         public function key():*;
-        public function next():Boolean;
+        public function next():void;
         public function rewind():void;
+        public function valid():Boolean;
     }
 }

@@ -97,5 +97,11 @@ var _Symbol = Internal.$Symbol || (function()
 
 }());
 
+
+if( !_Symbol.iterator )
+{
+    _Symbol.iterator=Symbol("Symbol.iterator");
+}
+
 module.exports =_Symbol;
 var System = require("./System.js");
