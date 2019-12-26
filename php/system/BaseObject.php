@@ -9,28 +9,16 @@
  */
 class BaseObject extends \stdClass implements \Iterator, \ArrayAccess
 {
-    static public function each($target, $callback, $thisArg=null)
+    static public function forEach($target, $callback, $thisArg=null)
     {
         if( $target==null )return;
         if( $thisArg && $thisArg !== null )
         {
             $callback = System::bind($callback,$thisArg);
         }
-
-        if( System::isIterator($target) )
+        foreach ($target as $key=>$item)
         {
-            $target->rewind();
-            for ( ;$target->next(); )
-            {
-                $callback( $target->current(), $target->key() );
-            }
-
-        }else
-        {
-            foreach ($target as $key=>$item)
-            {
-                $callback($item, $key);
-            }
+            $callback($item, $key);
         }
     }
 

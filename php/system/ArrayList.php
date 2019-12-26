@@ -41,13 +41,9 @@ class ArrayList extends BaseObject implements \Countable
         return $items;
     }
 
-    public static function of( $target )
+    public static function of()
     {
-        if( $target instanceof ArrayList)
-        {
-            return $target->slice(0);
-        }
-        return array_slice($target,0);
+        return new ArrayList( func_get_args() );
     }
 
     public static function isArray( $target )
@@ -58,12 +54,25 @@ class ArrayList extends BaseObject implements \Countable
     private $dataItems=array();
     public function __construct()
     {
-        if( func_num_args() === 1 && System::isArray( func_get_arg(0) ) )
+        if( func_num_args() === 1 )
         {
-            $this->dataItems=func_get_arg(0);
-        }else{
+            if( System::isArray( func_get_arg(0) ) )
+            {
+               $this->dataItems=func_get_arg(0);
+
+            }else if( is_int( func_get_arg(0) ) )
+            {
+                $this->dataItems = array_pad([], func_get_arg(0), null);
+            }else
+            {
+                $this->dataItems = func_get_args();
+            }
+
+        }else
+        {
             $this->dataItems=func_get_args();
         }
+        parent::__construct( $this->dataItems );
     }
 
     public function slice($offset, $length = null, $preserve_keys = null)
@@ -130,31 +139,36 @@ class ArrayList extends BaseObject implements \Countable
         return $index === false ? -1 : $index;
     }
 
+    public function lastIndexOf( $value )
+    {
+        $len = count( $this->dataItems );
+        while( $len > 0 )
+        {
+           if( $this->dataItems[ --$i ] === $value )
+           {
+              return $i;
+           }
+        }
+        return -1;
+    }
+
+    public function includes( $value )
+    {
+        return in_array($value, $this->dataItems, true);
+    }
+
     public function map( $callback, $thisArg = null )
     {
-        if( $thisArg == null )$thisArg=$this;
-        $callback = System::bind($callback,$thisArg);
+        if( $thisArg !== null )
+        {
+           $callback = System::bind($callback,$thisArg);
+        }
         return new ArrayList( array_map( $callback , $this->dataItems ) );
     }
 
     public function __call($name, $avrg)
     {
-           
-
     }
-
-    // public function each( $callback , $thisArg = null )
-    // {
-    //     if( $thisArg == null )$thisArg=$this;
-    //     $callback = System::bind($thisArg,$callback);
-    //     $this->rewind();
-    //     while ( $this->valid() )
-    //     {
-    //         $callback($this->current(), $this->key() );
-    //         $this->next();
-    //     }
-    //     $this->rewind();
-    // }
 
     public function filter($callback = null, $flag = 0 )
     {
@@ -180,12 +194,10 @@ class ArrayList extends BaseObject implements \Countable
         {
             if( $callback($this->current(), $this->key() ) )
             {
-                $this->rewind();
                 return $this->current();
             }
             $this->next();
         }
-        $this->rewind();
         return null;
     }
 

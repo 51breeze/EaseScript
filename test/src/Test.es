@@ -16,42 +16,8 @@ package{
 
       public index()
       {
-
-         var arr:Array= [1,5,6,9];
-
-         console.log(  Array.from(arr) );
-
-
-          var json:Object = {
-             length:5,
-             name:456,
-             address:"sdfdsfdsf",
-             arr
-          };
-
-          var str:String = "name=123;avg=8";
-
-         console.log(  Array.from( json ) );
-         console.log(  Array.from( str.matchAll(/\(=)/ig)  ) );
-
-
-         console.log(  Array.from(  this  ) );
-
-
-         for( var item:* of this )
-         {
-            console.log( item, "=============") ;
-         }
-
-
-         for( var name:String in this )
-         {
-            console.log( name, "========for in=====");
-         }
-
-
-         var v:View = new view.TestView(this) ;
-         return this.render( v );
+          var v:View = new view.TestView(this) ;
+          return this.render( v );
       }
 
 
