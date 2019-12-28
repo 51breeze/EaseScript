@@ -103,6 +103,34 @@ class BaseObject extends \stdClass implements \Iterator, \ArrayAccess
         return $target;
     }
 
+    static public function __callStatic($name, $args)
+    {
+        switch ( $name )
+        {
+            //param $proto $properties
+            case "create" :
+                 return BaseObject::merge($args[0]===null ? new \stdClass() : $args[0], $args[1]);
+            //param $object
+            case "values" :
+            //param $object   
+            case "keys" :
+                $object = $args[0];
+                if( $object instanceof BaseObject)
+                {
+                    $object = $object->valueOf();
+                }
+                if( $name ==="keys")
+                {
+                   return array_keys( (array)$object );    
+                }
+                return array_values( (array)$object );
+            //param $obj, $prop, $desc
+            case "defineProperty" :
+                $args[0]->$args[1] = $args[2]->value;  
+        }
+        throw new RefenrenceError("\"{$name}\" is not exists.");
+    }
+
     private $_originValue= array();
     private $_originType= 'object';
     
@@ -170,10 +198,6 @@ class BaseObject extends \stdClass implements \Iterator, \ArrayAccess
         return json_encode( $this->_originValue, JSON_UNESCAPED_UNICODE);
     }
 
-    public function defineProperty($obj, $prop, $desc)
-    {
-    }
-
     public function hasOwnProperty( $name )
     {
         return isset( $this->_originValue[$name] );
@@ -182,16 +206,6 @@ class BaseObject extends \stdClass implements \Iterator, \ArrayAccess
     public function propertyIsEnumerable( $name )
     {
         return isset( $this->_originValue[$name] );
-    }
-
-    public function keys()
-    {
-        return array_keys($this->_originValue);
-    }
-
-    public function values()
-    {
-        return array_values( $this->_originValue );
     }
 
     public function getEnumerableProperties( $state=null )
@@ -229,7 +243,6 @@ class BaseObject extends \stdClass implements \Iterator, \ArrayAccess
 
     public function current()
     {
-       
         return current($this->_originValue);
     }
 
@@ -255,10 +268,6 @@ class BaseObject extends \stdClass implements \Iterator, \ArrayAccess
 
     public function __get($name)
     {
-        if( isset($this->__sealed__) && $this->__sealed__===true )
-        {
-            throw new ReferenceError($name.' is not exists.',__FILE__, __LINE__);
-        }
         return isset($this->_originValue[$name]) ? $this->_originValue[$name] : null;
     }
 
@@ -274,10 +283,6 @@ class BaseObject extends \stdClass implements \Iterator, \ArrayAccess
 
     public function __set($name,$value)
     {
-        if( isset($this->__sealed__) && $this->__sealed__===true )
-        {
-            throw new ReferenceError($name . ' is not exists.', __FILE__, __LINE__);
-        }
         if( $this->_originType && $this->_originType !== "object" && is_subclass_of($this,"BaseObject") )
         {
             throw new ReferenceError($name . ' is not writable. The value type is an '.$this->_originType);
@@ -285,12 +290,12 @@ class BaseObject extends \stdClass implements \Iterator, \ArrayAccess
         $this->_originValue[ $name ] = $value;
     }
 
-    public function __call($name, $arguments)
-    {
-        if( !method_exists($this, $name) )
-        {
-            throw new ReferenceError($name . ' is not exists.');
-        }
-        return call_user_func_array( array($this, $name),  $arguments );
-    }
+    // public function __call($name, $arguments)
+    // {
+    //     if( !method_exists($this, $name) )
+    //     {
+    //         throw new ReferenceError($name . ' is not exists.');
+    //     }
+    //     return call_user_func_array( array($this, $name),  $arguments );
+    // }
 }

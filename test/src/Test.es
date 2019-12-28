@@ -16,6 +16,9 @@ package{
 
       public index()
       {
+
+         var obj:Object={name:123,ag:88,add:"dsfdsfdsfsdf"};
+
           var v:View = new view.TestView(this) ;
           return this.render( v );
       }

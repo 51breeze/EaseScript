@@ -11,8 +11,14 @@ var $Object = Internal.$Object;
 
 function Object( value )
 {
-    if ( value != null )return $Object(value);
-    if( !(this instanceof Object) ) return new Object();
+    if ( value != null )
+    {
+        return $Object(value);
+    }
+    if( !(this instanceof Object) )
+    {
+         return new Object();
+    }
     return this;
 }
 
@@ -244,7 +250,6 @@ Object.defineProperty(Object,"keys",{
         return Object.prototype.getEnumerableProperties.call(target,-1);
     }
 });
-
 
 /**
  * 返回对象可枚举的属性值

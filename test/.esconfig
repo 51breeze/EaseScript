@@ -10,7 +10,7 @@
 	"compat_version":{
 		"ie":11
 },
-	"build_path":"D:/workspace/php/blog",
+	"build_path":"D:/workspace/node",
 	"project_path":"D:/workspace/EaseScript/test",
 	"workspace":"./src",
 	"skin_file_suffix":".html",
@@ -40,54 +40,54 @@
 	"module_exports":false,
 	"build_pack":true,
 	"hot_replacement":false,
-	"syntax":"php",
+	"syntax":"node",
 	"root_path":"D:/workspace/EaseScript",
 	"build":{
-		"path":"D:/workspace/php/blog",
-		"name":"blog",
+		"path":"D:/workspace/node",
+		"name":"node",
 		"child":{
 			"assets":{
-				"path":"D:/workspace/php/blog/public/assets",
+				"path":"D:/workspace/node/public/assets",
 				"name":"assets"
 		},
 			"js":{
-				"path":"D:/workspace/php/blog/public/js",
+				"path":"D:/workspace/node/public/js",
 				"name":"js"
 		},
 			"img":{
-				"path":"D:/workspace/php/blog/public/assets",
+				"path":"D:/workspace/node/public/assets",
 				"name":"assets"
 		},
 			"css":{
-				"path":"D:/workspace/php/blog/public/css",
+				"path":"D:/workspace/node/public/css",
 				"name":"css"
 		},
 			"font":{
-				"path":"D:/workspace/php/blog/public/assets",
+				"path":"D:/workspace/node/public/assets",
 				"name":"assets"
 		},
 			"view":{
-				"path":"D:/workspace/php/blog/server/view",
+				"path":"D:/workspace/node/server/view",
 				"name":"view"
 		},
 			"html":{
-				"path":"D:/workspace/php/blog/public/html",
+				"path":"D:/workspace/node/public/html",
 				"name":"html"
 		},
 			"webroot":{
-				"path":"D:/workspace/php/blog/public",
+				"path":"D:/workspace/node/public",
 				"name":"public"
 		},
 			"core":{
-				"path":"D:/workspace/php/blog/public/js",
+				"path":"D:/workspace/node/public/js",
 				"name":"js"
 		},
 			"bootstrap":{
-				"path":"D:/workspace/php/blog/server/bootstrap",
+				"path":"D:/workspace/node/server/bootstrap",
 				"name":"bootstrap"
 		},
 			"application":{
-				"path":"D:/workspace/php/blog/server",
+				"path":"D:/workspace/node/server",
 				"name":"server"
 		}
 	}

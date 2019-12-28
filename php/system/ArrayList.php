@@ -270,6 +270,16 @@ class ArrayList extends BaseObject implements \Countable
        return $this->dataItems;
     }
 
+    public function keys()
+    {
+        return array_keys( $this->dataItems );
+    }
+
+    public function values()
+    {
+        return $this->dataItems;
+    }
+
     public function __toString()
     {
         return json_decode($this->dataItems, JSON_UNESCAPED_UNICODE );
