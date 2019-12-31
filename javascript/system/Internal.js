@@ -187,29 +187,32 @@ Internal.getClassModule=function( name )
         return modules[name];
     }
 
-    if( Internal.require.has(name) )
+    if( Internal.require )
     {
-        Internal.require( name );
-
-    }else
-    {
-        var suffix = [".es",".html",".js"];
-        var spase = Internal.env.WORKSPACE;
-        name = name.replace(/\./g,'/');
-        for(var i=0;i<suffix.length;i++)
+        if( Internal.require.has(name) )
         {
-           if( Internal.require.has( name+suffix[i] ) )
-           {
-               return Internal.require( name+suffix[i] );
+            Internal.require( name );
 
-           }else if( Internal.require.has( spase+name+suffix[i] ) )
-           {
-              return Internal.require( spase+name+suffix[i] );
+        }else
+        {
+            var suffix = [".es",".html",".js"];
+            var spase = Internal.env.WORKSPACE;
+            name = name.replace(/\./g,'/');
+            for(var i=0;i<suffix.length;i++)
+            {
+                if( Internal.require.has( name+suffix[i] ) )
+                {
+                    return Internal.require( name+suffix[i] );
 
-           }else if( Internal.require.has( "system/"+name+suffix[i] ) )
-           {
-              return Internal.require( "system/"+name+suffix[i] );
-           }
+                }else if( Internal.require.has( spase+name+suffix[i] ) )
+                {
+                    return Internal.require( spase+name+suffix[i] );
+
+                }else if( Internal.require.has( "system/"+name+suffix[i] ) )
+                {
+                    return Internal.require( "system/"+name+suffix[i] );
+                }
+            }
         }
     }
     return null;

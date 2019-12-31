@@ -10,12 +10,14 @@ package es.components
     import es.core.SkinComponent;
     import es.events.NavigateEvent;
     import es.core.Skin;
+    import es.core.View;
     import es.core.Display;
     import es.interfaces.IContainer;
     import es.interfaces.IDisplay;
     import es.events.ApplicationEvent;
+    import es.events.DataSourceEvent;
+    import es.core.DataSource;
 
-    [Syntax(origin)]
     [Skin("es.skins.NavigateSkin")]
     public class Navigate extends SkinComponent
     {
@@ -24,13 +26,76 @@ package es.components
             super( componentId );
         }
 
+          /**
+         * @private
+         */
+        private var _dataSource:DataSource = null;
+
+        /**
+         * 获取数据源对象
+         * @returns {DataSource}
+         */
+        public function get dataSource():DataSource
+        {
+            var dataSource:DataSource = this._dataSource;
+            if ( dataSource === null )
+            {
+                dataSource= new DataSource();
+                this.dataSource = dataSource;
+            }
+            return dataSource;
+        };
+
+         /**
+         * 设置数据源对象
+         * @param value
+         */
+        public function set dataSource( value:DataSource ):void
+        {
+            var old:DataSource = this._dataSource;
+            if( old !== value )
+            {
+                this._dataSource = value;
+                var last:int = NaN;
+                value.addEventListener( DataSourceEvent.SELECT,(e:DataSourceEvent)=>{
+                    if( !e.waiting )
+                    {
+                        if( last != e.current )
+                        {
+                            last = e.current;
+                            this.assign( "datalist", e.data);
+                        }
+                    }
+                });
+            }
+        }
+
+        /**
+         * 设置数据源
+         * @param source
+         * @returns {void}
+         */
+        public function set source( data:* ):void
+        {
+            this.dataSource.source= data;
+        };
+
+        /**
+         * 获取数据源
+         * @returns {Object}
+         */
+        public function get source():*
+        {
+            return this.dataSource.source;
+        };
+
         /**
          * 设置表格的圆角值
          * @param value
          */
         public function set rowHeight(value:Number):void
         {
-            this.setAssign("rowHeight", value);
+            this.assign("rowHeight", value);
         }
 
         /**
@@ -39,7 +104,7 @@ package es.components
          */
         public function get rowHeight():Number
         {
-            return this.getAssign("rowHeight", 25);
+            return this.assign("rowHeight") || 25;
         }
 
         /**
@@ -48,7 +113,7 @@ package es.components
          */
         public function get current():*
         {
-            return this.getAssign("current", System.environments("HTTP_ROUTE_PATH") || 0);
+            return this.assign("current") || System.environments("HTTP_ROUTE_PATH") || 0;
         }
 
         /**
@@ -57,7 +122,7 @@ package es.components
          */
         public function set current(value:*):void
         {
-            this.getAssign("current", value);
+            this.assign("current", value);
         }
 
         /**
@@ -67,7 +132,7 @@ package es.components
          */
         public function set target(value:Boolean):void
         {
-           this.setAssign("target", value);
+           this.assign("target", value);
         }
 
         /**
@@ -76,7 +141,7 @@ package es.components
          */
         public function get target():Boolean
         {
-            return this.getAssign("target", true);
+            return this.assign("target") || true;
         }
 
         /**
@@ -85,7 +150,7 @@ package es.components
          */
         public function set transition(value:String):void
         {
-            this.setAssign("transition",value);
+            this.assign("transition",value);
         }
 
         /**
@@ -94,7 +159,7 @@ package es.components
          */
         public function get transition():String
         {
-            return this.getAssign("transition");
+            return this.assign("transition") as String;
         }
 
         private var frameHash:Object={};
@@ -121,7 +186,12 @@ package es.components
             var event:NavigateEvent = new NavigateEvent( NavigateEvent.LOAD_CONTENT_BEFORE );
             event.viewport = this.viewport;
             event.content = content;
-            if( !this.dispatchEvent(event) || !(event.viewport && event.content) )return false;
+
+            if( !this.dispatchEvent(event) || !(event.viewport && event.content) )
+            {
+                return false;
+            }
+
             var viewport:IContainer = event.viewport;
             var child:IDisplay=null;
             content = event.content;
@@ -136,35 +206,54 @@ package es.components
             }
             else if( System.isString(content) )
             {
-                content = System.trim( content );
-                var isUrl:Boolean = /^https?/i.test(content);
-                var segment:Object = Locator.create( content );
+                content = System.trim( content as String );
+                var isUrl:Boolean = /^https?/i.test(content as String );
+                var segment:Object = Locator.create( content as String );
                 var provider:String = Locator.match( segment );
+
                 if( isUrl && !provider )
                 {
                     return false;
                 }
+
                 if( provider )
                 {
                     if( !loadContentMap[ provider ] )
                     {
                         var doc:EventDispatcher = new EventDispatcher(document);
-                        var fn:Function = function(e: ApplicationEvent) {
-                            //阻止替换根容器
+
+                        //阻止替换根容器
+                        var fn:Function = function(e:ApplicationEvent) {
                             e.preventDefault();
                             e.container = viewport;
                             doc.removeEventListener(ApplicationEvent.FETCH_ROOT_CONTAINER, fn);
                         };
                         doc.addEventListener(ApplicationEvent.FETCH_ROOT_CONTAINER, fn);
-                        loadContentMap[ provider ] = child;
-                        var HTTP_DISPATCHER: Function = System.environments("HTTP_DISPATCHER") as Function;
-                        var controller:Array = provider.split("@");
-                        HTTP_DISPATCHER(controller[0], controller[1]);
-                        return true;
+
+                        //阻止直接响应
+                        var before:Function = function(e:ApplicationEvent) {
+                            loadContentMap[ provider ] = e.container;
+                            e.preventDefault();
+                            doc.removeEventListener(ApplicationEvent.RESPONSE_BEFORE,before);
+                        };
+                        doc.addEventListener(ApplicationEvent.RESPONSE_BEFORE, before);
+
+                        var HTTP_DISPATCHER:Function = System.environments("HTTP_DISPATCHER") as Function;
+                        if( HTTP_DISPATCHER  )
+                        {
+                            var controller:Array = provider.split("@");
+                            HTTP_DISPATCHER(controller[0], controller[1]);
+                            return true;
+                        }
 
                     }else
                     {
                        child = loadContentMap[ provider ] as IDisplay;
+                       if( child instanceof View )
+                       {
+                           child.display();
+                           return true;
+                       }
                     }
                    
                 }else
@@ -213,7 +302,10 @@ package es.components
         override protected function initializing()
         {
             super.initializing();
-            this.dataSource.select(1);
+            if( !this.dataSource.selected() )
+            {
+                this.dataSource.select(1);
+            }
         }
 
         /**

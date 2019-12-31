@@ -920,18 +920,10 @@ class Builder
                             {
                                 const identifier = utils.getRequireIdentifier(config, module, "javascript" );
                                 const output = this.outputMap.get( module ) || [];
-                                const script = output.filter( (item)=>{ return item.suffix ===".js" });
-                                const css = output.filter( (item)=>{ return item.suffix ===".css" });
-                                const require = output.filter( (item)=>{ return item.require }).map((item)=>item.path);
-                                requiremnets[ identifier ] = {
-                                    script:script[0] ? utils.getLoadFileRelativePath(config, script[0].path+'?v='+config.makeVersion ) : null,
-                                    css: css[0] ? utils.getLoadFileRelativePath(config, css[0].path+'?v='+config.makeVersion ) : null,
-                                    require:require
-                                };
+                                requiremnets[ identifier ] = output.map( item=>utils.getLoadFileRelativePath(config, item.path ) ).filter( value=>!!value );
                             }
                         });
 
-                        
                         const scriptContent = this.runtime(config, bootstrap , buildModules, this.routes, requiremnets );
                         this.emit( base, scriptContent );
 
@@ -983,6 +975,37 @@ class Builder
 
                         if( module.isApplication )
                         {
+                            var map = this.outputMap.get(module);
+                            if( !map )
+                            {
+                                map = [];
+                                this.outputMap.set(module,map);
+                            }
+
+                            if( this.chunkFlag )
+                            {
+                                if( content )
+                                {
+                                    map.push({
+                                        path:this.getMainPath('common','.css'),
+                                        name:'common',
+                                        main:true,
+                                        app:module.isApplication,
+                                        require:false,
+                                        suffix:".css"
+                                    });
+                                }
+
+                                map.push({
+                                    path:base,
+                                    name:'easescript',
+                                    main:true,
+                                    app:module.isApplication,
+                                    require:false,
+                                    suffix:".js"
+                                });
+                            }
+
                             const output = this.outputMap.get( module ) || [];
                             const script = output.filter( (item)=>{ return item.suffix ===".js" });
                             const css = output.filter( (item)=>{ return item.suffix ===".css" });
@@ -1010,7 +1033,7 @@ class Builder
             }
         };
 
-        const process = ()=>{
+        const task = ()=>{
 
             return new Promise((resovle, reject) =>{
 
@@ -1034,7 +1057,7 @@ class Builder
 
                 if( !done )
                 {
-                    return process();
+                    return task();
                 }else{
                     completed();
                 }
@@ -1042,7 +1065,7 @@ class Builder
             }).catch( completed );
 
         };
-        process();
+        task();
 
     }
 

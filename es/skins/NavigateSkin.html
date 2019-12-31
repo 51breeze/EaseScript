@@ -16,11 +16,10 @@
                 return false; 
             }
 
-            var dataProfile:String =  hostComponent.dataProfile;
             var event:NavigateEvent = new NavigateEvent( NavigateEvent.URL_JUMP_BEFORE );
             event.content = href;
             event.originalEvent = e;
-            var datalist:Array = this.assign( dataProfile ) as Array;
+            var datalist:Array = this.assign( "datalist" ) as Array;
             if( datalist )
             {
                 for(var i:int in datalist)
@@ -49,7 +48,7 @@
 
     <ul class="nav nav-pills">
         <:foreach name="datalist" value="item" key="link">
-            <:if condition="hostComponent.match(item,link)">
+            <:if condition="hostComponent.match(item as Object,link)">
                 <li role="presentation" class="active">
                     <a href="{item.link}" onClick="{this.onClick}" target="{target? '_blank' : '_self'}">{item.label}</a>
                 </li>

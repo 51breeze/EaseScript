@@ -116,7 +116,20 @@ class EaseScript extends \es\system\EventDispatcher
         $env->COMMAND_SWITCH =[CODE[COMMAND_SWITCH]];
         $env->LOAD_JS_PATH ="[CODE[JS_LOAD_PATH]]";
         $env->LOAD_CSS_PATH ="[CODE[CSS_LOAD_PATH]]";
-        $env->LOAD_SCRIPTS = new \es\system\BaseObject( json_decode('[CODE[LOAD_SCRIPTS]]') );
+        $env->LOAD_SCRIPTS = new \es\system\BaseObject();
+        $env->HTTP_DISPATCHER = function($module, $method) use( $env )
+        {
+             $module = str_replace('.','\\',$module);
+             $obj = new $module();
+             $this->bindPipeline( $obj );
+             call_user_func_array( array($obj, $method), []);
+        };
+
+        $scripts = json_decode('[CODE[LOAD_SCRIPTS]]');
+        foreach( $scripts as $key=>$value)
+        {
+            $env->LOAD_SCRIPTS[ $key ] = new \es\system\ArrayList( $value );
+        }
         $this->environmentMap = $env;
     }
 

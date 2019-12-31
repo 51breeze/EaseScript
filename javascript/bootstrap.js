@@ -30,54 +30,44 @@ function require( identifier )
 	return module.exports;
 }
 
+/**
+ * 判断是否有定义此标识符的模块
+ */
 require.has=function has( identifier )
 {
     return definedModules.hasOwnProperty(identifier);
 }
 
-var Internal= require("[CODE[REQUIRE_IDENTIFIER(Internal)]]");
-var Locator = require("[CODE[REQUIRE_IDENTIFIER(Locator)]]");
-var Object  = require("[CODE[REQUIRE_IDENTIFIER(Object)]]");
-var System  = require("[CODE[REQUIRE_IDENTIFIER(System)]]");
-var Event   = require("[CODE[REQUIRE_IDENTIFIER(Event)]]");
-var global  = System.getGlobalEvent();
-var httpRoutes = [CODE[SERVICE_ROUTE_LIST]];
-var handle = "[CODE[HANDLE]]";
-var env={
-    "HTTP_DEFAULT_ROUTE":"[CODE[DEFAULT_BOOTSTRAP_ROUTER_PROVIDER]]",
-    "HTTP_ROUTES":httpRoutes,
-    "HTTP_ROUTE_PATH":null,
-    "MODE":[CODE[MODE]],
-    "ORIGIN_SYNTAX":"[CODE[ORIGIN_SYNTAX]]",
-    "URL_PATH_NAME":"[CODE[STATIC_URL_PATH_NAME]]",
-    "HTTP_ROUTE_CONTROLLER":null,
-    "COMMAND_SWITCH":[CODE[COMMAND_SWITCH]],
-    "VERSION":[CODE[VERSION]],
-    "LOAD_JS_PATH":"[CODE[JS_LOAD_PATH]]",
-    "LOAD_CSS_PATH":"[CODE[CSS_LOAD_PATH]]",
-    "WORKSPACE":"[CODE[WORKSPACE]]",
-    "MODULE_SUFFIX":"[CODE[MODULE_SUFFIX]]"
-};
-Object.merge(Internal.env, env);
-var EaseScript = window[ handle ] = {
-    "Requirements":[CODE[LOAD_REQUIREMENTS]],
-    "Load":{},
-    "Environments":env
-};
-Internal.require = require;
-
-if( typeof window[ handle ] === "object" )
+/**
+ * 合并分块加载的模块
+ * @param {*} modules 
+ */
+function loadModuleCallback( modules )
 {
-    if( window[ handle ].Load )
+    for(var identifier in modules )
     {
-        EaseScript.Load = window[ handle ].Load;
-    }
-    if( window[ handle ].HTTP_DEFAULT_ROUTE )
-    {
-        env.HTTP_DEFAULT_ROUTE =  window[ handle ].HTTP_DEFAULT_ROUTE;
+        definedModules[identifier] = modules[ identifier ]; 
     }
 }
 
+
+/**
+ * 查找一个指定属性名的节点
+ * @param {*} scripts 
+ * @param {*} attrname 
+ * @param {*} value 
+ */
+function findScript( scripts, attrname, value )
+{
+    for(var i=0; i<scripts.length; i++)
+    {
+        if( (scripts[i].getAttribute && scripts[i].getAttribute( attrname ) === value) || scripts[i][attrname] === value )
+        {
+           return scripts[i];
+        }
+    }
+    return null;
+}
 
 /**
  * 加载指定的脚本文件
@@ -87,27 +77,40 @@ if( typeof window[ handle ] === "object" )
  * @return {HTMLScriptElement}
  */
 var loadMap = {};
+var loadQueues = [];
 function loadScript(filename,callback){
 
     if( loadMap[filename] )
     {
-        if(typeof callback === "function"){
+        if(typeof callback === "function")
+        {
             callback();
         }
         return loadMap[filename];
     }
+
     var script = null;
-    var match = filename.match(/\.(css|js)[$|\?]/i);
+    var match = filename.match(/\.(css|js)($|\?)/i);
+    var isJs = false;
     switch ( match && match[1].toLowerCase() ){
         case "js" :
-            script = document.createElement('script');
-            script.setAttribute('type', 'text/javascript');
-            script.setAttribute('src', filename );
+            isJs = true;
+            script = findScript( document.scripts,"src",filename);
+            if( !script )
+            {
+                script = document.createElement('script');
+                script.setAttribute('type', 'text/javascript');
+                script.setAttribute('src', filename );
+            }
             break;
         case "css":
-            script = document.createElement('link');
-            script.setAttribute('rel', 'stylesheet');
-            script.setAttribute('href', filename );
+            script = findScript( document.styleSheets,"href",filename);
+            if( !script )
+            {
+                script = document.createElement('link');
+                script.setAttribute('rel', 'stylesheet');
+                script.setAttribute('href', filename );
+            }
             break;
     }
     if( !script )
@@ -115,25 +118,47 @@ function loadScript(filename,callback){
         throw new TypeError("Invalid script file. only support css or js for the '"+filename+"'");
     }
     loadMap[filename] = script;
+
     if( callback )
     {
+        loadQueues.push( callback );
+    }
+
+    (function ready(script,filename,callback){
+
         var loaded = false;
+        var timeid = null;
         script.onreadystatechange = script.onload = function (e) {
-            if ((script.readyState == 'loaded' || script.readyState == 'complete' || script.readyState == 4) || (e && e.type === "load")) {
+            if ((script.readyState == 'loaded' || script.readyState == 'complete' || script.readyState == 4) || (e && e.type === "load"))
+            {
                 script.onreadystatechange  = script.onload = null;
-                if(loaded===false){
-                    callback(e);
+                if(loaded===false)
+                {
+                    window.clearTimeout(timeid);
                     loaded = true;
+                    if( callback )
+                    {
+                        loadQueues.splice( loadQueues.indexOf( callback ), 1 )[0]( loadQueues.length ===0 );
+                    }
                 }
             }
         }
-    }
+        timeid = window.setTimeout( function(){
+            throw new Error("Load script timeout in '"+filename+"'" );
+        }, 120000 );
+
+    }(script,filename,callback));
+
     var headElement = document.head || document.getElementsByTagName("head")[0];
     if( !headElement || !headElement.parentNode )
     {
         throw new ReferenceError("Head element is not exist.");
     }
-    headElement.appendChild(script);
+
+    if( !script.parentNode )
+    {
+        headElement.appendChild(script);
+    }
     return script;
 }
 
@@ -162,40 +187,38 @@ function start(module, method)
     }
 }
 
+
 /**
  * 加载器
  * @param requirements
  * @param then
  */
-function loader(requirements, then)
+function loader(requirements, callback)
 {
-    if( !requirements || !(requirements.length > 0) )return then();
-    requirements = requirements.slice(0);
-    (function load() {
-       requirements.length > 0 ? loadScript(requirements.shift(), load) :  then();
-    }());
-}
-
-/**
- * 初始化模块文件
- * @param {} module 
- */
-function initModule(module)
-{
-    if( typeof EaseScript.Load[module] === "function" && EaseScript.Load[module].init !==true )
+    if( !requirements || !(requirements.length > 0) )
     {
-        EaseScript.Load[module].init = true;
-        var modules = EaseScript.Load[module].call( EaseScript, require );
-        Object.forEach( modules, function(classModule,classname)
+        return callback();
+    }
+
+    var success = function( done )
+    {
+        if( done )
         {
-            if( !definedModules.hasOwnProperty(classname) )
-            {
-                definedModules[ classname ] = classModule;
-            }
-        });
+           callback();
+        }
+    }
+
+    for(var i=0;i<requirements.length;i++)
+    {
+        loadScript(requirements[i], success );
     }
 }
 
+/**
+ * 尝试匹配一个指定路径名的模块信息
+ * @param {*} routes 
+ * @param {*} pathName 
+ */
 function match(routes, pathName )
 {
     if( !routes )
@@ -204,11 +227,11 @@ function match(routes, pathName )
     }
 
     pathName = pathName.replace(/^\/|\/$/g,'');
-    var pathArr = pathName.split('/');
+    const pathArr = pathName.split('/');
     for(var p in routes )
     {
-       var routeName = p.replace(/^\/|\/$/g,'').toLowerCase();
-       var routeArr = routeName.split('/');
+       const routeName = p.replace(/^\/|\/$/g,'').toLowerCase();
+       const routeArr = routeName.split('/');
        if( routeArr.length === pathArr.length )
        {
            var args = [];
@@ -222,10 +245,36 @@ function match(routes, pathName )
                     var name = routeArr[ index ];
                     if( name.charAt(0) ==="{" && name.charAt(name.length-1) ==="}" )
                     {
-                       props.push( name.slice(1,-1) )
-                       args.push( pathArr[index] );
+                       var rule = name.slice(1,-1);
+                       if( rule.charAt(0) ===":" )
+                       {
+                            var regexp = rule.slice(1);
+                            var flags = "";
+                            var index = regexp.lastIndexOf("/");
+                            if( index > 0 )
+                            {
+                                flags  = regexp.slice( index+1 );
+                                regexp = regexp.slice(0, index);
+                            }
 
-                    }else if( name !== pathArr[index].toLowerCase() )
+                            var mathed = pathArr[index].match( new RegExp( regexp, flags) );
+                            if( mathed )
+                            {
+                                props.push( name );
+                                args.push( mathed[1] || pathArr[index] );
+
+                            }else
+                            {
+                                break;
+                            }
+
+                       }else
+                       {
+                            props.push( rule );
+                            args.push( pathArr[index] );
+                       }
+
+                    }else if( name !== pathArr[ index ].toLowerCase() )
                     {
                        break;
                     }
@@ -241,6 +290,7 @@ function match(routes, pathName )
            {
                continue;
            }
+
            return {
               provider:routes[ p ],
               props:props,
@@ -251,86 +301,98 @@ function match(routes, pathName )
     return null;
 }
 
-
-/**
- * 文档加载就绪
- */
-global.addEventListener(Event.READY,function (e) {
- 
-    var routeMap = env.HTTP_ROUTES && env.HTTP_ROUTES.get || {};
-    var path = Locator.query( env.URL_PATH_NAME );
-    if( !path )
+var Internal= require("[CODE[REQUIRE_IDENTIFIER(Internal)]]");
+var Locator = require("[CODE[REQUIRE_IDENTIFIER(Locator)]]");
+var Object  = require("[CODE[REQUIRE_IDENTIFIER(Object)]]");
+var System  = require("[CODE[REQUIRE_IDENTIFIER(System)]]");
+var Event   = require("[CODE[REQUIRE_IDENTIFIER(Event)]]");
+var global  = System.getGlobalEvent();
+var handle = "[CODE[HANDLE]]";
+var depModules = [CODE[LOAD_REQUIREMENTS]];
+var env={
+    "HTTP_DEFAULT_ROUTE":"[CODE[DEFAULT_BOOTSTRAP_ROUTER_PROVIDER]]",
+    "HTTP_ROUTES": [CODE[SERVICE_ROUTE_LIST]],
+    "HTTP_ROUTE":null,
+    "HTTP_PATH":null,
+    "MODE":[CODE[MODE]],
+    "ORIGIN_SYNTAX":"[CODE[ORIGIN_SYNTAX]]",
+    "URL_PATH_NAME":"[CODE[STATIC_URL_PATH_NAME]]",
+    "COMMAND_SWITCH":[CODE[COMMAND_SWITCH]],
+    "VERSION":[CODE[VERSION]],
+    "LOAD_JS_PATH":"[CODE[JS_LOAD_PATH]]",
+    "LOAD_CSS_PATH":"[CODE[CSS_LOAD_PATH]]",
+    "WORKSPACE":"[CODE[WORKSPACE]]",
+    "MODULE_SUFFIX":"[CODE[MODULE_SUFFIX]]",
+    "HTTP_DISPATCHER":function(module, method, callback)
     {
-        path = Locator.path().join("/") ;
-    }else{
-        path = path.replace(/^\/|\/$/g,'');
-    }
-
-    path = path.toLowerCase();
-    var matchRouter = path && match( routeMap, path );
-    var router =  matchRouter || {
-        provider:env.HTTP_DEFAULT_ROUTE,
-        props:[],
-        args:[]
-    };
-
-    var controller = router ? router.provider.split("@") : [];
-    var module = controller[0];
-    var method = controller[1];
-    env.HTTP_ROUTE_CONTROLLER=router;
-
-    if( typeof routeMap[ path ] !== "undefined"){
-        env.HTTP_ROUTE_PATH = path ;
-    }else{
-        Object.forEach(routeMap,function (provider, name) {
-            if( provider === router ){
-                env.HTTP_ROUTE_PATH = name;
-                return false;
-            }
-        });
-    }
-
-    //调度指定模块中的方法
-    (env.HTTP_DISPATCHER=function(module, method, callback)
-    {
-        module = env.WORKSPACE+module+env.MODULE_SUFFIX;
-
-        //如果存在先初始化
-        initModule(module);
+        identifier = env.WORKSPACE+module+env.MODULE_SUFFIX;
 
         //如果模块类已经加载
-        if( require.has( module ) )
+        if( require.has( identifier ) )
         {
-            typeof callback === "function" ? callback( start(module, method) ) : start(module, method);
+            typeof callback === "function" ? callback( start(identifier, method) ) : start(identifier, method);
         }
         //需要加载模块及模块相关脚本
         else
         {
             //如果没有配置指定的模块
-            var moduleInfo = EaseScript.Requirements[ module ]
-            if( !moduleInfo || !moduleInfo.script )
+            var deps = depModules[ identifier ];
+            if( !deps )
             {
                 throw new ReferenceError("Not found the '"+module+"'." );
             }
 
-            //加载模块样式
-            if( moduleInfo.css )
-            {
-                loadScript( moduleInfo.css );
-            }
-
             //加载模块依赖文件
-            loader(moduleInfo.require, function () {
-                //加载主模块
-                loadScript(moduleInfo.script, function () {
-                    //初始化模块
-                    initModule(module);
-                    typeof callback === "function" ? callback( start(module, method) ) : start(module, method);
-                },module);
+            loader(deps, function (){
+                typeof callback === "function" ? callback( start(identifier, method) ) : start(identifier, method);
             });
         }
+    }
+};
 
-    })(module, method);
+var loadArray = window[ handle ] || (window[ handle ]=[]);
+loadArray.push = loadModuleCallback;
+
+env = Object.merge(Internal.env, env);
+Internal.require = require;
+
+for(var i = 0; i < loadArray.length; i++)
+{
+    loadModuleCallback( loadArray[i] );
+}
+
+/**
+ * 文档加载就绪
+ */
+global.addEventListener(Event.READY,function (e) {
+
+    var requestMethod = window["HTTP_REQUEST_METHOD"] || "get";
+    var routeMap = (env.HTTP_ROUTES && env.HTTP_ROUTES[ requestMethod.toLowerCase() ]) || {};
+    var path = Locator.query( env.URL_PATH_NAME );
+    if( !path )
+    {
+        path = Locator.path().join("/");
+    }
+
+    var router = match( routeMap, path );
+    if( !router && env.HTTP_DEFAULT_ROUTE )
+    {
+        router = match( routeMap, env.HTTP_DEFAULT_ROUTE.split("@")[0] );
+    }
+
+    if( router )
+    {
+        var controller = router.provider.split("@");
+        var module = controller[0];
+        var method = controller[1];
+        env.HTTP_ROUTE=router.provider;
+        env.HTTP_PATH = path ;
+        env.HTTP_DISPATCHER( module,  method);
+
+    }else if( global.dispatchEvent( new Event("ROUTE_NOT_EXISTS") ) )
+    {
+        document.body.innerHTML = "<p style='text-align: center;margin-top: 50px;font-size: 18px;'>Access page does not exist.</p>";
+    }
     
 },false,-500);
 

@@ -144,6 +144,10 @@ for( var key in mapKeys )
             break;
             case "mode" :
                 val =  val=='dev' ? 1 : val=='test' ? 2 : 3;
+                config.env_name = "development";
+                if( val === 3 ){
+                    config.env_name = "production";
+                }
             break;
             case "strictType" :
             case "animate" :

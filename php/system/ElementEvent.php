@@ -11,7 +11,8 @@ class ElementEvent extends Event
 {
     const ADD='elementAdd';
     const REMOVE='elementRemove';
-    const CHNAGED='elementContentChanged';
+    const CHANGE='elementChildrenChange';
+    const ADD_TO_DOCUMENT='elementAddToDocument';
 
     public $parent=null;
     public $child=null;

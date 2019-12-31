@@ -9,9 +9,210 @@
  */
 final class Reflect
 {
-    final static private function map($type, $name)
+    final static private function funMap($type)
     {
-       
+        static $map=null;
+        if( $map === null )
+        {
+            $map = [
+                "system"=>function (&$target, &$name, $args=null){
+                    
+                    switch ( $name ) {
+                        case "isDefined":
+                            return ["isset", [$target]];
+                        case "trim" :
+                            return ["trim",[$target]];
+                        case "isString" :
+                            return ["is_string",[$target]];
+                        case "isFunction" :
+                            return ["is_callable",[$target]];
+                        case "parseInt" :
+                            return ["intval",[$target]];
+                    }
+                    return null;
+                },
+                "function"=>function (&$target, &$name, $args=null) {
+                    switch ( $name ) {
+                        case "call" :
+                            return  [["\\es\\system\\Reflect","call"], $args ];
+                        case "apply" :
+                            return  [["\\es\\system\\Reflect","apply"], $args ];
+                        case "bind" :
+                            return  [["\\es\\system\\System","bind"], $args ];
+                    }
+                    return null;
+                },
+                "array"=>function (&$target, &$name, $args=null)
+                {
+                    switch ( $name ){
+                        case "slice" :
+                            return ["array_slice", $args];
+                        case "indexOf" :
+                            return [function(&$target,&$needle){ 
+                                return ($result = array_search($needle, $target)) !== false ? $result : -1;
+                            }, $args];
+                        case "splice" :
+                            return ["array_splice", array_merge( [$target], $args) ];
+                        case "push" :
+                            return ["array_push", array_merge( [$target], $args) ];
+                        case "shift" :
+                            return ["array_shift", array_merge( [$target], $args) ];
+                        case "unshift" :
+                            return ["array_unshift", array_merge( [$target], $args) ];
+                        case "pop" :
+                            return ["array_unshift", [$target] ];
+                        case "length" :
+                            return ["count", [$target] ];
+                        case "concat" :
+                            return [function(&$args){
+                                $results = [];
+                                foreach( $args as $value )
+                                {
+                                    if( $value instanceof \es\system\BaseObject )
+                                    {
+                                        $value = $value->valueOf();
+                                    }
+                                    if( System::isArray($value) )
+                                    {
+                                        $results = array_merge($results, $value);
+                                    }else{
+                                        array_push($results,  $value);
+                                    }
+                                }
+                                return $results;
+                            }, $args];
+                        case "fill" :
+                            return ["array_fill", array_merge( [$target], $args) ];
+                        case "filter" :
+                            return ["array_filter", array_merge( [$target], $args) ];
+                        case "forEach" :
+                            return ["array_walk", array_merge( [$target], $args) ];
+                        case "join" :
+                            return ["implode", array_merge($args,[$target]) ];
+                        case "unique" :
+                            return ["array_unique", [$target] ];
+                        case "sort" :
+                            return ["usort", array_merge( [$target], $args) ];
+                        case "map" :
+                            return ["array_map", array_merge($args, [$target] ) ];
+                        case "lastIndexOf" :
+                            return [function(&$target,&$needle){
+                                $len = count( $target );
+                                while( $len > 0 )
+                                {
+                                    if( $target[ --$len ] === $needle )
+                                    {
+                                        return $len;
+                                    }
+                                }
+                                return null;
+                            }, array_merge( [$target], $args) ];
+                        case "find" :
+                            return [function(&$target,&$needle){
+                                $len = count( $target );
+                                for( $index = 0; $index < $len;$index++ )
+                                {
+                                    if( $target[ $index ] === $needle )
+                                    {
+                                        return  $target[ $index ];
+                                    }
+                                }
+                                return null;
+                            }, array_merge( [$target], $args) ];
+                    }
+                    return null;
+                },
+                "string"=>function (&$target, &$name, $args=null)
+                {
+                    switch ( $name )
+                    {
+                        case "length" :
+                            return ["mb_strlen", [$target] ];
+                        case "replace" :
+                            return ["str_replace", array_merge($args,[$target])];
+                        case "indexOf" :
+                            return [function(&$target,&$needle){
+                                return ($result = strpos($target, $needle )) !== false ? $result : -1;
+                            }, array_merge( [$target], $args) ];
+                        case "lastIndexOf" :
+                            return [function(&$target,&$needle){
+                                return ($result = strrpos($target, $needle )) !== false ? $result : -1;
+                            }, array_merge( [$target], $args) ];
+                        case "match" :
+                            return [ [$args[0],$name], [$target] ];
+                        case "matchAll" :
+                            return [ [$args[0],$name], [$target] ];
+                        case "split" :
+                            return ["explode", [$args[0],$target]];
+                        case "search" :
+                            return [function(&$target,&$needle){
+                                if( is_string($needle) )
+                                {
+                                    return ($result = strpos($target, $needle )) !== false ? $result : -1;
+
+                                }else if( $needle instanceof \es\system\RegExp )
+                                {
+                                    return $needle->search( $target );
+                                }
+                                throw new \es\system\TypeError("String.search parameter can only be String or RegExp");
+                            }, array_merge( [$target], $args) ];
+                        case "charAt" :
+                            return ["substr", [$target,$args[0],$args[0]+1] ];
+                        case "charCodeAt" :
+                            return ["ord", [substr($target,$args[0],$args[0]+1)]];
+                        case "repeat" :
+                            return ["str_repeat",  array_merge([$target], $args)];
+                        case "slice" :
+                            return ["substr",array_merge([$target], $args)];
+                        case "substring" :
+                            return ["substr",array_merge([$target], $args)];
+                        case "substr" :
+                            return ["substr",array_merge([$target], $args)];
+                        case "toLocaleLowerCase" :
+                        case "toLowerCase" :
+                            return ["strtolower",[$target]];
+                        case "toLocaleUpperCase" :
+                        case "toUpperCase" :
+                            return ["strtoupper",[$target]];
+                        case "trim" :
+                            return ["trim",[$target]];
+                        case "trimRight" :
+                            return ["rtrim",[$target]];
+                        case "trimLeft" :
+                            return ["ltrim",[$target]];
+                        case "includes" :
+                            return [function(&$target,&$needle){
+                                return @strpos( $target, $needle) !== false;
+                            },array_merge([$target], $args)];
+                        case "concat" :
+                            return ["implode",  array_merge([""], [array_merge([$target], $args)])];
+                        case "padEnd" :
+                            return ["str_pad", array_merge([$target], array_merge( array_pad( $args,3," " ),STR_PAD_RIGHT))];
+                        case "padStart" :
+                            return ["str_pad", array_merge([$target], array_merge( array_pad( $args,3," " ),STR_PAD_LEFT))];
+                    }
+                    return null;
+                } ,
+                "regexp"=>function (&$target, &$name, $args=null)
+                {
+                    return null;
+                },
+                "math"=>function (&$target, &$name, $args=null)
+                {
+                    switch ( $name )
+                    {
+                        case "random" :
+                            return [function(){
+                                return mt_rand(1,2147483647) / 2147483647;
+                            },[]];
+                        default :
+                            return [$name, $args];
+                    }
+                    return null;
+                }
+            ];
+        }
+        return @$map[$type] ?: null;
     }
 
     final static private function getReflectionMethodOrProperty( $target, $name, $accessor='',$scope=null, $ns=null)
@@ -176,20 +377,26 @@ final class Reflect
 
     final static public function call( $scope, $target, $name=null, array $args=null, $thisArg=null, $ns=null )
     {
+        $type = null;
         if( is_string($target) )
         {
-            switch ( $name ){
-                case "charAt" :
-                    return $target[ $args[0] ];
-                break;
-            }
-
-        }else if( is_array($target) && $name )
+            $type = "string";
+        }else if( is_array($target) )
         {
-            switch( $name )
+            $type = "array";
+        }
+
+        if( $type )
+        {
+            $fn = Reflect::funMap( $type );
+            if( $fn )
             {
-                case "push" :
-                  return array_push($target, $args ? $args[0] : null );
+                $args = $args ?: [];
+                $method = $fn($target, $name, $args);
+                if( $method )
+                {
+                    return call_user_func_array($method[0], $method[1]);
+                }
             }
         }
 

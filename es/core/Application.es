@@ -20,7 +20,6 @@ package es.core
        static private var lastApp:Node=null;
        private var appContainer:Node=null;
        private var initiated:Boolean = false;
-       private var _componentId:String;
 
        public function Application()
        {
@@ -175,51 +174,77 @@ package es.core
        }
 
        /**
+       * 获取当前应用入口需要的脚本文件
+       * 只有在服务端渲染时此方法才会调用
+       * @returns {Array}
+       */
+       [RunPlatform(server)] 
+       protected function getViewScripts():Array
+       {
+            var scripts:Object = System.environments("LOAD_SCRIPTS");
+            var classname:String = __CLASS__;
+            var items:Array = scripts[classname] || [];
+            return items;
+       }
+
+       /**
        * 响应一个视图页面
        */
-       [RunPlatform(server)]
-       protected responser()
+       protected responser(view:View)
        {
-            SystemManage.done(()=>{
-
-                document.title = this.title || "title";
-
-                var script:Node = new HTMLElement('script') as Node;
-                script.content='window["'+Interaction.key+'"]='+ JSON.stringify( Interaction.dataset );
-                document.head.appendChild( script );
-
-                var scripts:Object = System.environments("LOAD_SCRIPTS");
-                var classname:String = __CLASS__;
-                var items:Array = scripts[classname] || [];
-                for(var value:String of items )
+            if( this.hasEventListener( ApplicationEvent.RESPONSE_BEFORE ) )
+            {
+                var event:ApplicationEvent = new ApplicationEvent( ApplicationEvent.RESPONSE_BEFORE );
+                event.container = view;
+                this.dispatchEvent( event );
+                if( event.defaultPrevented )
                 {
-                    var type:String = value.substr(value.lastIndexOf(".")+1);
-                    if( type ==="js" )
-                    {
-                        var main:Node = new HTMLElement('script') as Node;
-                        main.setAttribute("src", value ); 
-                        document.body.appendChild( main );
-
-                    }else if( type ==="css")
-                    {
-                        var link:Node = new HTMLElement('link') as Node;
-                        link.setAttribute("href", value );
-                        link.setAttribute("rel", "stylesheet"); 
-                        document.head.appendChild( link );
-                    }
+                    return;
                 }
-            
-                var res:Response = System.environments("HTTP_RESPONSE") as Response;
-                res.status( 200 );
-                res.send( document.documentElement.outerHTML );
+            }
 
-            });
+            when( RunPlatform(server) )
+            {
+                SystemManage.done(()=>{
+
+                    document.title = this.title || "title";
+
+                    var script:Node = new HTMLElement('script') as Node;
+                    script.content='window["'+Interaction.key+'"]='+ JSON.stringify( Interaction.dataset );
+                    document.head.appendChild( script );
+
+                    var items:Array = this.getViewScripts();
+                    for(var value:String of items )
+                    {
+                        var type:String = value.substr(value.lastIndexOf(".")+1);
+                        if( type ==="js" )
+                        {
+                            var main:Node = new HTMLElement('script') as Node;
+                            main.setAttribute("src", value ); 
+                            document.body.appendChild( main );
+
+                        }else if( type ==="css")
+                        {
+                            var link:Node = new HTMLElement('link') as Node;
+                            link.setAttribute("href", value );
+                            link.setAttribute("rel", "stylesheet"); 
+                            document.head.appendChild( link );
+                        }
+                    }
+                
+                    var res:Response = System.environments("HTTP_RESPONSE") as Response;
+                    res.status( 200 );
+                    res.send( document.documentElement.outerHTML );
+
+                });
+            }
        }
 
        /**
         * 渲染并且显示一个视图
+        * returns {View}
         */
-       public function render( view:View ):View
+       protected function render( view:View ):View
        {
            var elem:Element = view.display();
            var app:Node = this.appContainer;
@@ -227,7 +252,7 @@ package es.core
            {
                (document.body as Node).appendChild( app );
            }
-           this.responser();
+           this.responser( view );
            return view;
        }
    }

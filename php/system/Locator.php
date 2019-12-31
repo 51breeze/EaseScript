@@ -164,11 +164,11 @@ class Locator
     static public function create($url,$name=null)
     {
         if( !is_string($url) )return false;
-        $url = time($url);
+        $url = trim($url);
         if( !preg_match('/^https?\:\/\//i',$url) )
         {
             $request = static::getRequest();
-            $port = $request->host();
+            $port = $request->port();
             if( $port==80 ){
                 $port=0;
             }
@@ -196,7 +196,10 @@ class Locator
      */
     static public function match( $name )
     {
-        $urlSegments = static::create( $name );
+        $urlSegments = $name;
+        if( is_string( $name) ){
+            $urlSegments = static::create( $name );
+        }
         if( !$urlSegments )return null;
         if( $urlSegments->host !== static::getRequest()->host() )
         {
@@ -207,15 +210,14 @@ class Locator
         {
             $name = $urlSegments->query[ $pathName ];
         }else{
-            $name = '/'. implode('/',$urlSegments->path);
+            $name = $urlSegments->path;
         }
+
         $routes = System::environments("HTTP_ROUTES");
-        foreach($routes as $method => $route )
+        $method = strtolower( static::getRequest()->method() ?: "get" );
+        if( $routes && isset($routes[$method]) && isset($routes[$method][$name])  )
         {
-            if( isset($route[$name]) )
-            {
-                return $route[$name];
-            }
+           return $routes[$method][$name];
         }
         return null;
     }

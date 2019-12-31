@@ -66,8 +66,11 @@ class Node extends EventDispatcher
             case 'parentNode' :
                 throw new ReferenceError('parentNode is not writable.');
             case 'text' :
-                return $this->content = $value;
             case 'textContent' :
+                if( !is_scalar($value) )
+                {
+                    throw new ReferenceError('textContent can only is an string');
+                }
                 return $this->content = $value;
         }
         $this->attr->$name = $value;

@@ -11,6 +11,7 @@
     "version": "node ./bin/es.js -V",
     "dev":"node ./bin/es.js -p ./test -o ./build --clean --source-file --minify disabled -s node -m production --webroot",
     "test":"node ./bin/es.js -p ./test -o D:/workspace/node --clean --source-file --minify disabled -s node -m production --webroot",
+    "js":"node ./bin/es.js -p ./test -o D:/workspace/node --clean --source-file --minify disabled -s javascript --sps node -m production --webroot",
     "php":"node ./bin/es.js -p ./test -o D:/workspace/php/blog --clean --source-file --minify disabled -s php -m production --webroot"
   },
   "repository": {

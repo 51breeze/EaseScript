@@ -92,8 +92,22 @@ class ArrayList extends BaseObject implements \Countable
 
     public function concat()
     {
-        $param = array_merge( array( $this->dataItems ) , func_get_args() );
-        return new ArrayList( $param  );
+        $param = func_get_args();
+        $result = array_slice($this->valueOf(),0);
+        foreach( $param as $item )
+        {
+            if( $item instanceof ArrayList )
+            {
+                $item = $item->valueOf();
+            }
+            if( is_array($item) )
+            {
+                $result=array_merge( $result ,  $item  );
+            }else{
+                array_push($result, $item );
+            }
+        }
+        return new ArrayList( $result );
     }
 
     public function join( $glue="" )

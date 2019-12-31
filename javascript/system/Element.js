@@ -1813,9 +1813,10 @@ Element.prototype.addChildAt=function addChildAt( childElemnet, index )
      if( System.isNaN(index) )throw new Error('Invalid param the index in addChildAt');
      if( System.instanceOf(childElemnet,Element) )
      {
+         var self = this;
          childElemnet.forEach(function(child,at) {
-             this.addChildAt(child, !isNaN(at) ? at+index : index );
-         },this);
+            self.addChildAt(child, !isNaN(at) ? at+index : index );
+         });
          return childElemnet;
      }
      if( !Element.isNodeElement( childElemnet ) )

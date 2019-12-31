@@ -6,12 +6,11 @@
  */
 package es.events
 {
-    import es.interfaces.IContainer;
-    import es.core.State;
     public class ApplicationEvent extends Event
     {
         static public const FETCH_ROOT_CONTAINER:String ='applicationFetchRootContainer';
-        public var container:Object;
+        static public const RESPONSE_BEFORE:String ='applicationResponseBefore';
+        public var container:Object=null;
         public function ApplicationEvent(type:String, bubbles:Boolean=true, cancelable:Boolean=true)
         {
             super(type, bubbles, cancelable);

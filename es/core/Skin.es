@@ -211,6 +211,7 @@ package es.core
          * 一个标记用来区分是否需要重新生成子级列表
          */
         private var invalidate:Boolean=true;
+        private var lastRenderChildren:Array = [];
 
         /**
          * 创建并更新子级元素
@@ -224,7 +225,9 @@ package es.core
                 timeoutId = null;
             }
 
-            this.updateChildren(this, this.render() );
+            var children:Array = this.render();
+            this.lastRenderChildren = children;
+            this.updateChildren(this, children );
             this.updateInstallState();
             
             this.mount();
@@ -1138,11 +1141,11 @@ package es.core
          */
         override public function display():Element
         {
+            var node:HTMLElement = this.element.current() as HTMLElement;
             if( this.initialized===false )
             {
                 this.initialized = true;
                 this.initializing();
-                var node:HTMLElement = this.element.current() as HTMLElement;
                 when( RunPlatform(server) )
                 {
                     if( this.hostComponent is SkinComponent )
@@ -1152,6 +1155,7 @@ package es.core
                 }
             }
             super.display();
+            this.invalidate = true;
             this.nowUpdate(0);
             return this.element;
         }
