@@ -49,7 +49,6 @@ function include(contents, name , filepath, config )
             {
                return '';
             }
-
             if( info.name.charAt(0) ==="@" )
             {
                 return 'var '+b+'=require("'+c.substr(1)+'");';

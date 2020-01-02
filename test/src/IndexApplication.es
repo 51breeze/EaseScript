@@ -34,6 +34,10 @@ package
             console.log( this ,1, true, view.Viewport );
         }
 
+        public function getObject():Object{
+            return [];
+        }
+
     
         [Router(method="get")]
         public function viewport()

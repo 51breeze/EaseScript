@@ -183,7 +183,7 @@ final class System
         return $high > $low ? range($low, $high, $step) : array($low);
     }
 
-    public static function bind($callback,$thisArg=null)
+    public static function bind($callback,$thisArg=null, ...$rest )
     {
         if( is_array($callback) )
         {
@@ -210,6 +210,13 @@ final class System
                     {
                         $method = \Closure::bind($method, $thisArg);
                     }
+                    if( count($rest) > 0 )
+                    {
+                        return function()use( $method, $rest )
+                        {
+                            return call_user_func_array( $method, $rest );
+                        };
+                    }
                     return $method;
                 }
             }else
@@ -220,7 +227,15 @@ final class System
         if( is_callable($callback) )
         {
             $reflect = new \ReflectionFunction($callback);
-            return $thisArg ? \Closure::bind( $reflect->getClosure() , $thisArg) : $reflect->getClosure();
+            $method = $thisArg ? \Closure::bind( $reflect->getClosure() , $thisArg) : $reflect->getClosure();
+            if( count($rest) > 0 )
+            {
+                return function()use( $method, $rest )
+                {
+                    return call_user_func_array( $method, $rest );
+                };
+            }
+            return $method;
         }
         throw new TypeError('callback is not callable');
     }

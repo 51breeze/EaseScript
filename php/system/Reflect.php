@@ -19,15 +19,15 @@ final class Reflect
                     
                     switch ( $name ) {
                         case "isDefined":
-                            return ["isset", [$target]];
+                            return ["isset", [&$target]];
                         case "trim" :
-                            return ["trim",[$target]];
+                            return ["trim",[&$target]];
                         case "isString" :
-                            return ["is_string",[$target]];
+                            return ["is_string",[&$target]];
                         case "isFunction" :
-                            return ["is_callable",[$target]];
+                            return ["is_callable",[&$target]];
                         case "parseInt" :
-                            return ["intval",[$target]];
+                            return ["intval",[&$target]];
                     }
                     return null;
                 },
@@ -50,19 +50,19 @@ final class Reflect
                         case "indexOf" :
                             return [function(&$target,&$needle){ 
                                 return ($result = array_search($needle, $target)) !== false ? $result : -1;
-                            }, $args];
+                            }, array_merge( [&$target], $args) ];
                         case "splice" :
-                            return ["array_splice", array_merge( [$target], $args) ];
+                            return ["array_splice", array_merge( [&$target], $args) ];
                         case "push" :
-                            return ["array_push", array_merge( [$target], $args) ];
+                            return ["array_push", array_merge( [&$target], $args) ];
                         case "shift" :
-                            return ["array_shift", array_merge( [$target], $args) ];
+                            return ["array_shift", array_merge( [&$target], $args) ];
                         case "unshift" :
-                            return ["array_unshift", array_merge( [$target], $args) ];
+                            return ["array_unshift", array_merge( [&$target], $args) ];
                         case "pop" :
-                            return ["array_unshift", [$target] ];
+                            return ["array_unshift", [&$target] ];
                         case "length" :
-                            return ["count", [$target] ];
+                            return ["count", [&$target] ];
                         case "concat" :
                             return [function(&$args){
                                 $results = [];
@@ -80,21 +80,21 @@ final class Reflect
                                     }
                                 }
                                 return $results;
-                            }, $args];
+                            }, [array_merge( [&$target], $args)] ];
                         case "fill" :
-                            return ["array_fill", array_merge( [$target], $args) ];
+                            return ["array_fill", array_merge( [&$target], $args) ];
                         case "filter" :
-                            return ["array_filter", array_merge( [$target], $args) ];
+                            return ["array_filter", array_merge( [&$target], $args) ];
                         case "forEach" :
-                            return ["array_walk", array_merge( [$target], $args) ];
+                            return ["array_walk", array_merge( [&$target], $args) ];
                         case "join" :
-                            return ["implode", array_merge($args,[$target]) ];
+                            return ["implode", array_merge($args,[&$target]) ];
                         case "unique" :
-                            return ["array_unique", [$target] ];
+                            return ["array_unique", [&$target] ];
                         case "sort" :
-                            return ["usort", array_merge( [$target], $args) ];
+                            return ["usort", array_merge( [&$target], $args) ];
                         case "map" :
-                            return ["array_map", array_merge($args, [$target] ) ];
+                            return ["array_map", array_merge($args, [&$target] ) ];
                         case "lastIndexOf" :
                             return [function(&$target,&$needle){
                                 $len = count( $target );
@@ -106,7 +106,7 @@ final class Reflect
                                     }
                                 }
                                 return null;
-                            }, array_merge( [$target], $args) ];
+                            }, array_merge( [&$target], $args) ];
                         case "find" :
                             return [function(&$target,&$needle){
                                 $len = count( $target );
@@ -118,7 +118,7 @@ final class Reflect
                                     }
                                 }
                                 return null;
-                            }, array_merge( [$target], $args) ];
+                            }, array_merge( [&$target], $args) ];
                     }
                     return null;
                 },

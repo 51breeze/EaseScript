@@ -4,9 +4,10 @@
  * Released under the MIT license
  * https://github.com/51breeze/EaseScript
  * @author Jun Ye <664371281@qq.com>
- * @require System,BaseObject,Node,SyntaxError,ReferenceError
+ * @require System,BaseObject,Node,SyntaxError,ReferenceError,NodeList
  */
-const Node = require("./Node.js");
+var Node = require("./Node.js");
+var NodeList = require("./NodeList.js");
 class HTMLElement extends Node
 {
     /**
@@ -55,7 +56,7 @@ class HTMLElement extends Node
         /**
          * @var array
          */
-        this._children=[];
+        this._children = new NodeList();
 
         /**
          * 是否需要重新解析对象为html字符串
@@ -329,8 +330,8 @@ class HTMLElement extends Node
 
     set innerHTML( value )
     {
-        this._children=[];
-        this.innerHTML = value;
+        this._children.splice(0, this._children.length );
+        this._innerHTML = value;
         this._parseHtml=true;
         this._hasInnerHTML = true;
         return value;
@@ -373,7 +374,7 @@ class HTMLElement extends Node
 
     get childNodes()
     {
-        return this._children.slice(0);
+        return this._children;
     }
 
 }
@@ -383,5 +384,5 @@ HTMLElement.typeMap ={
     'document':9,
 };
 module.exports = HTMLElement;
-const System = require("./System.js");
-const Document = require("./Document.js");
+var System = require("./System.js");
+var Document = require("./Document.js");

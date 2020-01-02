@@ -7,7 +7,7 @@
  * @require BaseObject,EventDispatcher,ReferenceError,Document
  */
 
-const EventDispatcher = require("./EventDispatcher.js");
+var EventDispatcher = require("./EventDispatcher.js");
 class Node extends EventDispatcher
 {
     constructor(nodeName='text', nodeType=3, attr=null )
@@ -55,4 +55,4 @@ class Node extends EventDispatcher
 }
 
 module.exports = Node;
-const Document = require("./Document.js");
+var Document = require("./Document.js");

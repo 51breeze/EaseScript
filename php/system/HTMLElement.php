@@ -5,7 +5,7 @@
  * Released under the MIT license
  * https://github.com/51breeze/EaseScript
  * @author Jun Ye <664371281@qq.com>
- * @require System,BaseObject,Node,SyntaxError,ReferenceError,ArrayList
+ * @require System,BaseObject,Node,SyntaxError,ReferenceError,NodeList
  */
 class HTMLElement extends Node
 {
@@ -80,7 +80,7 @@ class HTMLElement extends Node
         $this->nodeName = $name;
         $this->nodeType = $type;
         parent::__construct($name, $type, $attr);
-        $this->children = new ArrayList();
+        $this->children = new NodeList();
     }
 
     /**

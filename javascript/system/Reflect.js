@@ -125,7 +125,7 @@ function getNamespaceUri(context, ns)
     {
         return context ? context.__T__.uri : [];
     }
-    var uri = context.__T__.uri.slice(0);
+    var uri = context.__T__.uri;
     var len = ns.length;
     for(;i<len;i++)
     {
@@ -146,14 +146,17 @@ function description(scope, target, name , receiver , ns, accessor)
         var isstatic = ( !receiver || receiver === target ) && System.isClass(target);
         var objClass = isstatic ? target : target.constructor;
         var context = System.isClass(scope) ? scope : null;
-        var proto = isstatic ? objClass.__T__.method : objClass.__T__.proto;
-
-        //获取公开的属性
-        var desc = fetchMethodAndAttributeDesc( context, proto, target, name, isstatic, accessor, '');
-        if( desc )
-        {
-            return desc;
-        }
+        var proto = null;
+        
+        do{ 
+            proto = isstatic ? objClass.__T__.method : objClass.__T__.proto;
+            //获取公开的属性
+            var desc = fetchMethodAndAttributeDesc( context, proto, target, name, isstatic, accessor, '');
+            if( desc )
+            {
+                return desc;
+            }
+        }while( !isstatic && System.isClass(objClass = objClass.__T__["extends"]) );
 
         //获取带有命名空间的属性
         var uri = getNamespaceUri( context, ns);

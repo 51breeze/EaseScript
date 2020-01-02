@@ -163,8 +163,8 @@ Locator.create=function create(url,name)
     url = System.trim(url);
     if( !/^(https?|file|ftp|udp|tcp)\:\/\//i.test(url) )
     {
-        var request = Internal.env.HTTP_REQUEST;
-        var http =  request.protocol+"//"+request.hostname+(request.port ? ":"+request.port : "");
+        var request = System.environments("HTTP_REQUEST");
+        var http =  request.protocol+"//"+request.host+(request.port ? ":"+request.port : "");
         url = url.charAt(0) === "/" || url.charAt(0) === "?" ? http+url : http+"/"+url;
     }
 
@@ -268,9 +268,12 @@ Locator.match = function match( name )
         segments = Locator.create(name);
     }
     if( !segments )return null;
-    if( segments.host !== location.hostname ){
+
+    var request = System.environments("HTTP_REQUEST");
+    if( segments.host !== request.hostname ){
         return null;
     }
+
     var pathName = System.environments("URL_PATH_NAME");
     if( typeof segments.query[ pathName ] !== "undefined" )
     {

@@ -646,7 +646,8 @@ package es.core
                 {
                     events[ type ] = [];
                 }
-                events[type].push({
+
+                (events[type] as Array).push({
                     "callback":callback,
                     "useCapture":useCapture,
                     "priority":priority,

@@ -37,6 +37,7 @@ class Bootstrap{
     constructor( app )
     {
         this.app = app;
+        Internal.env.BOOT_APP = this;
     }
 
     serviceProvider( name , factory )
@@ -101,34 +102,31 @@ class Bootstrap{
 
     start( factory )
     {
-        const obj = this;
-        const bindRoute = (routes, method)=>{
-
-            Object.forEach(routes,function(provider,route)
+        for(var method in env.HTTP_ROUTES )
+        {
+            const routes = env.HTTP_ROUTES[ method ];
+            for( var route in routes)
             {
-                factory(method,route.replace(/\{(\w+)\}/g,':$1'),function(req, res)
-                {
+                const provider = routes[ route ];
+                factory(method, route.replace(/\{(\w+)\}/g,':$1'),(req, res)=>{
                     Internal.env.HTTP_REQUEST ={
                         "method":req.method,
                         "path":req.path,
-                        "body":req.body,
-                        "query":req.query,
-                        "params":req.params,
-                        "host":req.get("host"),
+                        "body":req.body||{},
+                        "query":req.query||{},
+                        "params":req.params||{},
+                        "host":req.get("host").split(":")[0],
                         "port":req.get("host").split(":")[1] || null,
                         "protocol":req.protocol,
                         "cookie":req.cookies || null,
                         "uri":req.originalUrl,
                         "url":req.protocol + '://' + req.get('host') + req.originalUrl,
-                    }
+                    };
                     Internal.env.HTTP_RESPONSE = res;
-                    Internal.env.BOOT_APP = obj;
-                    obj.dispatch( provider , req.params );
+                    this.dispatch( provider , req.params );
                 });
-            });
+            };
         }
-
-        Object.forEach( env.HTTP_ROUTES,bindRoute,this);
     }
 }
 
