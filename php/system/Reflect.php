@@ -5,7 +5,7 @@
  * Released under the MIT license
  * https://github.com/51breeze/EaseScript
  * @author Jun Ye <664371281@qq.com>
- * @require Namespaces,TypeError,System,ReferenceError
+ * @require TypeError,System,ReferenceError,ArrayList
  */
 final class Reflect
 {
@@ -487,9 +487,9 @@ final class Reflect
 
     final static public function type($value, $typeClass)
     {
+        $original = $value;
         if( is_string($typeClass) )
         {
-            $original = $value;
             $flag = false;
             switch ( strtolower($typeClass) )
             {
@@ -497,29 +497,71 @@ final class Reflect
                 case "int" :
                 case "number":
                 case "uint":
-                    $value = intval($value);
                     $flag = true;
-                    if ( strtolower($typeClass) !== "number")
+                    $value = null;
+                    if( is_numeric($original) )
                     {
-                        if( $typeClass === "uint" && $value < 0 )throw new RangeError($original ." convert failed. can only be an unsigned Integer");
-                        if( $value > 2147483647 || $value < -2147483648)throw new RangeError($original . " convert failed. the length of overflow Integer");
+                        $value = intval($original);
+                        if( strtolower($typeClass) === "uint" && $value < 0 )
+                        {
+                            throw new RangeError($original ." convert failed. can only be an unsigned Integer");
+                        }
+                        if( $value > 2147483647 || $value < -2147483648)
+                        {
+                            throw new RangeError($original . " convert failed. the length of overflow Integer");
+                        }
                     }
                     break;
                 case "double":
                 case "float":
                     $flag = true;
-                    $value = floatval($value);
+                    $value = null;
+                    if( is_numeric($original) )
+                    {
+                       $value = floatval($original);
+                    }
+                    break;
+                case "object" :
+                    $flag = true;
+                    $value = null;
+                    if( System::isObject($original,true) )
+                    {
+                       $value = (object)$original;
+                    }
+                    break;
+                case "array" :
+                    $flag = true;
+                    $value = null;
+                    if( System::isObject($original,true) )
+                    {
+                       $value = new ArrayList( (array)$original );
+                    }
+                    break;
+                case "string" :
+                    $flag = true;
+                    $value = $original."";
+                    break;
+                case "boolean" :
+                    $flag = true;
+                    $value = boolval($original);
                     break;
             }
 
             if( $flag ===true )
             {
-                if( System::isNaN($value) ) throw new TypeError($original + " can not be converted for " . $typeClass);
+                if( $value === null ) 
+                {
+                    throw new TypeError($original + " can not be converted for " . $typeClass);
+                }
                 return $value;
             }
         }
 
-        if( $value == null || $typeClass === "Object" )return $value;
+        if( $value == null || $typeClass === "Object" )
+        {
+            return $value;
+        }
+
         if ( $typeClass && !System::is($value, $typeClass) )
         {
             throw new TypeError( 'Specify the type of value do not match. must is "'.$typeClass.'"');

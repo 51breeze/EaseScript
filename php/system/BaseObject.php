@@ -38,16 +38,6 @@ class BaseObject extends \stdClass implements \Iterator, \ArrayAccess
             $i++;
         }
 
-        if ( $length === $i )
-        {
-            $target = new \stdClass();
-            --$i;
-
-        }else if ( !System::isObject($target) )
-        {
-            $target = new \stdClass();
-        }
-
         $type = System::isArray($target) ? 'array' : 'object';
         for ( ;$i < $length; $i++ )
         {
@@ -121,9 +111,9 @@ class BaseObject extends \stdClass implements \Iterator, \ArrayAccess
                 }
                 if( $name ==="keys")
                 {
-                   return array_keys( (array)$object );    
+                   return new \es\system\ArrayList( array_keys( (array)$object ) );    
                 }
-                return array_values( (array)$object );
+                return new \es\system\ArrayList( array_values( (array)$object ) );
             //param $obj, $prop, $desc
             case "defineProperty" :
                 $args[0]->$args[1] = $args[2]->value;  
@@ -136,15 +126,9 @@ class BaseObject extends \stdClass implements \Iterator, \ArrayAccess
     
     public function __construct( $object=null )
     {
-         //is an self object
          if( $object != null && !is_subclass_of($this,BaseObject::class) )
          {
-             if( System::is($object,BaseObject::class,false) && !is_a($object,'ArrayAccess')  )
-             {
-                 $this->_originValue = $object->_originValue;
-                 $this->_originType =  $object->_originType;
-
-             }else if( is_object($object) )
+             if( is_object($object) )
              {
                  $object = (array)$object;
                  $this->_originValue = $object;
@@ -166,7 +150,7 @@ class BaseObject extends \stdClass implements \Iterator, \ArrayAccess
     public function valueOf()
     {
         $value = $this->_originValue;
-        if( System::isObject( $value ) )
+        if( System::isObject( $value, true ) )
         {
             foreach ( $value as &$item )
             {
@@ -191,11 +175,11 @@ class BaseObject extends \stdClass implements \Iterator, \ArrayAccess
             case 'string'  :
             case 'number'  :
             case 'boolean' :
-            case 'regexp' :
+            case 'regexp'  :
                 return $this->_originValue;
             break;
         }
-        return json_encode( $this->_originValue, JSON_UNESCAPED_UNICODE);
+        return '[object '.get_class( $this ).']';
     }
 
     public function hasOwnProperty( $name )
@@ -289,13 +273,4 @@ class BaseObject extends \stdClass implements \Iterator, \ArrayAccess
         }
         $this->_originValue[ $name ] = $value;
     }
-
-    // public function __call($name, $arguments)
-    // {
-    //     if( !method_exists($this, $name) )
-    //     {
-    //         throw new ReferenceError($name . ' is not exists.');
-    //     }
-    //     return call_user_func_array( array($this, $name),  $arguments );
-    // }
 }

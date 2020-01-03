@@ -6,10 +6,17 @@
     ]]>
     </s:Script>
 
+     <!--声明一组变量值 -->
+     <s:Declare>
+        const {
+            message:String="title is default"
+         } = dataset;
+     </s:Declare>
+
     <head>
         <title>title</title>
         <meta charset="UTF-8" http-equiv="X-UA-Compatible" />
-        <meta name="keyword" http-equiv="es,easescript" />
+        <meta name="keyword" http-equiv="{message}" />
     </head>
 
     <c:Navigate id="@navigate" width="120" viewport="@content" current="1" target="false" >

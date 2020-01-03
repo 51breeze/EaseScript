@@ -144,6 +144,35 @@ package es.core
           return _dataset.title as String;
        }
 
+        /**
+        *@private
+        */
+       private var metaMaps:Object = {};
+
+       /**
+       * 设置页面的meta元素属性
+       * @key key
+       * @attr
+       */
+       [RunPlatform(server)] 
+       public function meta(key:*, attrs:Object):void
+       {
+          if( metaMaps[ key ] )
+          {
+              attrs =Object.merge( metaMaps[ key ], attrs);
+          }
+          metaMaps[ key ] = attrs;
+       }
+
+       /**
+       * 获取页面的所有meta元素属性
+       * @returns {Array}
+       */
+       protected function get metas():Array
+       {
+           return Object.values( metaMaps );
+       }
+
        /**
         * @private
         */
@@ -213,6 +242,15 @@ package es.core
                     script.content='window["'+Interaction.key+'"]='+ JSON.stringify( Interaction.dataset );
                     document.head.appendChild( script );
 
+                    this.metas.map( (item:Object)=>{
+                        var script:Node = new HTMLElement('meta') as Node;
+                        for(var p:String in item )
+                        {
+                           script.setAttribute(p,item[p]);
+                        }
+                        document.head.appendChild( script );
+                    });
+
                     var items:Array = this.getViewScripts();
                     for(var value:String of items )
                     {
@@ -234,7 +272,7 @@ package es.core
                 
                     var res:Response = System.environments("HTTP_RESPONSE") as Response;
                     res.status( 200 );
-                    res.send( document.documentElement.outerHTML );
+                    res.send( "<!DOCTYPE html>\n"+document.documentElement.outerHTML );
 
                 });
             }

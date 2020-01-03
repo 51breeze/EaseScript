@@ -338,7 +338,7 @@ package es.components
                 {
                     return linkUrl(page,profile) as String;
                 }
-                return linkUrl.indexOf('?') >= 0 ? linkUrl + '&'+profile+'=' + page : linkUrl + '?'+profile+'=' + page;
+                return (linkUrl as String).indexOf('?') >= 0 ? linkUrl + '&'+profile+'=' + page : linkUrl + '?'+profile+'=' + page;
             }
             return '?'+profile+'=' + page;
         }

@@ -120,7 +120,7 @@ final class System
 
     public function isScalar( $obj )
     {
-        return false;
+        return is_scalar(  $obj );
     }
 
     public static function typeOf( $obj )
@@ -143,10 +143,10 @@ final class System
     {
         if( is_object($obj) )
         {
-            $type = strtolower(get_class($obj));
-            return $type === trim(ES_BUILD_SYSTEM_PATH.'\baseobject','\\') || $type === "stdclass" || $type === "object";
+            $type = strtolower( get_class($obj) );
+            return $flag ===true || $type === trim(ES_BUILD_SYSTEM_PATH.'\baseobject','\\') || $type === "stdclass" || $type === "object";
 
-        }else if( $flag !== true && is_array( $obj ) )
+        }else if( $flag === true && is_array($obj) )
         {
             return true;
         }
@@ -169,13 +169,14 @@ final class System
         return $obj === NaN || is_numeric($obj);
     }
 
-    public static function isFunction($obj){
+    public static function isFunction($obj)
+    {
         return is_callable($obj);
     }
 
     public static function isNaN($value)
     {
-        return $value === NaN;
+        return !is_numeric($value) || $value === NaN;
     }
 
     public static function range($low, $high, $step=1)
