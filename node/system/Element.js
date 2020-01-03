@@ -6,7 +6,7 @@
  * @author Jun Ye <664371281@qq.com>
  * @require System,HTMLElement,Document,Node,EventDispatcher
  */
-const EventDispatcher = require("./EventDispatcher.js");
+var EventDispatcher = require("./EventDispatcher.js");
 const attrpx = {
     "width":"px",
     "height":"px",
@@ -456,9 +456,9 @@ module.exports = class Element extends EventDispatcher
     }
 }
 
-const privateSymbol = Symbol("Element::data");
-const System = require("./System.js");
-const Node = require("./Node.js");
-const Object = require("./Object.js");
-const Document = require("./Document.js");
-const HTMLElement = require("./HTMLElement.js");
+var privateSymbol = Symbol("Element::data");
+var System = require("./System.js");
+var Node = require("./Node.js");
+var Object = require("./Object.js");
+var Document = require("./Document.js");
+var HTMLElement = require("./HTMLElement.js");

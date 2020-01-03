@@ -7,8 +7,8 @@
  * @require System,HTMLElement
  */
 
-const HTMLElement = require("./HTMLElement.js");
-const System = require("./System.js");
+var HTMLElement = require("./HTMLElement.js");
+var System = require("./System.js");
 class Document extends HTMLElement
 {
     constructor()

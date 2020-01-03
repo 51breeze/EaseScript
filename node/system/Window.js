@@ -5,7 +5,7 @@
  * https://github.com/51breeze/EaseScript
  * @require EventDispatcher,Document
  */
-const EventDispatcher = require("./EventDispatcher.js");
+var EventDispatcher = require("./EventDispatcher.js");
 class Window extends EventDispatcher
 {
     static get document()
@@ -21,4 +21,4 @@ class Window extends EventDispatcher
 
 Window.window = new Window();
 module.exports = Window;
-const Document = require("./Document.js");
+var Document = require("./Document.js");
