@@ -282,7 +282,7 @@ package es.core
         * 渲染并且显示一个视图
         * returns {View}
         */
-       protected function render( view:View ):View
+       public function render( view:View ):View
        {
            var elem:Element = view.display();
            var app:Node = this.appContainer;
