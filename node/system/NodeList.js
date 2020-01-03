@@ -6,7 +6,7 @@
  * @author Jun Ye <664371281@qq.com>
  * @require Array
  */
-
+var Array = require("./Array.js");
 class NodeList extends Array
 {
     item( index )
