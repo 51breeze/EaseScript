@@ -1,6 +1,6 @@
 {
   "name": "easescript",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "description": "EaseScript",
   "main": "lib/index.js",
   "bin": {
@@ -8,19 +8,13 @@
     "es": "./bin/es.js"
   },
   "scripts": {
-    "version": "node ./bin/es.js -V",
-    "dev":"node ./bin/es.js -p ./test -o ./build --clean --source-file --minify disabled -s node -m production --webroot",
-    "test":"node ./bin/es.js -p ./test -o D:/workspace/node --clean --source-file --minify disabled -s node -m production --webroot",
-    "js":"node ./bin/es.js -p ./test -o D:/workspace/node --clean --source-file --minify disabled -s javascript --sps node -m production --webroot",
-    "php":"node ./bin/es.js -p ./test -o D:/workspace/php/blog --clean --source-file --minify disabled -s php -m production --webroot"
+    "version": "node ./bin/es.js -V"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/51breeze/EaseScript.git"
   },
   "keywords": [
-    "es",
-    "ease",
     "script",
     "EaseScript",
     "web"
