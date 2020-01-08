@@ -24,7 +24,7 @@ package es.core
        public function Application()
        {
            super( document );
-           when( Syntax(origin) )
+           when( RunPlatform(server) )
            {
                 this.appContainer = Element.createElement("div");
                 this.appContainer.className="application";

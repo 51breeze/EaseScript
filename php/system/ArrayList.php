@@ -59,7 +59,7 @@ class ArrayList extends BaseObject implements \Countable
             if( System::isArray( func_get_arg(0) ) )
             {
                $this->dataItems=func_get_arg(0);
-
+              
             }else if( is_int( func_get_arg(0) ) )
             {
                 $this->dataItems = array_pad([], func_get_arg(0), null);
@@ -70,7 +70,7 @@ class ArrayList extends BaseObject implements \Countable
 
         }else
         {
-            $this->dataItems=func_get_args();
+            $this->dataItems= func_get_args();
         }
         parent::__construct( $this->dataItems );
     }

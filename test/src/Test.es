@@ -11,10 +11,20 @@ package{
    {
       public Test()
       {
+         const uu:Function = (item:Object={oo:55}, items:Object=null, ...args:Array) => {
+
+                  console.log("====arrow function======");
+
+                  var cc:int = 6;
+
+                  console.log(cc, args, this.index( ()=>4, (name:String)=> 999  )   );
+
+         };
+
          super();
       }
 
-      public index()
+      public index(inte:* =null )
       {
 
          var obj:Object={name:123,ag:88,add:"dsfdsfdsfsdf"};

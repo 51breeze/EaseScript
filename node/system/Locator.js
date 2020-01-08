@@ -164,7 +164,7 @@ Locator.create=function create(url,name)
     if( !/^(https?|file|ftp|udp|tcp)\:\/\//i.test(url) )
     {
         var request = System.environments("HTTP_REQUEST");
-        var http =  request.protocol+"//"+request.host+(request.port ? ":"+request.port : "");
+        var http =  request.protocol+"://"+request.host+(request.port ? ":"+request.port : "");
         url = url.charAt(0) === "/" || url.charAt(0) === "?" ? http+url : http+"/"+url;
     }
 
@@ -270,7 +270,8 @@ Locator.match = function match( name )
     if( !segments )return null;
 
     var request = System.environments("HTTP_REQUEST");
-    if( segments.host !== request.hostname ){
+    if( segments.host !== request.host )
+    {
         return null;
     }
 

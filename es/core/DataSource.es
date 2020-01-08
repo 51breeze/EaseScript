@@ -341,9 +341,6 @@ package es.core
                                 var provider:Array = (route[  this._url  ] as String).split("@");
                                 var classModule:Class = System.getDefinitionByName( provider[0] as String ) as Class;
                                 var target:Service = new classModule() as Service;
-                                var BOOT_APP:Object = System.environments("BOOT_APP");
-                                BOOT_APP.bindPipeline( target );
-
                                 target.addEventListener( PipelineEvent.RESPONSE_BEFORE , (event:PipelineEvent)=>{
                                     event.stopImmediatePropagation();
                                     var e:HttpEvent = new HttpEvent( HttpEvent.SUCCESS );

@@ -20,54 +20,67 @@ package es.core
         /**
         * @private
         */
-        static private var doneCallback:Function=null;
+        private var doneCallbacks:Array = [];
 
         /**
-        * 当所有的服务完成后的调用
+        * @private
+        */
+        private function callDone()
+        {
+            var queues:Array = doneCallbacks;
+            var task:Array = taskPromise;
+            if( queues.length > 0 && task.length < 1 )
+            {
+                do{
+                  var callback:Function = queues.shift() as Function;
+                  callback();
+                }while( queues.length > 0 );
+            }
+        }
+
+        /**
+        * @private
+        */
+        private var taskPromise:Array = [];
+
+        /**
+        * 生成一个任务处理器。
+        * 每一个任务处理器必须在指定的任务完成后至少调用一次来取消此任务处理。否则可能会造成线程挂起直到超时。
+        * 此方法主要用来异步处理数据时需要等待当前所有任务处理完成后再响应到前端。
+        * @return {Function}
+        */
+        public function createTaskPromise( callback:Function ):Function
+        {
+            var task:Array = this.taskPromise;
+            var promise:Function = (...args)=>{
+                var index:int = task.indexOf( promise );
+                if( index >= 0 )
+                {
+                    task.splice(index,1);
+                    callback.apply(null, args);
+                    this.callDone();
+                }
+            };
+            task.push( promise );
+            return promise;
+        }
+
+        /**
+        * 当所有的任务处理器结束后调用
         * @param callback
         */
         static public function done( callback:Function ):void
         {
-            SystemManage.doneCallback = callback;
-            if( SystemManage.callServerCouter < 1 )
-            {
-                callback();
-            }
-        }
-
-        /**
-        * 统计服务调用数
-        */
-        static private var callServerCouter:int=0;
-
-        /**
-        * 在每次调用服务调用此方法来累计服务调用次数
-        */
-        [RunPlatform(server)]
-        static public function incrementServerCouter():int
-        {
-            return callServerCouter++;
-        }
-
-        /**
-        * 在每次调用服务调用此方法来减去服务调用数
-        */
-        [RunPlatform(server)]
-        static public function decrementServerCouter():int
-        {
-            var val:int=--callServerCouter;
-            if( val < 1 && SystemManage.doneCallback )
-            {
-               SystemManage.doneCallback();
-            }
-            return val;
+            var systemManage:SystemManage = SystemManage.getSystemManage();
+            systemManage.doneCallbacks.push( callback );
+            systemManage.callDone();
         }
 
         /**
          * @pirvate
          */
         static private var _systemManage:SystemManage=null;
-        static public function getSystemManage()
+        static public function getSystemManage():SystemManage
         {
             var systemManage:SystemManage = SystemManage._systemManage;
             if( systemManage === null )

@@ -49,7 +49,7 @@ package es.core
         /**
          * @private
          */
-        private var _async:Boolean = Syntax(origin,javascript);
+        private var _async:Boolean = false;
 
         /**
          * 标记此组件的运行行为。是否异步(前端/后端)执行
@@ -68,11 +68,7 @@ package es.core
          */
         public function get async():Boolean
         {
-            when( Syntax(origin,javascript) ){
-               return true;
-            }then{
-               return _async;
-            }
+            return _async;
         }
 
         /**

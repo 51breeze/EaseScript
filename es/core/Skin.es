@@ -385,12 +385,10 @@ package es.core
             if( !obj )
             {
                 when( RunPlatform(client) ){
-                    when( Syntax(origin,javascript,false) ){
-                        if( this.inDomExists() )
-                        {
-                            obj = this.findElement( this.getUniqueKey( uukey ) );
-                        } 
-                    }
+                    if( this.inDomExists() )
+                    {
+                        obj = this.findElement( this.getUniqueKey( uukey ) );
+                    } 
                 }
                 obj = this.setUniqueElement(uukey, obj || document.createElement( name ) ) as Node;
                 if( attrs )
