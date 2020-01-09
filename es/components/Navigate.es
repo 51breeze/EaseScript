@@ -113,7 +113,7 @@ package es.components
          */
         public function get current():*
         {
-            return this.assign("current") || System.environments("HTTP_ROUTE_PATH") || 0;
+            return this.assign("current") || Locator.query("current", 0);
         }
 
         /**
@@ -133,6 +133,24 @@ package es.components
         public function set target(value:Boolean):void
         {
            this.assign("target", value);
+        }
+
+          /**
+         * 是否需要跳转地址
+         * @returns {void}
+         */
+        public function get jumpUrl():Boolean
+        {
+            return !!this.assign("jumpUrl");
+        }
+
+         /**
+         * 是否需要跳转地址
+         * @returns {void}
+         */
+        public function set jumpUrl(value:Boolean):void
+        {
+            this.assign("jumpUrl",value);
         }
 
         /**
