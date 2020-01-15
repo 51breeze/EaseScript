@@ -16,10 +16,25 @@
                 return false; 
             }
 
+            var datalist:Array = this.assign( "datalist" ) as Array;
+
+            if( hostComponent.jumpUrl && hostComponent.viewport )
+            {
+                var segment:Object = Locator.create( Locator.url() ) as Object;
+                for(var index:int=0;index < datalist.length;index++)
+                {
+                    if( datalist[index].link === href )
+                    {
+                        segment.query.current = index;
+                        target.property("href",  Locator.toUrl( segment ) );
+                        return true;
+                    }
+                }
+            }
+
             var event:NavigateEvent = new NavigateEvent( NavigateEvent.URL_JUMP_BEFORE );
             event.content = href;
             event.originalEvent = e;
-            var datalist:Array = this.assign( "datalist" ) as Array;
             if( datalist )
             {
                 for(var i:int in datalist)
@@ -31,6 +46,7 @@
                     }
                 }
             }
+
             hostComponent.dispatchEvent(event);
         }
 
@@ -42,7 +58,7 @@
     <s:Declare>
        const {
            target:Boolean=false,
-           datalist:Array=[],
+           datalist:Array=[]
         } = dataset;
     </s:Declare>
 

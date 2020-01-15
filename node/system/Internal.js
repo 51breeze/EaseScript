@@ -30,10 +30,11 @@ $Symbol,
 $console
 ){
 
+   
 /**
  * 环境参数配置
  */
-var env = Internal.env = {
+var env = Internal.env = global.__ENV__ = global.__ENV__ || {
     'BROWSER_IE': 'IE',
     'BROWSER_FIREFOX': 'FIREFOX',
     'BROWSER_CHROME': 'CHROME',

@@ -44,6 +44,11 @@ package es.core
             return _context;
         }
 
+         /**
+         * 获取一个唯一的元素键值
+         * @protected
+         * @return {String}
+         */
         override protected function getUniqueKey( key:String='', flag:Boolean = true ):String
         {
             return flag ? "es-"+key : key;

@@ -211,7 +211,6 @@ package es.core
          * 一个标记用来区分是否需要重新生成子级列表
          */
         private var invalidate:Boolean=true;
-        private var lastRenderChildren:Array = [];
 
         /**
          * 创建并更新子级元素
@@ -226,10 +225,17 @@ package es.core
             }
 
             var children:Array = this.render();
-            this.lastRenderChildren = children;
             this.updateChildren(this, children );
             this.updateInstallState();
-            
+
+            if( this.hasEventListener(ElementEvent.CHANGE) )
+            {
+                var eleEvent:ElementEvent = new ElementEvent( ElementEvent.CHANGE );
+                eleEvent.parent=this.element;
+                eleEvent.child=children;
+                this.dispatchEvent( eleEvent );
+            }
+ 
             this.mount();
             this.updateDisplayList();
 
@@ -267,18 +273,20 @@ package es.core
         * @param events
         */
         [RunPlatform(client)]
-        protected function bindEvent(index:int,uniqueKey:*,target:Object,events:Object):void
+        protected function bindEvent(index:int,uniqueKey:*,target:Object,events:Array):void
         {
             if( !(events && target) )return;
             var uukey:String = (index+""+uniqueKey) as String;
             var data:Object = bindEventMaps[uukey] as Object;
             if( !data )
             {
+                data = {items:{},origin:target};
+
                 if( target is Array )
                 {
                     target = new Element( target );
                 }
-                data = {items:{},origin:target};
+
                 bindEventMaps[uukey] = data;
                 if( target instanceof EventDispatcher )
                 {
@@ -287,20 +295,34 @@ package es.core
                     data.eventTarget = new EventDispatcher(target);
                 }
             }
-            for( var p:String in events)
-            {
-                if( data.items[ p ] !== events[p] )
-                {
-                    if( data.items[ p ] )
-                    {
-                        data.eventTarget.removeEventListener( p , data.items[ p ] );
-                    }
 
-                    if( events[p] )
+            var start:int = 0;
+            while( start < events.length )
+            {
+                var type:String = events[ start++ ]  as String;
+                var handle:Function = events[ start++ ]  as Function;
+          
+                if( typeof type !=="string" )
+                {
+                    throw new TypeError("Invalid event type. can only be string.");
+                }
+
+                if( data.items[ type ] !== handle  )
+                {
+                    if( data.items[ type ] )
                     {
-                        data.items[ p ] = events[p];
-                        data.eventTarget.addEventListener(p,events[p],false,0,this);
+                        (data.eventTarget as EventDispatcher).removeEventListener( type , data.items[ type ] as Function );
                     }
+                    
+                    if( handle  )
+                    {
+                        if( !System.isFunction(handle) )
+                        {
+                            throw new TypeError("Invalid event handle. can only be Function.");
+                        }
+                        (data.eventTarget as EventDispatcher).addEventListener( type, handle, false, 0, this );
+                    }
+                    data.items[ type ] = handle;
                 }
             }
         }
@@ -378,19 +400,17 @@ package es.core
         * @param events 绑定元素的事件
         * @returns {Object} 一个表示当前节点元素的对象
         */ 
-        protected function createElement(index:int,uniqueKey:int, name:String, children:*=null, attrs:Object=null,update:Object=null,events:*=null):Object
+        protected function createElement(index:int,uniqueKey:int, name:String, children:*=null, attrs:Object=null,update:Object=null,events:Array=null):Object
         {
             var uukey:String = this.getUniqueIndex(index, uniqueKey);
             var obj:Node = this.getUniqueElement( uukey ) as Node;
             if( !obj )
             {
                 when( RunPlatform(client) ){
-                    when( Syntax(origin,javascript,false) ){
-                        if( this.inDomExists() )
-                        {
-                            obj = this.findElement( this.getUniqueKey( uukey ) );
-                        } 
-                    }
+                    if( this.inDomExists() )
+                    {
+                        obj = this.findElement( this.getUniqueKey( uukey ) );
+                    } 
                 }
                 obj = this.setUniqueElement(uukey, obj || document.createElement( name ) ) as Node;
                 if( attrs )
@@ -421,7 +441,7 @@ package es.core
                 this.attributes(obj,update);
             }
 
-            this.bindEvent(index,uniqueKey,obj,events);  
+            this.bindEvent(index,uniqueKey,obj,events);
             return obj;
         }
 
@@ -435,7 +455,7 @@ package es.core
         * @param events 绑定元素的事件
         * @returns {Object} 一个表示当前节点元素的对象
         */ 
-        protected function createComponent(index:int,uniqueKey:int, classTarget:Class, tagName:String=null, children:*=null, attrs:Object=null,update:Object=null,events:*=null):IDisplay
+        protected function createComponent(index:int,uniqueKey:int, classTarget:Class, tagName:String=null, children:*=null, attrs:Object=null,update:Object=null,events:Array=null):IDisplay
         {
             var uukey:String = this.getUniqueIndex(index, uniqueKey);
             var obj:IDisplay = this.getUniqueElement(uukey) as IDisplay;
@@ -650,11 +670,14 @@ package es.core
                         {
                             childDisplay.es_internal::setParentDisplay( parentDisplay );
                         }
-                        
-                        var e:ElementEvent=new ElementEvent( ElementEvent.ADD );
-                        e.parent = parentDisplay || parent;
-                        e.child = newNode;
-                        childDisplay.element.dispatchEvent( e );
+
+                        if( (childDisplay as EventDispatcher).hasEventListener( ElementEvent.ADD ) )
+                        {
+                            var e:ElementEvent=new ElementEvent( ElementEvent.ADD );
+                            e.parent = parentDisplay || parent;
+                            e.child = newNode;
+                            (childDisplay as EventDispatcher).dispatchEvent( e );
+                        }
                     }
                 }
                 i++;

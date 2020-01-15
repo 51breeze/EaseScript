@@ -55,9 +55,17 @@ package es.core
             var index:int = 0;
             for(;index<len;index++)
             {
-                if( value[0] is IDisplay )
+                if( value[index] is IDisplay )
                 {
-                   this.addChild( value[0] as IDisplay );
+                   this.addChild( value[index] as IDisplay );
+
+                }else if( value[index] instanceof Node )
+                {
+                   this.addChild( new Display( new Element( value[index] ) ) );
+                   
+                }else if(  value[index] instanceof Element )
+                {
+                    this.addChild( new Display( value[index] as Element ) ); 
                 }
             }
         };

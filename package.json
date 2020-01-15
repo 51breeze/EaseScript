@@ -1,6 +1,6 @@
 {
   "name": "easescript",
-  "version": "1.2.6",
+  "version": "1.2.7",
   "description": "EaseScript",
   "main": "lib/index.js",
   "bin": {
@@ -31,6 +31,8 @@
     "less": "^2.7.3",
     "source-map": "^0.7.3",
     "libxmljs": "^0.19.7",
-    "uglify-js": "~3.1.1"
+    "uglify-js": "~3.1.1",
+    "mysql": "^2.17.1",
+    "axios": "^0.19.0"
   }
 }

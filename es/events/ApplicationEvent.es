@@ -14,6 +14,6 @@ package es.events
         public function ApplicationEvent(type:String, bubbles:Boolean=true, cancelable:Boolean=true)
         {
             super(type, bubbles, cancelable);
-        };
+        }
     }
 }

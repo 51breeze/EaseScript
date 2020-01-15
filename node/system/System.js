@@ -40,6 +40,7 @@ var Object = require("./Object.js");
 var Array = require("./Array.js");
 var Reflect = require("./Reflect.js");
 var EventDispatcher = require("./EventDispatcher.js");
+var Window = require("./Window.js");
 var $Object = Internal.$Object;
 var $Array = Internal.$Array;
 var $Function = Internal.$Function;
@@ -541,7 +542,7 @@ System.getGlobalEvent=function getGlobalEvent()
 {
       if( _globalEvent===null )
       {
-          _globalEvent = new EventDispatcher( window );
+          _globalEvent = new EventDispatcher( Window.window );
       }
       return _globalEvent;
 }

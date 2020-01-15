@@ -36,18 +36,14 @@ package es.core
            event.cmd = cmd;
            event.callback = callback;
            event.params = args;
-           if( target.hasEventListener(type) )
+           var global:EventDispatcher = System.getGlobalEvent();
+           if( global.hasEventListener(type) )
            {
-               target.dispatchEvent( event );
+               global.dispatchEvent( event );
                return event;
            }
            throw new ReferenceError("No binding to the specified '"+type+"' pipeline.");
        }
-
-       /**
-       * @private 
-       */ 
-       static private var asynchCallCouter:int = 0;
 
       /**
        * 生成一个响应结果的回调函数
@@ -59,25 +55,17 @@ package es.core
            if( args.length > 0 && args[ args.length - 1 ] instanceof Function )
            {
                 fn = args.pop() as Function;
-           }
-
-           SystemManage.incrementServerCouter();
-           return (result:*)=>{
-               
-                if( fn )
-                {
-                    fn( result );
-
-                }else
-                {
+           }else
+           {
+                fn = (result:*)=>{
                     if( result !== false ){
                         this.success( result );
                     }else{
                         this.failed( result as String );
                     }
-                }
-                SystemManage.decrementServerCouter();
-           };
+                };
+           }
+           return SystemManage.getSystemManage().createTaskPromise( fn );
        }
 
        /**

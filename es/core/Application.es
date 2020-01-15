@@ -24,7 +24,7 @@ package es.core
        public function Application()
        {
            super( document );
-           when( Syntax(origin) )
+           when( RunPlatform(server) )
            {
                 this.appContainer = Element.createElement("div");
                 this.appContainer.className="application";
@@ -277,6 +277,18 @@ package es.core
                 });
             }
        }
+
+       /**
+         * 实现热替换, 一般用于开发环境中
+         * @protected
+         */
+        [Env(development)]
+        public hotUpdate(newClass:Class, oldView:View):void
+        {
+            var newView:View = new newClass( this ) as View;
+            newView.dataset= this.dataset;
+            this.render( newView );
+        }
 
        /**
         * 渲染并且显示一个视图

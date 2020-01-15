@@ -167,16 +167,22 @@ function loadScript(filename,callback){
  * @param module
  * @param method
  */
-function start(module, method)
+function start(module, method, args )
 {
     var main = require( module );
+    if( typeof method === "function" )
+    {
+        method( main, args);
+        return;
+    }
+
     var obj = new main();
     global.dispatchEvent(new Event(Event.INITIALIZING));
     if( method )
     {
         if( typeof obj[method] === "function" )
         {
-            obj[method]();
+            obj[method].apply(obj, args||[]);
         }else{
             throw new ReferenceError( method+" is not exist.");
         }
@@ -323,14 +329,14 @@ var env={
     "LOAD_CSS_PATH":"[CODE[CSS_LOAD_PATH]]",
     "WORKSPACE":"[CODE[WORKSPACE]]",
     "MODULE_SUFFIX":"[CODE[MODULE_SUFFIX]]",
-    "HTTP_DISPATCHER":function(module, method, callback)
+    "HTTP_DISPATCHER":function(module, method, args)
     {
         identifier = env.WORKSPACE+module+env.MODULE_SUFFIX;
 
         //如果模块类已经加载
         if( require.has( identifier ) )
         {
-            typeof callback === "function" ? callback( start(identifier, method) ) : start(identifier, method);
+           start(identifier, method, args);
         }
         //需要加载模块及模块相关脚本
         else
@@ -344,7 +350,7 @@ var env={
 
             //加载模块依赖文件
             loader(deps, function (){
-                typeof callback === "function" ? callback( start(identifier, method) ) : start(identifier, method);
+                start(identifier, method, args);
             });
         }
     }
@@ -377,7 +383,11 @@ global.addEventListener(Event.READY,function (e) {
     var router = match( routeMap, path );
     if( !router && env.HTTP_DEFAULT_ROUTE )
     {
-        router = match( routeMap, env.HTTP_DEFAULT_ROUTE.split("@")[0] );
+        router ={
+            provider:env.HTTP_DEFAULT_ROUTE,
+            props:[],
+            args:[]
+        }
     }
 
     if( router )
@@ -386,8 +396,9 @@ global.addEventListener(Event.READY,function (e) {
         var module = controller[0];
         var method = controller[1];
         env.HTTP_ROUTE=router.provider;
-        env.HTTP_PATH = path ;
-        env.HTTP_DISPATCHER( module,  method);
+        env.HTTP_PATH = path;
+        env.HTTP_PARAMS = router.args;
+        env.HTTP_DISPATCHER(module, method, router.args);
 
     }else if( global.dispatchEvent( new Event("ROUTE_NOT_EXISTS") ) )
     {

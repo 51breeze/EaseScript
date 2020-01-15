@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<s:View uu="sss" xmlns:s="es.core"  xmlns:c="es.components" xmlns:b="com" xmlns:p="view.page">
+    <s:Metadata>[HostComponent("IndexApplication")]</s:Metadata>
+    <s:Script>
+    <![CDATA[
+
+       private var contentChildren:Array=[];
+       private contentChanged(e:ElementEvent)
+       {
+           if( e.child instanceof Array )
+           {
+               contentChildren = e.child as Array;
+
+           }else if( contentChildren.indexOf(e.child) < 0  )
+           {
+               contentChildren.push( e.child );
+           }
+           (hostComponent as Application).assign("contentChildren", contentChildren );
+       }
+
+    ]]>
+    </s:Script>
+
+     <!--声明一组变量值 -->
+     <s:Declare>
+        const {
+            message:String="title is default"
+         } = dataset;
+     </s:Declare>
+
+    <head>
+        <title>title</title>
+        <meta charset="UTF-8" http-equiv="X-UA-Compatible" />
+        <meta name="keyword" http-equiv="{message}" />
+    </head>
+
+    <c:Navigate id="@navigate" width="120" viewport="@content" target="false" jumpUrl="true" >
+        <c:source>@hostComponent.menus</c:source>
+    </c:Navigate>
+
+    <div>
+        <div style="width: 300px; float: left; height: 300px;">
+            @message
+        </div>
+        <s:Container  style="width: 600px; float: left;" id="@content"  ElementEvent.CHANGE="{contentChanged}" >
+        </s:Container>
+    </div>
+
+</s:View>

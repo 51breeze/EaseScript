@@ -265,7 +265,7 @@ Locator.match = function match( name )
         segments = Locator.create(name);
     }
     if( !segments )return null;
-    if( segments.host !== location.hostname ){
+    if( segments.host !== Locator.host() ){
         return null;
     }
     var pathName = System.environments("URL_PATH_NAME");

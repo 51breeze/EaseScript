@@ -1,6 +1,5 @@
 <?php
 define("EASESCRIPT_ROOT", realpath( __DIR__."[CODE[EASESCRIPT_ROOT]]") );
-define("URL_PATH_NAME", "[CODE[STATIC_URL_PATH_NAME]]");
 spl_autoload_register(function( $name )
 {
     static $globals=['BaseObject','ArrayList','String','EventDispatcher','Event',"PropertyEvent",
@@ -73,6 +72,10 @@ class Response
 
     public function send( $content )
     {
+        if( $content instanceof \es\system\BaseObject )
+        {
+            $content = $content->valueOf();
+        }
         $this->response->setContent( $content );
     }
 
@@ -91,7 +94,6 @@ class Response
     }
 }
 
-
 function Element($selector,  $context = null)
 {
     return new es\system\Element( $selector,  $context);
@@ -99,38 +101,111 @@ function Element($selector,  $context = null)
 
 class EaseScript extends \es\system\EventDispatcher
 {
-    private $routes = array();
-    //运行环境相关信息
-    private $environmentMap = null;
-    public function __construct( &$routes )
+    /**
+     * @private
+     */
+    private $env = null;
+
+    /**
+     * @private
+     */
+    private $pipelines=null;
+
+    /**
+     * @private
+     */
+    private $app=null;
+
+    /**
+     * @Constructor
+     */
+    public function __construct( $app )
     {
         parent::__construct( \es\system\Document::document() );
-        $this->routes = &$routes;
 
+        $this->app = $app;
         $env = \es\system\System::$env;
+        $env->APP = $this;
         $env->HTTP_DEFAULT_ROUTE = "[CODE[DEFAULT_BOOTSTRAP_ROUTER_PROVIDER]]";
-        $env->HTTP_ROUTES = $routes;
-        $env->URL_PATH_NAME = URL_PATH_NAME;
+        $env->HTTP_ROUTES = [CODE[SERVICE_ROUTE_LIST]];
+        $env->HTTP_ROUTE  = null;
+        $env->HTTP_PATH   = null;
+        $env->HTTP_PARAMS = null;
+        $env->URL_PATH_NAME = "[CODE[STATIC_URL_PATH_NAME]]";
         $env->VERSION =[CODE[VERSION]];
         $env->ROOT_PATH = EASESCRIPT_ROOT;
         $env->COMMAND_SWITCH =[CODE[COMMAND_SWITCH]];
         $env->LOAD_JS_PATH ="[CODE[JS_LOAD_PATH]]";
         $env->LOAD_CSS_PATH ="[CODE[CSS_LOAD_PATH]]";
         $env->LOAD_SCRIPTS = new \es\system\BaseObject();
-        $env->HTTP_DISPATCHER = function($module, $method) use( $env )
+        $env->APP_CONFIG = new \stdClass();
+        $env->HTTP_DISPATCHER = function($module, $method, $args=null)use( $env )
         {
-             $module = str_replace('.','\\',$module);
+            $module = str_replace('.','\\',$module);
+
+            if( is_callable($method) )
+            {
+                return method( $module );
+            }
+
              $obj = new $module();
-             $this->bindPipeline( $obj );
-             call_user_func_array( array($obj, $method), []);
+             if( !method_exists( $obj, $method ) )
+             {
+                  throw new \Exception("{$method} is exists. in the ".$module );
+             }
+
+             if( $args instanceof \es\system\BaseObject)
+             {
+                 $args = $args->valueOf();
+                 if( is_object($args) )
+                 {
+                    $args = array_values( (array)$args );
+                 }
+             }
+             call_user_func_array( array($obj, $method), $args ?: []);
         };
 
         $scripts = json_decode('[CODE[LOAD_SCRIPTS]]');
         foreach( $scripts as $key=>$value)
         {
-            $env->LOAD_SCRIPTS[ $key ] = new \es\system\ArrayList( $value );
+            $env->LOAD_SCRIPTS->$key = new \es\system\ArrayList( $value );
         }
-        $this->environmentMap = $env;
+
+        $config_path = dirname(__FILE__) . "/config.json";
+        if( file_exists($config_path) )
+        {
+            $env->APP_CONFIG =(object)json_decode( file_get_contents(  $config_path ) );
+        }
+
+        if( $env->HTTP_DEFAULT_ROUTE )
+        {
+            if( !isset($env->HTTP_ROUTES["get"]) )
+            {
+                $env->HTTP_ROUTES["get"] = [];
+            }
+            $env->HTTP_ROUTES["get"]["/"] = $env->HTTP_DEFAULT_ROUTE;
+        }
+
+        $this->env = $env;
+        $this->pipelines = new \stdClass();
+    }
+
+    /**
+     * 获取指定的配置项
+     * @param {*} name 
+     */
+    public function getConfig( $name )
+    {
+        return $name ? $this->env->APP_CONFIG->$name ?? null : $this->env->APP_CONFIG;
+    }
+
+    /**
+     * 获取指定的环境选项
+     * @param {*} name 
+     */
+    public function getEnv( $name )
+    {
+        return $name ? $this->env->$name ?? null : $this->env;
     }
 
     /**
@@ -193,26 +268,28 @@ class EaseScript extends \es\system\EventDispatcher
     }
 
     /**
-     * @var array
-     */
-    private $pipelines=array();
-
-    /**
      * 绑定管道操作服务
      * @param $name
-     * @param Closure $callback
+     * @param Closure $factor
      */
-    public function pipe($name, \Closure $callback, $priority=-500 )
+    public function pipe($name, \Closure $factor)
     {
-        array_push($this->pipelines, [$name, $callback, $priority]);
-    }
-
-    public function bindPipeline( \es\system\EventDispatcher $target )
-    {
-        foreach ($this->pipelines as $pipe)
+        switch( strtolower($name) )
         {
-            $target->addEventListener($pipe[0], $pipe[1], false, $pipe[2]);
+            case "database" :
+                $name = \es\events\PipeLineEvent::PIPELINE_DATABASE;
+            break;
+            case "redis" :
+                $name = \es\events\PipeLineEvent::PIPELINE_REDIS;
+            break;
+            default:
+                throw new \Exception( $name . " is not supported.");
         }
+
+        \es\system\System::getGlobalEvent()->addEventListener( $name, function(\es\events\PipeLineEvent $e)use($factor)
+        {
+            $factor( $e->cmd, $e->params, $e->callback );
+        });
     }
 
     /**
@@ -221,32 +298,26 @@ class EaseScript extends \es\system\EventDispatcher
      */
     public function bindRoute(\Closure $callback)
     {
-        $env = $this->environmentMap;
-        $env->BOOT_APP = $this;
-        foreach ( $this->routes as $method => $route )
+        $env = $this->env;
+        foreach ( $env->HTTP_ROUTES as $method => $route )
         {
             foreach ($route as $name => $provider )
             {
                 call_user_func($callback, $method, $name,
                 function( Illuminate\Http\Request $request, Illuminate\Http\Response $response, $params )
-                use( $provider , $name, $env )
+                use( $provider , $name, &$env )
                 {
-                     $env->HTTP_ROUTE_CONTROLLER = $provider;
-                     $env->HTTP_ROUTE_PATH = $name;
-                     list($module,$method) = explode("@", $provider);
-                     $module = str_replace('.','\\',$module);
-
+                     $env->HTTP_ROUTE  = $provider;
+                     $env->HTTP_PATH   = $name;
+                     $env->HTTP_PARAMS = $params;
                      $env->HTTP_REQUEST  = new Request( $request, $params );
                      $env->HTTP_RESPONSE = new Response( $response );
-                    
-                     $obj = new $module();
-                     $this->bindPipeline( $obj );
-                     call_user_func_array( array($obj, $method), $params);
+
+                     list($module,$method) = explode("@", $provider);
+                     call_user_func( $env->HTTP_DISPATCHER,  $module, $method, $params);
                      return $response;
                 });
             }
         }
     }
 }
-$routes=[CODE[SERVICE_ROUTE_LIST]];
-return new EaseScript($routes);

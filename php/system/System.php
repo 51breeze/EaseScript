@@ -368,7 +368,7 @@ final class System
     {
         if( static::$globalEvent===null )
         {
-            static::$globalEvent = new EventDispatcher( static::window() );
+            static::$globalEvent = new EventDispatcher( \es\system\Window::window() );
         }
         return static::$globalEvent;
     }
