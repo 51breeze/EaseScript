@@ -179,6 +179,12 @@ final class System
         return !is_numeric($value) || $value === NaN;
     }
 
+    public static function isEmpty($value, $flag=false)
+    {
+        $flag = !($flag === true && $value===0);
+        return  empty($value) && $flag;
+    }
+
     public static function range($low, $high, $step=1)
     {
         return $high > $low ? range($low, $high, $step) : array($low);

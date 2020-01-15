@@ -61,7 +61,12 @@ class Document extends HTMLElement
 
     get title()
     {
-        return this._title;
+        return this._title.textContent;
+    }
+    
+    set title( value )
+    {
+        this._title.textContent=value;
     }
 
     get head()

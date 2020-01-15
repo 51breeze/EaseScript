@@ -238,9 +238,13 @@ package es.core
 
                     document.title = this.title || "title";
 
-                    var script:Node = new HTMLElement('script') as Node;
-                    script.content='window["'+Interaction.key+'"]='+ JSON.stringify( Interaction.dataset );
-                    document.head.appendChild( script );
+                    const dataset:Object = Interaction.dataset;
+                    if( !System.isEmpty(dataset) )
+                    {
+                        var script:Node = new HTMLElement('script') as Node;
+                        script.content='window["'+Interaction.key+'"]='+ JSON.stringify( dataset );
+                        document.head.appendChild( script );
+                    }
 
                     this.metas.map( (item:Object)=>{
                         var script:Node = new HTMLElement('meta') as Node;
