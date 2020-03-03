@@ -1,6 +1,6 @@
 {
   "name": "easescript",
-  "version": "1.2.7",
+  "version": "1.2.6",
   "description": "EaseScript",
   "main": "lib/index.js",
   "bin": {
@@ -8,13 +8,19 @@
     "es": "./bin/es.js"
   },
   "scripts": {
-    "version": "node ./bin/es.js -V"
+    "version": "node ./bin/es.js -V",
+    "dev": "node ./bin/es.js -p ./test -o ./build --clean --source-file --minify disabled -s node -m production --webroot",
+    "test": "node ./bin/es.js -p ./test -o D:/workspace/node --clean --source-file --minify disabled -s node -m production --webroot",
+    "js": "node ./bin/es.js -p ./test -o D:/workspace/node --clean --source-file --minify disabled -s javascript --sps node -m production --webroot",
+    "php": "node ./bin/es.js -p ./test -o D:/workspace/php/blog --clean --source-file --minify disabled -s php -m production --webroot"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/51breeze/EaseScript.git"
   },
   "keywords": [
+    "es",
+    "ease",
     "script",
     "EaseScript",
     "web"
@@ -26,13 +32,13 @@
   },
   "homepage": "https://github.com/51breeze/EaseScript#readme",
   "dependencies": {
+    "axios": "^0.19.0",
     "colors": "~1.1.2",
     "commander": "~2.11.0",
     "less": "^2.7.3",
-    "source-map": "^0.7.3",
     "libxmljs": "^0.19.7",
-    "uglify-js": "~3.1.1",
     "mysql": "^2.17.1",
-    "axios": "^0.19.0"
+    "source-map": "^0.7.3",
+    "uglify-js": "~3.1.1"
   }
 }
